@@ -7,9 +7,9 @@ export default function BaseHeader(props) {
     title,
     menuButton,
     backButton,
-    optionsButton,
     navigation,
     actions,
+    options,
     ...otherProps
   } = props;
   function openDrawer() {
@@ -47,13 +47,13 @@ export default function BaseHeader(props) {
   );
 
   const RightHeaderButton = () => {
-    if (optionsButton) {
+    if (options) {
       return (
         <OptionsMenu
           customButton={myIcon}
           destructiveIndex={1}
-          options={['Edit', 'Delete', 'Cancel']}
-          actions={[]}
+          options={options}
+          actions={actions}
         />
       );
     }
@@ -78,5 +78,4 @@ export default function BaseHeader(props) {
 BaseHeader.defaultProps = {
   menuButton: true,
   backButton: false,
-  optionsButton: false,
 };

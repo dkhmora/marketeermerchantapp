@@ -11,20 +11,18 @@ import {
 } from 'native-base';
 
 export default function BaseListItem(props) {
-  const {keyText, valueText, editable, ...otherProps} = props;
+  const {image = '', leftText, middleText, editable, ...otherProps} = props;
 
   return (
     <ListItem {...otherProps} button={true} style={{minHeight: 80}}>
-      <Left style={{flex: 7}}>
-        <Text>{keyText}</Text>
-      </Left>
+      <Left style={{flex: 7}}>{leftText ? <Text>{leftText}</Text> : null}</Left>
       <Body style={{flex: 9}}>
         {editable ? (
           <Item rounded>
-            <Input placeholder="Edit" value={valueText} />
+            <Input placeholder="Edit" value={middleText} />
           </Item>
         ) : (
-          <Text>{valueText}</Text>
+          <Text>{middleText}</Text>
         )}
       </Body>
       <Right style={{flex: 1}}>
