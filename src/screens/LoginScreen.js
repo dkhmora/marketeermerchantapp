@@ -1,21 +1,12 @@
 import React from 'react';
-import {
-  Text,
-  Container,
-  Button,
-  Grid,
-  Col,
-  Row,
-  Input,
-  Item,
-} from 'native-base';
+import {Text, Container, Button, Grid, Row, Input, Item} from 'native-base';
 
 export const LoginScreen = ({navigation}) => {
   return (
     <Container>
       <Grid style={{padding: 18}}>
         <Row
-          size={3}
+          size={7}
           style={{
             justifyContent: 'flex-end',
             alignItems: 'center',
@@ -23,44 +14,32 @@ export const LoginScreen = ({navigation}) => {
           }}>
           <Text>Marketeer.ph</Text>
           <Text>for Merchants</Text>
-          <Text style={{marginTop: '20%'}}>Welcome!</Text>
+          <Text style={{marginTop: '40%'}}>Welcome!</Text>
         </Row>
         <Row
-          size={5}
+          size={8}
           style={{
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             flexDirection: 'column',
-            paddingTop: '30%',
           }}>
           <Item rounded>
             <Input placeholder="Email/Phone Number" />
           </Item>
-          <Item rounded style={{marginTop: 12}}>
+          <Item rounded style={{marginTop: 18}}>
             <Input placeholder="Password" />
           </Item>
           <Button
-            rounded
-            style={{marginTop: 36}}
+            full
+            style={{marginTop: 36, borderRadius: 24}}
             onPress={() => navigation.dangerouslyGetParent().navigate('Home')}>
-            <Text
-              style={{
-                width: '100%',
-                textAlign: 'center',
-              }}>
-              Login
-            </Text>
+            <Text>Login</Text>
           </Button>
           <Button
-            rounded
-            style={{marginTop: 12}}
+            full
+            bordered
+            style={{marginTop: 18, borderRadius: 24}}
             onPress={() => navigation.navigate('SignUp')}>
-            <Text
-              style={{
-                width: '100%',
-                textAlign: 'center',
-              }}>
-              Sign Up
-            </Text>
+            <Text>Sign Up</Text>
           </Button>
         </Row>
       </Grid>
