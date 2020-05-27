@@ -7,20 +7,7 @@ import BaseTab from '../navigation/BaseTab';
 const StackOrder = createStackNavigator();
 
 export const StoreItemsScreen = ({navigation}) => {
-  const categories = [
-    {
-      name: 'Fruits',
-    },
-    {
-      name: 'Vegetables',
-    },
-    {
-      name: 'Drinks',
-    },
-    {
-      name: 'Others',
-    },
-  ];
+  const categories = ['Fruits', 'Vegetables', 'Drinks', 'Others'];
 
   const collection = 'items';
   const leftTextKey = 'itemId';
