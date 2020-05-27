@@ -25,8 +25,6 @@ const categories = [{
 export default function BaseTab({route}) {
   const {categories, collection, leftTextKey, middleTextKey} = route.params;
 
-  console.log(route.params.leftTextKey);
-
   const scroll = categories.length > 2 ? true : false;
 
   return (
