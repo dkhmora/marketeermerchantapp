@@ -8,20 +8,7 @@ import OrderDetailsScreen from './OrderDetailsScreen';
 const StackOrder = createStackNavigator();
 
 export const OrdersScreen = ({navigation}) => {
-  const categories = [
-    {
-      name: 'Pending',
-    },
-    {
-      name: 'Accepted',
-    },
-    {
-      name: 'Shipped',
-    },
-    {
-      name: 'Completed',
-    },
-  ];
+  const categories = ['Pending', 'Accepted', 'Shipped', 'Completed'];
 
   const collection = 'orders';
   const leftTextKey = 'orderId';

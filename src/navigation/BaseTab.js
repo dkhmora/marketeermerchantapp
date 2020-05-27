@@ -35,10 +35,10 @@ export default function BaseTab({route}) {
         {categories.map((category) => {
           return (
             <TabBase.Screen
-              name={`${category.name}`}
+              name={`${category}`}
               component={BaseList}
               initialParams={{
-                categories,
+                category,
                 collection,
                 leftTextKey,
                 middleTextKey,
