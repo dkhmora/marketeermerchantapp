@@ -11,10 +11,17 @@ import {
 } from 'native-base';
 
 export default function BaseListItem(props) {
-  const {image = '', leftText, middleText, editable, ...otherProps} = props;
+  const {
+    image = '',
+    leftText,
+    middleText,
+    editable,
+    key,
+    ...otherProps
+  } = props;
 
   return (
-    <ListItem {...otherProps} button={true} style={{minHeight: 80}}>
+    <ListItem {...otherProps} button={true} style={{minHeight: 80}} key={key}>
       <Left style={{flex: 7}}>{leftText ? <Text>{leftText}</Text> : null}</Left>
       <Body style={{flex: 9}}>
         {editable ? (
