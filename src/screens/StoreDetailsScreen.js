@@ -18,8 +18,8 @@ export const StoreDetailsScreen = ({navigation}) => {
         <BaseListItem
           onPress={() => setEditable(!editable)}
           editable={editable}
-          keyText={`${_.startCase(item)}:`}
-          valueText={TestData[item]}
+          leftText={`${_.startCase(item)}:`}
+          middleText={TestData[item]}
           key={index}
         />
       );
