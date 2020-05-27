@@ -1,7 +1,24 @@
 import React from 'react';
 import {Text, Container, Button, Grid, Row, Input, Item} from 'native-base';
+import auth from '@react-native-firebase/auth';
 
-export const LoginScreen = ({navigation}) => {
+function signIn(email, password) {
+  auth()
+    .signInWithEmailAndPassword(email, password)
+    .then((userCredential) =>
+      console.log(
+        `User Account with email: ${userCredential.user.email} successfully logged in!`,
+      ),
+    )
+    .catch((err) => {
+      console.error(`Error: Something went wrong - ${err}`);
+    });
+}
+
+export function LoginScreen({navigation}) {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
   return (
     <Container>
       <Grid style={{padding: 18}}>
@@ -23,15 +40,22 @@ export const LoginScreen = ({navigation}) => {
             flexDirection: 'column',
           }}>
           <Item rounded>
-            <Input placeholder="Email/Phone Number" />
+            <Input
+              placeholder="Email/Phone Number"
+              onChangeText={(text) => setEmail(text)}
+            />
           </Item>
           <Item rounded style={{marginTop: 18}}>
-            <Input placeholder="Password" />
+            <Input
+              secureTextEntry
+              placeholder="Password"
+              onChangeText={(text) => setPassword(text)}
+            />
           </Item>
           <Button
             full
             style={{marginTop: 36, borderRadius: 24}}
-            onPress={() => navigation.dangerouslyGetParent().navigate('Home')}>
+            onPress={() => signIn(email, password)}>
             <Text>Login</Text>
           </Button>
           <Button
@@ -45,4 +69,4 @@ export const LoginScreen = ({navigation}) => {
       </Grid>
     </Container>
   );
-};
+}
