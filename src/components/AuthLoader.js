@@ -4,16 +4,16 @@ import AnimatedLoader from 'react-native-animated-loader';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-const merchantsCollection = firestore().collection('merchant_users');
-export default class Loader extends React.Component {
+const merchantUsersCollection = firestore().collection('merchant_users');
+export default class AuthLoader extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {visible: true, user: null};
+    this.state = {visible: true, user: null, merchantId: null};
   }
 
   onAuthStateChanged(user) {
     if (auth().currentUser != null) {
-      merchantsCollection
+      merchantUsersCollection
         .where(auth().currentUser.uid, '==', true)
         .get()
         .then((snapshot) => {
@@ -22,6 +22,7 @@ export default class Loader extends React.Component {
             console.log('Error: The user does not match with any merchants');
           } else {
             snapshot.forEach((doc) => {
+              this.setState({merchantId: doc.id.trim()});
               console.log(
                 `Current user is assigned to Merchant with doc id "${doc.id}"`,
               );
@@ -41,14 +42,19 @@ export default class Loader extends React.Component {
   }
 
   componentDidMount() {
-    auth().onAuthStateChanged(this.onAuthStateChanged.bind(this));
+    const subscriber = auth().onAuthStateChanged(
+      this.onAuthStateChanged.bind(this),
+    );
+    return subscriber;
   }
 
   componentDidUpdate() {
     if (!this.state.user) {
       this.props.navigation.navigate('Auth');
     } else {
-      this.props.navigation.navigate('Home');
+      this.props.navigation.navigate('Home', {
+        merchantId: this.state.merchantId,
+      });
     }
   }
 

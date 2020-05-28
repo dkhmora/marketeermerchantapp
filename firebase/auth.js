@@ -2,8 +2,6 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-const merchantsCollection = firestore().collection('merchant_users');
-
 function signIn(email, password) {
   auth()
     .signInWithEmailAndPassword(email, password)
@@ -23,4 +21,19 @@ function signOut() {
     });
 }
 
-export {signIn, signOut};
+const merchantDocId = firestore()
+  .collection('merchant_users')
+  .where(auth().currentUser.uid, '==', true)
+  .get()
+  .then((snapshot) => {
+    if (snapshot.empty) {
+      auth().signOut();
+      console.log('Error: The user does not match with any merchants');
+    } else {
+      snapshot.forEach((doc) => {
+        return doc.id;
+      });
+    }
+  });
+
+export {signIn, signOut, merchantDocId};
