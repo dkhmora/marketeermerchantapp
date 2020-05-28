@@ -4,7 +4,7 @@ import {StoreItemsScreen} from '../screens/StoreItemsScreen';
 import {StoreDetailsScreen} from '../screens/StoreDetailsScreen';
 import {OrdersScreen} from '../screens/OrdersScreen';
 
-export default function BaseDrawer() {
+export default function MainDrawer() {
   const Drawer = createDrawerNavigator();
 
   return (

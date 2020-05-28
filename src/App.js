@@ -1,9 +1,10 @@
 import React from 'react';
-import {Root, StyleProvider} from 'native-base';
+import {Root} from 'native-base';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
-import BaseDrawer from './navigation/BaseDrawer';
+import MainDrawer from './navigation/MainDrawer';
 import AuthStack from './navigation/AuthStack';
+import Loader from './components/Loader';
 
 const StackMain = createStackNavigator();
 
@@ -21,9 +22,10 @@ const NavigationTheme = {
 export default () => (
   <Root>
     <NavigationContainer theme={NavigationTheme}>
-      <StackMain.Navigator initialRouteName="Auth" headerMode="none">
+      <StackMain.Navigator initialRouteName="Loader" headerMode="none">
+        <StackMain.Screen name="Loader" component={Loader} />
         <StackMain.Screen name="Auth" component={AuthStack} />
-        <StackMain.Screen name="Home" component={BaseDrawer} />
+        <StackMain.Screen name="Home" component={MainDrawer} />
       </StackMain.Navigator>
     </NavigationContainer>
   </Root>
