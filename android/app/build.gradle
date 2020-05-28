@@ -136,6 +136,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     splits {
         abi {
@@ -191,6 +192,10 @@ android {
 
 dependencies {
     implementation project(':lottie-react-native')
+
+    implementation 'com.android.support:multidex:1.0.3'
+
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion

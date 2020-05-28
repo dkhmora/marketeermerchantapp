@@ -2,6 +2,7 @@ import React from 'react';
 import {Text, Container, List, Button, Grid, Row, Col} from 'native-base';
 import BaseListItem from '../components/BaseListItem';
 import BaseHeader from '../components/BaseHeader';
+import {signOut} from '../../firebase/auth';
 
 export const StoreDetailsScreen = ({navigation}) => {
   const TestData = {
@@ -39,7 +40,7 @@ export const StoreDetailsScreen = ({navigation}) => {
             </List>
           </Row>
           <Row size={1}>
-            <Button rounded style={{flex: 1}}>
+            <Button rounded style={{flex: 1}} onPress={() => signOut()}>
               <Text>Testing</Text>
             </Button>
           </Row>
