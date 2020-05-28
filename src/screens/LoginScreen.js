@@ -1,19 +1,6 @@
 import React from 'react';
 import {Text, Container, Button, Grid, Row, Input, Item} from 'native-base';
-import auth from '@react-native-firebase/auth';
-
-function signIn(email, password) {
-  auth()
-    .signInWithEmailAndPassword(email, password)
-    .then((userCredential) =>
-      console.log(
-        `User Account with email: ${userCredential.user.email} successfully logged in!`,
-      ),
-    )
-    .catch((err) => {
-      console.error(`Error: Something went wrong - ${err}`);
-    });
-}
+import {signIn} from '../../firebase/auth';
 
 export function LoginScreen({navigation}) {
   const [email, setEmail] = React.useState('');
