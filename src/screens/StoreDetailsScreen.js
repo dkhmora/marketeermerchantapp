@@ -1,11 +1,12 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {Text, Container, List, Button, Grid, Row, Col} from 'native-base';
+import AnimatedLoader from 'react-native-animated-loader';
+// Custom Components
 import BaseListItem from '../components/BaseListItem';
 import BaseHeader from '../components/BaseHeader';
+// Firebase
 import {signOut} from '../../firebase/auth';
-import firestore from '@react-native-firebase/firestore';
-import AnimatedLoader from 'react-native-animated-loader';
 import {getStoreDetails} from '../../firebase/store';
 
 export const StoreDetailsScreen = ({navigation, route}) => {
@@ -14,28 +15,6 @@ export const StoreDetailsScreen = ({navigation, route}) => {
   const [loading, setLoading] = React.useState(true);
   const [storeDetails, setStoreDetails] = React.useState(null);
   const [editable, setEditable] = React.useState(false);
-
-  /*
-  firestore()
-    .collection('merchants')
-    .doc(merchantId)
-    .collection('items')
-    .get()
-    .then((querySnapshot) => {
-      const data = [];
-      console.log('Total users: ', querySnapshot.size);
-
-      querySnapshot.forEach((documentSnapshot) => {
-        data.push(documentSnapshot.data());
-      });
-      return data;
-    })
-    .then((data) => (items = data))
-    .then(() => console.log(items))
-    .catch((err) => {
-      console.error(err);
-    });
-  */
 
   const StoreDetailsList = () => {
     if (storeDetails) {

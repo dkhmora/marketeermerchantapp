@@ -1,6 +1,9 @@
 import firestore from '@react-native-firebase/firestore';
 
-async function getStoreDetails(merchantId, {setStoreDetails, setLoading}) {
+async function getStoreDetails(
+  merchantId,
+  {setStoreDetails, setCategories, setLoading},
+) {
   await firestore()
     .collection('merchants')
     .doc(merchantId)
@@ -8,13 +11,43 @@ async function getStoreDetails(merchantId, {setStoreDetails, setLoading}) {
     .then((doc) => {
       return doc.data();
     })
-    .then((data) => setStoreDetails(data))
-    .then(() => {
-      setLoading(false);
+    .then((data) => {
+      if (setStoreDetails) {
+        setStoreDetails(data);
+      } else {
+        setCategories(data.item_categories);
+      }
     })
-    .catch((err) => {
-      console.error(err);
-    });
+    .then(() => {
+      if (setLoading) {
+        setLoading(false);
+      }
+    })
+    .catch((err) => console.error(err));
 }
 
-export {getStoreDetails};
+async function getStoreItems(merchantId, {setItems, setLoading}) {
+  await firestore()
+    .collection('merchants')
+    .doc(merchantId)
+    .collection('items')
+    .get()
+    .then((querySnapshot) => {
+      const data = [];
+      console.log('Total number of items: ', querySnapshot.size);
+
+      querySnapshot.forEach((documentSnapshot) => {
+        data.push(documentSnapshot.data());
+      });
+      return data;
+    })
+    .then((data) => setItems(data))
+    .then(() => {
+      if (setLoading) {
+        setLoading(false);
+      }
+    })
+    .catch((err) => console.error(err));
+}
+
+export {getStoreDetails, getStoreItems};
