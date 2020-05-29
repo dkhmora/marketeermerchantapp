@@ -50,4 +50,21 @@ async function getStoreItems(merchantId, {setItems, setLoading}) {
     .catch((err) => console.error(err));
 }
 
-export {getStoreDetails, getStoreItems};
+async function addStoreItem(
+  merchantId,
+  category,
+  name,
+  description,
+  unit,
+  price,
+  stock,
+) {
+  await firestore()
+    .collection('merchants')
+    .doc(merchantId)
+    .collection('items')
+    .add({category, name, description, unit, price, stock})
+    .then(() => console.log('Item added!'));
+}
+
+export {getStoreDetails, getStoreItems, addStoreItem};

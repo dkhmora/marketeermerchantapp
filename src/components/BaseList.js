@@ -1,9 +1,15 @@
 import React from 'react';
-import {Container, List} from 'native-base';
+import {Container, List, Fab, Icon} from 'native-base';
 import BaseListItem from './BaseListItem';
 
-export default function BaseList({navigation, route}) {
-  const {categoryItems, leftTextKey, middleTextKey} = route.params;
+export default function BaseList({route, navigation}) {
+  const {
+    pageCategory,
+    categoryItems,
+    leftTextKey,
+    middleTextKey,
+    fabButton,
+  } = route.params;
 
   const ListItems = () => {
     const listItem = categoryItems.map((item, index) => {
@@ -18,11 +24,29 @@ export default function BaseList({navigation, route}) {
     return listItem;
   };
 
+  const ButtonFab = () => {
+    if (fabButton) {
+      return (
+        <Fab
+          position="bottomRight"
+          style={{backgroundColor: '#5B0EB5'}}
+          onPress={() =>
+            navigation
+              .dangerouslyGetParent()
+              .navigate('Add Item', {pageCategory})
+          }>
+          <Icon name="add" />
+        </Fab>
+      );
+    }
+  };
+
   return (
     <Container style={{flex: 1}}>
       <List>
         <ListItems />
       </List>
+      <ButtonFab />
     </Container>
   );
 }

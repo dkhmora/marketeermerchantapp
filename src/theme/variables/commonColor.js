@@ -280,7 +280,7 @@ export default {
 
   // Other
   borderRadiusBase: platform === PLATFORM.IOS ? 5 : 2,
-  borderWidth: 1 / PixelRatio.getPixelSizeForLayoutSize(1),
+  borderWidth: 2 / PixelRatio.getPixelSizeForLayoutSize(1),
   contentPadding: 10,
   dropdownLinkColor: '#414142',
   inputLineHeight: 24,

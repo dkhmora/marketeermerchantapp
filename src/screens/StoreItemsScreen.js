@@ -6,6 +6,8 @@ import AnimatedLoader from 'react-native-animated-loader';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
 import BaseTab from '../navigation/BaseTab';
+import AddItemScreen from './AddItemScreen';
+
 // Firebase
 import {getStoreItems, getStoreDetails} from '../../firebase/store';
 
@@ -20,6 +22,7 @@ export const StoreItemsScreen = ({navigation, route}) => {
 
   const leftTextKey = 'name';
   const middleTextKey = 'description';
+  const fabButton = true;
 
   if (loading) {
     getStoreDetails(merchantId, {setCategories});
@@ -36,17 +39,24 @@ export const StoreItemsScreen = ({navigation, route}) => {
   }
 
   return (
-    <Container>
-      <BaseHeader title="Store Items" optionsButton navigation={navigation} />
-
-      <StackOrder.Navigator initialRouteName="Item Tab" headerMode="none">
-        <StackOrder.Screen
-          name="Item Tab"
-          component={BaseTab}
-          initialParams={{categories, items, leftTextKey, middleTextKey}}
-        />
-      </StackOrder.Navigator>
-    </Container>
+    <StackOrder.Navigator initialRouteName="Store Items" headerMode="none">
+      <StackOrder.Screen
+        name="Store Items"
+        component={BaseTab}
+        initialParams={{
+          categories,
+          items,
+          leftTextKey,
+          middleTextKey,
+          fabButton,
+        }}
+      />
+      <StackOrder.Screen
+        name="Add Item"
+        component={AddItemScreen}
+        initialParams={{merchantId}}
+      />
+    </StackOrder.Navigator>
   );
 };
 
