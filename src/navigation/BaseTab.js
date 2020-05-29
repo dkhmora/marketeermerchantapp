@@ -31,14 +31,16 @@ export default function BaseTab({route}) {
     <NavigationContainer theme={NavigationTheme} independent={true}>
       <TabBase.Navigator tabBarOptions={{scrollEnabled: scroll}}>
         {categories.map((category, index) => {
+          const categoryItems = items.filter((item) => {
+            return item.category === category;
+          });
           return (
             <TabBase.Screen
               name={`${category}`}
               component={BaseList}
               key={index}
               initialParams={{
-                category,
-                items,
+                categoryItems,
                 leftTextKey,
                 middleTextKey,
               }}
