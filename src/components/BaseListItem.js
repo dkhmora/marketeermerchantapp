@@ -16,12 +16,12 @@ export default function BaseListItem(props) {
     leftText,
     middleText,
     editable,
-    key,
+    index,
     ...otherProps
   } = props;
 
   return (
-    <ListItem {...otherProps} button={true} style={{minHeight: 80}} key={key}>
+    <ListItem {...otherProps} button={true} style={{minHeight: 80}} key={index}>
       <Left style={{flex: 7}}>{leftText ? <Text>{leftText}</Text> : null}</Left>
       <Body style={{flex: 9}}>
         {editable ? (

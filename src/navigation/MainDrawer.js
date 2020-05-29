@@ -6,7 +6,6 @@ import {OrdersScreen} from '../screens/OrdersScreen';
 
 export default function MainDrawer({route}) {
   const {merchantId} = route.params;
-  console.log(merchantId);
   const Drawer = createDrawerNavigator();
 
   return (
