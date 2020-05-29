@@ -23,21 +23,22 @@ const categories = [{
 }]; */
 
 export default function BaseTab({route}) {
-  const {categories, collection, leftTextKey, middleTextKey} = route.params;
+  const {categories, items, leftTextKey, middleTextKey} = route.params;
 
   const scroll = categories.length > 2 ? true : false;
 
   return (
     <NavigationContainer theme={NavigationTheme} independent={true}>
       <TabBase.Navigator tabBarOptions={{scrollEnabled: scroll}}>
-        {categories.map((category) => {
+        {categories.map((category, index) => {
           return (
             <TabBase.Screen
               name={`${category}`}
               component={BaseList}
+              key={index}
               initialParams={{
                 category,
-                collection,
+                items,
                 leftTextKey,
                 middleTextKey,
               }}
