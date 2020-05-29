@@ -3,10 +3,10 @@ import {Container, List} from 'native-base';
 import BaseListItem from './BaseListItem';
 
 export default function BaseList({navigation, route}) {
-  const {category, items, leftTextKey, middleTextKey} = route.params;
+  const {categoryItems, leftTextKey, middleTextKey} = route.params;
 
   const ListItems = () => {
-    const listItem = items.map((item, index) => {
+    const listItem = categoryItems.map((item, index) => {
       return (
         <BaseListItem
           leftText={`${item[`${leftTextKey}`]}`}
