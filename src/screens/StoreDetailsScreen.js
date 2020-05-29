@@ -6,16 +6,16 @@ import BaseHeader from '../components/BaseHeader';
 import {signOut} from '../../firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import AnimatedLoader from 'react-native-animated-loader';
+import {getStoreDetails} from '../../firebase/store';
+
 export const StoreDetailsScreen = ({navigation, route}) => {
   const {merchantId} = route.params;
+
   const [loading, setLoading] = React.useState(true);
   const [storeDetails, setStoreDetails] = React.useState(null);
-
-  console.log(merchantId);
+  const [editable, setEditable] = React.useState(false);
 
   /*
-  let items = null;
-
   firestore()
     .collection('merchants')
     .doc(merchantId)
@@ -37,24 +37,6 @@ export const StoreDetailsScreen = ({navigation, route}) => {
     });
   */
 
-  firestore()
-    .collection('merchants')
-    .doc(merchantId)
-    .get()
-    .then((doc) => {
-      return doc.data();
-    })
-    .then((data) => setStoreDetails(data))
-    .then(() => {
-      setLoading(false);
-      console.log(storeDetails);
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-
-  const [editable, setEditable] = React.useState(false);
-
   const StoreDetailsList = () => {
     if (storeDetails) {
       const listItem = Object.keys(storeDetails).map((item, index) => {
@@ -64,6 +46,7 @@ export const StoreDetailsScreen = ({navigation, route}) => {
             editable={editable}
             leftText={`${_.startCase(item)}:`}
             middleText={storeDetails[item]}
+            index={index}
             key={index}
           />
         );
@@ -72,10 +55,11 @@ export const StoreDetailsScreen = ({navigation, route}) => {
     }
   };
 
-  if (loading || !storeDetails) {
+  if (loading) {
+    getStoreDetails(merchantId, {setStoreDetails, setLoading});
     return (
       <AnimatedLoader
-        visible={true}
+        visible={loading}
         overlayColor="rgba(255,255,255,0.75)"
         source={require('../../assets/loader.json')}
         animationStyle={styles.lottie}
