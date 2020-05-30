@@ -9,7 +9,7 @@ import {StoreItemsScreen} from '../screens/StoreItemsScreen';
 import {StoreDetailsScreen} from '../screens/StoreDetailsScreen';
 import {OrdersScreen} from '../screens/OrdersScreen';
 import {signOut} from '../../firebase/auth';
-import {Icon, View, Text} from 'native-base';
+import {Icon, View, Text, Item, Label, Button} from 'native-base';
 
 export default function MainDrawer({route, navigation}) {
   const {merchantId} = route.params;
@@ -28,25 +28,14 @@ export default function MainDrawer({route, navigation}) {
               flexDirection: 'column',
             }}>
             <DrawerItemList {...props} />
-            <DrawerItem
-              style={{backgroundColor: '#455A64'}}
-              label={(props) => (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                  }}>
-                  <Icon
-                    name="log-out"
-                    type="Ionicons"
-                    style={{color: '#fff', marginRight: 12, marginLeft: 6}}
-                  />
-                  <Text style={{color: '#fff', textAlignVertical: 'center'}}>
-                    Sign out
-                  </Text>
-                </View>
-              )}
-              onPress={() => signOut({navigation})}
-            />
+            <Button
+              style={{
+                borderRadius: 24,
+                marginHorizontal: 12,
+              }}>
+              <Text>Sign Out</Text>
+              <Icon name="log-out" />
+            </Button>
           </DrawerContentScrollView>
         );
       }}>
