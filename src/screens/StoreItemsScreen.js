@@ -1,10 +1,8 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
-import {Container} from 'native-base';
 import {createStackNavigator} from '@react-navigation/stack';
 import AnimatedLoader from 'react-native-animated-loader';
 // Custom Components
-import BaseHeader from '../components/BaseHeader';
 import BaseTab from '../navigation/BaseTab';
 import AddItemScreen from './AddItemScreen';
 
@@ -19,10 +17,6 @@ export const StoreItemsScreen = ({navigation, route}) => {
   const [categories, setCategories] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [items, setItems] = React.useState(null);
-
-  const leftTextKey = 'name';
-  const middleTextKey = 'description';
-  const fabButton = true;
 
   if (loading) {
     getStoreDetails(merchantId, {setCategories});
@@ -46,9 +40,9 @@ export const StoreItemsScreen = ({navigation, route}) => {
         initialParams={{
           categories,
           items,
-          leftTextKey,
-          middleTextKey,
-          fabButton,
+          leftTextKey: 'name',
+          middleTextKey: 'description',
+          fabButton: true,
         }}
       />
       <StackOrder.Screen

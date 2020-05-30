@@ -17,12 +17,6 @@ const NavigationTheme = {
     border: '#eee',
   },
 };
-/*
-const categories = [{
-  name: 'Fruits',
-  leftTextKey: 'name',
-  middleTextKey: 'price'
-}]; */
 
 export default function BaseTab({route, navigation}) {
   const {

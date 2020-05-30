@@ -28,16 +28,14 @@ export default class AuthLoader extends React.Component {
               );
             });
             this.setState({user: user});
+            if (this.state.visible) {
+              this.setState({visible: false});
+            }
           }
         })
         .catch((err) => {
           console.log(`Error: Cannot read documents - ${err}`);
         });
-    } else {
-      this.setState({user: user});
-    }
-    if (this.state.visible) {
-      this.setState({visible: false});
     }
   }
 
