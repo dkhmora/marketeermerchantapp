@@ -14,13 +14,14 @@ const StackOrder = createStackNavigator();
 export const StoreItemsScreen = ({navigation, route}) => {
   const {merchantId} = route.params;
 
-  const [categories, setCategories] = React.useState(null);
+  const [categories, setCategories] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
   const [items, setItems] = React.useState(null);
 
   if (loading) {
-    getStoreDetails(merchantId, {setCategories});
-    getStoreItems(merchantId, {setItems, setLoading});
+    getStoreDetails(merchantId, {setCategories}).then(() => {
+      getStoreItems(merchantId, {setItems, setLoading});
+    });
     return (
       <AnimatedLoader
         visible={loading}

@@ -41,12 +41,14 @@ export default function BaseList({route, navigation}) {
     }
   };
 
-  return (
-    <Container style={{flex: 1}}>
-      <List>
-        <ListItems />
-      </List>
-      <ButtonFab />
-    </Container>
-  );
+  if (ListItems) {
+    return (
+      <Container style={{flex: 1}}>
+        <List>
+          <ListItems />
+        </List>
+        <ButtonFab />
+      </Container>
+    );
+  }
 }

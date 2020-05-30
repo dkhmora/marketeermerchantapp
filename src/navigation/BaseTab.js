@@ -2,8 +2,10 @@ import React from 'react';
 import {Container} from 'native-base';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import BaseList from '../components/BaseList';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, useLinkProps} from '@react-navigation/native';
 import BaseHeader from '../components/BaseHeader';
+import AnimatedLoader from 'react-native-animated-loader';
+import {StyleSheet} from 'react-native';
 
 const TabBase = createMaterialTopTabNavigator();
 
@@ -27,36 +29,60 @@ export default function BaseTab({route, navigation}) {
     fabButton,
   } = route.params;
 
-  const scroll = categories.length > 2 ? true : false;
+  if (categories) {
+    console.log(categories);
+    const scroll = categories.length > 2 ? true : false;
+
+    return (
+      <Container style={{flex: 1}}>
+        <BaseHeader title={route.name} optionsButton navigation={navigation} />
+
+        <NavigationContainer theme={NavigationTheme} independent={true}>
+          <TabBase.Navigator tabBarOptions={{scrollEnabled: scroll}}>
+            {categories.map((category, index) => {
+              const pageCategory = category;
+              const categoryItems = items.filter((item) => {
+                return item.category === category;
+              });
+              return (
+                <TabBase.Screen
+                  name={`${category}`}
+                  component={BaseList}
+                  key={index}
+                  initialParams={{
+                    pageCategory,
+                    categoryItems,
+                    leftTextKey,
+                    middleTextKey,
+                    fabButton,
+                  }}
+                />
+              );
+            })}
+          </TabBase.Navigator>
+        </NavigationContainer>
+      </Container>
+    );
+  }
 
   return (
-    <Container style={{flex: 1}}>
-      <BaseHeader title={route.name} optionsButton navigation={navigation} />
-
-      <NavigationContainer theme={NavigationTheme} independent={true}>
-        <TabBase.Navigator tabBarOptions={{scrollEnabled: scroll}}>
-          {categories.map((category, index) => {
-            const pageCategory = category;
-            const categoryItems = items.filter((item) => {
-              return item.category === category;
-            });
-            return (
-              <TabBase.Screen
-                name={`${category}`}
-                component={BaseList}
-                key={index}
-                initialParams={{
-                  pageCategory,
-                  categoryItems,
-                  leftTextKey,
-                  middleTextKey,
-                  fabButton,
-                }}
-              />
-            );
-          })}
-        </TabBase.Navigator>
-      </NavigationContainer>
-    </Container>
+    <AnimatedLoader
+      visible={true}
+      overlayColor="rgba(255,255,255,0.75)"
+      source={require('../../assets/loader.json')}
+      animationStyle={styles.lottie}
+      speed={1}
+    />
   );
 }
+
+BaseTab.defaultProps = {
+  categories: [],
+};
+
+const styles = StyleSheet.create({
+  lottie: {
+    width: 100,
+    height: 100,
+  },
+});

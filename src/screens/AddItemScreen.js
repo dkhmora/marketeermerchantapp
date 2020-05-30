@@ -12,6 +12,7 @@ import {
   Col,
   Textarea,
   Picker,
+  Icon,
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import {addStoreItem} from '../../firebase/store';
@@ -111,14 +112,20 @@ export default function AddItemScreen({navigation, route}) {
               flexDirection: 'column',
               alignContent: 'center',
             }}>
-            <Item rounded style={{marginTop: 18}}>
+            <Item
+              rounded
+              style={{
+                marginTop: 18,
+                flexDirection: 'column',
+                alignItems: 'stretch',
+              }}>
               <Picker
                 note={false}
                 placeholder="Select Item Category"
                 selectedValue={category}
                 mode="dropdown"
-                onValueChange={(itemValue) => setCategory(itemValue)}
-                style={{borderRadius: 24, borderWidth: 2, borderColor: 'blue'}}>
+                iosIcon={<Icon name="arrow-down" />}
+                onValueChange={(itemValue) => setCategory(itemValue)}>
                 <Picker.Item label="Fruit" value="Fruit" />
                 <Picker.Item label="Vegetable" value="Vegetable" />
               </Picker>
