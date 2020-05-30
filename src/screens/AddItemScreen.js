@@ -27,12 +27,13 @@ export default function AddItemScreen({navigation, route}) {
   const [stock, setStock] = React.useState('');
 
   function onSubmit() {
-    if (category.length <= 0) {
-      setCategory(pageCategory);
-    }
     addStoreItem(merchantId, category, name, description, unit, price, stock);
     console.log(merchantId, category, name, description, unit, price, stock);
   }
+
+  useEffect(() => {
+    setCategory(pageCategory);
+  }, [pageCategory]);
 
   return (
     <Container style={{flex: 1}}>
@@ -80,7 +81,7 @@ export default function AddItemScreen({navigation, route}) {
               <Picker
                 note={false}
                 placeholder="Select Item Category"
-                selectedValue={pageCategory}
+                selectedValue={category}
                 mode="dropdown"
                 onValueChange={(itemValue) => setCategory(itemValue)}
                 style={{borderRadius: 24, borderWidth: 2, borderColor: 'blue'}}>
