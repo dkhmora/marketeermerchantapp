@@ -15,13 +15,15 @@ import {
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import {addStoreItem} from '../../firebase/store';
-import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-crop-picker';
 
 export default function AddItemScreen({navigation, route}) {
   const {merchantId, pageCategory} = route.params;
 
   const [imagePath, setImagePath] = React.useState('');
+  const [imageDisplay, setImageDisplay] = React.useState(
+    require('../../assets/placeholder.jpg'),
+  );
   const [category, setCategory] = React.useState('');
   const [name, setName] = React.useState('');
   const [description, setDescription] = React.useState('');
@@ -56,6 +58,7 @@ export default function AddItemScreen({navigation, route}) {
       .then((image) => {
         console.log(image.path.split('.').pop());
         setImagePath(image.path);
+        setImageDisplay({uri: image.path});
       })
       .then(() => console.log('Image path successfully set!'))
       .catch((err) => console.error(err));
@@ -74,14 +77,15 @@ export default function AddItemScreen({navigation, route}) {
           <Row size={2} style={{marginBottom: '2%'}}>
             <Col style={{justifyContent: 'center'}}>
               <Image
-                source={require('../../assets/placeholder.jpg')}
+                source={imageDisplay}
                 style={{
                   alignSelf: 'flex-start',
                   borderColor: '#5B0EB5',
                   borderRadius: 24,
                   borderWidth: 1,
-                  height: '80%',
                   aspectRatio: 1,
+                  height: '100%',
+                  width: '100%',
                 }}
               />
             </Col>
@@ -89,7 +93,7 @@ export default function AddItemScreen({navigation, route}) {
               style={{
                 justifyContent: 'flex-end',
                 alignContent: 'center',
-                marginBottom: '5%',
+                marginHorizontal: 12,
               }}>
               <Button
                 full
