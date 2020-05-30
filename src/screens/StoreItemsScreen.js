@@ -49,7 +49,7 @@ export const StoreItemsScreen = ({navigation, route}) => {
       <StackOrder.Screen
         name="Add Item"
         component={AddItemScreen}
-        initialParams={{merchantId}}
+        initialParams={{merchantId, categories}}
       />
     </StackOrder.Navigator>
   );

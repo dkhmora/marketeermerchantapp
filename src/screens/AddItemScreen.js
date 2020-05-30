@@ -19,7 +19,7 @@ import {addStoreItem} from '../../firebase/store';
 import ImagePicker from 'react-native-image-crop-picker';
 
 export default function AddItemScreen({navigation, route}) {
-  const {merchantId, pageCategory} = route.params;
+  const {merchantId, pageCategory, categories} = route.params;
 
   const [imagePath, setImagePath] = React.useState('');
   const [imageDisplay, setImageDisplay] = React.useState(
@@ -63,6 +63,25 @@ export default function AddItemScreen({navigation, route}) {
       })
       .then(() => console.log('Image path successfully set!'))
       .catch((err) => console.error(err));
+  }
+
+  function CategoryPicker() {
+    if (categories) {
+      return (
+        <Picker
+          note={false}
+          placeholder="Select Item Category"
+          selectedValue={category}
+          mode="dropdown"
+          iosIcon={<Icon name="arrow-down" />}
+          onValueChange={(itemValue) => setCategory(itemValue)}>
+          {categories.map((cat, index) => {
+            return <Picker.Item key={index} label={cat} value={cat} />;
+          })}
+        </Picker>
+      );
+    }
+    return null;
   }
 
   return (
@@ -119,16 +138,7 @@ export default function AddItemScreen({navigation, route}) {
                 flexDirection: 'column',
                 alignItems: 'stretch',
               }}>
-              <Picker
-                note={false}
-                placeholder="Select Item Category"
-                selectedValue={category}
-                mode="dropdown"
-                iosIcon={<Icon name="arrow-down" />}
-                onValueChange={(itemValue) => setCategory(itemValue)}>
-                <Picker.Item label="Fruit" value="Fruit" />
-                <Picker.Item label="Vegetable" value="Vegetable" />
-              </Picker>
+              <CategoryPicker />
             </Item>
             <Item rounded style={{marginTop: 18}}>
               <Input
