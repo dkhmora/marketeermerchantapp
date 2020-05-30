@@ -1,4 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 
 async function getStoreDetails(
   merchantId,
@@ -50,8 +51,17 @@ async function getStoreItems(merchantId, {setItems, setLoading}) {
     .catch((err) => console.error(err));
 }
 
+async function uploadImage(imageRef, imagePath) {
+  await storage()
+    .ref(imageRef)
+    .putFile(imagePath)
+    .then(() => console.log('Image successfully uploaded!'))
+    .catch((err) => console.error(err));
+}
+
 async function addStoreItem(
   merchantId,
+  imagePath,
   category,
   name,
   description,
@@ -59,12 +69,24 @@ async function addStoreItem(
   price,
   stock,
 ) {
-  await firestore()
+  const merchantItemsRef = firestore()
     .collection('merchants')
     .doc(merchantId)
-    .collection('items')
+    .collection('items');
+  await merchantItemsRef
     .add({category, name, description, unit, price, stock})
-    .then(() => console.log('Item added!'));
+    .then((doc) => {
+      const docId = doc.id;
+      const fileExtension = imagePath.split('.').pop();
+      const imageRef = `/images/merchants/${merchantId}/items/${docId}.${fileExtension}`;
+      uploadImage(imageRef, imagePath);
+      return {imageRef, docId};
+    })
+    .then((image) => {
+      merchantItemsRef.doc(image.docId).update({imageUrl: image.imageRef});
+    })
+    .then(() => console.log('Item added!'))
+    .catch((err) => console.error(err));
 }
 
 export {getStoreDetails, getStoreItems, addStoreItem};

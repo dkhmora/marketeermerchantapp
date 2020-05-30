@@ -15,10 +15,13 @@ import {
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import {addStoreItem} from '../../firebase/store';
+import storage from '@react-native-firebase/storage';
+import ImagePicker from 'react-native-image-crop-picker';
 
 export default function AddItemScreen({navigation, route}) {
   const {merchantId, pageCategory} = route.params;
 
+  const [imagePath, setImagePath] = React.useState('');
   const [category, setCategory] = React.useState('');
   const [name, setName] = React.useState('');
   const [description, setDescription] = React.useState('');
@@ -27,13 +30,36 @@ export default function AddItemScreen({navigation, route}) {
   const [stock, setStock] = React.useState('');
 
   function onSubmit() {
-    addStoreItem(merchantId, category, name, description, unit, price, stock);
+    addStoreItem(
+      merchantId,
+      imagePath,
+      category,
+      name,
+      description,
+      unit,
+      price,
+      stock,
+    );
     console.log(merchantId, category, name, description, unit, price, stock);
   }
 
   useEffect(() => {
     setCategory(pageCategory);
   }, [pageCategory]);
+
+  function handleImageUpload() {
+    ImagePicker.openCamera({
+      width: 400,
+      height: 400,
+      cropping: true,
+    })
+      .then((image) => {
+        console.log(image.path.split('.').pop());
+        setImagePath(image.path);
+      })
+      .then(() => console.log('Image path successfully set!'))
+      .catch((err) => console.error(err));
+  }
 
   return (
     <Container style={{flex: 1}}>
@@ -65,7 +91,11 @@ export default function AddItemScreen({navigation, route}) {
                 alignContent: 'center',
                 marginBottom: '5%',
               }}>
-              <Button full bordered style={{borderRadius: 24}}>
+              <Button
+                full
+                bordered
+                style={{borderRadius: 24}}
+                onPress={() => handleImageUpload()}>
                 <Text>Upload Image</Text>
               </Button>
             </Col>
