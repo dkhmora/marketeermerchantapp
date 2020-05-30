@@ -58,11 +58,6 @@ export const StoreDetailsScreen = ({navigation, route}) => {
               <StoreDetailsList />
             </List>
           </Row>
-          <Row size={1}>
-            <Button rounded style={{flex: 1}} onPress={() => signOut()}>
-              <Text>Sign out</Text>
-            </Button>
-          </Row>
         </Col>
       </Grid>
     </Container>
