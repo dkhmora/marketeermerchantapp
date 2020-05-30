@@ -13,27 +13,14 @@ function signIn(email, password) {
     });
 }
 
-function signOut() {
+function signOut({navigation}) {
   auth()
     .signOut()
     .then(() => {
+      console.log(navigation.dangerouslyGetParent());
+      navigation.navigate('Auth');
       console.log('Successfully signed out!');
     });
 }
 
-const merchantDocId = firestore()
-  .collection('merchant_users')
-  .where(auth().currentUser.uid, '==', true)
-  .get()
-  .then((snapshot) => {
-    if (snapshot.empty) {
-      auth().signOut();
-      console.log('Error: The user does not match with any merchants');
-    } else {
-      snapshot.forEach((doc) => {
-        return doc.id;
-      });
-    }
-  });
-
-export {signIn, signOut, merchantDocId};
+export {signIn, signOut};

@@ -37,6 +37,9 @@ export default class AuthLoader extends React.Component {
           console.log(`Error: Cannot read documents - ${err}`);
         });
     }
+    if (this.state.visible) {
+      this.setState({visible: false});
+    }
   }
 
   componentDidMount() {
