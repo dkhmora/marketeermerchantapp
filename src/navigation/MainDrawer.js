@@ -40,7 +40,9 @@ export default function MainDrawer({route, navigation}) {
                     type="Ionicons"
                     style={{color: '#fff', marginRight: 12, marginLeft: 6}}
                   />
-                  <Text style={{color: '#fff'}}>Sign out</Text>
+                  <Text style={{color: '#fff', textAlignVertical: 'center'}}>
+                    Sign out
+                  </Text>
                 </View>
               )}
               onPress={() => signOut({navigation})}
