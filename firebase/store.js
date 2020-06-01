@@ -10,11 +10,18 @@ async function getStoreDetails(
     .doc(merchantId)
     .get()
     .then((doc) => {
+      console.log(doc.data());
       return doc.data();
     })
     .then((data) => {
       if (setStoreDetails) {
-        setStoreDetails(data);
+        setStoreDetails({
+          deliveryDescription: data.deliveryDescription,
+          storeDescription: data.storeDescription,
+          storeImageUrl: data.storeImageUrl,
+          storeName: data.storeName,
+          visible: data.visible,
+        });
       } else {
         setCategories(data.item_categories);
       }

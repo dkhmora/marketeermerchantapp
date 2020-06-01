@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Container} from 'native-base';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import BaseList from '../components/BaseList';
@@ -29,6 +29,10 @@ export default function BaseTab({route, navigation}) {
     fabButton,
   } = route.params;
 
+  useEffect(() => {
+    return console.log(items);
+  }, [items]);
+
   if (categories) {
     console.log(categories);
     const scroll = categories.length > 2 ? true : false;
@@ -41,9 +45,17 @@ export default function BaseTab({route, navigation}) {
           <TabBase.Navigator tabBarOptions={{scrollEnabled: scroll}}>
             {categories.map((category, index) => {
               const pageCategory = category;
-              const categoryItems = items.filter((item) => {
-                return item.category === category;
-              });
+              let categoryItems = [];
+
+              route.name === 'Order Tab'
+                ? (categoryItems = items.filter((item) => {
+                    return item.orderStatus[`${category}`].status === true;
+                  }))
+                : (categoryItems = items.filter((item) => {
+                    return item.category === category;
+                  }));
+              console.log(categoryItems);
+
               return (
                 <TabBase.Screen
                   name={`${category}`}
@@ -78,6 +90,8 @@ export default function BaseTab({route, navigation}) {
 
 BaseTab.defaultProps = {
   categories: [],
+  items: [],
+  fabButton: false,
 };
 
 const styles = StyleSheet.create({
