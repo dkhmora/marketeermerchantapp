@@ -1,34 +1,21 @@
-import React from 'react';
-import {Container} from 'native-base';
+import React, {Component} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import BaseHeader from '../components/BaseHeader';
-import BaseTab from '../navigation/BaseTab';
+import OrdersTab from './OrdersTab';
 import OrderDetailsScreen from './OrderDetailsScreen';
 
-const StackOrder = createStackNavigator();
-
-export const OrdersScreen = ({navigation}) => {
-  const categories = ['Pending', 'Accepted', 'Shipped', 'Completed'];
-
-  const collection = 'orders';
-  const leftTextKey = 'orderId';
-  const middleTextKey = 'userId';
-
-  return (
-    <Container>
-      <BaseHeader title="Orders" navigation={navigation} />
-
-      <StackOrder.Navigator initialRouteName="Order Tab" headerMode="none">
-        <StackOrder.Screen
-          name="Order Tab"
-          component={BaseTab}
-          initialParams={{categories, collection, leftTextKey, middleTextKey}}
-        />
-        <StackOrder.Screen
+const StackOrders = createStackNavigator();
+class OrdersScreen extends Component {
+  render() {
+    return (
+      <StackOrders.Navigator headerMode="none">
+        <StackOrders.Screen name="Orders Tab" component={OrdersTab} />
+        <StackOrders.Screen
           name="Order Details"
           component={OrderDetailsScreen}
         />
-      </StackOrder.Navigator>
-    </Container>
-  );
-};
+      </StackOrders.Navigator>
+    );
+  }
+}
+
+export default OrdersScreen;

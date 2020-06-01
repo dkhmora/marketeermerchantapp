@@ -39,6 +39,7 @@ export default function BaseList({route, navigation}) {
         </Fab>
       );
     }
+    return null;
   };
 
   if (ListItems) {
@@ -52,3 +53,7 @@ export default function BaseList({route, navigation}) {
     );
   }
 }
+
+BaseList.defaultProps = {
+  fabButton: false,
+};

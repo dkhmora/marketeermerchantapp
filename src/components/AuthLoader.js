@@ -3,18 +3,23 @@ import {StyleSheet} from 'react-native';
 import AnimatedLoader from 'react-native-animated-loader';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import {inject} from 'mobx-react';
 
-const merchantUsersCollection = firestore().collection('merchant_users');
-export default class AuthLoader extends React.Component {
+const merchantsCollection = firestore().collection('merchants');
+@inject('authStore')
+@inject('orderStore')
+@inject('detailsStore')
+class AuthLoader extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {visible: true, user: null, merchantId: null};
+    this.state = {visible: true, user: null};
   }
 
   onAuthStateChanged(user) {
     if (auth().currentUser != null) {
-      merchantUsersCollection
-        .where(auth().currentUser.uid, '==', true)
+      const currentUserId = auth().currentUser.uid;
+      merchantsCollection
+        .where(`admins.${currentUserId}`, '==', true)
         .get()
         .then((snapshot) => {
           if (snapshot.empty) {
@@ -22,9 +27,10 @@ export default class AuthLoader extends React.Component {
             console.log('Error: The user does not match with any merchants');
           } else {
             snapshot.forEach((doc) => {
-              this.setState({merchantId: doc.id.trim()});
+              this.props.authStore.setMerchantId(doc.id.trim());
+              this.props.detailsStore.setStoreDetails(doc.id.trim());
               console.log(
-                `Current user is assigned to Merchant with doc id "${doc.id}"`,
+                `Current user is assigned to Merchant with doc id "${this.props.authStore.merchantId}"`,
               );
             });
             this.setState({user: user});
@@ -54,7 +60,7 @@ export default class AuthLoader extends React.Component {
       this.props.navigation.navigate('Auth');
     } else {
       this.props.navigation.navigate('Home', {
-        merchantId: this.state.merchantId,
+        merchantId: this.props.authStore.merchantId,
       });
     }
   }
@@ -79,3 +85,5 @@ const styles = StyleSheet.create({
     height: 100,
   },
 });
+
+export default AuthLoader;
