@@ -52,68 +52,65 @@ class OrdersTab extends Component {
     return (
       <Container>
         <BaseHeader title={name} optionsButton navigation={navigation} />
-
-        <NavigationContainer theme={NavigationTheme} independent={true}>
-          <TabOrders.Navigator
-            tabBarOptions={{scrollEnabled: scroll}}
-            headerMode="none">
-            <TabOrders.Screen
-              name="Pending"
-              component={BaseFlatList}
-              initialParams={{
-                storeFunctionName: 'setPendingOrders',
-                storeVarName: 'pendingOrders',
-                leftTextKey: 'orderNumber',
-                middleTextKey: 'userId',
-                fabButton: false,
-              }}
-            />
-            <TabOrders.Screen
-              name="Accepted"
-              component={BaseFlatList}
-              initialParams={{
-                storeFunctionName: 'setAcceptedOrders',
-                storeVarName: 'acceptedOrders',
-                leftTextKey: 'orderNumber',
-                middleTextKey: 'userId',
-                fabButton: false,
-              }}
-            />
-            <TabOrders.Screen
-              name="Shipped"
-              component={BaseFlatList}
-              initialParams={{
-                storeFunctionName: 'setShippedOrders',
-                storeVarName: 'shippedOrders',
-                leftTextKey: 'orderNumber',
-                middleTextKey: 'userId',
-                fabButton: false,
-              }}
-            />
-            <TabOrders.Screen
-              name="Completed"
-              component={BaseFlatList}
-              initialParams={{
-                storeFunctionName: 'setCompletedOrders',
-                storeVarName: 'completedOrders',
-                leftTextKey: 'orderNumber',
-                middleTextKey: 'userId',
-                fabButton: false,
-              }}
-            />
-            <TabOrders.Screen
-              name="Cancelled"
-              component={BaseFlatList}
-              initialParams={{
-                storeFunctionName: 'setCancelledOrders',
-                storeVarName: 'cancelledOrders',
-                leftTextKey: 'orderNumber',
-                middleTextKey: 'userId',
-                fabButton: false,
-              }}
-            />
-          </TabOrders.Navigator>
-        </NavigationContainer>
+        <TabOrders.Navigator
+          tabBarOptions={{scrollEnabled: scroll}}
+          headerMode="none">
+          <TabOrders.Screen
+            name="Pending"
+            component={BaseFlatList}
+            initialParams={{
+              storeFunctionName: 'setPendingOrders',
+              storeVarName: 'pendingOrders',
+              leftTextKey: 'orderNumber',
+              middleTextKey: 'userId',
+              fabButton: false,
+            }}
+          />
+          <TabOrders.Screen
+            name="Accepted"
+            component={BaseFlatList}
+            initialParams={{
+              storeFunctionName: 'setAcceptedOrders',
+              storeVarName: 'acceptedOrders',
+              leftTextKey: 'orderNumber',
+              middleTextKey: 'userId',
+              fabButton: false,
+            }}
+          />
+          <TabOrders.Screen
+            name="Shipped"
+            component={BaseFlatList}
+            initialParams={{
+              storeFunctionName: 'setShippedOrders',
+              storeVarName: 'shippedOrders',
+              leftTextKey: 'orderNumber',
+              middleTextKey: 'userId',
+              fabButton: false,
+            }}
+          />
+          <TabOrders.Screen
+            name="Completed"
+            component={BaseFlatList}
+            initialParams={{
+              storeFunctionName: 'setCompletedOrders',
+              storeVarName: 'completedOrders',
+              leftTextKey: 'orderNumber',
+              middleTextKey: 'userId',
+              fabButton: false,
+            }}
+          />
+          <TabOrders.Screen
+            name="Cancelled"
+            component={BaseFlatList}
+            initialParams={{
+              storeFunctionName: 'setCancelledOrders',
+              storeVarName: 'cancelledOrders',
+              leftTextKey: 'orderNumber',
+              middleTextKey: 'userId',
+              fabButton: false,
+            }}
+          />
+        </TabOrders.Navigator>
       </Container>
     );
   }
