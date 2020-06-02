@@ -1,27 +1,27 @@
 import React, {Component} from 'react';
 import {FlatList} from 'react-native';
-import {Container, Content, View} from 'native-base';
+import {Container, View} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components
 import OrderCard from './OrderCard';
 
 @inject('authStore')
-@inject('orderStore')
+@inject('ordersStore')
 @observer
-class OrdersFlatList extends Component {
+class OrdersList extends Component {
   constructor(props) {
     super(props);
   }
 
   componentDidMount() {
-    this.props.orderStore[`${this.props.route.params.storeFunctionName}`](
+    this.props.ordersStore[`${this.props.route.params.storeFunctionName}`](
       this.props.authStore.merchantId,
     );
   }
 
   render() {
     const {storeVarName} = this.props.route.params;
-    const dataSource = this.props.orderStore[`${storeVarName}`].slice();
+    const dataSource = this.props.ordersStore[`${storeVarName}`].slice();
 
     return (
       <Container style={{flex: 1}}>
@@ -49,4 +49,4 @@ class OrdersFlatList extends Component {
   }
 }
 
-export default OrdersFlatList;
+export default OrdersList;

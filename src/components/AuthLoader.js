@@ -7,7 +7,7 @@ import {inject} from 'mobx-react';
 
 const merchantsCollection = firestore().collection('merchants');
 @inject('authStore')
-@inject('orderStore')
+@inject('ordersStore')
 @inject('detailsStore')
 class AuthLoader extends React.Component {
   constructor(props) {

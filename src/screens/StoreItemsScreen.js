@@ -3,7 +3,7 @@ import {StyleSheet} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import AnimatedLoader from 'react-native-animated-loader';
 // Custom Components
-import BaseTab from '../navigation/BaseTab';
+import StoreItemsTab from '../navigation/StoreItemsTab';
 import AddItemScreen from './AddItemScreen';
 
 // Firebase
@@ -37,7 +37,7 @@ export const StoreItemsScreen = ({navigation, route}) => {
     <StackOrder.Navigator initialRouteName="Store Items" headerMode="none">
       <StackOrder.Screen
         name="Store Items"
-        component={BaseTab}
+        component={StoreItemsTab}
         initialParams={{
           categories,
           items,
