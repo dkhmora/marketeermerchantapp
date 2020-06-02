@@ -107,20 +107,9 @@ class DetailsStore {
       .collection('merchants')
       .doc(merchantId)
       .onSnapshot((documentSnapshot) => {
-        console.log(documentSnapshot.data());
-        const storeDetails = {
-          deliveryDescription: documentSnapshot.data().deliveryDescription,
-          storeDescription: documentSnapshot.data().storeDescription,
-          storeImageUrl: documentSnapshot.data().storeImageUrl,
-          storeName: documentSnapshot.data().storeName,
-          visible: documentSnapshot.data().visible,
-        };
-
-        this.storeDetails = storeDetails;
-
-        console.log(this.storeDetails);
-
+        this.storeDetails = documentSnapshot.data();
         this.storeCategories = documentSnapshot.data().itemCategories;
+        console.log(this.storeDetails);
       });
   }
 }
