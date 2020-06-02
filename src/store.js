@@ -17,21 +17,6 @@ class OrderStore {
   @observable completedOrders = [];
   @observable cancelledOrders = [];
 
-  @action setOrders(merchantId) {
-    console.log('Galing sa setOrders', AuthStore.merchantId);
-    firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .collection('orders')
-      .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc) => {
-          data.push(doc.data());
-        });
-        this.orders = data;
-      });
-  }
-
   @action setPendingOrders(merchantId) {
     firestore()
       .collection('merchants')
@@ -44,7 +29,6 @@ class OrderStore {
           data.push(doc.data());
           data[index].orderId = doc.id;
         });
-        console.log('this ius data', data);
         this.pendingOrders = data;
       });
   }
@@ -57,10 +41,10 @@ class OrderStore {
       .where('orderStatus.accepted.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach((doc, index) => {
           data.push(doc.data());
+          data[index].orderId = doc.id;
         });
-        console.log('pending', data);
         this.acceptedOrders = data;
       });
   }
@@ -73,10 +57,10 @@ class OrderStore {
       .where('orderStatus.shipped.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach((doc, index) => {
           data.push(doc.data());
+          data[index].orderId = doc.id;
         });
-        console.log('pending', data);
         this.shippedOrders = data;
       });
   }
@@ -93,7 +77,6 @@ class OrderStore {
           data.push(doc.data());
           data[index].orderId = doc.id;
         });
-        console.log('completed', data);
         this.completedOrders = data;
       });
   }
@@ -106,10 +89,10 @@ class OrderStore {
       .where('orderStatus.cancelled.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach((doc, index) => {
           data.push(doc.data());
+          data[index].orderId = doc.id;
         });
-        console.log('pending', data);
         this.cancelledOrders = data;
       });
   }
@@ -137,7 +120,7 @@ class DetailsStore {
 
         console.log(this.storeDetails);
 
-        this.storeCategories = documentSnapshot.data().item_categories;
+        this.storeCategories = documentSnapshot.data().itemCategories;
       });
   }
 }

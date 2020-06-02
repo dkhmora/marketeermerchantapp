@@ -25,6 +25,7 @@
     "lottie-react-native": "^3.4.0",
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
+    "moment": "^2.26.0",
     "native-base": "^2.13.12",
     "react": "16.11.0",
     "react-native": "0.62.2",

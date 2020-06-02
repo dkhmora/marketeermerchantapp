@@ -130,7 +130,7 @@ export default {
   checkboxTickColor: '#fff',
 
   // Color
-  brandPrimary: '#5B0EB5',
+  brandPrimary: '#E91E63',
   brandInfo: '#62B1F6',
   brandSuccess: '#5cb85c',
   brandDanger: '#d9534f',
@@ -171,21 +171,21 @@ export default {
   tabBarTextColor: '#737373',
   tabBarTextSize: platform === PLATFORM.IOS ? 14 : 11,
   activeTab: '#fff',
-  sTabBarActiveTextColor: '#5B0EB5',
+  sTabBarActiveTextColor: '#E91E63',
   tabBarActiveTextColor: '#737373',
   tabActiveBgColor: platform === PLATFORM.IOS ? '#cde1f9' : '#3F51B5',
 
   // Header
-  toolbarBtnColor: '#5B0EB5',
+  toolbarBtnColor: '#E91E63',
   toolbarDefaultBg: '#F8F8F8',
   toolbarHeight: platform === PLATFORM.IOS ? 64 : 56,
   toolbarSearchIconSize: platform === PLATFORM.IOS ? 20 : 23,
-  toolbarInputColor: '#5B0EB5',
+  toolbarInputColor: '#E91E63',
   searchBarHeight: platform === PLATFORM.IOS ? 30 : 40,
   searchBarInputHeight: platform === PLATFORM.IOS ? 30 : 50,
-  toolbarBtnTextColor: '#5B0EB5',
+  toolbarBtnTextColor: '#E91E63',
   iosStatusbar: 'dark-content',
-  toolbarDefaultBorder: '#5B0EB5',
+  toolbarDefaultBorder: '#E91E63',
   get statusBarColor() {
     return color(this.toolbarDefaultBg).darken(0.05).hex();
   },
@@ -200,7 +200,7 @@ export default {
 
   // InputGroup
   inputFontSize: 17,
-  inputBorderColor: '#5B0EB5',
+  inputBorderColor: '#E91E63',
   inputSuccessBorderColor: '#2b8339',
   inputErrorBorderColor: '#ed2f2f',
   inputHeightBase: 50,
@@ -226,7 +226,7 @@ export default {
   listItemPadding: platform === PLATFORM.IOS ? 10 : 12,
   listNoteColor: '#808080',
   listNoteSize: 13,
-  listItemSelected: platform === PLATFORM.IOS ? '#5B0EB5' : '#3F51B5',
+  listItemSelected: platform === PLATFORM.IOS ? '#E91E63' : '#3F51B5',
 
   // Progress Bar
   defaultProgressColor: '#E4202D',
@@ -242,10 +242,10 @@ export default {
 
   // Segment
   segmentBackgroundColor: '#fff',
-  segmentActiveBackgroundColor: platform === PLATFORM.IOS ? '#5B0EB5' : '#fff',
-  segmentTextColor: platform === PLATFORM.IOS ? '#5B0EB5' : '#fff',
+  segmentActiveBackgroundColor: platform === PLATFORM.IOS ? '#E91E63' : '#fff',
+  segmentTextColor: platform === PLATFORM.IOS ? '#E91E63' : '#fff',
   segmentActiveTextColor: '#fff',
-  segmentBorderColor: platform === PLATFORM.IOS ? '#5B0EB5' : '#fff',
+  segmentBorderColor: platform === PLATFORM.IOS ? '#E91E63' : '#fff',
   segmentBorderColorMain: platform === PLATFORM.IOS ? '#a7a6ab' : '#3F51B5',
 
   // Spinner
@@ -254,10 +254,10 @@ export default {
 
   // Tab
   tabDefaultBg: '#fff',
-  topTabBarTextColor: '#5B0EB5',
-  topTabBarActiveTextColor: '#5B0EB5',
-  topTabBarBorderColor: '#5B0EB5',
-  topTabBarActiveBorderColor: '#5B0EB5',
+  topTabBarTextColor: '#E91E63',
+  topTabBarActiveTextColor: '#E91E63',
+  topTabBarBorderColor: '#E91E63',
+  topTabBarActiveBorderColor: '#E91E63',
 
   // Tabs
   tabBgColor: '#F8F8F8',
@@ -276,7 +276,7 @@ export default {
   titleFontSize: platform === PLATFORM.IOS ? 17 : 19,
   subTitleFontSize: platform === PLATFORM.IOS ? 11 : 14,
   subtitleColor: platform === PLATFORM.IOS ? '#000' : '#fff',
-  titleFontColor: '#5B0EB5',
+  titleFontColor: '#E91E63',
 
   // Other
   borderRadiusBase: platform === PLATFORM.IOS ? 5 : 2,

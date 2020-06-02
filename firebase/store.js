@@ -23,7 +23,7 @@ async function getStoreDetails(
           visible: data.visible,
         });
       } else {
-        setCategories(data.item_categories);
+        setCategories(data.itemCategories);
       }
     })
     .then(() => {
