@@ -32,19 +32,26 @@ export default function OrderCard(props) {
   const timeStamp = moment(createdAt, ISO_8601).fromNow();
 
   return (
-    <Card {...otherProps} style={{borderRadius: 24, overflow: 'hidden'}}>
-      <CardItem header bordered>
+    <Card {...otherProps} style={{borderRadius: 16, overflow: 'hidden'}}>
+      <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
         <Left>
           <Body>
-            <Text style={{color: '#E91E63'}}>{userName}</Text>
-            <Text note>Order # {orderNumber}</Text>
+            <Text style={{color: '#fff'}}>{userName}</Text>
+            <Text note style={{color: '#ddd'}}>
+              Order # {orderNumber}
+            </Text>
           </Body>
         </Left>
         <Right>
           <Button transparent>
             <OptionsMenu
               customButton={
-                <Icon active name="dots-three-vertical" type="Entypo" />
+                <Icon
+                  active
+                  name="dots-three-vertical"
+                  type="Entypo"
+                  style={{color: '#fff'}}
+                />
               }
               destructiveIndex={1}
               options={['Cancel Order']}
