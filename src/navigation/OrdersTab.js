@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {Container} from 'native-base';
 // Custom Components
-import OrdersFlatList from '../components/OrdersFlatList';
+import OrdersList from '../components/OrdersList';
 import BaseHeader from '../components/BaseHeader';
 
 const TabOrders = createMaterialTopTabNavigator();
@@ -30,7 +30,7 @@ class OrdersTab extends Component {
           headerMode="none">
           <TabOrders.Screen
             name="Pending"
-            component={OrdersFlatList}
+            component={OrdersList}
             initialParams={{
               storeFunctionName: 'setPendingOrders',
               storeVarName: 'pendingOrders',
@@ -38,7 +38,7 @@ class OrdersTab extends Component {
           />
           <TabOrders.Screen
             name="Accepted"
-            component={OrdersFlatList}
+            component={OrdersList}
             initialParams={{
               storeFunctionName: 'setAcceptedOrders',
               storeVarName: 'acceptedOrders',
@@ -46,7 +46,7 @@ class OrdersTab extends Component {
           />
           <TabOrders.Screen
             name="Shipped"
-            component={OrdersFlatList}
+            component={OrdersList}
             initialParams={{
               storeFunctionName: 'setShippedOrders',
               storeVarName: 'shippedOrders',
@@ -54,7 +54,7 @@ class OrdersTab extends Component {
           />
           <TabOrders.Screen
             name="Completed"
-            component={OrdersFlatList}
+            component={OrdersList}
             initialParams={{
               storeFunctionName: 'setCompletedOrders',
               storeVarName: 'completedOrders',
@@ -62,7 +62,7 @@ class OrdersTab extends Component {
           />
           <TabOrders.Screen
             name="Cancelled"
-            component={OrdersFlatList}
+            component={OrdersList}
             initialParams={{
               storeFunctionName: 'setCancelledOrders',
               storeVarName: 'cancelledOrders',

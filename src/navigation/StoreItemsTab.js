@@ -20,7 +20,7 @@ const NavigationTheme = {
   },
 };
 
-export default function BaseTab({route, navigation}) {
+export default function StoreItemsTab({route, navigation}) {
   const {
     categories,
     items,
@@ -47,14 +47,9 @@ export default function BaseTab({route, navigation}) {
               const pageCategory = category;
               let categoryItems = [];
 
-              route.name === 'Order Tab'
-                ? (categoryItems = items.filter((item) => {
-                    return item.orderStatus[`${category}`].status === true;
-                  }))
-                : (categoryItems = items.filter((item) => {
-                    return item.category === category;
-                  }));
-              console.log(categoryItems);
+              categoryItems = items.filter((item) => {
+                return item.category === category;
+              });
 
               return (
                 <TabBase.Screen
@@ -88,7 +83,7 @@ export default function BaseTab({route, navigation}) {
   );
 }
 
-BaseTab.defaultProps = {
+StoreItemsTab.defaultProps = {
   categories: [],
   items: [],
   fabButton: false,

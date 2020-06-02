@@ -15,18 +15,24 @@ global.moment = moment;
 
 import Setup from './src/boot/setup';
 import {Provider} from 'mobx-react';
-import {OrderStore, AuthStore, DetailsStore} from './src/store';
+import OrdersStore from './src/store/ordersStore';
+import AuthStore from './src/store/authStore';
+import DetailsStore from './src/store/detailsStore';
+import ItemsStore from './src/store/itemsStore';
 
-const orderStore = (window.store = new OrderStore());
+const ordersStore = (window.store = new OrdersStore());
 const authStore = (window.store = new AuthStore());
 const detailsStore = (window.store = new DetailsStore());
+const itemsStore = (window.store = new ItemsStore());
+
 export default class App extends React.Component {
   render() {
     return (
       <Provider
-        orderStore={orderStore}
+        ordersStore={ordersStore}
         authStore={authStore}
-        detailsStore={detailsStore}>
+        detailsStore={detailsStore}
+        itemsStore={itemsStore}>
         <Setup />
       </Provider>
     );

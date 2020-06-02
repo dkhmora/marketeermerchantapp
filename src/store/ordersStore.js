@@ -1,15 +1,7 @@
 import {observable, action} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 
-class AuthStore {
-  @observable merchantId = 'testest';
-
-  @action setMerchantId(id) {
-    this.merchantId = id;
-  }
-}
-
-class OrderStore {
+class OrdersStore {
   @observable orders = [];
   @observable pendingOrders = [];
   @observable acceptedOrders = [];
@@ -98,20 +90,4 @@ class OrderStore {
   }
 }
 
-class DetailsStore {
-  @observable storeDetails = {};
-  @observable storeCategories = [];
-
-  @action setStoreDetails(merchantId) {
-    firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .onSnapshot((documentSnapshot) => {
-        this.storeDetails = documentSnapshot.data();
-        this.storeCategories = documentSnapshot.data().itemCategories;
-        console.log(this.storeDetails);
-      });
-  }
-}
-
-export {AuthStore, DetailsStore, OrderStore};
+export default OrdersStore;
