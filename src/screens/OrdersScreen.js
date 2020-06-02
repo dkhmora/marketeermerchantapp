@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import OrdersTab from './OrdersTab';
+import OrdersTab from '../navigation/OrdersTab';
 import OrderDetailsScreen from './OrderDetailsScreen';
 
 const StackOrders = createStackNavigator();

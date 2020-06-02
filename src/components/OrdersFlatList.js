@@ -1,14 +1,14 @@
 import React, {Component} from 'react';
 import {FlatList} from 'react-native';
-import BaseListItem from '../components/BaseListItem';
+import {Container, Content, View} from 'native-base';
 import {observer, inject} from 'mobx-react';
+// Custom Components
 import OrderCard from './OrderCard';
-import {Container, Content} from 'native-base';
 
 @inject('authStore')
 @inject('orderStore')
 @observer
-class BaseFlatList extends Component {
+class OrdersFlatList extends Component {
   constructor(props) {
     super(props);
   }
@@ -20,14 +20,12 @@ class BaseFlatList extends Component {
   }
 
   render() {
-    const {storeVarName, leftTextKey, middleTextKey} = this.props.route.params;
+    const {storeVarName} = this.props.route.params;
     const dataSource = this.props.orderStore[`${storeVarName}`].slice();
-
-    console.log('data shit', dataSource.user);
 
     return (
       <Container style={{flex: 1}}>
-        <Content padder>
+        <View style={{paddingHorizontal: 10}}>
           <FlatList
             data={dataSource}
             renderItem={({item, index}) => (
@@ -43,11 +41,12 @@ class BaseFlatList extends Component {
               />
             )}
             keyExtractor={(item) => item.orderId}
+            showsVerticalScrollIndicator={false}
           />
-        </Content>
+        </View>
       </Container>
     );
   }
 }
 
-export default BaseFlatList;
+export default OrdersFlatList;
