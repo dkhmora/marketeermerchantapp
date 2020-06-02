@@ -9,17 +9,6 @@ import BaseFlatList from '../components/BaseFlatList';
 
 const TabOrders = createMaterialTopTabNavigator();
 
-const NavigationTheme = {
-  dark: false,
-  colors: {
-    primary: '#5B0EB5',
-    background: '#fff',
-    card: '#fff',
-    text: '#1A191B',
-    border: '#eee',
-  },
-};
-
 @inject('orderStore')
 @inject('authStore')
 @observer
@@ -53,7 +42,14 @@ class OrdersTab extends Component {
       <Container>
         <BaseHeader title={name} optionsButton navigation={navigation} />
         <TabOrders.Navigator
-          tabBarOptions={{scrollEnabled: scroll}}
+          tabBarOptions={{
+            scrollEnabled: scroll,
+            style: {backgroundColor: '#E91E63'},
+            activeTintColor: '#fff',
+            inactiveTintcolor: '#eee',
+            indicatorStyle: {backgroundColor: '#FFEB3B'},
+          }}
+          labelStyle={{activeTintColor: '#fff'}}
           headerMode="none">
           <TabOrders.Screen
             name="Pending"
@@ -62,7 +58,7 @@ class OrdersTab extends Component {
               storeFunctionName: 'setPendingOrders',
               storeVarName: 'pendingOrders',
               leftTextKey: 'orderNumber',
-              middleTextKey: 'userId',
+              middleTextKey: 'user',
               fabButton: false,
             }}
           />

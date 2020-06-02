@@ -8,7 +8,10 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import _ from 'lodash';
+import moment from 'moment';
+
 global._ = _;
+global.moment = moment;
 
 import Setup from './src/boot/setup';
 import {Provider} from 'mobx-react';

@@ -8,7 +8,7 @@ class OrdersScreen extends Component {
   render() {
     return (
       <StackOrders.Navigator headerMode="none">
-        <StackOrders.Screen name="Orders Tab" component={OrdersTab} />
+        <StackOrders.Screen name="Orders" component={OrdersTab} />
         <StackOrders.Screen
           name="Order Details"
           component={OrderDetailsScreen}

@@ -11,11 +11,11 @@ const StackMain = createStackNavigator();
 const NavigationTheme = {
   dark: false,
   colors: {
-    primary: '#5B0EB5',
+    primary: '#E91E63',
     background: '#fff',
     card: '#fff',
-    text: '#1A191B',
-    border: '#eee',
+    text: '#1A1918',
+    border: '#fff',
   },
 };
 
