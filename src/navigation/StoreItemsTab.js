@@ -1,11 +1,13 @@
-import React, {useEffect} from 'react';
+import React, {Component} from 'react';
 import {Container} from 'native-base';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import BaseList from '../components/BaseList';
+import ItemsList from '../components/ItemsList';
 import {NavigationContainer, useLinkProps} from '@react-navigation/native';
 import BaseHeader from '../components/BaseHeader';
 import AnimatedLoader from 'react-native-animated-loader';
 import {StyleSheet} from 'react-native';
+import {observer, inject} from 'mobx-react';
 
 const TabBase = createMaterialTopTabNavigator();
 
@@ -19,68 +21,52 @@ const NavigationTheme = {
     border: '#eee',
   },
 };
+@inject('authStore')
+@inject('detailsStore')
+@inject('itemsStore')
+@observer
+class StoreItemsTab extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-export default function StoreItemsTab({route, navigation}) {
-  const {
-    categories,
-    items,
-    leftTextKey,
-    middleTextKey,
-    fabButton,
-  } = route.params;
+  render() {
+    const {storeCategories} = this.props.detailsStore;
+    const {name} = this.props.route;
+    const {navigation} = this.props;
 
-  useEffect(() => {
-    return console.log(items);
-  }, [items]);
-
-  if (categories) {
-    console.log(categories);
-    const scroll = categories.length > 2 ? true : false;
+    const scroll = storeCategories.length > 2 ? true : false;
 
     return (
       <Container style={{flex: 1}}>
-        <BaseHeader title={route.name} optionsButton navigation={navigation} />
+        <BaseHeader title={name} optionsButton navigation={navigation} />
 
-        <NavigationContainer theme={NavigationTheme} independent={true}>
-          <TabBase.Navigator tabBarOptions={{scrollEnabled: scroll}}>
-            {categories.map((category, index) => {
-              const pageCategory = category;
-              let categoryItems = [];
+        <TabBase.Navigator
+          tabBarOptions={{
+            scrollEnabled: scroll,
+            style: {backgroundColor: '#E91E63'},
+            activeTintColor: '#fff',
+            inactiveTintcolor: '#eee',
+            indicatorStyle: {backgroundColor: '#FFEB3B'},
+          }}>
+          {storeCategories.map((category, index) => {
+            this.props.itemsStore.setCategoryItems(category);
 
-              categoryItems = items.filter((item) => {
-                return item.category === category;
-              });
-
-              return (
-                <TabBase.Screen
-                  name={`${category}`}
-                  component={BaseList}
-                  key={index}
-                  initialParams={{
-                    pageCategory,
-                    categoryItems,
-                    leftTextKey,
-                    middleTextKey,
-                    fabButton,
-                  }}
-                />
-              );
-            })}
-          </TabBase.Navigator>
-        </NavigationContainer>
+            return (
+              <TabBase.Screen
+                name={`${category}`}
+                component={ItemsList}
+                key={index}
+                initialParams={{
+                  category,
+                }}
+              />
+            );
+          })}
+        </TabBase.Navigator>
       </Container>
     );
   }
-
-  return (
-    <AnimatedLoader
-      visible={true}
-      overlayColor="rgba(255,255,255,0.75)"
-      source={require('../../assets/loader.json')}
-      animationStyle={styles.lottie}
-      speed={1}
-    />
-  );
 }
 
 StoreItemsTab.defaultProps = {
@@ -89,9 +75,4 @@ StoreItemsTab.defaultProps = {
   fabButton: false,
 };
 
-const styles = StyleSheet.create({
-  lottie: {
-    width: 100,
-    height: 100,
-  },
-});
+export default StoreItemsTab;
