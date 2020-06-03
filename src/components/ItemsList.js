@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList} from 'react-native';
-import {Container, View} from 'native-base';
+import {Container, View, Fab, Icon, Button} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components
 import ItemCard from './ItemCard';
@@ -63,6 +63,12 @@ class ItemsList extends Component {
             keyExtractor={(item, index) => `${item.name}${index.toString()}`}
             showsVerticalScrollIndicator={false}
           />
+          <Fab
+            containerStyle={{}}
+            position="bottomRight"
+            style={{backgroundColor: '#5cb85c'}}>
+            <Icon name="add" />
+          </Fab>
         </View>
       </Container>
     );

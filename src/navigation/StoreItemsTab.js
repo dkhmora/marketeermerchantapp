@@ -32,7 +32,7 @@ class StoreItemsTab extends Component {
             style: {backgroundColor: '#E91E63'},
             activeTintColor: '#fff',
             inactiveTintcolor: '#eee',
-            indicatorStyle: {backgroundColor: '#FFEB3B'},
+            indicatorStyle: {backgroundColor: '#FFC107'},
           }}>
           {storeCategories.map((category, index) => {
             this.props.itemsStore.setCategoryItems(category);
