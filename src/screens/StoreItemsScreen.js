@@ -25,15 +25,7 @@ class StoreItemsScreen extends Component {
   render() {
     return (
       <StackOrder.Navigator initialRouteName="Store Items" headerMode="none">
-        <StackOrder.Screen
-          name="Store Items"
-          component={StoreItemsTab}
-          initialParams={{
-            leftTextKey: 'price',
-            middleTextKey: 'description',
-            fabButton: true,
-          }}
-        />
+        <StackOrder.Screen name="Store Items" component={StoreItemsTab} />
         <StackOrder.Screen name="Add Item" component={AddItemScreen} />
       </StackOrder.Navigator>
     );
