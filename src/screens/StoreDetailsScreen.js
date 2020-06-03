@@ -20,6 +20,7 @@ import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 
 @inject('detailsStore')
+@inject('itemsStore')
 @inject('authStore')
 @observer
 class StoreDetailsScreen extends Component {
@@ -29,6 +30,7 @@ class StoreDetailsScreen extends Component {
 
   componentDidMount() {
     this.props.detailsStore.setStoreDetails(this.props.authStore.merchantId);
+    this.props.itemsStore.setItemCategories(this.props.authStore.merchantId);
   }
 
   render() {

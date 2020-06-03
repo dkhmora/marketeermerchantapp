@@ -17,7 +17,7 @@ import {
 import BaseHeader from '../components/BaseHeader';
 import ImagePicker from 'react-native-image-crop-picker';
 import {inject, observer} from 'mobx-react';
-import {observable, action} from 'mobx';
+import {observable} from 'mobx';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -41,19 +41,7 @@ class AddItemScreen extends Component {
   @observable unit = '';
   @observable price = '';
   @observable stock = 0;
-  @observable categories = this.props.detailsStore.storeCategories;
-
-  @action resetFields() {
-    this.imageDisplay = require('../../assets/placeholder.jpg');
-    this.imagePath = '';
-    this.name = '';
-    this.category = '';
-    this.description = '';
-    this.unit = '';
-    this.price = '';
-    this.stock = 0;
-    this.categories = this.props.detailsStore.storeCategories;
-  }
+  @observable categories = this.props.itemsStore.itemCategories;
 
   componentDidMount() {
     this.category = this.props.route.params.pageCategory;
@@ -87,7 +75,6 @@ class AddItemScreen extends Component {
       cropping: true,
     })
       .then((image) => {
-        console.log(image.path.split('.').pop());
         this.imagePath = image.path;
         this.imageDisplay = {uri: image.path};
       })
@@ -98,7 +85,6 @@ class AddItemScreen extends Component {
   render() {
     const {name} = this.props.route;
     const {navigation} = this.props;
-    console.log(this.props.route.params.pageCategory);
 
     return (
       <Container style={{flex: 1}}>
