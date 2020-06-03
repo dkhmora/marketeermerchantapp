@@ -1,43 +1,43 @@
-import React from 'react';
-import {Container} from 'native-base';
+import React, {Component} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import BaseHeader from '../components/BaseHeader';
-import BaseTab from '../navigation/BaseTab';
+import {observer, inject} from 'mobx-react';
+// Custom Components
+import StoreItemsTab from '../navigation/StoreItemsTab';
+import AddItemScreen from './AddItemScreen';
 
 const StackOrder = createStackNavigator();
+@inject('authStore')
+@inject('detailsStore')
+@inject('itemsStore')
+@observer
+class StoreItemsScreen extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-export const StoreItemsScreen = ({navigation}) => {
-  const categories = [
-    {
-      name: 'Fruits',
-    },
-    {
-      name: 'Vegetables',
-    },
-    {
-      name: 'Drinks',
-    },
-    {
-      name: 'Others',
-    },
-  ];
+  componentDidMount() {
+    this.props.itemsStore.setStoreItems(
+      this.props.authStore.merchantId,
+      this.props.detailsStore.storeCategories,
+    );
+  }
 
-  const collection = 'items';
-  const leftTextKey = 'itemId';
-  const middleTextKey = 'userId';
-
-  return (
-    <Container>
-      <BaseHeader title="Store Items" optionsButton navigation={navigation} />
-
-      <StackOrder.Navigator initialRouteName="Item Tab" headerMode="none">
+  render() {
+    return (
+      <StackOrder.Navigator initialRouteName="Store Items" headerMode="none">
         <StackOrder.Screen
-          name="Item Tab"
-          component={BaseTab}
-          j
-          initialParams={{categories, collection, leftTextKey, middleTextKey}}
+          name="Store Items"
+          component={StoreItemsTab}
+          initialParams={{
+            leftTextKey: 'price',
+            middleTextKey: 'description',
+            fabButton: true,
+          }}
         />
+        <StackOrder.Screen name="Add Item" component={AddItemScreen} />
       </StackOrder.Navigator>
-    </Container>
-  );
-};
+    );
+  }
+}
+
+export default StoreItemsScreen;

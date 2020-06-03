@@ -1,50 +1,146 @@
-import React from 'react';
-import {Text, Container, List, Button, Grid, Row, Col} from 'native-base';
-import BaseListItem from '../components/BaseListItem';
+import React, {Component} from 'react';
+import {StyleSheet} from 'react-native';
+import {
+  Container,
+  List,
+  Grid,
+  Row,
+  Col,
+  Content,
+  Card,
+  Body,
+  Text,
+  CardItem,
+  Left,
+  Right,
+} from 'native-base';
+// Custom Components
 import BaseHeader from '../components/BaseHeader';
+// Mobx
+import {inject, observer} from 'mobx-react';
 
-export const StoreDetailsScreen = ({navigation}) => {
-  const TestData = {
-    storeName: 'Test Store',
-    storeDescription: 'Test Description',
-    deliveryDescription: 'Test Delivery Descriptionasdadadasss asdasda asdasda',
-  };
+@inject('detailsStore')
+@inject('authStore')
+@observer
+class StoreDetailsScreen extends Component {
+  constructor(props) {
+    super(props);
+  }
 
-  const [editable, setEditable] = React.useState(false);
+  componentDidMount() {
+    this.props.detailsStore.setStoreDetails(this.props.authStore.merchantId);
+  }
 
-  const StoreDetailsList = () => {
-    const listItem = Object.keys(TestData).map((item, index) => {
-      return (
-        <BaseListItem
-          onPress={() => setEditable(!editable)}
-          editable={editable}
-          leftText={`${_.startCase(item)}:`}
-          middleText={TestData[item]}
-          key={index}
+  render() {
+    const {
+      address,
+      cities,
+      deliveryDescription,
+      itemCategories,
+      storeDescription,
+      storeImage,
+      storeName,
+      visibleToPublic,
+    } = this.props.detailsStore.storeDetails;
+
+    return (
+      <Container style={{flex: 1}}>
+        <BaseHeader
+          title={this.props.route.name}
+          optionsButton
+          navigation={this.props.navigation}
         />
-      );
-    });
-    return listItem;
-  };
 
-  return (
-    <Container style={{flex: 1}}>
-      <BaseHeader title="Store Details" optionsButton navigation={navigation} />
+        <Content padder>
+          <Card style={{borderRadius: 16, overflow: 'hidden'}}>
+            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
+              <Left>
+                <Body>
+                  <Text style={{color: '#fff'}}>Store Card Preview</Text>
+                </Body>
+              </Left>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>Test</Text>
+              </Left>
+              <Right>
+                <Text>Text</Text>
+              </Right>
+            </CardItem>
+          </Card>
 
-      <Grid>
-        <Col>
-          <Row style={{backgroundColor: '#eee'}}>
-            <List style={{flex: 1}} listBorderColor="red">
-              <StoreDetailsList />
-            </List>
-          </Row>
-          <Row size={1}>
-            <Button rounded style={{flex: 1}}>
-              <Text>Testing</Text>
-            </Button>
-          </Row>
-        </Col>
-      </Grid>
-    </Container>
-  );
-};
+          <Card style={{borderRadius: 16, overflow: 'hidden'}}>
+            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
+              <Left>
+                <Body>
+                  <Text style={{color: '#fff'}}>Current Details</Text>
+                </Body>
+              </Left>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>Store Image:</Text>
+              </Left>
+              <Right>
+                <Text>{storeImage}</Text>
+              </Right>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>Store Display Name:</Text>
+              </Left>
+              <Right>
+                <Text>{storeName}</Text>
+              </Right>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>Store Description:</Text>
+              </Left>
+              <Right>
+                <Text>{storeDescription}</Text>
+              </Right>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>Delivery Description:</Text>
+              </Left>
+              <Right>
+                <Text>{deliveryDescription}</Text>
+              </Right>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>Store Address:</Text>
+              </Left>
+              <Right>
+                <Text>{address}</Text>
+              </Right>
+            </CardItem>
+          </Card>
+
+          <Card style={{borderRadius: 16, overflow: 'hidden'}}>
+            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
+              <Left>
+                <Body>
+                  <Text style={{color: '#fff'}}>Delivery Bounds</Text>
+                </Body>
+              </Left>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>Test</Text>
+              </Left>
+              <Right>
+                <Text>Text</Text>
+              </Right>
+            </CardItem>
+          </Card>
+        </Content>
+      </Container>
+    );
+  }
+}
+
+export default StoreDetailsScreen;

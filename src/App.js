@@ -1,29 +1,31 @@
 import React from 'react';
-import {Root, StyleProvider} from 'native-base';
+import {Root} from 'native-base';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
-import BaseDrawer from './navigation/BaseDrawer';
+import MainDrawer from './navigation/MainDrawer';
 import AuthStack from './navigation/AuthStack';
+import AuthLoader from './components/AuthLoader';
 
 const StackMain = createStackNavigator();
 
 const NavigationTheme = {
   dark: false,
   colors: {
-    primary: '#5B0EB5',
+    primary: '#E91E63',
     background: '#fff',
     card: '#fff',
-    text: '#1A191B',
-    border: '#eee',
+    text: '#1A1918',
+    border: '#fff',
   },
 };
 
 export default () => (
   <Root>
     <NavigationContainer theme={NavigationTheme}>
-      <StackMain.Navigator initialRouteName="Auth" headerMode="none">
+      <StackMain.Navigator initialRouteName="Loader" headerMode="none">
+        <StackMain.Screen name="Loader" component={AuthLoader} />
         <StackMain.Screen name="Auth" component={AuthStack} />
-        <StackMain.Screen name="Home" component={BaseDrawer} />
+        <StackMain.Screen name="Home" component={MainDrawer} />
       </StackMain.Navigator>
     </NavigationContainer>
   </Root>
