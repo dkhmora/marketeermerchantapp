@@ -7,7 +7,6 @@ import {observer, inject} from 'mobx-react';
 
 const TabBase = createMaterialTopTabNavigator();
 @inject('authStore')
-@inject('detailsStore')
 @inject('itemsStore')
 @observer
 class StoreItemsTab extends Component {
@@ -16,11 +15,11 @@ class StoreItemsTab extends Component {
   }
 
   render() {
-    const {storeCategories} = this.props.detailsStore;
+    const {itemCategories} = this.props.itemsStore;
     const {name} = this.props.route;
     const {navigation} = this.props;
 
-    const scroll = storeCategories.length > 2 ? true : false;
+    const scroll = itemCategories.length > 2 ? true : false;
 
     return (
       <Container style={{flex: 1}}>
@@ -34,7 +33,7 @@ class StoreItemsTab extends Component {
             inactiveTintcolor: '#eee',
             indicatorStyle: {backgroundColor: '#FFC107'},
           }}>
-          {storeCategories.map((category, index) => {
+          {itemCategories.map((category, index) => {
             this.props.itemsStore.setCategoryItems(category);
 
             return (

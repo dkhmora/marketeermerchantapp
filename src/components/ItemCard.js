@@ -35,7 +35,6 @@ export default function ItemCard(props) {
 
   const getImage = async () => {
     const link = await ref.getDownloadURL();
-    console.log(link);
     setUrl(link);
   };
   useEffect(() => {

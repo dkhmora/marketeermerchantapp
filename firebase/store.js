@@ -10,7 +10,6 @@ async function getStoreDetails(
     .doc(merchantId)
     .get()
     .then((doc) => {
-      console.log(doc.data());
       return doc.data();
     })
     .then((data) => {

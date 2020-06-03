@@ -3,7 +3,6 @@ import firestore from '@react-native-firebase/firestore';
 
 class DetailsStore {
   @observable storeDetails = {};
-  @observable storeCategories = [];
 
   @action setStoreDetails(merchantId) {
     firestore()
@@ -11,8 +10,6 @@ class DetailsStore {
       .doc(merchantId)
       .onSnapshot((documentSnapshot) => {
         this.storeDetails = documentSnapshot.data();
-        this.storeCategories = documentSnapshot.data().itemCategories;
-        console.log(this.storeDetails);
       });
   }
 }
