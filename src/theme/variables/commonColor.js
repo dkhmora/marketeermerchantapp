@@ -113,7 +113,7 @@ export default {
 
   // Card
   cardDefaultBg: '#fff',
-  cardBorderColor: '#ccc',
+  cardBorderColor: '#BDBDBD',
   cardBorderRadius: 2,
   cardItemPadding: platform === PLATFORM.IOS ? 10 : 12,
 
@@ -136,7 +136,7 @@ export default {
   brandDanger: '#d9534f',
   brandWarning: '#f0ad4e',
   brandDark: '#000',
-  brandLight: '#a9a9a9',
+  brandLight: '#F8BBD0',
 
   // Container
   containerBgColor: '#fff',
@@ -220,7 +220,7 @@ export default {
 
   // List
   listBg: 'transparent',
-  listBorderColor: '#c9c9c9',
+  listBorderColor: '#BDBDBD',
   listDividerBg: '#f4f4f4',
   listBtnUnderlayColor: '#DDD',
   listItemPadding: platform === PLATFORM.IOS ? 10 : 12,
@@ -264,7 +264,7 @@ export default {
   tabFontSize: 15,
 
   // Text
-  textColor: '#000',
+  textColor: '#212121',
   inverseTextColor: '#fff',
   noteFontSize: 14,
   get defaultTextColor() {

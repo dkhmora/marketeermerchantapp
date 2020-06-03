@@ -25,10 +25,6 @@ export default function OrderCard(props) {
     ...otherProps
   } = props;
 
-  // Card Title: User's Display Name,
-  // Card Subtitle: Order Number
-  // Card Body: User Address, Number of Items, Total Amount
-  // Card Footer: Button Actions for Orders
   const timeStamp = moment(createdAt, ISO_8601).fromNow();
 
   return (
