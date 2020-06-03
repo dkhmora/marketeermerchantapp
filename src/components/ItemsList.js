@@ -42,7 +42,10 @@ class ItemsList extends Component {
             numColumns={2}
             renderItem={({item, index}) =>
               item.empty ? (
-                <View style={{flex: 1, backgroundColor: 'transparent'}} />
+                <View
+                  style={{flex: 1, backgroundColor: 'transparent'}}
+                  key={index}
+                />
               ) : (
                 <ItemCard
                   name={`${item.name}`}
@@ -57,7 +60,7 @@ class ItemsList extends Component {
                 />
               )
             }
-            keyExtractor={(item) => item.name}
+            keyExtractor={(item, index) => `${item.name}${index.toString()}`}
             showsVerticalScrollIndicator={false}
           />
         </View>
