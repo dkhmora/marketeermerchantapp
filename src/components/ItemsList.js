@@ -29,6 +29,7 @@ class ItemsList extends Component {
 
   render() {
     const {category} = this.props.route.params;
+    const {navigation} = this.props;
     const dataSource = this.props.itemsStore.categoryItems
       .get(category)
       .slice();
@@ -63,13 +64,16 @@ class ItemsList extends Component {
             keyExtractor={(item, index) => `${item.name}${index.toString()}`}
             showsVerticalScrollIndicator={false}
           />
-          <Fab
-            containerStyle={{}}
-            position="bottomRight"
-            style={{backgroundColor: '#5cb85c'}}>
-            <Icon name="add" />
-          </Fab>
         </View>
+        <Fab
+          containerStyle={{}}
+          position="bottomRight"
+          style={{backgroundColor: '#5cb85c'}}
+          onPress={() =>
+            navigation.navigate('Add Item', {pageCategory: category})
+          }>
+          <Icon name="add" />
+        </Fab>
       </Container>
     );
   }

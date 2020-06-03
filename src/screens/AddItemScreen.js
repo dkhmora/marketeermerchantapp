@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {Component} from 'react';
 import {Image} from 'react-native';
 import {
   Container,
@@ -15,42 +15,72 @@ import {
   Icon,
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';
-import {addStoreItem} from '../../firebase/store';
 import ImagePicker from 'react-native-image-crop-picker';
+import {inject, observer} from 'mobx-react';
+import {observable, action} from 'mobx';
 
-export default function AddItemScreen({navigation, route}) {
-  const {merchantId, pageCategory, categories} = route.params;
+@inject('authStore')
+@inject('itemsStore')
+@inject('detailsStore')
+@observer
+class AddItemScreen extends Component {
+  constructor(props) {
+    super(props);
 
-  const [imagePath, setImagePath] = React.useState('');
-  const [imageDisplay, setImageDisplay] = React.useState(
-    require('../../assets/placeholder.jpg'),
-  );
-  const [category, setCategory] = React.useState('');
-  const [name, setName] = React.useState('');
-  const [description, setDescription] = React.useState('');
-  const [unit, setUnit] = React.useState('');
-  const [price, setPrice] = React.useState('');
-  const [stock, setStock] = React.useState('');
-
-  function onSubmit() {
-    addStoreItem(
-      merchantId,
-      imagePath,
-      category,
-      name,
-      description,
-      unit,
-      price,
-      stock,
-    );
-    console.log(merchantId, category, name, description, unit, price, stock);
+    this.state = {
+      pageCategory: this.props.pageCategory,
+    };
   }
 
-  useEffect(() => {
-    setCategory(pageCategory);
-  }, [pageCategory]);
+  // MobX
+  @observable imageDisplay = require('../../assets/placeholder.jpg');
+  @observable imagePath = '';
+  @observable name = '';
+  @observable category = '';
+  @observable description = '';
+  @observable unit = '';
+  @observable price = '';
+  @observable stock = 0;
+  @observable categories = this.props.detailsStore.storeCategories;
 
-  function handleImageUpload() {
+  @action resetFields() {
+    this.imageDisplay = require('../../assets/placeholder.jpg');
+    this.imagePath = '';
+    this.name = '';
+    this.category = '';
+    this.description = '';
+    this.unit = '';
+    this.price = '';
+    this.stock = 0;
+    this.categories = this.props.detailsStore.storeCategories;
+  }
+
+  componentDidMount() {
+    this.category = this.props.route.params.pageCategory;
+  }
+
+  onSubmit() {
+    this.props.itemsStore
+      .addStoreItem(
+        this.props.authStore.merchantId,
+        this.imagePath,
+        this.category,
+        this.name,
+        this.description,
+        this.unit,
+        this.price,
+        this.stock,
+      )
+      .then(() => {
+        this.props.navigation.goBack();
+      });
+  }
+
+  onValueChange(value) {
+    this.category = value;
+  }
+
+  handleImageUpload() {
     ImagePicker.openCamera({
       width: 400,
       height: 400,
@@ -58,134 +88,133 @@ export default function AddItemScreen({navigation, route}) {
     })
       .then((image) => {
         console.log(image.path.split('.').pop());
-        setImagePath(image.path);
-        setImageDisplay({uri: image.path});
+        this.imagePath = image.path;
+        this.imageDisplay = {uri: image.path};
       })
       .then(() => console.log('Image path successfully set!'))
       .catch((err) => console.error(err));
   }
 
-  function CategoryPicker() {
-    if (categories) {
-      return (
-        <Picker
-          note={false}
-          placeholder="Select Item Category"
-          selectedValue={category}
-          mode="dropdown"
-          iosIcon={<Icon name="arrow-down" />}
-          onValueChange={(itemValue) => setCategory(itemValue)}>
-          {categories.map((cat, index) => {
-            return <Picker.Item key={index} label={cat} value={cat} />;
-          })}
-        </Picker>
-      );
-    }
-    return null;
-  }
+  render() {
+    const {name} = this.props.route;
+    const {navigation} = this.props;
+    console.log(this.props.route.params.pageCategory);
 
-  return (
-    <Container style={{flex: 1}}>
-      <BaseHeader
-        title={route.name}
-        backButton
-        optionsButton
-        navigation={navigation}
-      />
-      <Content>
-        <Grid style={{padding: 18}}>
-          <Row size={2} style={{marginBottom: '2%'}}>
-            <Col style={{justifyContent: 'center'}}>
-              <Image
-                source={imageDisplay}
+    return (
+      <Container style={{flex: 1}}>
+        <BaseHeader
+          title={name}
+          backButton
+          optionsButton
+          navigation={navigation}
+        />
+        <Content>
+          <Grid style={{padding: 18}}>
+            <Row size={2} style={{marginBottom: '2%'}}>
+              <Col style={{justifyContent: 'center'}}>
+                <Image
+                  source={this.imageDisplay}
+                  style={{
+                    alignSelf: 'flex-start',
+                    borderColor: '#5B0EB5',
+                    borderRadius: 24,
+                    borderWidth: 1,
+                    aspectRatio: 1,
+                    height: '100%',
+                    width: '100%',
+                  }}
+                />
+              </Col>
+              <Col
                 style={{
-                  alignSelf: 'flex-start',
-                  borderColor: '#5B0EB5',
-                  borderRadius: 24,
-                  borderWidth: 1,
-                  aspectRatio: 1,
-                  height: '100%',
-                  width: '100%',
-                }}
-              />
-            </Col>
-            <Col
+                  justifyContent: 'flex-end',
+                  alignContent: 'center',
+                  marginHorizontal: 12,
+                }}>
+                <Button
+                  full
+                  bordered
+                  style={{borderRadius: 24}}
+                  onPress={() => this.handleImageUpload()}>
+                  <Text>Upload Image</Text>
+                </Button>
+              </Col>
+            </Row>
+            <Row
+              size={1}
               style={{
-                justifyContent: 'flex-end',
+                justifyContent: 'center',
+                flexDirection: 'column',
                 alignContent: 'center',
-                marginHorizontal: 12,
               }}>
+              <Item
+                rounded
+                style={{
+                  marginTop: 18,
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                }}>
+                <Picker
+                  note={false}
+                  placeholder="Select Item Category"
+                  mode="dropdown"
+                  selectedValue={this.category}
+                  iosIcon={<Icon name="arrow-down" />}
+                  onValueChange={this.onValueChange.bind(this)}>
+                  {this.categories.map((cat, index) => {
+                    return <Picker.Item key={index} label={cat} value={cat} />;
+                  })}
+                </Picker>
+              </Item>
+              <Item rounded style={{marginTop: 18}}>
+                <Input
+                  placeholder="Item Name"
+                  value={this.name}
+                  onChangeText={(value) => (this.name = value)}
+                />
+              </Item>
+              <Textarea
+                rowSpan={5}
+                bordered
+                placeholder="Item Description"
+                value={this.description}
+                onChangeText={(value) => (this.description = value)}
+                style={{marginTop: 18, borderRadius: 24}}
+              />
+              <Item rounded style={{marginTop: 18}}>
+                <Input
+                  placeholder="Price"
+                  keyboardType="number-pad"
+                  value={this.price}
+                  onChangeText={(value) => (this.price = value)}
+                />
+              </Item>
+              <Item rounded style={{marginTop: 18}}>
+                <Input
+                  placeholder="Unit"
+                  value={this.unit}
+                  onChangeText={(value) => (this.unit = value)}
+                />
+              </Item>
+              <Item rounded style={{marginTop: 18}}>
+                <Input
+                  placeholder="Initial Stock"
+                  value={this.stock}
+                  onChangeText={(value) => (this.stock = value)}
+                />
+              </Item>
               <Button
                 full
-                bordered
-                style={{borderRadius: 24}}
-                onPress={() => handleImageUpload()}>
-                <Text>Upload Image</Text>
+                style={{marginTop: 30, borderRadius: 24}}
+                onPress={() => this.onSubmit()}>
+                <Text>Submit</Text>
               </Button>
-            </Col>
-          </Row>
-          <Row
-            size={1}
-            style={{
-              justifyContent: 'center',
-              flexDirection: 'column',
-              alignContent: 'center',
-            }}>
-            <Item
-              rounded
-              style={{
-                marginTop: 18,
-                flexDirection: 'column',
-                alignItems: 'stretch',
-              }}>
-              <CategoryPicker />
-            </Item>
-            <Item rounded style={{marginTop: 18}}>
-              <Input
-                placeholder="Item Name"
-                value={name}
-                onChangeText={(value) => setName(value)}
-              />
-            </Item>
-            <Textarea
-              rowSpan={5}
-              bordered
-              placeholder="Item Description"
-              value={description}
-              onChangeText={(value) => setDescription(value)}
-              style={{marginTop: 18, borderRadius: 24}}
-            />
-            <Item rounded style={{marginTop: 18}}>
-              <Input
-                placeholder="Price"
-                keyboardType="number-pad"
-                value={price}
-                onChangeText={(value) => setPrice(value)}
-              />
-            </Item>
-            <Item rounded style={{marginTop: 18}}>
-              <Input
-                placeholder="Unit"
-                value={unit}
-                onChangeText={(value) => setUnit(value)}
-              />
-            </Item>
-            <Item rounded style={{marginTop: 18}}>
-              <Input
-                placeholder="Initial Stock"
-                value={stock}
-                onChangeText={(value) => setStock(value)}
-              />
-            </Item>
-            <Button
-              full
-              style={{marginTop: 30, borderRadius: 24}}
-              onPress={() => onSubmit()}>
-              <Text>Submit</Text>
-            </Button>
-          </Row>
-        </Grid>
-      </Content>
-    </Container>
-  );
+            </Row>
+          </Grid>
+        </Content>
+      </Container>
+    );
+  }
 }
+
+export default AddItemScreen;

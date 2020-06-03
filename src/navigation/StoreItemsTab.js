@@ -44,6 +44,7 @@ class StoreItemsTab extends Component {
                 key={index}
                 initialParams={{
                   category,
+                  navigation,
                 }}
               />
             );
@@ -53,11 +54,5 @@ class StoreItemsTab extends Component {
     );
   }
 }
-
-StoreItemsTab.defaultProps = {
-  categories: [],
-  items: [],
-  fabButton: false,
-};
 
 export default StoreItemsTab;
