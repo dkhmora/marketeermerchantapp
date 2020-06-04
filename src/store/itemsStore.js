@@ -20,8 +20,19 @@ class ItemsStore {
       });
   }
 
-  @action addItemCategory(merchantId, newCategory) {
-    firestore()
+  @action async deleteItemCategory(merchantId, category) {
+    const merchantItemsRef = firestore()
+      .collection('merchant_items')
+      .doc(merchantId);
+
+    await merchantItemsRef
+      .update('itemCategories', firestore.FieldValue.arrayRemove(category))
+      .then(() => console.log('Item deleted!'))
+      .catch((err) => console.error(err));
+  }
+
+  @action async addItemCategory(merchantId, newCategory) {
+    await firestore()
       .collection('merchant_items')
       .doc(merchantId)
       .get()

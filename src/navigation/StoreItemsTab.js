@@ -13,6 +13,8 @@ import {
   Body,
   H3,
   Toast,
+  Picker,
+  Icon,
 } from 'native-base';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import ItemsList from '../components/ItemsList';
@@ -31,6 +33,7 @@ class StoreItemsTab extends Component {
   }
 
   @observable newCategory = '';
+  @observable selectedCategory = '';
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
 
@@ -39,8 +42,20 @@ class StoreItemsTab extends Component {
     this.newCategory = '';
   }
 
-  showAddCategoryModal() {
+  @action showAddCategoryModal() {
     this.addCategoryModal = true;
+  }
+
+  @action showDeleteCategoryModal() {
+    this.deleteCategoryModal = true;
+  }
+
+  @action closeDeleteCategoryModal() {
+    this.deleteCategoryModal = false;
+  }
+
+  onValueChange(value) {
+    this.selectedCategory = value;
   }
 
   handleAddCategory() {
@@ -50,6 +65,13 @@ class StoreItemsTab extends Component {
     if (!itemCategories.includes(this.newCategory)) {
       addItemCategory(merchantId, this.newCategory);
       this.closeAddCategoryModal();
+      Toast.show({
+        text: `Category "${this.newCategory}" successfully added!`,
+        buttonText: 'Okay',
+        type: 'success',
+        duration: 5000,
+        style: {margin: 20, borderRadius: 16},
+      });
     } else {
       Toast.show({
         text: `Category "${this.newCategory}" already exists!`,
@@ -59,6 +81,32 @@ class StoreItemsTab extends Component {
         style: {margin: 20, borderRadius: 16},
       });
       this.closeAddCategoryModal();
+    }
+  }
+
+  handleDeleteCategory() {
+    const {deleteItemCategory, itemCategories} = this.props.itemsStore;
+    const {merchantId} = this.props.authStore;
+
+    if (itemCategories.includes(this.selectedCategory)) {
+      deleteItemCategory(merchantId, this.selectedCategory);
+      this.closeDeleteCategoryModal();
+      Toast.show({
+        text: `Category "${this.selectedCategory}" successfully deleted!`,
+        buttonText: 'Okay',
+        type: 'success',
+        duration: 5000,
+        style: {margin: 20, borderRadius: 16},
+      });
+    } else {
+      Toast.show({
+        text: `Category "${this.selectedCategory}" does not exist!`,
+        buttonText: 'Okay',
+        type: 'danger',
+        duration: 5000,
+        style: {margin: 20, borderRadius: 16},
+      });
+      this.closeDeleteCategoryModal();
     }
   }
 
@@ -74,7 +122,10 @@ class StoreItemsTab extends Component {
         <BaseHeader
           title={name}
           options={['Add Category', 'Delete Category']}
-          actions={[this.showAddCategoryModal.bind(this)]}
+          actions={[
+            this.showAddCategoryModal.bind(this),
+            this.showDeleteCategoryModal.bind(this),
+          ]}
           navigation={navigation}
         />
 
@@ -109,7 +160,7 @@ class StoreItemsTab extends Component {
                 <Right style={{flexDirection: 'row'}}>
                   <Button
                     transparent
-                    onPress={() => (this.addCategoryModal = false)}>
+                    onPress={() => this.closeAddCategoryModal()}>
                     <Text>Cancel</Text>
                   </Button>
                   <Button
@@ -122,6 +173,60 @@ class StoreItemsTab extends Component {
             </Card>
           </Modal>
         </View>
+
+        <View>
+          <Modal
+            isVisible={this.deleteCategoryModal}
+            transparent={true}
+            style={{alignItems: 'center'}}>
+            <Card
+              style={{
+                borderRadius: 16,
+                overflow: 'hidden',
+              }}>
+              <CardItem header>
+                <Left>
+                  <Body>
+                    <H3>Delete Category</H3>
+                  </Body>
+                </Left>
+              </CardItem>
+              <CardItem>
+                <Item rounded>
+                  <Picker
+                    note={false}
+                    placeholder="Select Item Category"
+                    mode="dropdown"
+                    selectedValue={this.selectedCategory}
+                    iosIcon={<Icon name="arrow-down" />}
+                    onValueChange={this.onValueChange.bind(this)}>
+                    {itemCategories.map((cat, index) => {
+                      return (
+                        <Picker.Item key={index} label={cat} value={cat} />
+                      );
+                    })}
+                  </Picker>
+                </Item>
+              </CardItem>
+              <CardItem footer>
+                <Left />
+                <Right style={{flexDirection: 'row'}}>
+                  <Button
+                    transparent
+                    onPress={() => this.closeDeleteCategoryModal()}>
+                    <Text>Cancel</Text>
+                  </Button>
+                  <Button
+                    transparent
+                    onPress={this.handleDeleteCategory.bind(this)}>
+                    <Text>Delete</Text>
+                  </Button>
+                </Right>
+              </CardItem>
+            </Card>
+          </Modal>
+        </View>
+
         <TabBase.Navigator
           tabBarOptions={{
             scrollEnabled: scroll,
