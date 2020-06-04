@@ -6,7 +6,6 @@ import BaseHeader from '../components/BaseHeader';
 import {observer, inject} from 'mobx-react';
 
 const TabBase = createMaterialTopTabNavigator();
-@inject('authStore')
 @inject('itemsStore')
 @observer
 class StoreItemsTab extends Component {

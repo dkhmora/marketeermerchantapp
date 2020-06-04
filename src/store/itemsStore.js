@@ -68,7 +68,7 @@ class ItemsStore {
           price,
           stock,
           sales: 0,
-          image: `/images/merchants/${merchantId}/items/${name}.${fileExtension}`,
+          image: imageRef,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         }),
@@ -77,6 +77,52 @@ class ItemsStore {
         this.uploadImage(imageRef, imagePath);
       })
       .then(() => console.log('Item added!'))
+      .catch((err) => console.error(err));
+  }
+
+  @action async deleteImage(image) {
+    await storage()
+      .ref(image)
+      .delete()
+      .then(() => {
+        console.log(`Image at ${image} successfully deleted!`);
+      });
+  }
+
+  @action async deleteStoreItem(
+    merchantId,
+    category,
+    name,
+    description,
+    unit,
+    price,
+    stock,
+    sales,
+    image,
+    createdAt,
+    updatedAt,
+  ) {
+    const merchantItemsRef = firestore()
+      .collection('merchant_items')
+      .doc(merchantId);
+
+    await merchantItemsRef
+      .update(
+        'items',
+        firestore.FieldValue.arrayRemove({
+          category,
+          name,
+          description,
+          unit,
+          price,
+          stock,
+          sales,
+          image,
+          createdAt,
+          updatedAt,
+        }),
+      )
+      .then(() => console.log('Item deleted!'))
       .catch((err) => console.error(err));
   }
 }

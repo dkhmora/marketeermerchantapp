@@ -40,7 +40,7 @@ class ItemsList extends Component {
         <View style={{paddingHorizontal: 10}}>
           <FlatList
             data={this.formatData(dataSource, numColumns)}
-            numColumns={2}
+            numColumns={numColumns}
             renderItem={({item, index}) =>
               item.empty ? (
                 <View
@@ -49,14 +49,16 @@ class ItemsList extends Component {
                 />
               ) : (
                 <ItemCard
-                  name={`${item.name}`}
-                  image={`${item.image}`}
-                  description={`${item.description}`}
-                  price={`${item.price}`}
-                  stock={`${item.stock}`}
-                  sales={`${item.sales}`}
-                  unit={`${item.unit}`}
-                  createdAt={`${item.createdAt}`}
+                  category={item.category}
+                  name={item.name}
+                  image={item.image}
+                  description={item.description}
+                  price={item.price}
+                  stock={item.stock}
+                  sales={item.sales}
+                  unit={item.unit}
+                  createdAt={item.createdAt}
+                  updatedAt={item.updatedAt}
                   key={index}
                 />
               )
