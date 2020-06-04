@@ -88,6 +88,52 @@ class OrdersStore {
         this.cancelledOrders = data;
       });
   }
+
+  @action setOrderStatus(merchantId, orderId) {
+    const statusArray = [
+      'pending',
+      'accepted',
+      'shipped',
+      'completed',
+      'cancelled',
+    ];
+    const orderRef = firestore()
+      .collection('merchants')
+      .doc(merchantId)
+      .collection('orders')
+      .doc(orderId);
+
+    orderRef
+      .get()
+      .then((documentReference) => {
+        const {orderStatus} = documentReference.data();
+        let currentStatus;
+        Object.keys(orderStatus).map((item, index) => {
+          if (orderStatus[`${item}`].status) {
+            currentStatus = item;
+          }
+        });
+        console.log(currentStatus);
+        return currentStatus;
+      })
+      .then((currentStatus) => {
+        const nextStatusIndex = statusArray.indexOf(currentStatus) + 1;
+        const nextStatus = statusArray[nextStatusIndex];
+
+        orderRef.update({
+          orderStatus: {
+            [currentStatus]: {
+              status: false,
+              updatedAt: new Date().toISOString(),
+            },
+            [nextStatus]: {
+              status: true,
+              updatedAt: new Date().toISOString(),
+            },
+          },
+        });
+      });
+  }
 }
 
 export default OrdersStore;

@@ -20,7 +20,8 @@ class OrdersList extends Component {
   }
 
   render() {
-    const {storeVarName} = this.props.route.params;
+    const {storeVarName, buttonText} = this.props.route.params;
+    const {merchantId} = this.props.authStore;
     const dataSource = this.props.ordersStore[`${storeVarName}`].slice();
 
     return (
@@ -30,13 +31,15 @@ class OrdersList extends Component {
             data={dataSource}
             renderItem={({item, index}) => (
               <OrderCard
-                orderNumber={`${item.orderNumber}`}
+                merchantId={merchantId}
+                orderNumber={item.orderNumber}
                 userName={`${item.userName}`}
-                numberOfItems={`${item.numberOfItems}`}
-                totalAmount={`${item.totalAmount}`}
-                orderId={`${item.orderId}`}
-                userAddress={`${item.userAddress}`}
-                createdAt={`${item.createdAt}`}
+                numberOfItems={item.numberOfItems}
+                totalAmount={item.totalAmount}
+                orderId={item.orderId}
+                userAddress={item.userAddress}
+                createdAt={item.createdAt}
+                buttonText={buttonText}
                 key={index}
               />
             )}
