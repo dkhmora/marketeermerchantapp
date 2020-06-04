@@ -22,7 +22,11 @@ class StoreItemsTab extends Component {
 
     return (
       <Container style={{flex: 1}}>
-        <BaseHeader title={name} optionsButton navigation={navigation} />
+        <BaseHeader
+          title={name}
+          options={['Add Category', 'Delete Category']}
+          navigation={navigation}
+        />
 
         <TabBase.Navigator
           tabBarOptions={{

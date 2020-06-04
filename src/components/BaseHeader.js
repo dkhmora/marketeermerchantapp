@@ -42,15 +42,15 @@ export default function BaseHeader(props) {
     return null;
   };
 
-  const myIcon = (
-    <Icon name="more" size={30} style={{color: '#5B0EB5', marginRight: 8}} />
+  const optionsIcon = (
+    <Icon name="more" style={{color: '#E91E63', marginRight: 8}} />
   );
 
   const RightHeaderButton = () => {
     if (options) {
       return (
         <OptionsMenu
-          customButton={myIcon}
+          customButton={optionsIcon}
           destructiveIndex={1}
           options={options}
           actions={actions}
