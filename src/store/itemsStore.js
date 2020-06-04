@@ -20,6 +20,28 @@ class ItemsStore {
       });
   }
 
+  @action addItemCategory(merchantId, newCategory) {
+    firestore()
+      .collection('merchant_items')
+      .doc(merchantId)
+      .get()
+      .then((documentSnapshot) => {
+        if (!documentSnapshot.data().itemCategories.includes(newCategory)) {
+          documentSnapshot.ref
+            .update(
+              'itemCategories',
+              firestore.FieldValue.arrayUnion(newCategory),
+            )
+            .then(() =>
+              console.log(`Successfully added new category "${newCategory}"`),
+            );
+        } else {
+          console.error(`${newCategory} already exists`);
+        }
+      })
+      .catch((err) => console.error(err));
+  }
+
   @action setStoreItems(merchantId) {
     firestore()
       .collection('merchant_items')

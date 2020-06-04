@@ -1,6 +1,5 @@
 import React from 'react';
 import {Text, Container, Button, Grid, Row, Input, Item} from 'native-base';
-import {signIn} from '../../firebase/auth';
 
 export function LoginScreen({navigation}) {
   const [email, setEmail] = React.useState('');

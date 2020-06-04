@@ -8,7 +8,6 @@ import {
 import StoreItemsScreen from '../screens/StoreItemsScreen';
 import StoreDetailsScreen from '../screens/StoreDetailsScreen';
 import OrdersScreen from '../screens/OrdersScreen';
-import {signOut} from '../../firebase/auth';
 import {Icon, View, Text, Item, Label, Button} from 'native-base';
 
 export default function MainDrawer({route, navigation}) {
