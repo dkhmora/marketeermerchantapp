@@ -10,7 +10,7 @@ import {
   Icon,
   View,
 } from 'native-base';
-import {Image} from 'react-native';
+import {Image, ActionSheetIOS, Platform} from 'react-native';
 import moment, {ISO_8601} from 'moment';
 import OptionsMenu from 'react-native-options-menu';
 import storage from '@react-native-firebase/storage';
@@ -61,6 +61,23 @@ class ItemCard extends Component {
     ).then(() => deleteImage(image));
   }
 
+  openOptions() {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'Delete'],
+        destructiveIndex: 1,
+        cancelButtonIndex: 0,
+      },
+      (buttonIndex) => {
+        if (buttonIndex === 0) {
+          // cancel action
+        } else {
+          this.handleDelete();
+        }
+      },
+    );
+  }
+
   componentDidMount() {
     if (this.image) {
       this.getImage();
@@ -106,18 +123,24 @@ class ItemCard extends Component {
               </Body>
             </Left>
             <Right style={{marginLeft: '-50%'}}>
-              <Button transparent>
-                <OptionsMenu
-                  customButton={
-                    <View>
-                      <Icon name="more" style={{color: '#fff'}} />
-                    </View>
-                  }
-                  destructiveIndex={1}
-                  options={['Delete Item']}
-                  actions={[this.handleDelete.bind(this)]}
-                />
-              </Button>
+              {Platform.OS === 'android' ? (
+                <Button transparent>
+                  <OptionsMenu
+                    customButton={
+                      <View>
+                        <Icon name="more" style={{color: '#fff'}} />
+                      </View>
+                    }
+                    destructiveIndex={1}
+                    options={['Delete Item', 'Cancel']}
+                    actions={[this.handleDelete.bind(this)]}
+                  />
+                </Button>
+              ) : (
+                <Button transparent onPress={() => this.openOptions()}>
+                  <Icon name="more" style={{color: '#fff'}} />
+                </Button>
+              )}
             </Right>
           </CardItem>
           <CardItem cardBody>

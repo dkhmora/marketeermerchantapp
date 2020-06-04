@@ -16,6 +16,7 @@ import {
   Picker,
   Icon,
 } from 'native-base';
+import {ActionSheetIOS} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import ItemsList from '../components/ItemsList';
 import BaseHeader from '../components/BaseHeader';
@@ -52,6 +53,25 @@ class StoreItemsTab extends Component {
 
   @action closeDeleteCategoryModal() {
     this.deleteCategoryModal = false;
+  }
+
+  openOptions() {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'Add Category', 'Delete Category'],
+        destructiveIndex: 1,
+        cancelButtonIndex: 0,
+      },
+      (buttonIndex) => {
+        if (buttonIndex === 0) {
+          // cancel action
+        } else if (buttonIndex === 1) {
+          this.showAddCategoryModal();
+        } else {
+          this.showDeleteCategoryModal();
+        }
+      },
+    );
   }
 
   onValueChange(value) {
@@ -121,11 +141,12 @@ class StoreItemsTab extends Component {
       <Container style={{flex: 1}}>
         <BaseHeader
           title={name}
-          options={['Add Category', 'Delete Category']}
+          options={['Add Category', 'Delete Category', 'Cancel']}
           actions={[
             this.showAddCategoryModal.bind(this),
             this.showDeleteCategoryModal.bind(this),
           ]}
+          openOptions={this.openOptions.bind(this)}
           navigation={navigation}
         />
 
@@ -192,7 +213,9 @@ class StoreItemsTab extends Component {
                 </Left>
               </CardItem>
               <CardItem>
-                <Item rounded>
+                <Item
+                  rounded
+                  style={{flexDirection: 'column', alignItems: 'stretch'}}>
                   <Picker
                     note={false}
                     placeholder="Select Item Category"
@@ -210,7 +233,7 @@ class StoreItemsTab extends Component {
               </CardItem>
               <CardItem footer>
                 <Left />
-                <Right style={{flexDirection: 'row'}}>
+                <Right style={{flexDirection: 'row', marginRight: 45}}>
                   <Button
                     transparent
                     onPress={() => this.closeDeleteCategoryModal()}>
