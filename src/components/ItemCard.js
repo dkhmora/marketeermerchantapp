@@ -109,12 +109,9 @@ class ItemCard extends Component {
               <Button transparent>
                 <OptionsMenu
                   customButton={
-                    <Icon
-                      active
-                      name="dots-three-vertical"
-                      type="Entypo"
-                      style={{color: '#fff'}}
-                    />
+                    <View>
+                      <Icon name="more" style={{color: '#fff'}} />
+                    </View>
                   }
                   destructiveIndex={1}
                   options={['Delete Item']}

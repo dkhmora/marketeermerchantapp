@@ -88,12 +88,7 @@ class AddItemScreen extends Component {
 
     return (
       <Container style={{flex: 1}}>
-        <BaseHeader
-          title={name}
-          backButton
-          optionsButton
-          navigation={navigation}
-        />
+        <BaseHeader title={name} backButton navigation={navigation} />
         <Content>
           <Grid style={{padding: 18}}>
             <Row size={2} style={{marginBottom: '2%'}}>
