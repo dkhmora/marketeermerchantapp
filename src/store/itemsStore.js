@@ -70,7 +70,6 @@ class ItemsStore {
           sales: 0,
           image: imageRef,
           createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
         }),
       })
       .then(() => {
@@ -100,7 +99,6 @@ class ItemsStore {
     sales,
     image,
     createdAt,
-    updatedAt,
   ) {
     const merchantItemsRef = firestore()
       .collection('merchant_items')
@@ -119,7 +117,6 @@ class ItemsStore {
           sales,
           image,
           createdAt,
-          updatedAt,
         }),
       )
       .then(() => console.log('Item deleted!'))

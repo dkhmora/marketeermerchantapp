@@ -16,6 +16,7 @@ import OptionsMenu from 'react-native-options-menu';
 import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
 import {observable} from 'mobx';
+import {ScrollView} from 'react-native-gesture-handler';
 @inject('itemsStore')
 @inject('authStore')
 @observer
@@ -44,7 +45,6 @@ class ItemCard extends Component {
       sales,
       unit,
       createdAt,
-      updatedAt,
     } = this.props;
 
     deleteStoreItem(
@@ -58,12 +58,13 @@ class ItemCard extends Component {
       sales,
       image,
       createdAt,
-      updatedAt,
     ).then(() => deleteImage(image));
   }
 
   componentDidMount() {
-    this.getImage();
+    if (this.image) {
+      this.getImage();
+    }
   }
 
   render() {
@@ -152,27 +153,39 @@ class ItemCard extends Component {
               borderTopRightRadius: 8,
               position: 'relative',
               bottom: 20,
+              elevation: 5,
             }}>
-            <Body>
-              <Text>{description}</Text>
+            <Body
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                height: 100,
+                flexGrow: 1,
+                flexShrink: 1,
+              }}>
+              <ScrollView style={{flex: 1}}>
+                <Text>{description ? description : 'No description'}</Text>
+              </ScrollView>
             </Body>
           </CardItem>
-          <CardItem bordered style={{bottom: 20}}>
-            <Body>
+          <CardItem bordered style={{bottom: 20, elevation: 5}}>
+            <Body
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+              }}>
               <Text>
                 ₱{price}/{unit}
               </Text>
             </Body>
           </CardItem>
-          <CardItem footer bordered style={{bottom: 20, marginBottom: -20}}>
-            <Left>
-              <Text note>Created {timeStamp}</Text>
-            </Left>
-            <Right>
-              <Button rounded light>
-                <Text>Edit</Text>
-              </Button>
-            </Right>
+          <CardItem
+            footer
+            bordered
+            style={{bottom: 20, marginBottom: -20, elevation: 5}}>
+            <Body>
+              <Text note>Added {timeStamp}</Text>
+            </Body>
           </CardItem>
         </Card>
       </View>
