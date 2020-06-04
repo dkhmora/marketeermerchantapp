@@ -34,7 +34,7 @@ class OrdersTab extends Component {
             initialParams={{
               storeFunctionName: 'setPendingOrders',
               storeVarName: 'pendingOrders',
-              buttonText: 'accept',
+              buttonText: 'Accept',
             }}
           />
           <TabOrders.Screen
@@ -43,7 +43,7 @@ class OrdersTab extends Component {
             initialParams={{
               storeFunctionName: 'setAcceptedOrders',
               storeVarName: 'acceptedOrders',
-              buttonText: 'ship',
+              buttonText: 'Ship',
             }}
           />
           <TabOrders.Screen
