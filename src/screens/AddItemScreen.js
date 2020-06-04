@@ -168,6 +168,7 @@ class AddItemScreen extends Component {
                 style={{marginTop: 18, borderRadius: 24}}
               />
               <Item rounded style={{marginTop: 18}}>
+                <Text style={{marginLeft: 15}}>₱</Text>
                 <Input
                   placeholder="Price"
                   keyboardType="number-pad"
@@ -184,6 +185,7 @@ class AddItemScreen extends Component {
               </Item>
               <Item rounded style={{marginTop: 18}}>
                 <Input
+                  keyboardType="number-pad"
                   placeholder="Initial Stock"
                   value={this.stock}
                   onChangeText={(value) => (this.stock = value)}
