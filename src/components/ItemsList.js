@@ -58,7 +58,6 @@ class ItemsList extends Component {
                   sales={item.sales}
                   unit={item.unit}
                   createdAt={item.createdAt}
-                  updatedAt={item.updatedAt}
                   key={index}
                 />
               )
