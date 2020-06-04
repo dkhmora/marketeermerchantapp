@@ -29,7 +29,9 @@ class ItemCard extends Component {
 
   getImage = async () => {
     const ref = storage().ref(this.props.image);
-    this.url = await ref.getDownloadURL();
+    const link = await ref.getDownloadURL();
+    this.url = link;
+    console.log(this.url);
   };
 
   handleDelete() {
@@ -79,7 +81,7 @@ class ItemCard extends Component {
   }
 
   componentDidMount() {
-    if (this.image) {
+    if (this.props.image) {
       this.getImage();
     }
   }
