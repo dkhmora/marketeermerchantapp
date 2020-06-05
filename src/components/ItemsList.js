@@ -37,7 +37,7 @@ class ItemsList extends Component {
 
     return (
       <Container style={{flex: 1}}>
-        <View style={{paddingHorizontal: 10}}>
+        <View style={{paddingHorizontal: 10, flex: 1}}>
           <FlatList
             data={this.formatData(dataSource, numColumns)}
             numColumns={numColumns}
