@@ -25,6 +25,34 @@ class OrderCard extends Component {
     this.props.ordersStore.setOrderStatus(merchantId, orderId);
   }
 
+  handleViewOrderItems() {
+    const {
+      navigation,
+      orderId,
+      userName,
+      orderNumber,
+      numberOfItems,
+      shippingPrice,
+      totalAmount,
+      userAddress,
+      createdAt,
+    } = this.props;
+
+    this.props.ordersStore.setOrderItems(orderId).then(() => {
+      navigation.dangerouslyGetParent().navigate('Order Details', {
+        orderId,
+        orderItems: this.props.ordersStore.orderItems,
+        userName,
+        orderNumber,
+        numberOfItems,
+        shippingPrice,
+        totalAmount,
+        userAddress,
+        createdAt,
+      });
+    });
+  }
+
   render() {
     const {
       orderNumber,
@@ -99,13 +127,17 @@ class OrderCard extends Component {
             <Text>Total Amount:</Text>
           </Left>
           <Right>
-            <Text>{totalAmount}</Text>
+            <Text>₱{totalAmount}</Text>
           </Right>
         </CardItem>
         <CardItem>
           <Body>
-            <Button full bordered rounded>
-              <Text>View Order Items</Text>
+            <Button
+              full
+              bordered
+              rounded
+              onPress={this.handleViewOrderItems.bind(this)}>
+              <Text>View Full Order</Text>
             </Button>
           </Body>
         </CardItem>
