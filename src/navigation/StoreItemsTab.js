@@ -214,7 +214,13 @@ class StoreItemsTab extends Component {
                 </Left>
               </CardItem>
               <CardItem>
-                <Item rounded>
+                <Item
+                  rounded
+                  style={{
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                    width: '100%',
+                  }}>
                   <Picker
                     note={false}
                     placeholder="Select Item Category"
