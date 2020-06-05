@@ -13,6 +13,8 @@ import {
   Textarea,
   Picker,
   Icon,
+  Card,
+  CardItem,
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -68,8 +70,22 @@ class AddItemScreen extends Component {
     this.category = value;
   }
 
-  handleImageUpload() {
+  handleTakePhoto() {
     ImagePicker.openCamera({
+      width: 400,
+      height: 400,
+      cropping: true,
+    })
+      .then((image) => {
+        this.imagePath = image.path;
+        this.imageDisplay = {uri: image.path};
+      })
+      .then(() => console.log('Image path successfully set!'))
+      .catch((err) => console.error(err));
+  }
+
+  handleSelectImage() {
+    ImagePicker.openPicker({
       width: 400,
       height: 400,
       cropping: true,
@@ -91,35 +107,59 @@ class AddItemScreen extends Component {
         <BaseHeader title={name} backButton navigation={navigation} />
         <Content>
           <Grid style={{padding: 18}}>
-            <Row size={2} style={{marginBottom: '2%'}}>
+            <Row size={3} style={{marginBottom: '2%'}}>
               <Col style={{justifyContent: 'center'}}>
                 <Image
                   source={this.imageDisplay}
                   style={{
                     alignSelf: 'flex-start',
-                    borderColor: '#5B0EB5',
+                    borderColor: '#BDBDBD',
                     borderRadius: 24,
                     borderWidth: 1,
                     aspectRatio: 1,
                     height: '100%',
-                    width: '100%',
+                    width: null,
                   }}
                 />
               </Col>
               <Col
                 style={{
-                  justifyContent: 'flex-end',
+                  justifyContent: 'center',
                   alignContent: 'center',
                   marginHorizontal: 12,
                 }}>
                 <Button
                   full
                   bordered
+                  iconLeft
                   style={{borderRadius: 24}}
-                  onPress={() => this.handleImageUpload()}>
-                  <Text>Upload Image</Text>
+                  onPress={() => this.handleSelectImage()}>
+                  <Icon name="images" />
+                  <Text>Select Image</Text>
+                </Button>
+                <Text style={{textAlign: 'center', marginVertical: 12}}>
+                  or
+                </Text>
+                <Button
+                  full
+                  bordered
+                  iconLeft
+                  style={{borderRadius: 24}}
+                  onPress={() => this.handleTakePhoto()}>
+                  <Icon name="camera" />
+                  <Text>Take Photo</Text>
                 </Button>
               </Col>
+            </Row>
+            <Row>
+              <Card style={{borderRadius: 16, overflow: 'hidden'}}>
+                <CardItem>
+                  <Text note style={{textAlign: 'left'}}>
+                    Tip: Uploading a photo makes customers more likely to buy
+                    your product!
+                  </Text>
+                </CardItem>
+              </Card>
             </Row>
             <Row
               size={1}
