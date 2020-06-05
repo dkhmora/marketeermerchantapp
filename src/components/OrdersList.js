@@ -21,6 +21,7 @@ class OrdersList extends Component {
 
   render() {
     const {storeVarName, buttonText} = this.props.route.params;
+    const {name} = this.props.route;
     const {merchantId} = this.props.authStore;
     const dataSource = this.props.ordersStore[`${storeVarName}`].slice();
 
@@ -39,7 +40,7 @@ class OrdersList extends Component {
                 orderId={item.orderId}
                 userAddress={item.userAddress}
                 createdAt={item.createdAt}
-                buttonText={buttonText}
+                tabName={name}
                 key={index}
               />
             )}
