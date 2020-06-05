@@ -88,8 +88,16 @@ class OrderCard extends Component {
               </Text>
             </Body>
           </Left>
-          <Right>
-            <Button transparent>
+          <Right
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginLeft: `-15%`,
+            }}>
+            <Text note style={{color: '#ddd'}}>
+              Merchant Fee: ₱{(totalAmount * 0.05).toPrecision(5)}
+            </Text>
+            <Button transparent style={{marginLeft: '10%'}}>
               <OptionsMenu
                 customButton={
                   <Icon
@@ -108,18 +116,10 @@ class OrderCard extends Component {
         </CardItem>
         <CardItem bordered>
           <Left>
-            <Text>User Address:</Text>
+            <Text>Address:</Text>
           </Left>
           <Right>
             <Text>{userAddress}</Text>
-          </Right>
-        </CardItem>
-        <CardItem bordered>
-          <Left>
-            <Text>Number of Items:</Text>
-          </Left>
-          <Right>
-            <Text>{numberOfItems}</Text>
           </Right>
         </CardItem>
         <CardItem bordered>
@@ -128,6 +128,7 @@ class OrderCard extends Component {
           </Left>
           <Right>
             <Text>₱{totalAmount}</Text>
+            <Text note>{numberOfItems} items</Text>
           </Right>
         </CardItem>
         <CardItem>
