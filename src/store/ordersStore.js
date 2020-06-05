@@ -107,31 +107,32 @@ class OrdersStore {
       .get()
       .then((documentReference) => {
         const {orderStatus} = documentReference.data();
+        let newOrderStatus = {};
         let currentStatus;
         Object.keys(orderStatus).map((item, index) => {
           if (orderStatus[`${item}`].status) {
             currentStatus = item;
           }
         });
-        console.log(currentStatus);
-        return currentStatus;
-      })
-      .then((currentStatus) => {
+
         const nextStatusIndex = statusArray.indexOf(currentStatus) + 1;
         const nextStatus = statusArray[nextStatusIndex];
 
-        orderRef.update({
-          orderStatus: {
-            [currentStatus]: {
-              status: false,
-              updatedAt: new Date().toISOString(),
-            },
-            [nextStatus]: {
-              status: true,
-              updatedAt: new Date().toISOString(),
-            },
-          },
-        });
+        newOrderStatus = orderStatus;
+
+        newOrderStatus[`${currentStatus}`].status = false;
+
+        newOrderStatus[`${nextStatus}`] = {
+          status: true,
+          updatedAt: new Date().toISOString(),
+        };
+
+        console.log(newOrderStatus);
+
+        return newOrderStatus;
+      })
+      .then((newOrderStatus) => {
+        orderRef.update({orderStatus: newOrderStatus});
       });
   }
 }
