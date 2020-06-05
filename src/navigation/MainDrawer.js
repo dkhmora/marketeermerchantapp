@@ -6,7 +6,7 @@ import {
   DrawerItemList,
 } from '@react-navigation/drawer';
 import StoreItemsScreen from '../screens/StoreItemsScreen';
-import StoreDetailsScreen from '../screens/StoreDetailsScreen';
+import StoreDetailsScreen from '../screens/DashboardScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import {Icon, View, Text, Item, Label, Button} from 'native-base';
 
@@ -16,7 +16,7 @@ export default function MainDrawer({route, navigation}) {
 
   return (
     <Drawer.Navigator
-      initialRouteName="Store Details"
+      initialRouteName="Dashboard"
       drawerStyle={{backgroundColor: '#eee', width: 240}}
       drawerContent={(props) => {
         return (
@@ -39,7 +39,7 @@ export default function MainDrawer({route, navigation}) {
         );
       }}>
       <Drawer.Screen
-        name="Store Details"
+        name="Dashboard"
         component={StoreDetailsScreen}
         initialParams={{merchantId}}
       />

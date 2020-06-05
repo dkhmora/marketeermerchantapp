@@ -76,7 +76,7 @@ class StoreDetailsScreen extends Component {
             <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
               <Left>
                 <Body>
-                  <Text style={{color: '#fff'}}>Current Details</Text>
+                  <Text style={{color: '#fff'}}>Store Details</Text>
                 </Body>
               </Left>
             </CardItem>
@@ -127,6 +127,24 @@ class StoreDetailsScreen extends Component {
               <Left>
                 <Body>
                   <Text style={{color: '#fff'}}>Delivery Bounds</Text>
+                </Body>
+              </Left>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>Test</Text>
+              </Left>
+              <Right>
+                <Text>Text</Text>
+              </Right>
+            </CardItem>
+          </Card>
+
+          <Card style={{borderRadius: 16, overflow: 'hidden'}}>
+            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
+              <Left>
+                <Body>
+                  <Text style={{color: '#fff'}}>Sales</Text>
                 </Body>
               </Left>
             </CardItem>
