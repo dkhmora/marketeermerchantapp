@@ -15,6 +15,8 @@ import {
   Icon,
   Card,
   CardItem,
+  H3,
+  View,
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -206,30 +208,33 @@ class AddItemScreen extends Component {
               <Text note style={{alignSelf: 'flex-end', marginRight: 16}}>
                 Character Limit: {this.description.length}/150
               </Text>
-              <Item rounded style={{marginTop: 18}}>
-                <Text style={{marginLeft: 15}}>₱</Text>
-                <Input
-                  placeholder="Price"
-                  keyboardType="number-pad"
-                  value={this.price}
-                  onChangeText={(value) => (this.price = value)}
-                />
-              </Item>
-              <Item rounded style={{marginTop: 18}}>
-                <Input
-                  placeholder="Unit"
-                  value={this.unit}
-                  onChangeText={(value) => (this.unit = value)}
-                />
-              </Item>
-              <Item rounded style={{marginTop: 18}}>
-                <Input
-                  keyboardType="number-pad"
-                  placeholder="Initial Stock"
-                  value={this.stock}
-                  onChangeText={(value) => (this.stock = value)}
-                />
-              </Item>
+              <View style={{flex: 1, flexDirection: 'row', marginTop: 18}}>
+                <Item rounded style={{flex: 1, marginRight: 12}}>
+                  <Text style={{marginLeft: 15}}>₱</Text>
+                  <Input
+                    placeholder="Price"
+                    keyboardType="number-pad"
+                    value={this.price}
+                    onChangeText={(value) => (this.price = value)}
+                    style={{textAlign: 'right'}}
+                  />
+                  <H3>/</H3>
+                  <Input
+                    placeholder="Unit"
+                    autoCapitalize="none"
+                    value={this.unit}
+                    onChangeText={(value) => (this.unit = value)}
+                  />
+                </Item>
+                <Item rounded style={{flex: 1}}>
+                  <Input
+                    keyboardType="number-pad"
+                    placeholder="Initial Stock"
+                    value={this.stock}
+                    onChangeText={(value) => (this.stock = value)}
+                  />
+                </Item>
+              </View>
               <Button
                 full
                 style={{marginTop: 30, borderRadius: 24}}
