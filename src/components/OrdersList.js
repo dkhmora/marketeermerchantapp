@@ -20,7 +20,7 @@ class OrdersList extends Component {
   }
 
   render() {
-    const { navigation } = this.props;
+    const {navigation} = this.props;
     const {storeVarName, buttonText} = this.props.route.params;
     const {name} = this.props.route;
     const {merchantId} = this.props.authStore;
@@ -28,7 +28,7 @@ class OrdersList extends Component {
 
     return (
       <Container style={{flex: 1}}>
-        <View style={{paddingHorizontal: 10}}>
+        <View style={{paddingHorizontal: 10, flex: 1}}>
           <FlatList
             data={dataSource}
             renderItem={({item, index}) => (
