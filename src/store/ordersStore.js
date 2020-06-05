@@ -127,8 +127,6 @@ class OrdersStore {
           updatedAt: new Date().toISOString(),
         };
 
-        console.log(newOrderStatus);
-
         return newOrderStatus;
       })
       .then((newOrderStatus) => {
