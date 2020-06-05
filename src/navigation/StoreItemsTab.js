@@ -34,7 +34,7 @@ class StoreItemsTab extends Component {
   }
 
   @observable newCategory = '';
-  @observable selectedCategory = '';
+  @observable selectedCategory = this.props.itemsStore.itemCategories[0];
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
 
@@ -110,6 +110,7 @@ class StoreItemsTab extends Component {
 
     if (itemCategories.includes(this.selectedCategory)) {
       deleteItemCategory(merchantId, this.selectedCategory);
+      this.selectedCategory = this.props.itemsStore.itemCategories[0];
       this.closeDeleteCategoryModal();
       Toast.show({
         text: `Category "${this.selectedCategory}" successfully deleted!`,
@@ -213,9 +214,7 @@ class StoreItemsTab extends Component {
                 </Left>
               </CardItem>
               <CardItem>
-                <Item
-                  rounded
-                  style={{flexDirection: 'column', alignItems: 'stretch'}}>
+                <Item rounded>
                   <Picker
                     note={false}
                     placeholder="Select Item Category"
