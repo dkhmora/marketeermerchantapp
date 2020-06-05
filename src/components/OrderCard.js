@@ -36,9 +36,17 @@ class OrderCard extends Component {
       userAddress,
       createdAt,
       index,
-      buttonText,
+      tabName,
       ...otherProps
     } = this.props;
+
+    const buttonText =
+      (tabName === 'Accepted' && 'Ship') || (tabName === 'Pending' && 'Accept');
+
+    const footerStatus =
+      tabName === 'Shipped'
+        ? 'Waiting for Customer to Confirm Receipt of Products'
+        : `Order ${tabName}`;
 
     const timeStamp = moment(createdAt, ISO_8601).fromNow();
 
@@ -107,14 +115,16 @@ class OrderCard extends Component {
             <Text note>{timeStamp}</Text>
           </Left>
           <Right>
-            {buttonText ? (
+            {footerStatus && !buttonText ? (
+              <Text note>{footerStatus}</Text>
+            ) : (
               <Button
                 success
                 rounded
                 onPress={this.handleOrderStatus.bind(this)}>
                 <Text>{buttonText}</Text>
               </Button>
-            ) : null}
+            )}
           </Right>
         </CardItem>
       </Card>
