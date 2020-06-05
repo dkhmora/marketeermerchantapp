@@ -146,8 +146,11 @@ class ItemCard extends Component {
             </Right>
           </CardItem>
           <CardItem cardBody>
-            {this.url ? (
+            {image ? (
               <Image
+                loadingIndicatorSource={
+                  (require('../../assets/placeholder.jpg'), 2)
+                }
                 source={{uri: this.url}}
                 style={{
                   height: 150,
