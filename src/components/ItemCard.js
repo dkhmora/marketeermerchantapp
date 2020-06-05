@@ -31,7 +31,6 @@ class ItemCard extends Component {
     const ref = storage().ref(this.props.image);
     const link = await ref.getDownloadURL();
     this.url = link;
-    console.log(this.url);
   };
 
   handleDelete() {

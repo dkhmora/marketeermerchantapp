@@ -22,7 +22,6 @@ class OrderCard extends Component {
 
   handleOrderStatus() {
     const {merchantId, orderId} = this.props;
-    console.log(merchantId, orderId);
     this.props.ordersStore.setOrderStatus(merchantId, orderId);
   }
 
