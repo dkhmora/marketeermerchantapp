@@ -195,13 +195,17 @@ class AddItemScreen extends Component {
                 />
               </Item>
               <Textarea
-                rowSpan={5}
+                rowSpan={4}
+                maxLength={150}
                 bordered
                 placeholder="Item Description"
                 value={this.description}
                 onChangeText={(value) => (this.description = value)}
                 style={{marginTop: 18, borderRadius: 24}}
               />
+              <Text note style={{alignSelf: 'flex-end', marginRight: 16}}>
+                Character Limit: {this.description.length}/150
+              </Text>
               <Item rounded style={{marginTop: 18}}>
                 <Text style={{marginLeft: 15}}>₱</Text>
                 <Input
