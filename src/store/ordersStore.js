@@ -3,11 +3,22 @@ import firestore from '@react-native-firebase/firestore';
 
 class OrdersStore {
   @observable orders = [];
+  @observable orderItems = [];
   @observable pendingOrders = [];
   @observable acceptedOrders = [];
   @observable shippedOrders = [];
   @observable completedOrders = [];
   @observable cancelledOrders = [];
+
+  @action async setOrderItems(orderId) {
+    await firestore()
+      .collection('order_items')
+      .doc(orderId)
+      .get()
+      .then((documentReference) => {
+        return (this.orderItems = documentReference.data().items);
+      });
+  }
 
   @action setPendingOrders(merchantId) {
     firestore()

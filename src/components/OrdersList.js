@@ -20,6 +20,7 @@ class OrdersList extends Component {
   }
 
   render() {
+    const { navigation } = this.props;
     const {storeVarName, buttonText} = this.props.route.params;
     const {name} = this.props.route;
     const {merchantId} = this.props.authStore;
@@ -36,11 +37,13 @@ class OrdersList extends Component {
                 orderNumber={item.orderNumber}
                 userName={`${item.userName}`}
                 numberOfItems={item.numberOfItems}
+                shippingPrice={item.shippingPrice}
                 totalAmount={item.totalAmount}
                 orderId={item.orderId}
                 userAddress={item.userAddress}
                 createdAt={item.createdAt}
                 tabName={name}
+                navigation={navigation}
                 key={index}
               />
             )}
