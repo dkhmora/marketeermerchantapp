@@ -16,7 +16,8 @@ class ItemsStore {
       .collection('merchant_items')
       .doc(merchantId)
       .onSnapshot((documentSnapshot) => {
-        this.itemCategories = documentSnapshot.data().itemCategories;
+        const itemCats = documentSnapshot.data().itemCategories;
+        this.itemCategories = itemCats.sort();
       });
   }
 
@@ -32,22 +33,27 @@ class ItemsStore {
   }
 
   @action async addItemCategory(merchantId, newCategory) {
+    const formattedCategory = _.capitalize(newCategory);
     await firestore()
       .collection('merchant_items')
       .doc(merchantId)
       .get()
       .then((documentSnapshot) => {
-        if (!documentSnapshot.data().itemCategories.includes(newCategory)) {
+        if (
+          !documentSnapshot.data().itemCategories.includes(formattedCategory)
+        ) {
           documentSnapshot.ref
             .update(
               'itemCategories',
-              firestore.FieldValue.arrayUnion(newCategory),
+              firestore.FieldValue.arrayUnion(formattedCategory),
             )
             .then(() =>
-              console.log(`Successfully added new category "${newCategory}"`),
+              console.log(
+                `Successfully added new category "${formattedCategory}"`,
+              ),
             );
         } else {
-          console.error(`${newCategory} already exists`);
+          console.error(`${formattedCategory} already exists`);
         }
       })
       .catch((err) => console.error(err));
