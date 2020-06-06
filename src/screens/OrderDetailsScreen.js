@@ -21,11 +21,12 @@ class OrderDetailsScreen extends Component {
   }
 
   openInMaps() {
-    const {coordinates} = this.props.route.params;
+    const {coordinates, userName} = this.props.route.params;
+    const markerName = `Customer ${userName}'s Location`;
 
     const latLng = `${coordinates._latitude},${coordinates._longitude}`;
     const url = Platform.select({
-      ios: `http://maps.apple.com/?ll=${latLng}`,
+      ios: `http://maps.apple.com/?q=${markerName}&ll=${latLng}`,
       android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
     });
 
