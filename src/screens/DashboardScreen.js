@@ -195,20 +195,22 @@ class StoreDetailsScreen extends Component {
                     </Button>
                   </View>
                 </View>
-                <Image
-                  source={{uri: this.displayUrl}}
-                  style={{
-                    height: 150,
-                    width: 150,
-                    flex: 1,
-                    backgroundColor: '#e1e4e8',
-                    alignSelf: 'center',
-                    marginTop: 20,
-                    borderRadius: 24,
-                    borderWidth: 1,
-                    borderColor: '#E91E63',
-                  }}
-                />
+                {this.displayUrl && (
+                  <Image
+                    source={{uri: this.displayUrl}}
+                    style={{
+                      height: 150,
+                      width: 150,
+                      flex: 1,
+                      backgroundColor: '#e1e4e8',
+                      alignSelf: 'center',
+                      marginTop: 20,
+                      borderRadius: 24,
+                      borderWidth: 1,
+                      borderColor: '#E91E63',
+                    }}
+                  />
+                )}
               </Body>
             </CardItem>
             <CardItem bordered>
@@ -234,20 +236,22 @@ class StoreDetailsScreen extends Component {
                     </Button>
                   </View>
                 </View>
-                <Image
-                  source={{uri: this.coverUrl}}
-                  style={{
-                    height: 200,
-                    width: 300,
-                    flex: 1,
-                    backgroundColor: '#e1e4e8',
-                    alignSelf: 'center',
-                    marginTop: 20,
-                    borderRadius: 24,
-                    borderWidth: 1,
-                    borderColor: '#E91E63',
-                  }}
-                />
+                {this.coverUrl && (
+                  <Image
+                    source={{uri: this.coverUrl}}
+                    style={{
+                      height: 200,
+                      width: 300,
+                      flex: 1,
+                      backgroundColor: '#e1e4e8',
+                      alignSelf: 'center',
+                      marginTop: 20,
+                      borderRadius: 24,
+                      borderWidth: 1,
+                      borderColor: '#E91E63',
+                    }}
+                  />
+                )}
               </Body>
             </CardItem>
             <CardItem bordered>
