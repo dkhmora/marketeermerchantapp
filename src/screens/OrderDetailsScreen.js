@@ -70,6 +70,7 @@ class OrderDetailsScreen extends Component {
         />
 
         <ScrollView
+          showsVerticalScrollIndicator={false}
           style={{
             flex: 1,
             flexDirection: 'column',
