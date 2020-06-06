@@ -9,6 +9,7 @@ import {
   Right,
   Icon,
 } from 'native-base';
+import {ActionSheetIOS, Platform} from 'react-native';
 import moment, {ISO_8601} from 'moment';
 import OptionsMenu from 'react-native-options-menu';
 import {observer, inject} from 'mobx-react';
@@ -53,6 +54,23 @@ class OrderCard extends Component {
     });
   }
 
+  openOptions() {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'Decline Order'],
+        destructiveIndex: 1,
+        cancelButtonIndex: 0,
+      },
+      (buttonIndex) => {
+        if (buttonIndex === 0) {
+          // cancel action
+        } else {
+          this.handleDelete();
+        }
+      },
+    );
+  }
+
   render() {
     const {
       orderNumber,
@@ -92,26 +110,29 @@ class OrderCard extends Component {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              marginLeft: `-15%`,
+              justifyContent: 'space-between',
+              marginLeft: `-30%`,
             }}>
             <Text note style={{color: '#ddd'}}>
               Merchant Fee: ₱{(totalAmount * 0.05).toPrecision(5)}
             </Text>
-            <Button transparent style={{marginLeft: '10%'}}>
+            {Platform.OS === 'ios' ? (
+              <Button
+                transparent
+                onPress={() => this.openOptions()}
+                style={{paddingLeft: 5}}>
+                <Icon name="more" style={{color: '#fff'}} />
+              </Button>
+            ) : (
               <OptionsMenu
                 customButton={
-                  <Icon
-                    active
-                    name="dots-three-vertical"
-                    type="Entypo"
-                    style={{color: '#fff'}}
-                  />
+                  <Icon active name="more" style={{color: '#fff'}} />
                 }
                 destructiveIndex={1}
                 options={['Cancel Order']}
                 actions={[]}
               />
-            </Button>
+            )}
           </Right>
         </CardItem>
         <CardItem bordered>
