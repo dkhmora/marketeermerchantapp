@@ -1,8 +1,18 @@
 import React, {Component} from 'react';
-import {Container, Card, CardItem, Text, Left, Right, Body} from 'native-base';
-import {View} from 'react-native';
+import {
+  Container,
+  Card,
+  CardItem,
+  Text,
+  Left,
+  Right,
+  Body,
+  Button,
+  Icon,
+} from 'native-base';
+import {View, Platform, Linking} from 'react-native';
 import BaseHeader from '../components/BaseHeader';
-import {FlatList} from 'react-native-gesture-handler';
+import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import OrderItemCard from '../components/OrderItemCard';
 
 class OrderDetailsScreen extends Component {
@@ -10,8 +20,21 @@ class OrderDetailsScreen extends Component {
     super(props);
   }
 
+  openInMaps() {
+    const {coordinates} = this.props.route.params;
+
+    const latLng = `${coordinates._latitude},${coordinates._longitude}`;
+    const url = Platform.select({
+      ios: `http://maps.apple.com/?ll=${latLng}`,
+      android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
+    });
+
+    Linking.openURL(url);
+  }
+
   render() {
     const {
+      coordinates,
       orderId,
       orderItems,
       cancelReason,
@@ -25,9 +48,8 @@ class OrderDetailsScreen extends Component {
     } = this.props.route.params;
     const {navigation} = this.props;
 
-    console.log(cancelReason);
-
-    console.log(orderItems);
+    const mapButtonText =
+      Platform.OS === 'ios' ? 'Open in Apple Maps' : 'Open in Google Maps';
 
     const actions = [
       {
@@ -46,13 +68,55 @@ class OrderDetailsScreen extends Component {
           navigation={navigation}
         />
 
-        <View
+        <ScrollView
           style={{
             flex: 1,
             flexDirection: 'column',
             marginHorizontal: 6,
             marginVertical: 3,
           }}>
+          <Card
+            style={{
+              borderRadius: 16,
+              overflow: 'hidden',
+            }}>
+            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
+              <Text style={{color: '#fff'}}>Customer Details</Text>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>Customer Name:</Text>
+              </Left>
+              <Right>
+                <Text>{userName}</Text>
+              </Right>
+            </CardItem>
+            <CardItem bordered>
+              <Left>
+                <Text>User Address:</Text>
+              </Left>
+              <Right>
+                <Text>{userAddress}</Text>
+                <Text note>
+                  {coordinates._latitude}, {coordinates._longitude}
+                </Text>
+              </Right>
+            </CardItem>
+            <CardItem bordered>
+              <Body>
+                <Button
+                  iconRight
+                  full
+                  bordered
+                  onPress={() => this.openInMaps()}
+                  style={{borderRadius: 24}}>
+                  <Text>{mapButtonText}</Text>
+                  <Icon name="map" />
+                </Button>
+              </Body>
+            </CardItem>
+          </Card>
+
           <Card
             style={{
               borderRadius: 16,
@@ -110,7 +174,7 @@ class OrderDetailsScreen extends Component {
               </Body>
             </CardItem>
           </Card>
-        </View>
+        </ScrollView>
       </Container>
     );
   }

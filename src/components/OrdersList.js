@@ -36,6 +36,7 @@ class OrdersList extends Component {
                 merchantId={merchantId}
                 orderNumber={item.orderNumber}
                 orderStatus={item.orderStatus}
+                coordinates={item.coordinates}
                 userName={`${item.userName}`}
                 numberOfItems={item.numberOfItems}
                 shippingPrice={item.shippingPrice}

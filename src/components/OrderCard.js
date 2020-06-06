@@ -57,6 +57,7 @@ class OrderCard extends Component {
   handleViewOrderItems() {
     const {
       navigation,
+      coordinates,
       orderId,
       orderStatus,
       userName,
@@ -75,6 +76,7 @@ class OrderCard extends Component {
       navigation.dangerouslyGetParent().navigate('Order Details', {
         orderId,
         orderItems: this.props.ordersStore.orderItems,
+        coordinates,
         cancelReason,
         userName,
         orderNumber,
@@ -342,8 +344,8 @@ class OrderCard extends Component {
               <Button
                 full
                 bordered
-                rounded
-                onPress={this.handleViewOrderItems.bind(this)}>
+                onPress={this.handleViewOrderItems.bind(this)}
+                style={{borderRadius: 24}}>
                 <Text>View Full Order</Text>
               </Button>
             </Body>
