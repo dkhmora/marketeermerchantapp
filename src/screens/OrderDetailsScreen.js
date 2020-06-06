@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Container, Card, CardItem, Text, Left, Right} from 'native-base';
+import {Container, Card, CardItem, Text, Left, Right, Body} from 'native-base';
 import {View} from 'react-native';
 import BaseHeader from '../components/BaseHeader';
 import {FlatList} from 'react-native-gesture-handler';
@@ -14,6 +14,7 @@ class OrderDetailsScreen extends Component {
     const {
       orderId,
       orderItems,
+      cancelReason,
       userName,
       orderNumber,
       numberOfItems,
@@ -23,6 +24,8 @@ class OrderDetailsScreen extends Component {
       createdAt,
     } = this.props.route.params;
     const {navigation} = this.props;
+
+    console.log(cancelReason);
 
     console.log(orderItems);
 
@@ -88,6 +91,23 @@ class OrderDetailsScreen extends Component {
               <Right>
                 <Text>Order Total: ₱{totalAmount + shippingPrice}</Text>
               </Right>
+            </CardItem>
+          </Card>
+
+          <Card
+            style={{
+              borderRadius: 16,
+              overflow: 'hidden',
+            }}>
+            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
+              <Text style={{color: '#fff'}}>Reason for Cancellation</Text>
+            </CardItem>
+            <CardItem>
+              <Body>
+                <Text style={{width: '100%', textAlign: 'justify'}}>
+                  {cancelReason}
+                </Text>
+              </Body>
             </CardItem>
           </Card>
         </View>

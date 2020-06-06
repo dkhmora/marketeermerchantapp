@@ -145,7 +145,7 @@ class OrdersStore {
       });
   }
 
-  @action async cancelOrder(merchantId, orderId) {
+  @action async cancelOrder(merchantId, orderId, cancelReason) {
     const orderRef = firestore()
       .collection('merchants')
       .doc(merchantId)
@@ -170,6 +170,7 @@ class OrdersStore {
 
         newOrderStatus.cancelled = {
           status: true,
+          reason: cancelReason,
           updatedAt: new Date().toISOString(),
         };
 

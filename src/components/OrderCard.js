@@ -13,6 +13,7 @@ import {
   Item,
   Input,
   H3,
+  Textarea,
 } from 'native-base';
 import {ActionSheetIOS, Platform} from 'react-native';
 import moment, {ISO_8601} from 'moment';
@@ -29,6 +30,7 @@ class OrderCard extends Component {
   }
 
   @observable confirmationModal = false;
+  @observable cancelReason = '';
 
   @action openConfirmationModal() {
     this.confirmationModal = true;
@@ -56,6 +58,7 @@ class OrderCard extends Component {
     const {
       navigation,
       orderId,
+      orderStatus,
       userName,
       orderNumber,
       numberOfItems,
@@ -65,10 +68,14 @@ class OrderCard extends Component {
       createdAt,
     } = this.props;
 
+    const cancelReason =
+      orderStatus.cancelled.status && orderStatus.cancelled.reason;
+
     this.props.ordersStore.setOrderItems(orderId).then(() => {
       navigation.dangerouslyGetParent().navigate('Order Details', {
         orderId,
         orderItems: this.props.ordersStore.orderItems,
+        cancelReason,
         userName,
         orderNumber,
         numberOfItems,
@@ -82,15 +89,17 @@ class OrderCard extends Component {
 
   handleCancelOrder() {
     const {merchantId, orderId, orderNumber} = this.props;
-    this.props.ordersStore.cancelOrder(merchantId, orderId).then(() => {
-      Toast.show({
-        text: `Order # ${orderNumber} successfully cancelled!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 3500,
-        style: {margin: 20, borderRadius: 16},
+    this.props.ordersStore
+      .cancelOrder(merchantId, orderId, this.cancelReason)
+      .then(() => {
+        Toast.show({
+          text: `Order # ${orderNumber} successfully cancelled!`,
+          buttonText: 'Okay',
+          type: 'success',
+          duration: 3500,
+          style: {margin: 20, borderRadius: 16},
+        });
       });
-    });
   }
 
   openOptions() {
@@ -114,6 +123,7 @@ class OrderCard extends Component {
     const {
       orderNumber,
       userName,
+      orderStatus,
       numberOfItems,
       totalAmount,
       orderId,
@@ -210,6 +220,9 @@ class OrderCard extends Component {
     };
 
     const CardFooter = () => {
+      const cancellationStatus =
+        orderStatus.cancelled.status && orderStatus.cancelled.reason;
+
       const footerStatus =
         tabName === 'Shipped'
           ? 'Waiting for Customer to Confirm Receipt of Products'
@@ -259,14 +272,28 @@ class OrderCard extends Component {
                 </Left>
               </CardItem>
               <CardItem>
-                <Left style={{marginRight: '5%'}}>
-                  <Body>
-                    <Text style={{textAlign: 'justify'}}>
-                      You can no longer bring back an order after it has been
-                      cancelled.
-                    </Text>
-                  </Body>
-                </Left>
+                <Body>
+                  <Textarea
+                    rowSpan={6}
+                    maxLength={600}
+                    bordered
+                    placeholder="Reason for Cancellation"
+                    value={this.cancelReason}
+                    onChangeText={(value) => (this.cancelReason = value)}
+                    style={{borderRadius: 24, width: '100%'}}
+                  />
+                  <Text note style={{alignSelf: 'flex-end', marginRight: 16}}>
+                    Character Limit: {this.cancelReason.length}/600
+                  </Text>
+                </Body>
+              </CardItem>
+              <CardItem>
+                <Body>
+                  <Text note style={{textAlign: 'justify', width: '100%'}}>
+                    You can no longer bring back an order after it has been
+                    cancelled.
+                  </Text>
+                </Body>
               </CardItem>
               <CardItem footer>
                 <Left />

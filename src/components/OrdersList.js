@@ -35,6 +35,7 @@ class OrdersList extends Component {
               <OrderCard
                 merchantId={merchantId}
                 orderNumber={item.orderNumber}
+                orderStatus={item.orderStatus}
                 userName={`${item.userName}`}
                 numberOfItems={item.numberOfItems}
                 shippingPrice={item.shippingPrice}
