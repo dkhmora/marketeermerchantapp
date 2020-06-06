@@ -33,11 +33,11 @@ class AddItemScreen extends Component {
 
     this.state = {
       pageCategory: this.props.pageCategory,
+      imageDisplay: require('../../assets/placeholder.jpg'),
     };
   }
 
   // MobX
-  @observable imageDisplay = require('../../assets/placeholder.jpg');
   @observable imagePath = '';
   @observable name = '';
   @observable category = '';
@@ -80,7 +80,7 @@ class AddItemScreen extends Component {
     })
       .then((image) => {
         this.imagePath = image.path;
-        this.imageDisplay = {uri: image.path};
+        this.setState({imageDisplay: {uri: image.path}});
       })
       .then(() => console.log('Image path successfully set!'))
       .catch((err) => console.error(err));
@@ -94,7 +94,7 @@ class AddItemScreen extends Component {
     })
       .then((image) => {
         this.imagePath = image.path;
-        this.imageDisplay = {uri: image.path};
+        this.setState({imageDisplay: {uri: image.path}});
       })
       .then(() => console.log('Image path successfully set!'))
       .catch((err) => console.error(err));
@@ -103,6 +103,7 @@ class AddItemScreen extends Component {
   render() {
     const {name} = this.props.route;
     const {navigation} = this.props;
+    const {imageDisplay} = this.state;
 
     return (
       <Container style={{flex: 1}}>
@@ -112,7 +113,7 @@ class AddItemScreen extends Component {
             <Row size={3} style={{marginBottom: '2%'}}>
               <Col style={{justifyContent: 'center'}}>
                 <Image
-                  source={this.imageDisplay}
+                  source={imageDisplay}
                   style={{
                     alignSelf: 'flex-start',
                     borderColor: '#BDBDBD',
