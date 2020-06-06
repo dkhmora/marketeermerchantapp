@@ -71,6 +71,9 @@ class StoreDetailsScreen extends Component {
   handleTakePhoto(type) {
     const {uploadImage} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
+    const {displayImage, coverImage} = this.props.detailsStore.storeDetails;
+
+    const currentImagePath = type === 'display' ? displayImage : coverImage;
     const width = type === 'display' ? 1080 : 1620;
 
     ImagePicker.openCamera({
@@ -82,7 +85,9 @@ class StoreDetailsScreen extends Component {
         this[`${type}Path`] = image.path;
       })
       .then(() => console.log('Image path successfully set!'))
-      .then(() => uploadImage(merchantId, this[`${type}Path`], type))
+      .then(() =>
+        uploadImage(merchantId, this[`${type}Path`], type, currentImagePath),
+      )
       .then(() => {
         this[`${type}Path`] = null;
         this[`${type}Url`] = null;
@@ -93,6 +98,9 @@ class StoreDetailsScreen extends Component {
   handleSelectImage(type) {
     const {uploadImage} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
+    const {displayImage, coverImage} = this.props.detailsStore.storeDetails;
+
+    const currentImagePath = type === 'display' ? displayImage : coverImage;
     const width = type === 'display' ? 1080 : 1620;
 
     ImagePicker.openPicker({
@@ -104,7 +112,9 @@ class StoreDetailsScreen extends Component {
         this[`${type}Path`] = image.path;
       })
       .then(() => console.log('Image path successfully set!'))
-      .then(() => uploadImage(merchantId, this[`${type}Path`], type))
+      .then(() =>
+        uploadImage(merchantId, this[`${type}Path`], type, currentImagePath),
+      )
       .then(() => {
         this[`${type}Path`] = null;
         this[`${type}Url`] = null;
