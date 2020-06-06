@@ -14,7 +14,7 @@ class DetailsStore {
       });
   }
 
-  @action async uploadImage(merchantId, imagePath, type) {
+  @action async uploadImage(merchantId, imagePath, type, currentImagePath) {
     const fileExtension = imagePath.split('.').pop();
     const imageRef = `/images/merchants/${merchantId}/${type}.${fileExtension}`;
 
@@ -36,7 +36,21 @@ class DetailsStore {
           `Merchant ${_.capitalize(type)} image path successfully set!`,
         ),
       )
+      .then(() => {
+        if (!(imageRef === currentImagePath)) {
+          this.deleteImage(currentImagePath);
+        }
+      })
       .catch((err) => console.error(err));
+  }
+
+  @action async deleteImage(image) {
+    await storage()
+      .ref(image)
+      .delete()
+      .then(() => {
+        console.log(`Image at ${image} successfully deleted!`);
+      });
   }
 }
 
