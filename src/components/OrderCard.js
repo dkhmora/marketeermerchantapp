@@ -134,7 +134,7 @@ class OrderCard extends Component {
           <Body style={{flex: 5}}>
             <Card
               style={{
-                backgroundColor: '#fff',
+                backgroundColor: '#F8BBD0',
                 borderRadius: 16,
               }}>
               <CardItem
@@ -156,7 +156,7 @@ class OrderCard extends Component {
                         ₱{(totalAmount * 0.05).toPrecision(5)}
                       </Text>
                     </View>
-                    <Text note style={{color: 'grey', textAlign: 'center'}}>
+                    <Text note style={{color: '#757575', textAlign: 'center'}}>
                       {transactionFeeStatus}
                     </Text>
                   </Body>
