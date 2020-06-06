@@ -32,6 +32,9 @@ import ImagePicker from 'react-native-image-crop-picker';
 class StoreDetailsScreen extends Component {
   constructor(props) {
     super(props);
+
+    this.props.detailsStore.setStoreDetails(this.props.authStore.merchantId);
+    this.props.itemsStore.setItemCategories(this.props.authStore.merchantId);
   }
 
   @observable displayUrl = null;
@@ -40,8 +43,6 @@ class StoreDetailsScreen extends Component {
   @observable coverPath = null;
 
   componentDidMount() {
-    this.props.detailsStore.setStoreDetails(this.props.authStore.merchantId);
-    this.props.itemsStore.setItemCategories(this.props.authStore.merchantId);
     this.getImage();
   }
 
@@ -70,10 +71,11 @@ class StoreDetailsScreen extends Component {
   handleTakePhoto(type) {
     const {uploadImage} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
+    const width = type === 'display' ? 1080 : 1620;
 
     ImagePicker.openCamera({
-      width: 400,
-      height: 400,
+      width,
+      height: 1080,
       cropping: true,
     })
       .then((image) => {
@@ -81,17 +83,21 @@ class StoreDetailsScreen extends Component {
       })
       .then(() => console.log('Image path successfully set!'))
       .then(() => uploadImage(merchantId, this[`${type}Path`], type))
-      .then(() => (this[`${type}Path`] = null))
-      .catch((err) => console.error(err));
+      .then(() => {
+        this[`${type}Path`] = null;
+        this[`${type}Url`] = null;
+      })
+      .catch((err) => console.log(err));
   }
 
   handleSelectImage(type) {
     const {uploadImage} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
+    const width = type === 'display' ? 1080 : 1620;
 
     ImagePicker.openPicker({
-      width: 400,
-      height: 400,
+      width,
+      height: 1080,
       cropping: true,
     })
       .then((image) => {
@@ -99,8 +105,11 @@ class StoreDetailsScreen extends Component {
       })
       .then(() => console.log('Image path successfully set!'))
       .then(() => uploadImage(merchantId, this[`${type}Path`], type))
-      .then(() => (this[`${type}Path`] = null))
-      .catch((err) => console.error(err));
+      .then(() => {
+        this[`${type}Path`] = null;
+        this[`${type}Url`] = null;
+      })
+      .catch((err) => console.log(err));
   }
 
   render() {
@@ -205,14 +214,12 @@ class StoreDetailsScreen extends Component {
                   <View style={{flexDirection: 'row'}}>
                     <Button
                       transparent
-                      onPress={() => this.handleTakePhoto('cover').bind(this)}>
+                      onPress={() => this.handleTakePhoto('cover')}>
                       <Icon name="camera" />
                     </Button>
                     <Button
                       transparent
-                      onPress={() =>
-                        this.handleSelectImage('cover').bind(this)
-                      }>
+                      onPress={() => this.handleSelectImage('cover')}>
                       <Icon name="image" />
                     </Button>
                   </View>
@@ -220,7 +227,7 @@ class StoreDetailsScreen extends Component {
                 <Image
                   source={{uri: this.coverUrl}}
                   style={{
-                    height: 150,
+                    height: 200,
                     width: 300,
                     flex: 1,
                     backgroundColor: '#e1e4e8',
