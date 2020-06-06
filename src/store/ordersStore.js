@@ -100,7 +100,7 @@ class OrdersStore {
       });
   }
 
-  @action setOrderStatus(merchantId, orderId) {
+  @action async setOrderStatus(merchantId, orderId) {
     const statusArray = [
       'pending',
       'accepted',
@@ -114,7 +114,7 @@ class OrdersStore {
       .collection('orders')
       .doc(orderId);
 
-    orderRef
+    await orderRef
       .get()
       .then((documentReference) => {
         const {orderStatus} = documentReference.data();
@@ -134,6 +134,41 @@ class OrdersStore {
         newOrderStatus[`${currentStatus}`].status = false;
 
         newOrderStatus[`${nextStatus}`] = {
+          status: true,
+          updatedAt: new Date().toISOString(),
+        };
+
+        return newOrderStatus;
+      })
+      .then((newOrderStatus) => {
+        orderRef.update({orderStatus: newOrderStatus});
+      });
+  }
+
+  @action async cancelOrder(merchantId, orderId) {
+    const orderRef = firestore()
+      .collection('merchants')
+      .doc(merchantId)
+      .collection('orders')
+      .doc(orderId);
+
+    await orderRef
+      .get()
+      .then((documentReference) => {
+        const {orderStatus} = documentReference.data();
+        let newOrderStatus = {};
+        let currentStatus;
+        Object.keys(orderStatus).map((item, index) => {
+          if (orderStatus[`${item}`].status) {
+            currentStatus = item;
+          }
+        });
+
+        newOrderStatus = orderStatus;
+
+        newOrderStatus[`${currentStatus}`].status = false;
+
+        newOrderStatus.cancelled = {
           status: true,
           updatedAt: new Date().toISOString(),
         };
