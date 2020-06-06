@@ -25,7 +25,7 @@ class ItemCard extends Component {
     super(props);
   }
 
-  @observable url = '';
+  @observable url = null;
 
   getImage = async () => {
     const ref = storage().ref(this.props.image);
@@ -145,7 +145,7 @@ class ItemCard extends Component {
             </Right>
           </CardItem>
           <CardItem cardBody>
-            {image ? (
+            {this.url ? (
               <Image
                 loadingIndicatorSource={
                   (require('../../assets/placeholder.jpg'), 2)
