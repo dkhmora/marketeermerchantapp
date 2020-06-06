@@ -38,10 +38,6 @@ class DetailsStore {
       )
       .catch((err) => console.error(err));
   }
-
-  @action uploadCoverImage(merchantId) {
-    const imageRef = `/images/merchants/${merchantId}/cover.${fileExtension}`;
-  }
 }
 
 export default DetailsStore;
