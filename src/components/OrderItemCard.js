@@ -11,7 +11,7 @@ class OrderItemCard extends Component {
     super(props);
   }
 
-  @observable url = '';
+  @observable url = null;
 
   getImage = async () => {
     const ref = storage().ref(this.props.image);
