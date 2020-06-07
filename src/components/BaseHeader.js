@@ -2,6 +2,7 @@ import React from 'react';
 import OptionsMenu from 'react-native-options-menu';
 import {Header, Text, Button, Icon, Body, Right, Left} from 'native-base';
 import {Platform, ActionSheetIOS} from 'react-native';
+import BaseOptionsMenu from './BaseOptionsMenu';
 
 export default function BaseHeader(props) {
   const {
@@ -11,9 +12,10 @@ export default function BaseHeader(props) {
     navigation,
     actions,
     options,
-    openOptions,
+    destructiveIndex,
     ...otherProps
   } = props;
+
   function openDrawer() {
     if (navigation) {
       navigation.openDrawer();
@@ -44,28 +46,16 @@ export default function BaseHeader(props) {
     return null;
   };
 
-  const optionsIcon = (
-    <Icon name="more" style={{color: '#E91E63', marginRight: 8}} />
-  );
-
   const RightHeaderButton = () => {
-    if (options) {
-      if (Platform.OS === 'android') {
-        return (
-          <OptionsMenu
-            customButton={optionsIcon}
-            destructiveIndex={1}
-            options={options}
-            actions={actions}
-          />
-        );
-      } else {
-        return (
-          <Button transparent onPress={() => openOptions()}>
-            <Icon name="more" />
-          </Button>
-        );
-      }
+    if (options && actions) {
+      return (
+        <BaseOptionsMenu
+          iconStyle={{color: '#E91E63', marginRight: 10}}
+          options={options}
+          actions={actions}
+          destructiveIndex={destructiveIndex}
+        />
+      );
     }
     return null;
   };
