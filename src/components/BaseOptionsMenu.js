@@ -58,7 +58,7 @@ class BaseOptionsMenu extends Component {
 
     return Platform.OS === 'android' ? (
       <OptionsMenu
-        customButton={OptionsIcon}
+        customButton={<OptionsIcon />}
         destructiveIndex={destructiveIndex}
         options={options}
         actions={actions}
