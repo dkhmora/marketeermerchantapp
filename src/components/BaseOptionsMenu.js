@@ -6,20 +6,31 @@ import OptionsMenu from 'react-native-options-menu';
 class BaseOptionsMenu extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      optionActions: {},
+    };
   }
 
-  openOptions() {
-    const {options, actions, destructiveIndex} = this.props;
-
-    let optionActions = {};
+  componentDidMount() {
+    const {options, actions} = this.props;
 
     if (options.length === actions.length) {
       options.map((option, index) => {
-        optionActions[option] = actions[index];
+        this.setState((state) => {
+          let optionActions = {...state.optionActions};
+          optionActions[option] = actions[index];
+
+          return {optionActions};
+        });
       });
     } else {
       console.log('Please put an equal number of options and actions');
     }
+  }
+
+  openOptions() {
+    const {options, destructiveIndex} = this.props;
 
     ActionSheetIOS.showActionSheetWithOptions(
       {
@@ -31,7 +42,7 @@ class BaseOptionsMenu extends Component {
         if (buttonIndex === 0) {
           // cancel action
         } else {
-          optionActions[buttonIndex - 1];
+          this.state.optionActions[options[buttonIndex - 1]]();
         }
       },
     );
@@ -41,18 +52,20 @@ class BaseOptionsMenu extends Component {
     const {options, actions, destructiveIndex} = this.props;
     const {iconStyle} = this.props;
 
-    const optionsIcon = <Icon name="more" style={{...iconStyle}} />;
+    const OptionsIcon = () => {
+      return <Icon name="more" style={{...iconStyle}} />;
+    };
 
     return Platform.OS === 'android' ? (
       <OptionsMenu
-        customButton={optionsIcon}
+        customButton={OptionsIcon}
         destructiveIndex={destructiveIndex}
         options={options}
         actions={actions}
       />
     ) : (
       <Button transparent onPress={() => this.openOptions()}>
-        <optionsIcon />
+        <OptionsIcon />
       </Button>
     );
   }
