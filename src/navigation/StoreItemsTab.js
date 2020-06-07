@@ -55,25 +55,6 @@ class StoreItemsTab extends Component {
     this.deleteCategoryModal = false;
   }
 
-  openOptions() {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: ['Cancel', 'Add Category', 'Delete Category'],
-        destructiveIndex: 1,
-        cancelButtonIndex: 0,
-      },
-      (buttonIndex) => {
-        if (buttonIndex === 0) {
-          // cancel action
-        } else if (buttonIndex === 1) {
-          this.showAddCategoryModal();
-        } else {
-          this.showDeleteCategoryModal();
-        }
-      },
-    );
-  }
-
   onValueChange(value) {
     this.selectedCategory = value;
   }
@@ -142,12 +123,12 @@ class StoreItemsTab extends Component {
       <Container style={{flex: 1}}>
         <BaseHeader
           title={name}
-          options={['Add Category', 'Delete Category', 'Cancel']}
+          options={['Delete Category', 'Add Category']}
           actions={[
-            this.showAddCategoryModal.bind(this),
             this.showDeleteCategoryModal.bind(this),
+            this.showAddCategoryModal.bind(this),
           ]}
-          openOptions={this.openOptions.bind(this)}
+          destructiveIndex={1}
           navigation={navigation}
         />
 
