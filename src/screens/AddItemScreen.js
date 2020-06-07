@@ -17,6 +17,7 @@ import {
   CardItem,
   H3,
   View,
+  Toast,
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -49,6 +50,17 @@ class AddItemScreen extends Component {
 
   componentDidMount() {
     this.category = this.props.route.params.pageCategory;
+
+    if (this.props.itemsStore.itemCategories.length <= 0) {
+      this.props.navigation.goBack();
+      Toast.show({
+        text: `Please add a category before adding an item.`,
+        buttonText: 'Okay',
+        type: 'danger',
+        style: {margin: 20, borderRadius: 16},
+        duration: 0,
+      });
+    }
   }
 
   onSubmit() {
