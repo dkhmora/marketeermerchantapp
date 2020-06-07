@@ -3,6 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import OrdersTab from '../navigation/OrdersTab';
 import OrderDetailsScreen from './OrderDetailsScreen';
 import {NavigationContainer} from '@react-navigation/native';
+import OrderChatScreen from './OrderChatScreen';
 
 const StackOrders = createStackNavigator();
 class OrdersScreen extends Component {
@@ -15,6 +16,7 @@ class OrdersScreen extends Component {
             name="Order Details"
             component={OrderDetailsScreen}
           />
+          <StackOrders.Screen name="Order Chat" component={OrderChatScreen} />
         </StackOrders.Navigator>
       </NavigationContainer>
     );
