@@ -52,6 +52,28 @@ class DetailsStore {
         console.log(`Image at ${image} successfully deleted!`);
       });
   }
+
+  @action async updateStoreDetails(
+    merchantId,
+    storeName,
+    storeDescription,
+    deliveryDescription,
+    address,
+  ) {
+    await firestore()
+      .collection('merchants')
+      .doc(merchantId)
+      .update({
+        storeName,
+        storeDescription,
+        deliveryDescription,
+        address,
+      })
+      .then(() => console.log('Merchant details successfully updated!'))
+      .catch((err) => {
+        console.log(`Something went wrong. Error: ${err}`);
+      });
+  }
 }
 
 export default DetailsStore;
