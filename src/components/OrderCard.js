@@ -133,6 +133,7 @@ class OrderCard extends Component {
       createdAt,
       index,
       tabName,
+      navigation,
       ...otherProps
     } = this.props;
 
@@ -150,8 +151,27 @@ class OrderCard extends Component {
       optionsButton = tabName === 'Pending' && true;
 
       return (
-        <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
+        <CardItem
+          header
+          bordered
+          button
+          onPress={() =>
+            navigation.navigate('Order Chat', {
+              userName,
+              userAddress,
+              orderId,
+              orderNumber,
+              orderStatus,
+            })
+          }
+          style={{backgroundColor: '#E91E63'}}>
           <Left style={{flex: 3}}>
+            <Item>
+              <Icon
+                name="chatbubbles"
+                style={{color: '#fff', fontSize: 27, margin: -5}}
+              />
+            </Item>
             <Body>
               <Text style={{color: '#fff'}}>{userName}</Text>
               <Text note style={{color: '#ddd'}}>
