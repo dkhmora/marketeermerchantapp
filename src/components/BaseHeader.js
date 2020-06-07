@@ -65,7 +65,7 @@ export default function BaseHeader(props) {
       <Left>
         <LeftHeaderButton />
       </Left>
-      <Body>
+      <Body style={{flex: 3}}>
         <Text>{title}</Text>
       </Body>
       <Right>
