@@ -30,9 +30,14 @@ class ItemsList extends Component {
   render() {
     const {category} = this.props.route.params;
     const {navigation} = this.props;
-    const dataSource = this.props.itemsStore.categoryItems
-      .get(category)
-      .slice();
+    let dataSource;
+
+    if (category !== 'All') {
+      dataSource = this.props.itemsStore.categoryItems.get(category).slice();
+    } else {
+      dataSource = this.props.itemsStore.storeItems;
+    }
+
     const numColumns = 2;
 
     return (

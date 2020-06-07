@@ -48,7 +48,16 @@ class StoreItemsTab extends Component {
   }
 
   @action showDeleteCategoryModal() {
-    this.deleteCategoryModal = true;
+    if (this.props.itemsStore.itemCategories.length > 0) {
+      this.deleteCategoryModal = true;
+    } else {
+      Toast.show({
+        text: `There are no categories to be deleted.`,
+        type: 'warning',
+        style: {margin: 20, borderRadius: 16},
+        duration: 3000,
+      });
+    }
   }
 
   @action closeDeleteCategoryModal() {
@@ -244,6 +253,14 @@ class StoreItemsTab extends Component {
             inactiveTintcolor: '#eee',
             indicatorStyle: {backgroundColor: '#FFC107'},
           }}>
+          <TabBase.Screen
+            name="All"
+            component={ItemsList}
+            initialParams={{
+              category: 'All',
+              navigation,
+            }}
+          />
           {itemCategories.map((category, index) => {
             this.props.itemsStore.setCategoryItems(category);
 
