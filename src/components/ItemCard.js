@@ -12,11 +12,12 @@ import {
 } from 'native-base';
 import {Image, ActionSheetIOS, Platform} from 'react-native';
 import moment, {ISO_8601} from 'moment';
-import OptionsMenu from 'react-native-options-menu';
 import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
 import {observable} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
+import BaseOptionsMenu from './BaseOptionsMenu';
+
 @inject('itemsStore')
 @inject('authStore')
 @observer
@@ -124,24 +125,12 @@ class ItemCard extends Component {
               </Body>
             </Left>
             <Right style={{marginLeft: '-50%'}}>
-              {Platform.OS === 'android' ? (
-                <Button transparent>
-                  <OptionsMenu
-                    customButton={
-                      <View>
-                        <Icon name="more" style={{color: '#fff'}} />
-                      </View>
-                    }
-                    destructiveIndex={1}
-                    options={['Delete Item', 'Cancel']}
-                    actions={[this.handleDelete.bind(this)]}
-                  />
-                </Button>
-              ) : (
-                <Button transparent onPress={() => this.openOptions()}>
-                  <Icon name="more" style={{color: '#fff'}} />
-                </Button>
-              )}
+              <BaseOptionsMenu
+                destructiveIndex={1}
+                iconStyle={{color: '#fff', fontSize: 24}}
+                options={['Delete Item']}
+                actions={[this.handleDelete.bind(this)]}
+              />
             </Right>
           </CardItem>
           <CardItem cardBody>
