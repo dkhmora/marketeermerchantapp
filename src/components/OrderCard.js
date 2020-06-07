@@ -17,10 +17,10 @@ import {
 } from 'native-base';
 import {ActionSheetIOS, Platform} from 'react-native';
 import moment, {ISO_8601} from 'moment';
-import OptionsMenu from 'react-native-options-menu';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
 import {observable, action} from 'mobx';
+import BaseOptionsMenu from './BaseOptionsMenu';
 
 @inject('ordersStore')
 @observer
@@ -194,27 +194,12 @@ class OrderCard extends Component {
           </Body>
           {optionsButton && (
             <Right style={{flex: 1}}>
-              {Platform.OS === 'ios' ? (
-                <Button
-                  transparent
-                  onPress={() => this.openOptions()}
-                  style={{paddingLeft: 5}}>
-                  <Icon name="more" style={{color: '#fff', fontSize: 27}} />
-                </Button>
-              ) : (
-                <OptionsMenu
-                  customButton={
-                    <Icon
-                      active
-                      name="more"
-                      style={{color: '#fff', fontSize: 27}}
-                    />
-                  }
-                  destructiveIndex={1}
-                  options={['Cancel Order']}
-                  actions={[this.openConfirmationModal.bind(this)]}
-                />
-              )}
+              <BaseOptionsMenu
+                iconStyle={{color: '#fff', fontSize: 27}}
+                destructiveIndex={1}
+                options={['Cancel Order']}
+                actions={[this.openConfirmationModal.bind(this)]}
+              />
             </Right>
           )}
         </CardItem>
