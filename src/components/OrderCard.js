@@ -159,7 +159,7 @@ class OrderCard extends Component {
               </Text>
             </Body>
           </Left>
-          <Body style={{flex: 5}}>
+          <Body style={{flex: 5, alignItems: 'flex-end'}}>
             <Card
               style={{
                 backgroundColor: '#F8BBD0',
