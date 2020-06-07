@@ -255,7 +255,7 @@ class StoreDetailsScreen extends Component {
                 style={{
                   flex: 7,
                   alignItems: 'flex-end',
-                  marginVertical: -3,
+                  marginVertical: 5,
                 }}>
                 {this.editMode && (
                   <Button
@@ -267,13 +267,18 @@ class StoreDetailsScreen extends Component {
                       borderColor: '#fff',
                       borderWidth: 1,
                       backgroundColor: 'transparent',
+                      marginVertical: -7,
                     }}>
                     <Text style={{color: '#fff'}}>Confirm</Text>
                     <Icon name="checkmark" style={{color: '#fff'}} />
                   </Button>
                 )}
               </Body>
-              <Right style={{flex: 1}}>
+              <Right
+                style={{
+                  flex: 1,
+                  marginVertical: -9.5,
+                }}>
                 {this.editMode ? (
                   <Button
                     transparent
