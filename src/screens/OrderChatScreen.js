@@ -55,11 +55,17 @@ class OrderChatScreen extends Component {
         <Button transparent onPress={() => console.log('gumana')}>
           <Icon name="camera" />
         </Button>
-        <Item
-          rounded
-          style={{flex: 1, marginRight: 15, marginVertical: 10, height: 40}}>
+        <View
+          style={{
+            flex: 1,
+            marginRight: 15,
+            marginVertical: 10,
+            borderWidth: 1,
+            borderColor: '#E91E63',
+            borderRadius: 24,
+          }}>
           <Composer {...props} />
-        </Item>
+        </View>
         <Send {...props}>
           <Icon
             name="send"
@@ -94,6 +100,8 @@ class OrderChatScreen extends Component {
             textStyle={{color: '#E91E63'}}
             renderBubble={this.renderBubble}
             renderComposer={this.renderComposer}
+            maxComposerHeight={150}
+            listViewProps={{marginBottom: 20}}
             alwaysShowSend
             messages={dataSource}
             onSend={(messages) => this.onSend(messages)}
