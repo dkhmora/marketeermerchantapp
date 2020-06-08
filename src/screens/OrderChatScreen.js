@@ -49,6 +49,8 @@ class OrderChatScreen extends Component {
 
     const {orderMessages} = this.props.ordersStore;
 
+    const messages = orderMessages.slice();
+
     return (
       <Container style={{flex: 1}}>
         <BaseHeader title={headerTitle} backButton navigation={navigation} />
@@ -57,7 +59,7 @@ class OrderChatScreen extends Component {
           <GiftedChat
             textStyle={{color: '#E91E63'}}
             renderBubble={this.renderBubble}
-            messages={orderMessages}
+            messages={messages}
             onSend={(messages) => this.onSend(messages)}
             user={{
               _id: 1,
