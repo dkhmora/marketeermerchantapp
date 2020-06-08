@@ -1,5 +1,6 @@
 import {observable, action} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
+import {GiftedChat} from 'react-native-gifted-chat';
 
 class OrdersStore {
   @observable orders = [];
@@ -9,6 +10,35 @@ class OrdersStore {
   @observable shippedOrders = [];
   @observable completedOrders = [];
   @observable cancelledOrders = [];
+  @observable orderMessages = [];
+
+  @action async sendMessage(orderId, message) {
+    const createdAt = Date.parse(message.createdAt);
+    message.createdAt = createdAt;
+
+    await firestore()
+      .collection('order_chats')
+      .doc(orderId)
+      .update('messages', firestore.FieldValue.arrayUnion(message))
+      .then(() => console.log('Successfully sent the message'))
+      .catch((err) => console.log(err));
+  }
+
+  @action getMessages(orderId) {
+    firestore()
+      .collection('order_chats')
+      .doc(orderId)
+      .onSnapshot((documentSnapshot) => {
+        if (documentSnapshot.data().messages.length <= 0) {
+          this.orderMessages = GiftedChat.append(
+            this.orderMessages,
+            documentSnapshot.data().messages,
+          );
+        } else {
+          this.orderMessages = documentSnapshot.data().messages.reverse();
+        }
+      });
+  }
 
   @action async setOrderItems(orderId) {
     await firestore()
