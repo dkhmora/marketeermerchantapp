@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, Image} from 'react-native';
-import {Container, Text, Icon, Button, Input} from 'native-base';
+import {Container, Text, Icon, Button, Input, Item} from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BaseHeader from '../components/BaseHeader';
 import {GiftedChat, Bubble, Send, Composer} from 'react-native-gifted-chat';
@@ -48,15 +48,22 @@ class OrderChatScreen extends Component {
 
   renderComposer(props) {
     return (
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Button transparent onPress={() => console.log('gumana')}>
           <Icon name="image" />
         </Button>
-        <Composer {...props} />
+        <Button transparent onPress={() => console.log('gumana')}>
+          <Icon name="camera" />
+        </Button>
+        <Item
+          rounded
+          style={{flex: 1, marginRight: 15, marginVertical: 10, height: 40}}>
+          <Composer {...props} />
+        </Item>
         <Send {...props}>
           <Icon
             name="send"
-            style={{color: '#E91E63', marginBottom: 5, marginRight: 10}}
+            style={{color: '#E91E63', marginBottom: 8, marginRight: 10}}
           />
         </Send>
       </View>
