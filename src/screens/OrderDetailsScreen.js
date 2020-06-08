@@ -20,6 +20,18 @@ class OrderDetailsScreen extends Component {
     super(props);
   }
 
+  componentDidMount() {
+    this.props.navigation
+      .dangerouslyGetParent()
+      .setOptions({gestureEnabled: false});
+  }
+
+  componentWillUnmount() {
+    this.props.navigation
+      .dangerouslyGetParent()
+      .setOptions({gestureEnabled: true});
+  }
+
   openInMaps() {
     const {coordinates, userName} = this.props.route.params;
     const markerName = `Customer ${userName}'s Location`;

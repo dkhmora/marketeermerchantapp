@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {View} from 'react-native';
-import {Container, Text} from 'native-base';
+import {View, Image} from 'react-native';
+import {Container, Text, Icon, Button, Input} from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BaseHeader from '../components/BaseHeader';
-import {GiftedChat, Bubble} from 'react-native-gifted-chat';
+import {GiftedChat, Bubble, Send, Composer} from 'react-native-gifted-chat';
 import {inject, observer} from 'mobx-react';
 
 @inject('ordersStore')
@@ -14,8 +14,18 @@ class OrderChatScreen extends Component {
   }
 
   componentDidMount() {
+    this.props.navigation
+      .dangerouslyGetParent()
+      .setOptions({gestureEnabled: false});
+
     const {orderId} = this.props.route.params;
     this.props.ordersStore.getMessages(orderId);
+  }
+
+  componentWillUnmount() {
+    this.props.navigation
+      .dangerouslyGetParent()
+      .setOptions({gestureEnabled: true});
   }
 
   onSend(messages = []) {
@@ -36,6 +46,23 @@ class OrderChatScreen extends Component {
     );
   }
 
+  renderComposer(props) {
+    return (
+      <View style={{flexDirection: 'row'}}>
+        <Button transparent onPress={() => console.log('gumana')}>
+          <Icon name="image" />
+        </Button>
+        <Composer {...props} />
+        <Send {...props}>
+          <Icon
+            name="send"
+            style={{color: '#E91E63', marginBottom: 5, marginRight: 10}}
+          />
+        </Send>
+      </View>
+    );
+  }
+
   render() {
     const {navigation} = this.props;
     const {
@@ -49,7 +76,7 @@ class OrderChatScreen extends Component {
 
     const {orderMessages} = this.props.ordersStore;
 
-    const messages = orderMessages.slice();
+    const dataSource = orderMessages.slice();
 
     return (
       <Container style={{flex: 1}}>
@@ -59,7 +86,9 @@ class OrderChatScreen extends Component {
           <GiftedChat
             textStyle={{color: '#E91E63'}}
             renderBubble={this.renderBubble}
-            messages={messages}
+            renderComposer={this.renderComposer}
+            alwaysShowSend
+            messages={dataSource}
             onSend={(messages) => this.onSend(messages)}
             user={{
               _id: 1,
