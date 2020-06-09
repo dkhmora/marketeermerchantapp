@@ -13,17 +13,18 @@ class DeliveryAreaScreen extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      newMarkerPosition: null,
+      ready: false,
+    };
+
     const {coordinates} = this.props.detailsStore.storeDetails;
     console.log(coordinates);
 
-    const {_latitude, _longitude} = coordinates;
-
-    this.state = {
-      markerPosition: {latitude: _latitude, longitude: _longitude},
-      newMarkerPosition: null,
-      marginBottom: 1,
-      initialRegion: '',
-    };
+    if (coordinates) {
+      const {_latitude, _longitude} = coordinates;
+      this.state.markerPosition = {latitude: _latitude, longitude: _longitude};
+    }
   }
 
   componentDidMount() {
@@ -32,20 +33,23 @@ class DeliveryAreaScreen extends Component {
     if (!coordinates) {
       console.log('setInitialMarkerPosition');
       this.setInitialMarkerPosition();
+    } else {
+      this.setState({ready: true});
     }
   }
 
   async setInitialMarkerPosition() {
     await Geolocation.getCurrentPosition(
       (position) => {
-        let region = {
-          latitude: parseFloat(position.coords.latitude),
-          longitude: parseFloat(position.coords.longitude),
-        };
-
-        this.setState({markerPosition: {...region}});
+        this.setState({
+          markerPosition: {
+            latitude: parseFloat(position.coords.latitude),
+            longitude: parseFloat(position.coords.longitude),
+          },
+          ready: true,
+        });
       },
-      (error) => console.log(error),
+      (err) => console.log(err),
       {
         enableHighAccuracy: true,
         timeout: 20000,
@@ -58,7 +62,6 @@ class DeliveryAreaScreen extends Component {
     PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
     ).then((granted) => {
-      this.setState({marginBottom: 0});
       console.log(granted); // just to ensure that permissions were granted
     });
   };
@@ -69,53 +72,64 @@ class DeliveryAreaScreen extends Component {
 
   handleSetStoreLocation() {
     const {updateCoordinates} = this.props.detailsStore;
-    const {newMarkerPosition} = this.state;
+    const {merchantId} = this.props.authStore;
+    const {markerPosition, newMarkerPosition} = this.state;
 
-    updateCoordinates(
-      this.props.authStore.merchantId,
-      newMarkerPosition.latitude,
-      newMarkerPosition.longitude,
-    );
+    if (!newMarkerPosition) {
+      console.log('markerPosition');
+      updateCoordinates(
+        merchantId,
+        markerPosition.latitude,
+        markerPosition.longitude,
+      );
+    } else {
+      updateCoordinates(
+        merchantId,
+        newMarkerPosition.latitude,
+        newMarkerPosition.longitude,
+      );
+    }
   }
 
   render() {
     const {navigation} = this.props;
-
-    const {markerPosition} = this.state;
+    const {markerPosition, ready} = this.state;
 
     return (
       <View style={StyleSheet.absoluteFillObject}>
         <StatusBar translucent backgroundColor="transparent" />
 
-        <MapView
-          style={{flex: 1, marginBottom: this.state.marginBottom}}
-          ref={(map) => {
-            this.map = map;
-          }}
-          showsUserLocation
-          followsUserLocation
-          onMapReady={() => {
-            this._onMapReady();
-          }}
-          initialRegion={{
-            ...markerPosition,
-            latitudeDelta: 0.04,
-            longitudeDelta: 0.05,
-          }}>
-          <Marker
-            draggable
-            coordinate={markerPosition}
-            onDrag={(e) => this.setMarkerPosition(e)}
-          />
-          <Circle
-            center={markerPosition}
-            radius={10000}
-            fillColor="rgba(233, 30, 99, 0.3)"
-            strokeColor="rgba(0,0,0,0.5)"
-            zIndex={2}
-            strokeWidth={2}
-          />
-        </MapView>
+        {ready && (
+          <MapView
+            style={{flex: 1}}
+            ref={(map) => {
+              this.map = map;
+            }}
+            showsUserLocation
+            followsUserLocation
+            onMapReady={() => {
+              this._onMapReady();
+            }}
+            initialRegion={{
+              ...markerPosition,
+              latitudeDelta: 0.04,
+              longitudeDelta: 0.05,
+            }}>
+            <Marker
+              draggable
+              coordinate={markerPosition}
+              onDrag={(e) => this.setMarkerPosition(e)}
+            />
+            <Circle
+              center={markerPosition}
+              radius={10000}
+              fillColor="rgba(233, 30, 99, 0.3)"
+              strokeColor="rgba(0,0,0,0.5)"
+              zIndex={2}
+              strokeWidth={2}
+            />
+          </MapView>
+        )}
         <View
           style={{
             position: 'absolute',
