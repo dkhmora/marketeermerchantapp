@@ -8,6 +8,7 @@ import {
 import StoreItemsScreen from '../screens/StoreItemsScreen';
 import StoreDetailsScreen from '../screens/DashboardScreen';
 import OrdersScreen from '../screens/OrdersScreen';
+import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
 import {Icon, View, Text, Item, Label, Button} from 'native-base';
 
 export default function MainDrawer({route, navigation}) {
@@ -51,6 +52,11 @@ export default function MainDrawer({route, navigation}) {
       <Drawer.Screen
         name="Orders"
         component={OrdersScreen}
+        initialParams={{merchantId}}
+      />
+      <Drawer.Screen
+        name="Delivery Area"
+        component={DeliveryAreaScreen}
         initialParams={{merchantId}}
       />
     </Drawer.Navigator>

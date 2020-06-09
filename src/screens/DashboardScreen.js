@@ -29,6 +29,7 @@ import {observable, action} from 'mobx';
 import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import BaseOptionsMenu from '../components/BaseOptionsMenu';
+import MapView from 'react-native-maps';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -499,12 +500,18 @@ class StoreDetailsScreen extends Component {
               </Left>
             </CardItem>
             <CardItem bordered>
-              <Left>
-                <Text>Test</Text>
-              </Left>
-              <Right>
-                <Text>Text</Text>
-              </Right>
+              <Body style={{flex: 1}}>
+                <View style={{flex: 1}}>
+                  <MapView
+                    initialRegion={{
+                      latitude: 37.78825,
+                      longitude: -122.4324,
+                      latitudeDelta: 0.0922,
+                      longitudeDelta: 0.0421,
+                    }}
+                  />
+                </View>
+              </Body>
             </CardItem>
           </Card>
 
