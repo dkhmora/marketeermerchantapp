@@ -1,7 +1,16 @@
 import React, {Component} from 'react';
 import MapView, {Circle, Marker} from 'react-native-maps';
 import {View, StatusBar, StyleSheet, PermissionsAndroid} from 'react-native';
-import {Button, Icon, Text, Item} from 'native-base';
+import {
+  Button,
+  Icon,
+  Text,
+  Item,
+  Input,
+  Label,
+  Card,
+  CardItem,
+} from 'native-base';
 import {observer, inject} from 'mobx-react';
 import {observable} from 'mobx';
 import Geolocation from '@react-native-community/geolocation';
@@ -21,12 +30,15 @@ class DeliveryAreaScreen extends Component {
       editMode: false,
     };
 
-    const {coordinates} = this.props.detailsStore.storeDetails;
-    console.log(coordinates);
+    const {coordinates, deliveryRadius} = this.props.detailsStore.storeDetails;
 
     if (coordinates) {
       const {_latitude, _longitude} = coordinates;
       this.state.markerPosition = {latitude: _latitude, longitude: _longitude};
+    }
+
+    if (deliveryRadius) {
+      this.state.radius = deliveryRadius;
     }
   }
 
@@ -34,7 +46,6 @@ class DeliveryAreaScreen extends Component {
     const {coordinates} = this.props.detailsStore.storeDetails;
 
     if (!coordinates) {
-      console.log('setInitialMarkerPosition');
       this.setInitialMarkerPosition();
     } else {
       this.setState({ready: true});
@@ -79,7 +90,6 @@ class DeliveryAreaScreen extends Component {
     const {markerPosition, newMarkerPosition} = this.state;
 
     if (!newMarkerPosition) {
-      console.log('markerPosition');
       updateCoordinates(
         merchantId,
         markerPosition.latitude,
@@ -91,8 +101,10 @@ class DeliveryAreaScreen extends Component {
         newMarkerPosition.latitude,
         newMarkerPosition.longitude,
       );
+
       this.setState({markerPosition: this.state.newMarkerPosition});
     }
+    this.setState({editMode: false});
   }
 
   handleCancelChanges() {
@@ -105,7 +117,7 @@ class DeliveryAreaScreen extends Component {
 
   render() {
     const {navigation} = this.props;
-    const {markerPosition, ready, editMode} = this.state;
+    const {markerPosition, radius, ready, editMode} = this.state;
 
     return (
       <View style={StyleSheet.absoluteFillObject}>
@@ -165,24 +177,69 @@ class DeliveryAreaScreen extends Component {
             bottom: '5%',
           }}>
           {editMode ? (
-            <View style={{flexDirection: 'row'}}>
-              <Button
-                iconLeft
-                rounded
-                danger
-                onPress={() => this.handleCancelChanges()}
-                style={{marginRight: 20}}>
-                <Icon name="close" />
-                <Text>Cancel Changes</Text>
-              </Button>
-              <Button
-                iconLeft
-                rounded
-                success
-                onPress={() => this.handleSetStoreLocation()}>
-                <Icon name="save" />
-                <Text>Save Changes</Text>
-              </Button>
+            <View style={{flexDirection: 'column'}}>
+              <Card
+                style={{
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  backgroundColor: 'rgba(255,255,255, 0.6)',
+                }}>
+                <CardItem style={{flexDirection: 'column'}}>
+                  <Text style={{alignSelf: 'flex-start', marginBottom: 5}}>
+                    Delivery Radius (Kilometers)
+                  </Text>
+                  <Item
+                    style={{
+                      flex: 1,
+                      borderColor: 'transparent',
+                    }}>
+                    <Input
+                      value={radius.toString()}
+                      keyboardType="numeric"
+                      style={{
+                        borderRadius: 24,
+                        borderColor: '#E91E63',
+                        borderWidth: 1,
+                      }}
+                    />
+                  </Item>
+                </CardItem>
+                <CardItem>
+                  <Card
+                    style={{
+                      borderRadius: 16,
+                      overflow: 'hidden',
+                      backgroundColor: '#eee',
+                    }}>
+                    <CardItem style={{backgroundColor: '#eef'}}>
+                      <Text note style={{margin: 6}}>
+                        Tip: Tap and Hold the Red Marker to drag it around!
+                      </Text>
+                    </CardItem>
+                  </Card>
+                </CardItem>
+                <CardItem>
+                  <View style={{flexDirection: 'row'}}>
+                    <Button
+                      iconLeft
+                      rounded
+                      danger
+                      onPress={() => this.handleCancelChanges()}
+                      style={{marginRight: 20}}>
+                      <Icon name="close" />
+                      <Text>Cancel Changes</Text>
+                    </Button>
+                    <Button
+                      iconLeft
+                      rounded
+                      success
+                      onPress={() => this.handleSetStoreLocation()}>
+                      <Icon name="save" />
+                      <Text>Save Changes</Text>
+                    </Button>
+                  </View>
+                </CardItem>
+              </Card>
             </View>
           ) : (
             <Button
