@@ -13,9 +13,12 @@ class DeliveryAreaScreen extends Component {
   constructor(props) {
     super(props);
 
+    this.markerRef = React.createRef();
+
     this.state = {
       newMarkerPosition: null,
       ready: false,
+      editMode: false,
     };
 
     const {coordinates} = this.props.detailsStore.storeDetails;
@@ -88,12 +91,21 @@ class DeliveryAreaScreen extends Component {
         newMarkerPosition.latitude,
         newMarkerPosition.longitude,
       );
+      this.setState({markerPosition: this.state.newMarkerPosition});
     }
+  }
+
+  handleCancelChanges() {
+    this.setState({
+      newMarkerPosition: this.state.markerPosition,
+      editMode: false,
+    });
+    this.markerRef.current.animateMarkerToCoordinate(this.state.markerPosition);
   }
 
   render() {
     const {navigation} = this.props;
-    const {markerPosition, ready} = this.state;
+    const {markerPosition, ready, editMode} = this.state;
 
     return (
       <View style={StyleSheet.absoluteFillObject}>
@@ -116,7 +128,8 @@ class DeliveryAreaScreen extends Component {
               longitudeDelta: 0.05,
             }}>
             <Marker
-              draggable
+              ref={this.markerRef}
+              draggable={this.state.editMode}
               coordinate={markerPosition}
               onDrag={(e) => this.setMarkerPosition(e)}
             />
@@ -149,13 +162,37 @@ class DeliveryAreaScreen extends Component {
             position: 'absolute',
             alignSelf: 'center',
             justifyContent: 'center',
-            bottom: '30%',
+            bottom: '5%',
           }}>
-          <Button
-            onPress={() => this.handleSetStoreLocation()}
-            style={{borderRadius: 24, overflow: 'hidden', top: '100%'}}>
-            <Text>Update Store Location</Text>
-          </Button>
+          {editMode ? (
+            <View style={{flexDirection: 'row'}}>
+              <Button
+                iconLeft
+                rounded
+                danger
+                onPress={() => this.handleCancelChanges()}
+                style={{marginRight: 20}}>
+                <Icon name="close" />
+                <Text>Cancel Changes</Text>
+              </Button>
+              <Button
+                iconLeft
+                rounded
+                success
+                onPress={() => this.handleSetStoreLocation()}>
+                <Icon name="save" />
+                <Text>Save Changes</Text>
+              </Button>
+            </View>
+          ) : (
+            <Button
+              iconLeft
+              onPress={() => this.setState({editMode: true})}
+              style={{borderRadius: 24, overflow: 'hidden'}}>
+              <Icon name="create" />
+              <Text>Edit Delivery Area</Text>
+            </Button>
+          )}
         </View>
       </View>
     );
