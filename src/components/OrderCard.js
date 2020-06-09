@@ -146,15 +146,16 @@ class OrderCard extends Component {
         : 'Charged to account';
 
     const CardHeader = () => {
-      let optionsButton = false;
+      const optionsButton = tabName === 'Pending' ? true : false;
 
-      optionsButton = tabName === 'Pending' && true;
+      const chatButton =
+        tabName === 'Completed' || tabName === 'Cancelled' ? false : true;
 
       return (
         <CardItem
           header
           bordered
-          button
+          button={chatButton}
           onPress={() =>
             navigation.navigate('Order Chat', {
               userName,
@@ -166,12 +167,14 @@ class OrderCard extends Component {
           }
           style={{backgroundColor: '#E91E63'}}>
           <Left style={{flex: 3}}>
-            <Item>
-              <Icon
-                name="chatbubbles"
-                style={{color: '#fff', fontSize: 27, margin: -5}}
-              />
-            </Item>
+            {chatButton && (
+              <Item>
+                <Icon
+                  name="chatbubbles"
+                  style={{color: '#fff', fontSize: 27, margin: -5}}
+                />
+              </Item>
+            )}
             <Body>
               <Text style={{color: '#fff'}}>{userName}</Text>
               <Text note style={{color: '#ddd'}}>
