@@ -7,20 +7,9 @@ import {
   PermissionsAndroid,
   Platform,
   Dimensions,
-  Image,
 } from 'react-native';
-import {
-  Button,
-  Icon,
-  Text,
-  Item,
-  Input,
-  Label,
-  Card,
-  CardItem,
-} from 'native-base';
+import {Button, Icon, Text, Item, Input, Card, CardItem} from 'native-base';
 import {observer, inject} from 'mobx-react';
-import {observable} from 'mobx';
 import Geolocation from '@react-native-community/geolocation';
 
 @inject('authStore')
@@ -67,13 +56,6 @@ class DeliveryAreaScreen extends Component {
     } else {
       this.setState({mapReady: true});
     }
-    console.log(
-      'center',
-      Dimensions.get('window').height,
-      '-',
-      StatusBar.currentHeight,
-      (Dimensions.get('window').height - StatusBar.currentHeight) / 2,
-    );
   }
 
   async setInitialMarkerPosition() {
@@ -121,10 +103,6 @@ class DeliveryAreaScreen extends Component {
     }
   };
 
-  setMarkerPosition(e) {
-    this.setState({markerPosition: e.nativeEvent.coordinate});
-  }
-
   handleSetStoreLocation() {
     const {updateCoordinates} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
@@ -149,6 +127,7 @@ class DeliveryAreaScreen extends Component {
       newMarkerPosition: this.state.markerPosition,
       editMode: true,
     });
+
     if (Platform.OS === 'ios') {
       this.map.animateCamera(
         {
@@ -171,11 +150,10 @@ class DeliveryAreaScreen extends Component {
         },
         150,
       );
-      setTimeout(() => {
-        this.setState({cameraMoved: true});
-        console.log('yes');
-      }, 800);
     }
+    setTimeout(() => {
+      this.setState({cameraMoved: true});
+    }, 800);
   }
 
   handleCancelChanges() {
@@ -223,8 +201,7 @@ class DeliveryAreaScreen extends Component {
               <Marker
                 ref={this.markerRef}
                 tracksViewChanges={false}
-                coordinate={markerPosition}
-                onDrag={(e) => this.setMarkerPosition(e)}>
+                coordinate={markerPosition}>
                 <View>
                   <Icon
                     style={{
