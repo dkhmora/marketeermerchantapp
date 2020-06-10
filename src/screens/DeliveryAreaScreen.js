@@ -1,6 +1,12 @@
 import React, {Component} from 'react';
 import MapView, {Circle, Marker} from 'react-native-maps';
-import {View, StatusBar, StyleSheet, PermissionsAndroid} from 'react-native';
+import {
+  View,
+  StatusBar,
+  StyleSheet,
+  PermissionsAndroid,
+  Platform,
+} from 'react-native';
 import {
   Button,
   Icon,
@@ -25,9 +31,10 @@ class DeliveryAreaScreen extends Component {
     this.markerRef = React.createRef();
 
     this.state = {
-      newMarkerPosition: null,
+      initialMarkerPosition: null,
       ready: false,
       editMode: false,
+      mapData: null,
     };
 
     const {coordinates, deliveryRadius} = this.props.detailsStore.storeDetails;
@@ -35,6 +42,12 @@ class DeliveryAreaScreen extends Component {
     if (coordinates) {
       const {_latitude, _longitude} = coordinates;
       this.state.markerPosition = {latitude: _latitude, longitude: _longitude};
+      this.state.mapData = {
+        latitude: _latitude,
+        longitude: _longitude,
+        latitudeDelta: 0.04,
+        longitudeDelta: 0.05,
+      };
     }
 
     if (deliveryRadius) {
@@ -60,6 +73,12 @@ class DeliveryAreaScreen extends Component {
             latitude: parseFloat(position.coords.latitude),
             longitude: parseFloat(position.coords.longitude),
           },
+          mapData: {
+            latitude: parseFloat(position.coords.latitude),
+            longitude: parseFloat(position.coords.latitude),
+            latitudeDelta: 0.04,
+            longitudeDelta: 0.05,
+          },
           ready: true,
         });
       },
@@ -73,47 +92,75 @@ class DeliveryAreaScreen extends Component {
   }
 
   _onMapReady = () => {
-    PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    ).then((granted) => {
-      console.log(granted); // just to ensure that permissions were granted
-    });
+    if (Platform.OS === 'android') {
+      PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      ).then((granted) => {
+        console.log(granted); // just to ensure that permissions were granted
+      });
+    }
   };
 
   setMarkerPosition(e) {
-    this.setState({newMarkerPosition: e.nativeEvent.coordinate});
+    this.setState({markerPosition: e.nativeEvent.coordinate});
   }
 
   handleSetStoreLocation() {
-    const {updateCoordinates} = this.props.detailsStore;
+    const {updateCoordinates, coordinates} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
-    const {markerPosition, newMarkerPosition} = this.state;
+    const {markerPosition, initialMarkerPosition} = this.state;
 
-    if (!newMarkerPosition) {
+    if (!(markerPosition === initialMarkerPosition) || !coordinates) {
       updateCoordinates(
         merchantId,
         markerPosition.latitude,
         markerPosition.longitude,
       );
-    } else {
-      updateCoordinates(
-        merchantId,
-        newMarkerPosition.latitude,
-        newMarkerPosition.longitude,
-      );
-
-      this.setState({markerPosition: this.state.newMarkerPosition});
     }
     this.setState({editMode: false});
   }
 
+  handleEditDeliveryArea() {
+    this.setState({
+      mapData: {...this.state.markerPosition},
+      initialMarkerPosition: this.state.markerPosition,
+      editMode: true,
+    });
+    this.map.animateCamera(
+      {
+        center: this.state.markerPosition,
+        pitch: 2,
+        heading: 20,
+        altitude: 6000,
+        zoom: 5,
+      },
+      150,
+    );
+  }
+
   handleCancelChanges() {
     this.setState({
-      newMarkerPosition: this.state.markerPosition,
+      mapData: {...this.state.initialMarkerPosition},
+      markerPosition: this.state.initialMarkerPosition,
       editMode: false,
     });
-    this.markerRef.current.animateMarkerToCoordinate(this.state.markerPosition);
+    if (Platform.OS === 'android') {
+      this.markerRef.current.animateMarkerToCoordinate(
+        this.state.markerPosition,
+      );
+    }
   }
+
+  handleRegionChange = (mapData) => {
+    if (this.state.editMode) {
+      this.setState({
+        markerPosition: {
+          latitude: mapData.latitude,
+          longitude: mapData.longitude,
+        },
+      });
+    }
+  };
 
   render() {
     const {navigation} = this.props;
@@ -129,19 +176,16 @@ class DeliveryAreaScreen extends Component {
             ref={(map) => {
               this.map = map;
             }}
+            onRegionChange={this.handleRegionChange}
             showsUserLocation
             followsUserLocation
             onMapReady={() => {
               this._onMapReady();
             }}
-            initialRegion={{
-              ...markerPosition,
-              latitudeDelta: 0.04,
-              longitudeDelta: 0.05,
-            }}>
+            initialRegion={this.state.mapData}>
             <Marker
               ref={this.markerRef}
-              draggable={this.state.editMode}
+              tracksViewChanges={false}
               coordinate={markerPosition}
               onDrag={(e) => this.setMarkerPosition(e)}
             />
@@ -244,7 +288,7 @@ class DeliveryAreaScreen extends Component {
           ) : (
             <Button
               iconLeft
-              onPress={() => this.setState({editMode: true})}
+              onPress={() => this.handleEditDeliveryArea()}
               style={{borderRadius: 24, overflow: 'hidden'}}>
               <Icon name="create" />
               <Text>Edit Delivery Area</Text>
