@@ -6,6 +6,8 @@ import {
   StyleSheet,
   PermissionsAndroid,
   Platform,
+  Dimensions,
+  Image,
 } from 'react-native';
 import {
   Button,
@@ -31,11 +33,11 @@ class DeliveryAreaScreen extends Component {
     this.markerRef = React.createRef();
 
     this.state = {
-      initialMarkerPosition: null,
-      ready: false,
+      mapReady: false,
       editMode: false,
       cameraMoved: false,
-      mapData: null,
+      newMarkerPosition: null,
+      centerOfScreen: (Dimensions.get('window').height - 17) / 2,
     };
 
     const {coordinates, deliveryRadius} = this.props.detailsStore.storeDetails;
@@ -43,6 +45,7 @@ class DeliveryAreaScreen extends Component {
     if (coordinates) {
       const {_latitude, _longitude} = coordinates;
       this.state.markerPosition = {latitude: _latitude, longitude: _longitude};
+      this.state.circlePosition = {latitude: _latitude, longitude: _longitude};
       this.state.mapData = {
         latitude: _latitude,
         longitude: _longitude,
@@ -62,25 +65,41 @@ class DeliveryAreaScreen extends Component {
     if (!coordinates) {
       this.setInitialMarkerPosition();
     } else {
-      this.setState({ready: true});
+      this.setState({mapReady: true});
     }
+    console.log(
+      'center',
+      Dimensions.get('window').height,
+      '-',
+      StatusBar.currentHeight,
+      (Dimensions.get('window').height - StatusBar.currentHeight) / 2,
+    );
   }
 
   async setInitialMarkerPosition() {
     await Geolocation.getCurrentPosition(
       (position) => {
+        const coords = {
+          latitude: parseFloat(position.coords.latitude),
+          longitude: parseFloat(position.coords.longitude),
+        };
+
         this.setState({
           markerPosition: {
-            latitude: parseFloat(position.coords.latitude),
-            longitude: parseFloat(position.coords.longitude),
+            ...coords,
+          },
+          newMarkerPosition: {
+            ...coords,
           },
           mapData: {
-            latitude: parseFloat(position.coords.latitude),
-            longitude: parseFloat(position.coords.latitude),
+            ...coords,
             latitudeDelta: 0.04,
             longitudeDelta: 0.05,
           },
-          ready: true,
+          circlePosition: {
+            ...coords,
+          },
+          mapReady: true,
         });
       },
       (err) => console.log(err),
@@ -107,24 +126,27 @@ class DeliveryAreaScreen extends Component {
   }
 
   handleSetStoreLocation() {
-    const {updateCoordinates, coordinates} = this.props.detailsStore;
+    const {updateCoordinates} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
-    const {markerPosition, initialMarkerPosition} = this.state;
+    const {newMarkerPosition} = this.state;
 
-    if (!(markerPosition === initialMarkerPosition) || !coordinates) {
-      updateCoordinates(
-        merchantId,
-        markerPosition.latitude,
-        markerPosition.longitude,
-      );
-    }
-    this.setState({editMode: false});
+    updateCoordinates(
+      merchantId,
+      newMarkerPosition.latitude,
+      newMarkerPosition.longitude,
+    );
+
+    this.setState({
+      editMode: false,
+      circlePosition: newMarkerPosition,
+      markerPosition: newMarkerPosition,
+    });
   }
 
   handleEditDeliveryArea() {
     this.setState({
       mapData: {...this.state.markerPosition},
-      initialMarkerPosition: this.state.markerPosition,
+      newMarkerPosition: this.state.markerPosition,
       editMode: true,
     });
     if (Platform.OS === 'ios') {
@@ -158,22 +180,17 @@ class DeliveryAreaScreen extends Component {
 
   handleCancelChanges() {
     this.setState({
-      mapData: {...this.state.initialMarkerPosition},
-      markerPosition: this.state.initialMarkerPosition,
+      mapData: {...this.state.markerPosition},
+      newMarkerPosition: null,
       editMode: false,
       cameraMoved: false,
     });
-    if (Platform.OS === 'android') {
-      this.markerRef.current.animateMarkerToCoordinate(
-        this.state.initialMarkerPosition,
-      );
-    }
   }
 
   handleRegionChange = (mapData) => {
     if (this.state.editMode && this.state.cameraMoved) {
       this.setState({
-        markerPosition: {
+        newMarkerPosition: {
           latitude: mapData.latitude,
           longitude: mapData.longitude,
         },
@@ -183,33 +200,45 @@ class DeliveryAreaScreen extends Component {
 
   render() {
     const {navigation} = this.props;
-    const {markerPosition, radius, ready, editMode} = this.state;
+    const {markerPosition, radius, mapReady, editMode} = this.state;
 
     return (
       <View style={StyleSheet.absoluteFillObject}>
         <StatusBar translucent backgroundColor="transparent" />
 
-        {ready && (
+        {mapReady && (
           <MapView
             style={{flex: 1}}
             ref={(map) => {
               this.map = map;
             }}
-            onRegionChange={this.handleRegionChange}
+            onRegionChangeComplete={this.handleRegionChange}
             showsUserLocation
             followsUserLocation
             onMapReady={() => {
               this._onMapReady();
             }}
             initialRegion={this.state.mapData}>
-            <Marker
-              ref={this.markerRef}
-              tracksViewChanges={false}
-              coordinate={markerPosition}
-              onDrag={(e) => this.setMarkerPosition(e)}
-            />
+            {!editMode && (
+              <Marker
+                ref={this.markerRef}
+                tracksViewChanges={false}
+                coordinate={markerPosition}
+                onDrag={(e) => this.setMarkerPosition(e)}>
+                <View>
+                  <Icon
+                    style={{
+                      color: '#B11C01',
+                      fontSize: 34,
+                    }}
+                    name="pin"
+                    solid
+                  />
+                </View>
+              </Marker>
+            )}
             <Circle
-              center={markerPosition}
+              center={this.state.circlePosition}
               radius={10000}
               fillColor="rgba(233, 30, 99, 0.3)"
               strokeColor="rgba(0,0,0,0.5)"
@@ -217,6 +246,27 @@ class DeliveryAreaScreen extends Component {
               strokeWidth={2}
             />
           </MapView>
+        )}
+        {editMode && (
+          <View
+            style={{
+              left: 0,
+              right: 0,
+              marginLeft: 0,
+              marginTop: 0,
+              position: 'absolute',
+              top: this.state.centerOfScreen,
+              alignItems: 'center',
+            }}>
+            <Icon
+              style={{
+                color: '#B11C01',
+                fontSize: 34,
+              }}
+              name="pin"
+              solid
+            />
+          </View>
         )}
         <View
           style={{
