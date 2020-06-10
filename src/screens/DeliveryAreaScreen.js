@@ -307,8 +307,11 @@ class DeliveryAreaScreen extends Component {
                       overflow: 'hidden',
                       backgroundColor: '#eee',
                     }}>
-                    <CardItem style={{backgroundColor: '#eef'}}>
-                      <Text note style={{margin: 6}}>
+                    <CardItem
+                      style={{
+                        backgroundColor: '#eef',
+                      }}>
+                      <Text note style={{margin: 6, width: '100%'}}>
                         Tip: Pan around the map to move your store's location!
                       </Text>
                     </CardItem>
