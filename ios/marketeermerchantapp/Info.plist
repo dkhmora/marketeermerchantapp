@@ -38,7 +38,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string>Location needs to be obtained in order for User to set delivery bounds for their store in Google Maps.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -57,6 +57,8 @@
 	<string>User Photos needs to be accessed in order to upload item and store images</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera needs to be accesed in order to upload captured item and store images</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
