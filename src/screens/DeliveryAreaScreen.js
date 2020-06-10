@@ -9,6 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {Button, Icon, Text, Item, Input, Card, CardItem} from 'native-base';
+import {Slider} from 'react-native-elements';
 import {observer, inject} from 'mobx-react';
 import Geolocation from '@react-native-community/geolocation';
 
@@ -25,6 +26,8 @@ class DeliveryAreaScreen extends Component {
       mapReady: false,
       editMode: false,
       cameraMoved: false,
+      radius: 0,
+      initialRadius: 0,
       newMarkerPosition: null,
       centerOfScreen: (Dimensions.get('window').height - 17) / 2,
     };
@@ -106,12 +109,13 @@ class DeliveryAreaScreen extends Component {
   handleSetStoreLocation() {
     const {updateCoordinates} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
-    const {newMarkerPosition} = this.state;
+    const {newMarkerPosition, radius} = this.state;
 
     updateCoordinates(
       merchantId,
       newMarkerPosition.latitude,
       newMarkerPosition.longitude,
+      radius,
     );
 
     this.setState({
@@ -125,6 +129,7 @@ class DeliveryAreaScreen extends Component {
     this.setState({
       mapData: {...this.state.markerPosition},
       newMarkerPosition: this.state.markerPosition,
+      initialRadius: this.state.radius,
       editMode: true,
     });
 
@@ -160,6 +165,7 @@ class DeliveryAreaScreen extends Component {
     this.setState({
       mapData: {...this.state.markerPosition},
       newMarkerPosition: null,
+      radius: this.state.initialRadius,
       editMode: false,
       cameraMoved: false,
     });
@@ -216,7 +222,7 @@ class DeliveryAreaScreen extends Component {
             )}
             <Circle
               center={this.state.circlePosition}
-              radius={10000}
+              radius={this.state.radius * 1000}
               fillColor="rgba(233, 30, 99, 0.3)"
               strokeColor="rgba(0,0,0,0.5)"
               zIndex={2}
@@ -276,23 +282,23 @@ class DeliveryAreaScreen extends Component {
                 }}>
                 <CardItem style={{flexDirection: 'column'}}>
                   <Text style={{alignSelf: 'flex-start', marginBottom: 5}}>
-                    Delivery Radius (Kilometers)
+                    Delivery Radius
                   </Text>
-                  <Item
+                  <View
                     style={{
-                      flex: 1,
-                      borderColor: 'transparent',
+                      width: '100%',
                     }}>
-                    <Input
-                      value={radius.toString()}
-                      keyboardType="numeric"
-                      style={{
-                        borderRadius: 24,
-                        borderColor: '#E91E63',
-                        borderWidth: 1,
-                      }}
+                    <Slider
+                      step={1}
+                      minimumValue={0}
+                      maximumValue={100}
+                      value={this.state.radius}
+                      onValueChange={(value) => this.setState({radius: value})}
                     />
-                  </Item>
+                    <Text style={{alignSelf: 'center'}}>
+                      {this.state.radius} KM
+                    </Text>
+                  </View>
                 </CardItem>
                 <CardItem>
                   <Card
@@ -303,7 +309,7 @@ class DeliveryAreaScreen extends Component {
                     }}>
                     <CardItem style={{backgroundColor: '#eef'}}>
                       <Text note style={{margin: 6}}>
-                        Tip: Tap and Hold the Red Marker to drag it around!
+                        Tip: Pan around the map to move your store's location!
                       </Text>
                     </CardItem>
                   </Card>

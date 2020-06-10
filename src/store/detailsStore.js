@@ -6,7 +6,12 @@ import storage from '@react-native-firebase/storage';
 class DetailsStore {
   @observable storeDetails = {};
 
-  @action async updateCoordinates(merchantId, latitude, longitude) {
+  @action async updateCoordinates(
+    merchantId,
+    latitude,
+    longitude,
+    deliveryRadius,
+  ) {
     const coordinates = new firebase.firestore.GeoPoint(latitude, longitude);
 
     await firestore()
@@ -14,6 +19,7 @@ class DetailsStore {
       .doc(merchantId)
       .update({
         coordinates,
+        deliveryRadius,
       })
       .then(() => console.log('Successfully updated merchant coordinates'))
       .catch((err) => console.log(err));
