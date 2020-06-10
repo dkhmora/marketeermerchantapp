@@ -34,6 +34,7 @@ class DeliveryAreaScreen extends Component {
       initialMarkerPosition: null,
       ready: false,
       editMode: false,
+      cameraMoved: false,
       mapData: null,
     };
 
@@ -126,16 +127,33 @@ class DeliveryAreaScreen extends Component {
       initialMarkerPosition: this.state.markerPosition,
       editMode: true,
     });
-    this.map.animateCamera(
-      {
-        center: this.state.markerPosition,
-        pitch: 2,
-        heading: 20,
-        altitude: 6000,
-        zoom: 5,
-      },
-      150,
-    );
+    if (Platform.OS === 'ios') {
+      this.map.animateCamera(
+        {
+          center: this.state.markerPosition,
+          pitch: 2,
+          heading: 20,
+          altitude: 6000,
+          zoom: 5,
+        },
+        150,
+      );
+    } else {
+      this.map.animateCamera(
+        {
+          center: this.state.markerPosition,
+          pitch: 2,
+          heading: 1,
+          altitude: 500,
+          zoom: 15,
+        },
+        150,
+      );
+      setTimeout(() => {
+        this.setState({cameraMoved: true});
+        console.log('yes');
+      }, 800);
+    }
   }
 
   handleCancelChanges() {
@@ -143,16 +161,17 @@ class DeliveryAreaScreen extends Component {
       mapData: {...this.state.initialMarkerPosition},
       markerPosition: this.state.initialMarkerPosition,
       editMode: false,
+      cameraMoved: false,
     });
     if (Platform.OS === 'android') {
       this.markerRef.current.animateMarkerToCoordinate(
-        this.state.markerPosition,
+        this.state.initialMarkerPosition,
       );
     }
   }
 
   handleRegionChange = (mapData) => {
-    if (this.state.editMode) {
+    if (this.state.editMode && this.state.cameraMoved) {
       this.setState({
         markerPosition: {
           latitude: mapData.latitude,
