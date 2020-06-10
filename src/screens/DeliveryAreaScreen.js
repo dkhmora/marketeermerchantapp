@@ -20,12 +20,9 @@ class DeliveryAreaScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.markerRef = React.createRef();
-
     this.state = {
       mapReady: false,
       editMode: false,
-      cameraMoved: false,
       radius: 0,
       initialRadius: 0,
       newMarkerPosition: null,
@@ -125,14 +122,7 @@ class DeliveryAreaScreen extends Component {
     });
   }
 
-  handleEditDeliveryArea() {
-    this.setState({
-      mapData: {...this.state.markerPosition},
-      newMarkerPosition: this.state.markerPosition,
-      initialRadius: this.state.radius,
-      editMode: true,
-    });
-
+  panMapToMarker() {
     if (Platform.OS === 'ios') {
       this.map.animateCamera(
         {
@@ -156,27 +146,49 @@ class DeliveryAreaScreen extends Component {
         150,
       );
     }
-    setTimeout(() => {
-      this.setState({cameraMoved: true});
-    }, 800);
+  }
+
+  handleEditDeliveryArea() {
+    this.setState({
+      mapData: {
+        ...this.state.markerPosition,
+        latitudeDelta: 0.04,
+        longitudeDelta: 0.05,
+      },
+      newMarkerPosition: this.state.markerPosition,
+      initialRadius: this.state.radius,
+      editMode: true,
+    });
+
+    this.panMapToMarker();
   }
 
   handleCancelChanges() {
+    const {markerPosition, initialRadius} = this.state;
+
     this.setState({
-      mapData: {...this.state.markerPosition},
+      mapData: {...markerPosition, latitudeDelta: 0.04, longitudeDelta: 0.05},
       newMarkerPosition: null,
-      radius: this.state.initialRadius,
+      radius: initialRadius,
       editMode: false,
-      cameraMoved: false,
     });
+
+    this.panMapToMarker();
   }
 
   handleRegionChange = (mapData) => {
-    if (this.state.editMode && this.state.cameraMoved) {
+    const {editMode} = this.state;
+    const {latitude, longitude} = mapData;
+
+    if (editMode) {
       this.setState({
         newMarkerPosition: {
-          latitude: mapData.latitude,
-          longitude: mapData.longitude,
+          latitude,
+          longitude,
+        },
+        circlePosition: {
+          latitude,
+          longitude,
         },
       });
     }
@@ -184,7 +196,15 @@ class DeliveryAreaScreen extends Component {
 
   render() {
     const {navigation} = this.props;
-    const {markerPosition, radius, mapReady, editMode} = this.state;
+    const {
+      markerPosition,
+      radius,
+      circlePosition,
+      centerOfScreen,
+      mapData,
+      mapReady,
+      editMode,
+    } = this.state;
 
     return (
       <View style={StyleSheet.absoluteFillObject}>
@@ -202,10 +222,12 @@ class DeliveryAreaScreen extends Component {
             onMapReady={() => {
               this._onMapReady();
             }}
-            initialRegion={this.state.mapData}>
+            initialRegion={mapData}>
             {!editMode && (
               <Marker
-                ref={this.markerRef}
+                ref={(marker) => {
+                  this.marker = marker;
+                }}
                 tracksViewChanges={false}
                 coordinate={markerPosition}>
                 <View>
@@ -221,8 +243,8 @@ class DeliveryAreaScreen extends Component {
               </Marker>
             )}
             <Circle
-              center={this.state.circlePosition}
-              radius={this.state.radius * 1000}
+              center={circlePosition}
+              radius={radius * 1000}
               fillColor="rgba(233, 30, 99, 0.3)"
               strokeColor="rgba(0,0,0,0.5)"
               zIndex={2}
@@ -238,7 +260,7 @@ class DeliveryAreaScreen extends Component {
               marginLeft: 0,
               marginTop: 0,
               position: 'absolute',
-              top: this.state.centerOfScreen,
+              top: centerOfScreen,
               alignItems: 'center',
             }}>
             <Icon
@@ -292,12 +314,10 @@ class DeliveryAreaScreen extends Component {
                       step={1}
                       minimumValue={0}
                       maximumValue={100}
-                      value={this.state.radius}
+                      value={radius}
                       onValueChange={(value) => this.setState({radius: value})}
                     />
-                    <Text style={{alignSelf: 'center'}}>
-                      {this.state.radius} KM
-                    </Text>
+                    <Text style={{alignSelf: 'center'}}>{radius} KM</Text>
                   </View>
                 </CardItem>
                 <CardItem>
