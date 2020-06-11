@@ -2,8 +2,11 @@ import {observable, action} from 'mobx';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import messaging from '@react-native-firebase/messaging';
+
+const fcmCollection = firestore().collection('merchant_fcm');
 class AuthStore {
-  @observable merchantId = 'testest';
+  @observable merchantId = '';
+  @observable subscribedToNotifications = false;
 
   @action setMerchantId(id) {
     this.merchantId = id;
@@ -20,16 +23,43 @@ class AuthStore {
     await auth().signOut();
   }
 
-  @action async subscribeToNotifications() {
-    const fcmCollection = firestore().collection('merchant_fcm');
-
+  @action async checkNotificationSubscriptionStatus() {
     messaging()
       .getToken()
-      .then((value) =>
+      .then((token) =>
         fcmCollection
-          .doc(this.props.authStore.merchantId)
-          .update('fcmTokens', firestore.FieldValue.arrayUnion(value)),
+          .doc(this.merchantId)
+          .get()
+          .then((document) => {
+            if (document.data().fcmTokens.includes(token)) {
+              this.subscribedToNotifications = true;
+            } else {
+              this.subscribedToNotifications = false;
+            }
+          }),
       );
+  }
+
+  @action async subscribeToNotifications() {
+    messaging()
+      .getToken()
+      .then((token) =>
+        fcmCollection
+          .doc(this.merchantId)
+          .update('fcmTokens', firestore.FieldValue.arrayUnion(token)),
+      )
+      .catch((err) => console.log(err));
+  }
+
+  @action async unsubscribeToNotifications() {
+    messaging()
+      .getToken()
+      .then((token) =>
+        fcmCollection
+          .doc(this.merchantId)
+          .update('fcmTokens', firestore.FieldValue.arrayRemove(token)),
+      )
+      .catch((err) => console.log(err));
   }
 }
 
