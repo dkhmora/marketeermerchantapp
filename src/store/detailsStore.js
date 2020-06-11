@@ -30,7 +30,9 @@ class DetailsStore {
       .collection('merchants')
       .doc(merchantId)
       .onSnapshot((documentSnapshot) => {
-        this.storeDetails = documentSnapshot.data();
+        if (documentSnapshot) {
+          this.storeDetails = documentSnapshot.data();
+        }
       });
   }
 

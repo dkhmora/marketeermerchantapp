@@ -495,30 +495,6 @@ class StoreDetailsScreen extends Component {
             <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
               <Left>
                 <Body>
-                  <Text style={{color: '#fff'}}>Delivery Bounds</Text>
-                </Body>
-              </Left>
-            </CardItem>
-            <CardItem bordered>
-              <Body style={{flex: 1}}>
-                <View style={{flex: 1}}>
-                  <MapView
-                    initialRegion={{
-                      latitude: 37.78825,
-                      longitude: -122.4324,
-                      latitudeDelta: 0.0922,
-                      longitudeDelta: 0.0421,
-                    }}
-                  />
-                </View>
-              </Body>
-            </CardItem>
-          </Card>
-
-          <Card style={{borderRadius: 16, overflow: 'hidden'}}>
-            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
-              <Left>
-                <Body>
                   <Text style={{color: '#fff'}}>Sales</Text>
                 </Body>
               </Left>
