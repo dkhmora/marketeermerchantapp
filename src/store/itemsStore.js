@@ -16,8 +16,10 @@ class ItemsStore {
       .collection('merchant_items')
       .doc(merchantId)
       .onSnapshot((documentSnapshot) => {
-        const itemCats = documentSnapshot.data().itemCategories;
-        this.itemCategories = itemCats.sort();
+        if (documentSnapshot) {
+          const itemCats = documentSnapshot.data().itemCategories;
+          this.itemCategories = itemCats.sort();
+        }
       });
   }
 

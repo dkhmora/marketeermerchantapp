@@ -5,7 +5,6 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {inject} from 'mobx-react';
 
-const merchantsCollection = firestore().collection('merchants');
 @inject('authStore')
 @inject('ordersStore')
 @inject('detailsStore')
@@ -16,25 +15,35 @@ class AuthLoader extends React.Component {
   }
 
   onAuthStateChanged(user) {
+    const merchantAdminsCollection = firestore().collection('merchant_admins');
+    const {visible} = this.state;
+
     if (auth().currentUser != null) {
       const currentUserId = auth().currentUser.uid;
-      merchantsCollection
-        .where(`admins.${currentUserId}`, '==', true)
+
+      merchantAdminsCollection
+        .where(`${currentUserId}`, '==', true)
         .get()
         .then((snapshot) => {
           if (snapshot.empty) {
             auth().signOut();
+
             console.log('Error: The user does not match with any merchants');
           } else {
             snapshot.forEach((doc) => {
-              this.props.authStore.setMerchantId(doc.id.trim());
-              this.props.detailsStore.setStoreDetails(doc.id.trim());
+              const merchantId = doc.id.trim();
+
+              this.props.authStore.setMerchantId(merchantId);
+              this.props.detailsStore.setStoreDetails(merchantId);
+
               console.log(
-                `Current user is assigned to Merchant with doc id "${this.props.authStore.merchantId}"`,
+                `Current user is assigned to Merchant with doc id "${merchantId}"`,
               );
             });
-            this.setState({user: user});
-            if (this.state.visible) {
+
+            this.setState({user});
+
+            if (visible) {
               this.setState({visible: false});
             }
           }
@@ -43,7 +52,8 @@ class AuthLoader extends React.Component {
           console.log(`Error: Cannot read documents - ${err}`);
         });
     }
-    if (this.state.visible) {
+
+    if (visible) {
       this.setState({visible: false});
     }
   }
@@ -52,21 +62,27 @@ class AuthLoader extends React.Component {
     const subscriber = auth().onAuthStateChanged(
       this.onAuthStateChanged.bind(this),
     );
+
     return subscriber;
   }
 
   componentDidUpdate() {
-    if (!this.state.user) {
-      this.props.navigation.navigate('Auth');
+    const {navigation} = this.props;
+    const {merchantId} = this.props.authStore;
+    const {user} = this.state;
+
+    if (!user) {
+      navigation.navigate('Auth');
     } else {
-      this.props.navigation.navigate('Home', {
-        merchantId: this.props.authStore.merchantId,
+      navigation.navigate('Home', {
+        merchantId,
       });
     }
   }
 
   render() {
     const {visible} = this.state;
+
     return (
       <AnimatedLoader
         visible={visible}
