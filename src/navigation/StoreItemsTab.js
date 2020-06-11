@@ -34,7 +34,7 @@ class StoreItemsTab extends Component {
   }
 
   @observable newCategory = '';
-  @observable selectedCategory = this.props.itemsStore.itemCategories[0];
+  @observable selectedCategory = this.props.itemsStore.itemCategories.slice[0];
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
 
