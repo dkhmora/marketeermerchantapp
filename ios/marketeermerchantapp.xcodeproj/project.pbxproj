@@ -104,6 +104,7 @@
 		E145BCCA533CB62B3CEB9498 /* Pods-marketeermerchantapp-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOS.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOS/Pods-marketeermerchantapp-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		E412BF5BD3995AAF5DA4EAAE /* Pods-marketeermerchantapp-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOSTests/Pods-marketeermerchantapp-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		E81FB80B247FAC0B00310A89 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		E89A0973249282A000007182 /* marketeermerchantapp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = marketeermerchantapp.entitlements; path = marketeermerchantapp/marketeermerchantapp.entitlements; sourceTree = "<group>"; };
 		EA6014E5D57E74B7685744A2 /* Pods-marketeermerchantapp-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOS/Pods-marketeermerchantapp-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
@@ -168,6 +169,7 @@
 		13B07FAE1A68108700A75B9A /* marketeermerchantapp */ = {
 			isa = PBXGroup;
 			children = (
+				E89A0973249282A000007182 /* marketeermerchantapp.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -783,6 +785,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = marketeermerchantapp/marketeermerchantapp.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -810,6 +813,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = marketeermerchantapp/marketeermerchantapp.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = marketeermerchantapp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
