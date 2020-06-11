@@ -9,6 +9,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
+import SplashScreen from 'react-native-splash-screen';
 
 global._ = _;
 global.moment = moment;
@@ -26,6 +27,10 @@ const detailsStore = (window.store = new DetailsStore());
 const itemsStore = (window.store = new ItemsStore());
 
 export default class App extends React.Component {
+  componentDidMount() {
+    SplashScreen.hide();
+  }
+
   render() {
     return (
       <Provider
