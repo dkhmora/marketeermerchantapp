@@ -16,6 +16,8 @@
 
 #import <GoogleMaps/GoogleMaps.h>
 
+#import "RNSplashScreen.h"
+
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
   SKDescriptorMapper *layoutDescriptorMapper = [[SKDescriptorMapper alloc] initWithDefaults];
@@ -31,6 +33,9 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+
+  [RNSplashScreen show];
+
   [GMSServices provideAPIKey:@"AIzaSyDm8mCUY6ht6s2k_3S62CStnF3QiA4wVqM"];
   if ([FIRApp defaultApp] == nil) {
     [FIRApp configure];
