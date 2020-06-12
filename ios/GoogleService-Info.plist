@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1549607298-k5rm4tfevvjpoc7ap09c3scad3isbr6b.apps.googleusercontent.com</string>
+	<string>1549607298-d8e94dip379r3i0umnj1et2lvt2sgeg6.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1549607298-k5rm4tfevvjpoc7ap09c3scad3isbr6b</string>
+	<string>com.googleusercontent.apps.1549607298-d8e94dip379r3i0umnj1et2lvt2sgeg6</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>1549607298-6c2jet8dr53fqgeu5nf0ggv5bh9idbq4.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.marketeerph.marketeermerchantapp</string>
+	<string>com.marketeerph.marketeermerchantapp.ios</string>
 	<key>PROJECT_ID</key>
 	<string>marketeerph-b9653</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,7 +31,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1549607298:ios:401f83787a19660b09af9b</string>
+	<string>1:1549607298:ios:59e88c0bf2b4b46b09af9b</string>
 	<key>DATABASE_URL</key>
 	<string>https://marketeerph-b9653.firebaseio.com</string>
 </dict>
