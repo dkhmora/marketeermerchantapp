@@ -29,17 +29,23 @@ class ItemsList extends Component {
 
   render() {
     const {category} = this.props.route.params;
-    const dataSource = this.props.itemsStore.categoryItems
-      .get(category)
-      .slice();
+    const {navigation} = this.props;
+    let dataSource;
+
+    if (category !== 'All') {
+      dataSource = this.props.itemsStore.categoryItems.get(category).slice();
+    } else {
+      dataSource = this.props.itemsStore.storeItems;
+    }
+
     const numColumns = 2;
 
     return (
       <Container style={{flex: 1}}>
-        <View style={{paddingHorizontal: 10}}>
+        <View style={{paddingHorizontal: 10, flex: 1}}>
           <FlatList
             data={this.formatData(dataSource, numColumns)}
-            numColumns={2}
+            numColumns={numColumns}
             renderItem={({item, index}) =>
               item.empty ? (
                 <View
@@ -48,14 +54,15 @@ class ItemsList extends Component {
                 />
               ) : (
                 <ItemCard
-                  name={`${item.name}`}
-                  image={`${item.image}`}
-                  description={`${item.description}`}
-                  price={`${item.price}`}
-                  stock={`${item.stock}`}
-                  sales={`${item.sales}`}
-                  unit={`${item.unit}`}
-                  createdAt={`${item.createdAt}`}
+                  category={item.category}
+                  name={item.name}
+                  image={item.image}
+                  description={item.description}
+                  price={item.price}
+                  stock={item.stock}
+                  sales={item.sales}
+                  unit={item.unit}
+                  createdAt={item.createdAt}
                   key={index}
                 />
               )
@@ -63,13 +70,16 @@ class ItemsList extends Component {
             keyExtractor={(item, index) => `${item.name}${index.toString()}`}
             showsVerticalScrollIndicator={false}
           />
-          <Fab
-            containerStyle={{}}
-            position="bottomRight"
-            style={{backgroundColor: '#5cb85c'}}>
-            <Icon name="add" />
-          </Fab>
         </View>
+        <Fab
+          containerStyle={{}}
+          position="bottomRight"
+          style={{backgroundColor: '#5cb85c'}}
+          onPress={() =>
+            navigation.navigate('Add Item', {pageCategory: category})
+          }>
+          <Icon name="add" />
+        </Fab>
       </Container>
     );
   }

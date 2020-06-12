@@ -7,7 +7,6 @@ import AddItemScreen from './AddItemScreen';
 
 const StackOrder = createStackNavigator();
 @inject('authStore')
-@inject('detailsStore')
 @inject('itemsStore')
 @observer
 class StoreItemsScreen extends Component {
@@ -16,24 +15,13 @@ class StoreItemsScreen extends Component {
   }
 
   componentDidMount() {
-    this.props.itemsStore.setStoreItems(
-      this.props.authStore.merchantId,
-      this.props.detailsStore.storeCategories,
-    );
+    this.props.itemsStore.setStoreItems(this.props.authStore.merchantId);
   }
 
   render() {
     return (
       <StackOrder.Navigator initialRouteName="Store Items" headerMode="none">
-        <StackOrder.Screen
-          name="Store Items"
-          component={StoreItemsTab}
-          initialParams={{
-            leftTextKey: 'price',
-            middleTextKey: 'description',
-            fabButton: true,
-          }}
-        />
+        <StackOrder.Screen name="Store Items" component={StoreItemsTab} />
         <StackOrder.Screen name="Add Item" component={AddItemScreen} />
       </StackOrder.Navigator>
     );

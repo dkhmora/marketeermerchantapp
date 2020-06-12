@@ -20,23 +20,32 @@ class OrdersList extends Component {
   }
 
   render() {
-    const {storeVarName} = this.props.route.params;
+    const {navigation} = this.props;
+    const {storeVarName, buttonText} = this.props.route.params;
+    const {name} = this.props.route;
+    const {merchantId} = this.props.authStore;
     const dataSource = this.props.ordersStore[`${storeVarName}`].slice();
 
     return (
       <Container style={{flex: 1}}>
-        <View style={{paddingHorizontal: 10}}>
+        <View style={{paddingHorizontal: 10, flex: 1}}>
           <FlatList
             data={dataSource}
             renderItem={({item, index}) => (
               <OrderCard
-                orderNumber={`${item.orderNumber}`}
+                merchantId={merchantId}
+                orderNumber={item.orderNumber}
+                orderStatus={item.orderStatus}
+                coordinates={item.coordinates}
                 userName={`${item.userName}`}
-                numberOfItems={`${item.numberOfItems}`}
-                totalAmount={`${item.totalAmount}`}
-                orderId={`${item.orderId}`}
-                userAddress={`${item.userAddress}`}
-                createdAt={`${item.createdAt}`}
+                numberOfItems={item.numberOfItems}
+                shippingPrice={item.shippingPrice}
+                totalAmount={item.totalAmount}
+                orderId={item.orderId}
+                userAddress={item.userAddress}
+                createdAt={item.createdAt}
+                tabName={name}
+                navigation={navigation}
                 key={index}
               />
             )}
