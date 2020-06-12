@@ -38,10 +38,7 @@
 		C02C7172BB10405A89850CC0 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4DEF9CE37E414719B2EF1312 /* AntDesign.ttf */; };
 		C1524C0539E74961AE02BC3A /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98C14A12B3FC405EB915FA82 /* Foundation.ttf */; };
 		CA17F7535AD8468CBDA982E8 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CF25E96F2AA84B448BC32F59 /* Zocial.ttf */; };
-		E81FB80C247FAC0B00310A89 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E81FB80B247FAC0B00310A89 /* GoogleService-Info.plist */; };
-		E81FB80D247FAC0B00310A89 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E81FB80B247FAC0B00310A89 /* GoogleService-Info.plist */; };
-		E81FB80E247FAC0B00310A89 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E81FB80B247FAC0B00310A89 /* GoogleService-Info.plist */; };
-		E81FB80F247FAC0B00310A89 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E81FB80B247FAC0B00310A89 /* GoogleService-Info.plist */; };
+		E89A097D24938E3300007182 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E89A097C24938E3300007182 /* GoogleService-Info.plist */; };
 		FA36D5CBFDD942AB8E2B7C55 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DEE646FDEB6845B99023F346 /* Ionicons.ttf */; };
 /* End PBXBuildFile section */
 
@@ -68,7 +65,7 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* marketeermerchantappTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = marketeermerchantappTests.m; sourceTree = "<group>"; };
 		11C2F1DAE55BD51A4623EADA /* Pods-marketeermerchantapp-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOSTests/Pods-marketeermerchantapp-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* marketeermerchantapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = marketeermerchantapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Marketeer Merchant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Marketeer Merchant.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = marketeermerchantapp/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = marketeermerchantapp/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -103,8 +100,8 @@
 		DEE646FDEB6845B99023F346 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		E145BCCA533CB62B3CEB9498 /* Pods-marketeermerchantapp-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOS.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOS/Pods-marketeermerchantapp-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		E412BF5BD3995AAF5DA4EAAE /* Pods-marketeermerchantapp-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOSTests/Pods-marketeermerchantapp-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
-		E81FB80B247FAC0B00310A89 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E89A0973249282A000007182 /* marketeermerchantapp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = marketeermerchantapp.entitlements; path = marketeermerchantapp/marketeermerchantapp.entitlements; sourceTree = "<group>"; };
+		E89A097C24938E3300007182 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		EA6014E5D57E74B7685744A2 /* Pods-marketeermerchantapp-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOS/Pods-marketeermerchantapp-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
@@ -245,7 +242,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				E81FB80B247FAC0B00310A89 /* GoogleService-Info.plist */,
+				E89A097C24938E3300007182 /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* marketeermerchantapp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* marketeermerchantappTests */,
@@ -262,7 +259,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* marketeermerchantapp.app */,
+				13B07F961A680F5B00A75B9A /* Marketeer Merchant.app */,
 				00E356EE1AD99517003FC87E /* marketeermerchantappTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* marketeermerchantapp-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* marketeermerchantapp-tvOSTests.xctest */,
@@ -312,7 +309,7 @@
 			);
 			name = marketeermerchantapp;
 			productName = marketeermerchantapp;
-			productReference = 13B07F961A680F5B00A75B9A /* marketeermerchantapp.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Marketeer Merchant.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2D02E47A1E0B4A5D006451C7 /* marketeermerchantapp-tvOS */ = {
@@ -406,7 +403,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E81FB80D247FAC0B00310A89 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,7 +429,7 @@
 				ACB019C73FAB4B58A896CB3E /* Roboto_medium.ttf in Resources */,
 				1DE5944CE3754D3092D63B7B /* Roboto.ttf in Resources */,
 				39446CE4B6F54257A31B9F40 /* rubicon-icon-font.ttf in Resources */,
-				E81FB80C247FAC0B00310A89 /* GoogleService-Info.plist in Resources */,
+				E89A097D24938E3300007182 /* GoogleService-Info.plist in Resources */,
 				9E3426075EE4442AB5386D95 /* SimpleLineIcons.ttf in Resources */,
 				CA17F7535AD8468CBDA982E8 /* Zocial.ttf in Resources */,
 			);
@@ -444,7 +440,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */,
-				E81FB80E247FAC0B00310A89 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,7 +447,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E81FB80F247FAC0B00310A89 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -799,10 +793,11 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = marketeermerchantapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.marketeerph.marketeermerchantapp.ios;
+				PRODUCT_NAME = "Marketeer Merchant";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -822,9 +817,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = marketeermerchantapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.marketeerph.marketeermerchantapp.ios;
+				PRODUCT_NAME = "Marketeer Merchant";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
