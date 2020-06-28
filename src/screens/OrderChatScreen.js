@@ -3,12 +3,20 @@ import {View, Image} from 'react-native';
 import {Container, Text, Icon, Button, Input, Item} from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BaseHeader from '../components/BaseHeader';
-import {GiftedChat, Bubble, Send, Composer, MessageImage} from 'react-native-gifted-chat';
+import {
+  GiftedChat,
+  Bubble,
+  Send,
+  Composer,
+  MessageImage,
+} from 'react-native-gifted-chat';
 import {inject, observer} from 'mobx-react';
 import ImagePicker from 'react-native-image-crop-picker';
 import {observable} from 'mobx';
 
 @inject('ordersStore')
+@inject('detailsStore')
+@inject('authStore')
 @observer
 class OrderChatScreen extends Component {
   constructor(props) {
@@ -16,10 +24,8 @@ class OrderChatScreen extends Component {
 
     this.state = {
       user: {
-        _id: 1,
-        name: 'user',
-        avatar:
-          'https://store.playstation.com/store/api/chihiro/00_09_000/container/US/en/99/UP1675-CUSA11816_00-AV00000000000012//image?_version=00_09_000&platform=chihiro&w=720&h=720&bg_color=000000&opacity=100',
+        _id: this.props.authStore.merchantId,
+        name: this.props.detailsStore.storeDetails.storeName,
       },
     };
 
@@ -54,6 +60,8 @@ class OrderChatScreen extends Component {
     ImagePicker.openCamera({
       width: 1280,
       height: 720,
+      mediaType: 'photo',
+      compressImageQuality: 0.8,
     })
       .then((image) => {
         this.imagePath = image.path;
@@ -74,6 +82,8 @@ class OrderChatScreen extends Component {
     ImagePicker.openPicker({
       width: 1280,
       height: 720,
+      mediaType: 'photo',
+      compressImageQuality: 0.8,
     })
       .then((image) => {
         this.imagePath = image.path;
