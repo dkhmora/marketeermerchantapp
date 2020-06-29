@@ -4,6 +4,8 @@ import storage from '@react-native-firebase/storage';
 import {GiftedChat} from 'react-native-gifted-chat';
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
+
+const ordersCollection = firestore().collection('orders');
 class OrdersStore {
   @observable orders = [];
   @observable orderItems = [];
@@ -94,10 +96,8 @@ class OrdersStore {
   }
 
   @action setPendingOrders(merchantId) {
-    firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .collection('orders')
+    ordersCollection
+      .where('storeDetails.merchantId', '==', merchantId)
       .where('orderStatus.pending.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -110,10 +110,8 @@ class OrdersStore {
   }
 
   @action setAcceptedOrders(merchantId) {
-    firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .collection('orders')
+    ordersCollection
+      .where('storeDetails.merchantId', '==', merchantId)
       .where('orderStatus.accepted.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -126,10 +124,8 @@ class OrdersStore {
   }
 
   @action setShippedOrders(merchantId) {
-    firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .collection('orders')
+    ordersCollection
+      .where('storeDetails.merchantId', '==', merchantId)
       .where('orderStatus.shipped.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -142,10 +138,8 @@ class OrdersStore {
   }
 
   @action setCompletedOrders(merchantId) {
-    firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .collection('orders')
+    ordersCollection
+      .where('storeDetails.merchantId', '==', merchantId)
       .where('orderStatus.completed.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -158,10 +152,8 @@ class OrdersStore {
   }
 
   @action setCancelledOrders(merchantId) {
-    firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .collection('orders')
+    ordersCollection
+      .where('storeDetails.merchantId', '==', merchantId)
       .where('orderStatus.cancelled.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -173,7 +165,7 @@ class OrdersStore {
       });
   }
 
-  @action async setOrderStatus(merchantId, orderId) {
+  @action async setOrderStatus(orderId) {
     const statusArray = [
       'pending',
       'accepted',
@@ -181,11 +173,7 @@ class OrdersStore {
       'completed',
       'cancelled',
     ];
-    const orderRef = firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .collection('orders')
-      .doc(orderId);
+    const orderRef = firestore().collection('orders').doc(orderId);
 
     await orderRef
       .get()
@@ -218,12 +206,8 @@ class OrdersStore {
       });
   }
 
-  @action async cancelOrder(merchantId, orderId, cancelReason) {
-    const orderRef = firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .collection('orders')
-      .doc(orderId);
+  @action async cancelOrder(orderId, cancelReason) {
+    const orderRef = firestore().collection('orders').doc(orderId);
 
     await orderRef
       .get()
