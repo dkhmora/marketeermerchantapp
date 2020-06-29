@@ -76,7 +76,7 @@ class OrdersStore {
       .collection('order_chats')
       .doc(orderId)
       .onSnapshot((documentSnapshot) => {
-        if (documentSnapshot.data()) {
+        if (documentSnapshot.exists) {
           if (
             documentSnapshot.data().messages.length <= 0 &&
             this.orderMessages.length > 0
