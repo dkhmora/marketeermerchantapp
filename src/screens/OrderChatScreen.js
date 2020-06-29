@@ -47,6 +47,8 @@ class OrderChatScreen extends Component {
     this.props.navigation
       .dangerouslyGetParent()
       .setOptions({gestureEnabled: true});
+
+    this.props.ordersStore.unsubscribeGetMessages();
   }
 
   onSend(messages = []) {
