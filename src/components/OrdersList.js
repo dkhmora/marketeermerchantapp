@@ -40,6 +40,7 @@ class OrdersList extends Component {
                 userName={`${item.userName}`}
                 numberOfItems={item.numberOfItems}
                 shippingPrice={item.shippingPrice}
+                paymentMethod={item.paymentMethod}
                 totalAmount={item.totalAmount}
                 orderId={item.orderId}
                 userAddress={item.userAddress}

@@ -127,6 +127,7 @@ class OrderCard extends Component {
       numberOfItems,
       totalAmount,
       orderId,
+      paymentMethod,
       userAddress,
       createdAt,
       index,
@@ -164,7 +165,7 @@ class OrderCard extends Component {
             })
           }
           style={{backgroundColor: '#E91E63'}}>
-          <Left style={{flex: 3}}>
+          <View style={{flex: 3, flexDirection: 'row'}}>
             {chatButton && (
               <Item>
                 <Icon
@@ -173,14 +174,33 @@ class OrderCard extends Component {
                 />
               </Item>
             )}
-            <Body>
+            <View style={{flexDirection: 'column', paddingHorizontal: 10}}>
               <Text style={{color: '#fff'}}>{userName}</Text>
               <Text note style={{color: '#ddd'}}>
                 Order # {orderNumber}
               </Text>
-            </Body>
-          </Left>
-          <Body style={{flex: 5, alignItems: 'flex-end'}}>
+              <View
+                key={index}
+                style={{
+                  borderRadius: 20,
+                  backgroundColor: '#448AFF',
+                  alignItems: 'center',
+                  paddingVertical: 3,
+                  paddingHorizontal: 7,
+                  marginRight: 2,
+                  alignSelf: 'flex-start',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: '#fff',
+                  }}>
+                  {paymentMethod}
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View style={{flex: 5, alignItems: 'flex-end'}}>
             <Card
               style={{
                 backgroundColor: '#F8BBD0',
@@ -202,7 +222,7 @@ class OrderCard extends Component {
                       }}>
                       <Text style={{color: '#212121'}}>Transaction Fee: </Text>
                       <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
-                        ₱{(totalAmount * 0.05).toPrecision(5)}
+                        ₱{(totalAmount * 0.05).toPrecision(3)}
                       </Text>
                     </View>
                     <Text note style={{color: '#757575', textAlign: 'center'}}>
@@ -212,7 +232,7 @@ class OrderCard extends Component {
                 </View>
               </CardItem>
             </Card>
-          </Body>
+          </View>
           {optionsButton && (
             <Right style={{flex: 1}}>
               <BaseOptionsMenu
