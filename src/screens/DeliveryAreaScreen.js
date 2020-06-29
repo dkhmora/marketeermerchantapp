@@ -88,7 +88,6 @@ class DeliveryAreaScreen extends Component {
       {
         enableHighAccuracy: true,
         timeout: 20000,
-        maximumAge: 1000,
       },
     );
   }
@@ -207,12 +206,12 @@ class DeliveryAreaScreen extends Component {
     } = this.state;
 
     return (
-      <View style={StyleSheet.absoluteFillObject}>
+      <View style={{flex: 1}}>
         <StatusBar translucent backgroundColor="transparent" />
 
         {mapReady && (
           <MapView
-            style={{flex: 1}}
+            style={{...StyleSheet.absoluteFillObject}}
             ref={(map) => {
               this.map = map;
             }}

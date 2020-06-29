@@ -41,8 +41,8 @@ class OrderCard extends Component {
   }
 
   handleChangeOrderStatus() {
-    const {merchantId, orderId, orderNumber} = this.props;
-    this.props.ordersStore.setOrderStatus(merchantId, orderId).then(() => {
+    const {orderId, orderNumber} = this.props;
+    this.props.ordersStore.setOrderStatus(orderId).then(() => {
       Toast.show({
         text: `Successfully changed Order # ${orderNumber} status!`,
         buttonText: 'Okay',
@@ -90,18 +90,16 @@ class OrderCard extends Component {
   }
 
   handleCancelOrder() {
-    const {merchantId, orderId, orderNumber} = this.props;
-    this.props.ordersStore
-      .cancelOrder(merchantId, orderId, this.cancelReason)
-      .then(() => {
-        Toast.show({
-          text: `Order # ${orderNumber} successfully cancelled!`,
-          buttonText: 'Okay',
-          type: 'success',
-          duration: 3500,
-          style: {margin: 20, borderRadius: 16},
-        });
+    const {orderId, orderNumber} = this.props;
+    this.props.ordersStore.cancelOrder(orderId, this.cancelReason).then(() => {
+      Toast.show({
+        text: `Order # ${orderNumber} successfully cancelled!`,
+        buttonText: 'Okay',
+        type: 'success',
+        duration: 3500,
+        style: {margin: 20, borderRadius: 16},
       });
+    });
   }
 
   openOptions() {
