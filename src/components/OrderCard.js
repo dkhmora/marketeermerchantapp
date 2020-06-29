@@ -136,7 +136,7 @@ class OrderCard extends Component {
     } = this.props;
 
     const buttonText =
-      (tabName === 'Accepted' && 'Ship') || (tabName === 'Pending' && 'Accept');
+      (tabName === 'Paid' && 'Ship') || (tabName === 'Pending' && 'Accept');
 
     const transactionFeeStatus =
       tabName === 'Pending'

@@ -72,11 +72,19 @@ class OrdersTab extends Component {
             }}
           />
           <TabOrders.Screen
-            name="Accepted"
+            name="Unpaid"
             component={OrdersList}
             initialParams={{
-              storeFunctionName: 'setAcceptedOrders',
-              storeVarName: 'acceptedOrders',
+              storeFunctionName: 'setUnpaidOrders',
+              storeVarName: 'unpaidOrders',
+            }}
+          />
+          <TabOrders.Screen
+            name="Paid"
+            component={OrdersList}
+            initialParams={{
+              storeFunctionName: 'setPaidOrders',
+              storeVarName: 'paidOrders',
             }}
           />
           <TabOrders.Screen

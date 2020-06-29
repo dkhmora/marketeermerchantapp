@@ -10,7 +10,8 @@ class OrdersStore {
   @observable orders = [];
   @observable orderItems = [];
   @observable pendingOrders = [];
-  @observable acceptedOrders = [];
+  @observable paidOrders = [];
+  @observable unpaidOrders = [];
   @observable shippedOrders = [];
   @observable completedOrders = [];
   @observable cancelledOrders = [];
@@ -109,17 +110,31 @@ class OrdersStore {
       });
   }
 
-  @action setAcceptedOrders(merchantId) {
+  @action setUnpaidOrders(merchantId) {
     ordersCollection
       .where('storeDetails.merchantId', '==', merchantId)
-      .where('orderStatus.accepted.status', '==', true)
+      .where('orderStatus.unpaid.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
         querySnapshot.forEach((doc, index) => {
           data.push(doc.data());
           data[index].orderId = doc.id;
         });
-        this.acceptedOrders = data;
+        this.unpaidOrders = data;
+      });
+  }
+
+  @action setPaidOrders(merchantId) {
+    ordersCollection
+      .where('storeDetails.merchantId', '==', merchantId)
+      .where('orderStatus.paid.status', '==', true)
+      .onSnapshot((querySnapshot) => {
+        const data = [];
+        querySnapshot.forEach((doc, index) => {
+          data.push(doc.data());
+          data[index].orderId = doc.id;
+        });
+        this.paidOrders = data;
       });
   }
 
@@ -168,7 +183,8 @@ class OrdersStore {
   @action async setOrderStatus(orderId) {
     const statusArray = [
       'pending',
-      'accepted',
+      'unpaid',
+      'paid',
       'shipped',
       'completed',
       'cancelled',
@@ -178,7 +194,7 @@ class OrdersStore {
     await orderRef
       .get()
       .then((documentReference) => {
-        const {orderStatus} = documentReference.data();
+        const {orderStatus, paymentMethod} = documentReference.data();
         let newOrderStatus = {};
         let currentStatus;
         Object.keys(orderStatus).map((item, index) => {
@@ -187,7 +203,12 @@ class OrdersStore {
           }
         });
 
-        const nextStatusIndex = statusArray.indexOf(currentStatus) + 1;
+        let nextStatusIndex = statusArray.indexOf(currentStatus) + 1;
+
+        if (paymentMethod === 'COD' && currentStatus === 'pending') {
+          nextStatusIndex = 2;
+        }
+
         const nextStatus = statusArray[nextStatusIndex];
 
         newOrderStatus = orderStatus;
