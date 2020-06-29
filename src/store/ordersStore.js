@@ -16,6 +16,7 @@ class OrdersStore {
   @observable completedOrders = [];
   @observable cancelledOrders = [];
   @observable orderMessages = [];
+  @observable unsubscribeGetMessages = null;
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
@@ -71,17 +72,27 @@ class OrdersStore {
   }
 
   @action getMessages(orderId) {
-    firestore()
+    this.unsubscribeGetMessages = firestore()
       .collection('order_chats')
       .doc(orderId)
       .onSnapshot((documentSnapshot) => {
-        if (documentSnapshot.data().messages.length <= 0) {
-          this.orderMessages = GiftedChat.append(
-            this.orderMessages,
-            documentSnapshot.data().messages,
-          );
+        if (documentSnapshot.data()) {
+          if (
+            documentSnapshot.data().messages.length <= 0 &&
+            this.orderMessages.length > 0
+          ) {
+            this.orderMessages = GiftedChat.append(
+              this.orderMessages,
+              documentSnapshot.data().messages,
+            );
+          } else {
+            this.orderMessages = documentSnapshot.data().messages.reverse();
+          }
         } else {
-          this.orderMessages = documentSnapshot.data().messages.reverse();
+          firestore()
+            .collection('order_chats')
+            .doc(orderId)
+            .set({messages: []});
         }
       });
   }
