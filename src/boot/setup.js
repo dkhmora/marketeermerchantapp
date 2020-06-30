@@ -39,6 +39,17 @@ const theme = {
       fontFamily: 'ProductSans-Light',
     },
   },
+  Input: {
+    inputStyle: {
+      fontFamily: 'ProductSans-Light',
+    },
+    inputContainerStyle: {borderBottomWidth: 0},
+    containerStyle: {
+      borderRadius: 24,
+      borderWidth: 1,
+      borderColor: colors.primary,
+    },
+  },
 };
 class Setup extends Component {
   render() {

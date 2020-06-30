@@ -81,6 +81,7 @@ class DetailsStore {
     storeDescription,
     deliveryDescription,
     address,
+    vacationMode,
   ) {
     await firestore()
       .collection('merchants')
@@ -90,6 +91,7 @@ class DetailsStore {
         storeDescription,
         deliveryDescription,
         address,
+        vacationMode,
       })
       .then(() => console.log('Merchant details successfully updated!'))
       .catch((err) => {
