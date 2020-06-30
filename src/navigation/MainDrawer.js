@@ -12,6 +12,8 @@ import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
 import {Button, Icon, Text} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
+import {View} from 'react-native';
+import {SafeAreaConsumer, SafeAreaView} from 'react-native-safe-area-context';
 
 @inject('authStore')
 @observer
@@ -43,18 +45,23 @@ class MainDrawer extends Component {
               }}>
               <DrawerItemList {...props} />
 
-              <Button
-                title="Sign Out"
-                icon={<Icon name="log-out" color={colors.icons} />}
-                iconRight
-                onPress={() => this.handleSignOut()}
-                titleStyle={{color: colors.icons, paddingRight: 5}}
-                buttonStyle={{backgroundColor: colors.primary}}
-                containerStyle={{
-                  borderRadius: 24,
-                  marginHorizontal: 12,
-                }}
-              />
+              <View style={{flex: 1}} />
+
+              <SafeAreaView>
+                <Button
+                  title="Sign Out"
+                  icon={<Icon name="log-out" color={colors.icons} />}
+                  iconRight
+                  onPress={() => this.handleSignOut()}
+                  titleStyle={{color: colors.icons, paddingRight: 5}}
+                  buttonStyle={{backgroundColor: colors.primary}}
+                  containerStyle={{
+                    borderRadius: 24,
+                    marginHorizontal: 12,
+                    marginVertical: 10,
+                  }}
+                />
+              </SafeAreaView>
             </DrawerContentScrollView>
           );
         }}>

@@ -33,6 +33,7 @@ YellowBox.ignoreWarnings([
   'Require cycle: node_modules',
   "Warning: Can't perform a React state update on an unmounted component.",
   'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation',
+  "Can't perform a React state update on an unmounted component",
 ]);
 
 export default class App extends React.Component {
