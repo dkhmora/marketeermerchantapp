@@ -53,9 +53,9 @@ class OrderDetailsScreen extends Component {
       coordinates,
       orderId,
       orderItems,
-      cancelReason,
       userName,
       orderNumber,
+      orderStatus,
       quantity,
       shippingPrice,
       totalAmount,
@@ -191,15 +191,7 @@ class OrderDetailsScreen extends Component {
             <FlatList
               data={orderItems}
               renderItem={({item, index}) => (
-                <OrderItemCard
-                  name={item.name}
-                  image={item.image}
-                  price={item.price}
-                  unit={item.unit}
-                  quantity={item.quantity}
-                  createdAt={item.createdAt}
-                  key={index}
-                />
+                <OrderItemCard item={item} key={index} />
               )}
               keyExtractor={(item, index) => `${item.name}${index.toString()}`}
               showsVerticalScrollIndicator={false}
@@ -276,25 +268,29 @@ class OrderDetailsScreen extends Component {
             </CardItem>
           </Card>
 
-          <Card
-            style={{
-              borderRadius: 10,
-              overflow: 'hidden',
-            }}>
-            <CardItem header bordered style={{backgroundColor: colors.primary}}>
-              <Text style={{color: colors.icons, fontSize: 20}}>
-                Reason for Cancellation
-              </Text>
-            </CardItem>
-
-            <CardItem>
-              <Body>
-                <Text style={{width: '100%', textAlign: 'justify'}}>
-                  {cancelReason}
+          {orderStatus.cancelled.status && (
+            <Card
+              style={{
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}>
+              <CardItem
+                header
+                bordered
+                style={{backgroundColor: colors.primary}}>
+                <Text style={{color: colors.icons, fontSize: 20}}>
+                  Reason for Cancellation
                 </Text>
-              </Body>
-            </CardItem>
-          </Card>
+              </CardItem>
+              <CardItem>
+                <Body>
+                  <Text style={{width: '100%', textAlign: 'justify'}}>
+                    {cancelReason}
+                  </Text>
+                </Body>
+              </CardItem>
+            </Card>
+          )}
         </ScrollView>
       </Container>
     );

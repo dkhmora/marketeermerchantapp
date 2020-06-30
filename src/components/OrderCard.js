@@ -67,15 +67,12 @@ class OrderCard extends Component {
       createdAt,
     } = this.props;
 
-    const cancelReason =
-      orderStatus.cancelled.status && orderStatus.cancelled.reason;
-
     this.props.ordersStore.setOrderItems(orderId).then(() => {
       navigation.dangerouslyGetParent().navigate('Order Details', {
         orderId,
         orderItems: this.props.ordersStore.orderItems,
         coordinates,
-        cancelReason,
+        orderStatus,
         userName,
         orderNumber,
         quantity,
@@ -297,7 +294,7 @@ class OrderCard extends Component {
             style={{alignItems: 'center'}}>
             <Card
               style={{
-                borderRadius: 16,
+                borderRadius: 10,
                 overflow: 'hidden',
                 width: '100%',
               }}>
@@ -351,7 +348,7 @@ class OrderCard extends Component {
           </Modal>
         </View>
 
-        <Card {...otherProps} style={{borderRadius: 16, overflow: 'hidden'}}>
+        <Card {...otherProps} style={{borderRadius: 10, overflow: 'hidden'}}>
           <CardHeader />
           <CardItem bordered>
             <Left>
