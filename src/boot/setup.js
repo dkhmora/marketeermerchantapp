@@ -26,6 +26,9 @@ const theme = {
       color: colors.primary,
       fontFamily: 'ProductSans-Bold',
     },
+    buttonStyle: {
+      backgroundColor: colors.primary,
+    },
   },
   Avatar: {
     titleStyle: {
