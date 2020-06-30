@@ -23,6 +23,7 @@ import BaseHeader from '../components/BaseHeader';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
 import {observable, action} from 'mobx';
+import {colors} from '../../assets/colors';
 
 const TabBase = createMaterialTopTabNavigator();
 @inject('itemsStore')
@@ -247,11 +248,11 @@ class StoreItemsTab extends Component {
 
         <TabBase.Navigator
           tabBarOptions={{
-            scrollEnabled: scroll,
-            style: {backgroundColor: '#E91E63'},
-            activeTintColor: '#fff',
+            scrollEnabled: true,
+            style: {backgroundColor: colors.icons},
+            activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
-            indicatorStyle: {backgroundColor: '#FFC107'},
+            indicatorStyle: {backgroundColor: colors.primary},
           }}>
           <TabBase.Screen
             name="All"
