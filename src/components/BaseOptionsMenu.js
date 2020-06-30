@@ -57,7 +57,13 @@ class BaseOptionsMenu extends Component {
       return (
         <Button
           type="clear"
-          icon={<Icon name="more-vertical" style={{...iconStyle}} />}
+          icon={
+            <Icon
+              name="more-vertical"
+              color={colors.icons}
+              style={{...iconStyle}}
+            />
+          }
           color={colors.icons}
           containerStyle={{borderRadius: 24}}
           onPress={() => this.openOptions()}
