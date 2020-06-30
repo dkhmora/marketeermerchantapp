@@ -46,6 +46,7 @@ class StoreDetailsScreen extends Component {
       lalamoveCheckbox: false,
       mrSpeedyCheckbox: false,
       ownServiceCheckbox: false,
+      sameDayDeliveryCheckbox: false,
     };
   }
 
@@ -56,11 +57,12 @@ class StoreDetailsScreen extends Component {
   @observable editMode = false;
   @observable newStoreName = '';
   @observable newStoreDescription = '';
-  @observable newDeliveryDescription = '';
+  @observable newFreeDelivery = '';
   @observable newAddress = '';
   @observable newVacationMode = null;
   @observable newPaymentMethods = [];
   @observable newShippingMethods = [];
+  @observable newDeliveryType = '';
   @observable storeDetailsHeaderColor = colors.primary;
 
   componentDidMount() {
@@ -75,7 +77,7 @@ class StoreDetailsScreen extends Component {
 
   @action cancelEditing() {
     this.newAddress = '';
-    this.newDeliveryDescription = '';
+    this.newFreeDelivery = '';
     this.newStoreDescription = '';
     this.newStoreName = '';
     this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
@@ -88,10 +90,11 @@ class StoreDetailsScreen extends Component {
   @action toggleEditing() {
     const {
       address,
-      deliveryDescription,
+      freeDelivery,
       storeDescription,
       storeName,
       vacationMode,
+      deliveryType,
     } = this.props.detailsStore.storeDetails;
 
     if (this.editMode) {
@@ -99,12 +102,32 @@ class StoreDetailsScreen extends Component {
     } else {
       this.storeDetailsHeaderColor = colors.accent;
       this.newAddress = address;
-      this.newDeliveryDescription = deliveryDescription;
+      this.newFreeDelivery = freeDelivery;
       this.newStoreDescription = storeDescription;
       this.newStoreName = storeName;
       this.newVacationMode = vacationMode;
+      this.newDeliveryType = deliveryType;
       this.handleEditCheckBoxes();
+      this.handleEditDeliveryTypeCheckboxes();
       this.editMode = !this.editMode;
+    }
+  }
+
+  handleEditDeliveryTypeCheckboxes() {
+    const {deliveryType} = this.props.detailsStore.storeDetails;
+
+    if (deliveryType === 'Same Day Delivery') {
+      this.setState({sameDayDeliveryCheckbox: true});
+    } else {
+      this.setState({sameDayDeliveryCheckbox: false});
+    }
+  }
+
+  handleDeliveryTypeCheckboxes() {
+    if (this.state.sameDayDeliveryCheckbox) {
+      this.newDeliveryType = 'Same Day Delivery';
+    } else {
+      this.newDeliveryType = 'Next Day Delivery';
     }
   }
 
@@ -222,34 +245,38 @@ class StoreDetailsScreen extends Component {
     const {merchantId} = this.props.authStore;
     const {
       address,
-      deliveryDescription,
+      freeDelivery,
       storeDescription,
       storeName,
       vacationMode,
       paymentMethods,
       shippingMethods,
+      deliveryType,
     } = this.props.detailsStore.storeDetails;
 
     this.handleCheckBoxes();
+    this.handleDeliveryTypeCheckboxes();
 
     if (
       address !== this.newAddress ||
-      deliveryDescription !== this.newDeliveryDescription ||
+      freeDelivery !== this.newFreeDelivery ||
       storeDescription !== this.newStoreDescription ||
       storeName !== this.newStoreName ||
       vacationMode !== this.newVacationMode ||
       paymentMethods !== this.newPaymentMethods ||
-      shippingMethods !== this.newShippingMethods
+      shippingMethods !== this.newShippingMethods ||
+      deliveryType !== this.newDeliveryType
     ) {
       updateStoreDetails(
         merchantId,
         this.newStoreName,
         this.newStoreDescription,
-        this.newDeliveryDescription,
+        this.newFreeDelivery,
         this.newAddress,
         this.newVacationMode,
         this.newPaymentMethods,
         this.newShippingMethods,
+        this.newDeliveryType,
       ).then(() => {
         Toast.show({
           text: 'Store details successfully updated!',
@@ -281,6 +308,7 @@ class StoreDetailsScreen extends Component {
               style={{
                 borderRadius: 20,
                 backgroundColor: colors.accent,
+                marginTop: 5,
                 padding: 3,
                 paddingHorizontal: 10,
                 marginRight: 2,
@@ -306,7 +334,7 @@ class StoreDetailsScreen extends Component {
     const {
       address,
       cities,
-      deliveryDescription,
+      freeDelivery,
       itemCategories,
       storeDescription,
       storeName,
@@ -314,6 +342,7 @@ class StoreDetailsScreen extends Component {
       vacationMode,
       paymentMethods,
       shippingMethods,
+      deliveryType,
     } = this.props.detailsStore.storeDetails;
 
     return (
@@ -612,24 +641,73 @@ class StoreDetailsScreen extends Component {
                 }}>
                 <View style={{flex: 2, paddingright: 10}}>
                   <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
-                    Delivery Description
+                    Free Delivery
                   </Text>
                 </View>
 
                 <View style={{flex: 3, alignItems: 'flex-end'}}>
                   {this.editMode ? (
-                    <Input
-                      multiline
-                      maxLength={200}
-                      value={this.newDeliveryDescription}
-                      onChangeText={(value) =>
-                        (this.newDeliveryDescription = value)
+                    <Switch
+                      trackColor={{false: '#767577', true: colors.dark_accent}}
+                      thumbColor={
+                        this.newFreeDelivery ? colors.accent : '#f4f3f4'
                       }
-                      inputStyle={{textAlign: 'right'}}
-                      containerStyle={{
-                        borderColor: this.storeDetailsHeaderColor,
-                      }}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={() =>
+                        (this.newFreeDelivery = !this.newFreeDelivery)
+                      }
+                      value={this.newFreeDelivery}
                     />
+                  ) : (
+                    <Switch
+                      trackColor={{false: '#767577', true: colors.dark}}
+                      thumbColor={freeDelivery ? colors.primary : '#f4f3f4'}
+                      ios_backgroundColor="#3e3e3e"
+                      value={freeDelivery}
+                      disabled
+                    />
+                  )}
+                </View>
+              </View>
+            </CardItem>
+
+            <CardItem bordered>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Delivery Type
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  {this.editMode ? (
+                    <View>
+                      <CheckBox
+                        title="Same Day Delivery"
+                        checked={this.state.sameDayDeliveryCheckbox}
+                        checkedIcon="dot-circle-o"
+                        uncheckedIcon="circle-o"
+                        onPress={() =>
+                          this.setState({sameDayDeliveryCheckbox: true})
+                        }
+                      />
+                      <CheckBox
+                        title="Next Day Delivery"
+                        checked={!this.state.sameDayDeliveryCheckbox}
+                        checkedIcon="dot-circle-o"
+                        uncheckedIcon="circle-o"
+                        onPress={() =>
+                          this.setState({sameDayDeliveryCheckbox: false})
+                        }
+                      />
+                    </View>
                   ) : (
                     <Text
                       style={{
@@ -637,7 +715,7 @@ class StoreDetailsScreen extends Component {
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
                       }}>
-                      {deliveryDescription}
+                      {deliveryType}
                     </Text>
                   )}
                 </View>
