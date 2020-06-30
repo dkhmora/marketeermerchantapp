@@ -51,6 +51,7 @@ class StoreItemsTab extends Component {
   @action showDeleteCategoryModal() {
     if (this.props.itemsStore.itemCategories.length > 0) {
       this.deleteCategoryModal = true;
+      this.selectedCategory = this.props.itemsStore.itemCategories[0];
     } else {
       Toast.show({
         text: `There are no categories to be deleted.`,
@@ -127,7 +128,7 @@ class StoreItemsTab extends Component {
     const {name} = this.props.route;
     const {navigation} = this.props;
 
-    const scroll = itemCategories.length > 2 ? true : false;
+    const scroll = itemCategories.length > 1 ? true : false;
 
     return (
       <Container style={{flex: 1}}>
@@ -248,7 +249,7 @@ class StoreItemsTab extends Component {
 
         <TabBase.Navigator
           tabBarOptions={{
-            scrollEnabled: itemCategories.length > 2 ? true : false,
+            scrollEnabled: scroll,
             style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
