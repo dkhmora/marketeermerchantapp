@@ -254,7 +254,7 @@ class StoreDetailsScreen extends Component {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 paddingHorizontal: 8,
-                paddingVertical: 8,
+                paddingVertical: Platform.OS === 'ios' ? 8 : 16,
                 backgroundColor: this.storeDetailsHeaderColor,
                 paddingLeft: 25,
               }}>
