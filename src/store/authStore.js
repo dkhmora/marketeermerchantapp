@@ -52,7 +52,19 @@ class AuthStore {
           .then((token) =>
             fcmCollection
               .doc(this.merchantId)
-              .update('fcmTokens', firestore.FieldValue.arrayUnion(token)),
+              .get()
+              .then((document) => {
+                if (document.exists) {
+                  fcmCollection
+                    .doc(this.merchantId)
+                    .update(
+                      'fcmTokens',
+                      firestore.FieldValue.arrayUnion(token),
+                    );
+                } else {
+                  fcmCollection.doc(this.merchantId).set({fcmTokens: [token]});
+                }
+              }),
           )
           .catch((err) => console.log(err));
       }
