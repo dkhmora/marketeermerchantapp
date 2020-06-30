@@ -21,7 +21,7 @@ import BaseHeader from '../components/BaseHeader';
 // Mobx
 import {inject, observer} from 'mobx-react';
 import {observable, action} from 'mobx';
-import {Text, Input, Icon, Button} from 'react-native-elements';
+import {Text, Input, Icon, Button, CheckBox} from 'react-native-elements';
 import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import BaseOptionsMenu from '../components/BaseOptionsMenu';
@@ -38,6 +38,15 @@ class StoreDetailsScreen extends Component {
 
     this.props.detailsStore.setStoreDetails(this.props.authStore.merchantId);
     this.props.itemsStore.setItemCategories(this.props.authStore.merchantId);
+
+    this.state = {
+      CODCheckbox: false,
+      onlineBankingCheckbox: false,
+      grabExpressCheckbox: false,
+      lalamoveCheckbox: false,
+      mrSpeedyCheckbox: false,
+      ownServiceCheckbox: false,
+    };
   }
 
   @observable displayUrl = null;
@@ -50,6 +59,8 @@ class StoreDetailsScreen extends Component {
   @observable newDeliveryDescription = '';
   @observable newAddress = '';
   @observable newVacationMode = null;
+  @observable newPaymentMethods = [];
+  @observable newShippingMethods = [];
   @observable storeDetailsHeaderColor = colors.primary;
 
   componentDidMount() {
@@ -68,6 +79,8 @@ class StoreDetailsScreen extends Component {
     this.newStoreDescription = '';
     this.newStoreName = '';
     this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
+    this.newPaymentMethods = [];
+    this.newShippingMethods = [];
     this.storeDetailsHeaderColor = colors.primary;
     this.editMode = !this.editMode;
   }
@@ -90,6 +103,7 @@ class StoreDetailsScreen extends Component {
       this.newStoreDescription = storeDescription;
       this.newStoreName = storeName;
       this.newVacationMode = vacationMode;
+      this.handleEditCheckBoxes();
       this.editMode = !this.editMode;
     }
   }
@@ -164,6 +178,45 @@ class StoreDetailsScreen extends Component {
       .catch((err) => console.log(err));
   }
 
+  handleCheckBoxes() {
+    this.state.CODCheckbox && this.newPaymentMethods.push('COD');
+    this.state.onlineBankingCheckbox &&
+      this.newPaymentMethods.push('Online Banking');
+    this.state.grabExpressCheckbox &&
+      this.newShippingMethods.push('Grab Express');
+    this.state.lalamoveCheckbox && this.newShippingMethods.push('Lalamove');
+    this.state.mrSpeedyCheckbox && this.newShippingMethods.push('Mr. Speedy');
+    this.state.ownServiceCheckbox &&
+      this.newShippingMethods.push('Own Service');
+  }
+
+  handleEditCheckBoxes() {
+    const {
+      paymentMethods,
+      shippingMethods,
+    } = this.props.detailsStore.storeDetails;
+
+    paymentMethods.includes('Online Banking')
+      ? this.setState({onlineBankingCheckbox: true})
+      : this.setState({onlineBankingCheckbox: false});
+    paymentMethods.includes('COD')
+      ? this.setState({CODCheckbox: true})
+      : this.setState({CODCheckbox: false});
+
+    shippingMethods.includes('Grab Express')
+      ? this.setState({grabExpressCheckbox: true})
+      : this.setState({grabExpressCheckbox: false});
+    shippingMethods.includes('Lalamove')
+      ? this.setState({lalamoveCheckbox: true})
+      : this.setState({lalamoveCheckbox: false});
+    shippingMethods.includes('Mr. Speedy')
+      ? this.setState({mrSpeedyCheckbox: true})
+      : this.setState({mrSpeedyCheckbox: false});
+    shippingMethods.includes('Own Service')
+      ? this.setState({ownServiceCheckbox: true})
+      : this.setState({ownServiceCheckbox: false});
+  }
+
   handleConfirmDetails() {
     const {updateStoreDetails} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
@@ -173,14 +226,20 @@ class StoreDetailsScreen extends Component {
       storeDescription,
       storeName,
       vacationMode,
+      paymentMethods,
+      shippingMethods,
     } = this.props.detailsStore.storeDetails;
+
+    this.handleCheckBoxes();
 
     if (
       address !== this.newAddress ||
       deliveryDescription !== this.newDeliveryDescription ||
       storeDescription !== this.newStoreDescription ||
       storeName !== this.newStoreName ||
-      vacationMode !== this.newVacationMode
+      vacationMode !== this.newVacationMode ||
+      paymentMethods !== this.newPaymentMethods ||
+      shippingMethods !== this.newShippingMethods
     ) {
       updateStoreDetails(
         merchantId,
@@ -189,6 +248,8 @@ class StoreDetailsScreen extends Component {
         this.newDeliveryDescription,
         this.newAddress,
         this.newVacationMode,
+        this.newPaymentMethods,
+        this.newShippingMethods,
       ).then(() => {
         Toast.show({
           text: 'Store details successfully updated!',
@@ -199,14 +260,47 @@ class StoreDetailsScreen extends Component {
       });
     } else {
       Toast.show({
-        text: 'No details were changed.',
-        type: 'warning',
+        text: 'Store details successfully updated!',
+        type: 'success',
         style: {margin: 20, borderRadius: 16},
         duration: 3000,
       });
     }
     this.toggleEditing();
   }
+
+  CategoryPills = (items) => {
+    const pills = [];
+
+    if (items) {
+      if (items.length > 0) {
+        items.map((item, index) => {
+          pills.push(
+            <View
+              key={index}
+              style={{
+                borderRadius: 20,
+                backgroundColor: colors.accent,
+                padding: 3,
+                paddingHorizontal: 10,
+                marginRight: 2,
+              }}>
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontFamily: 'ProductSans-Regular',
+                  color: colors.icons,
+                }}>
+                {item}
+              </Text>
+            </View>,
+          );
+        });
+      }
+    }
+
+    return pills;
+  };
 
   render() {
     const {
@@ -218,6 +312,8 @@ class StoreDetailsScreen extends Component {
       storeName,
       visibleToPublic,
       vacationMode,
+      paymentMethods,
+      shippingMethods,
     } = this.props.detailsStore.storeDetails;
 
     return (
@@ -327,7 +423,7 @@ class StoreDetailsScreen extends Component {
                       }}>
                       <Button
                         type="clear"
-                        titleStyle={colors.accent}
+                        titleStyle={{color: colors.accent}}
                         color={colors.icons}
                         onPress={() => this.handleTakePhoto('display')}
                         icon={<Icon name="camera" color={colors.accent} />}
@@ -336,7 +432,7 @@ class StoreDetailsScreen extends Component {
 
                       <Button
                         type="clear"
-                        titleStyle={colors.accent}
+                        titleStyle={{color: colors.accent}}
                         color={colors.icons}
                         onPress={() => this.handleSelectImage('display')}
                         icon={<Icon name="image" color={colors.accent} />}
@@ -383,7 +479,7 @@ class StoreDetailsScreen extends Component {
                       <Button
                         type="clear"
                         color={colors.icons}
-                        titleStyle={colors.accent}
+                        titleStyle={{color: colors.accent}}
                         icon={<Icon name="camera" color={colors.accent} />}
                         onPress={() => this.handleTakePhoto('cover')}
                         containerStyle={{borderRadius: 24}}
@@ -391,7 +487,7 @@ class StoreDetailsScreen extends Component {
                       <Button
                         type="clear"
                         color={colors.icons}
-                        titleStyle={colors.accent}
+                        titleStyle={{color: colors.accent}}
                         icon={<Icon name="image" color={colors.accent} />}
                         onPress={() => this.handleSelectImage('cover')}
                         containerStyle={{borderRadius: 24}}
@@ -626,6 +722,112 @@ class StoreDetailsScreen extends Component {
                       value={vacationMode}
                       disabled
                     />
+                  )}
+                </View>
+              </View>
+            </CardItem>
+
+            <CardItem bordered>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Payment Methods
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  {this.editMode ? (
+                    <View>
+                      <CheckBox
+                        title="COD"
+                        checked={this.state.CODCheckbox}
+                        onPress={() =>
+                          this.setState({CODCheckbox: !this.state.CODCheckbox})
+                        }
+                      />
+                      <CheckBox
+                        title="Online Banking"
+                        checked={this.state.onlineBankingCheckbox}
+                        onPress={() =>
+                          this.setState({
+                            onlineBankingCheckbox: !this.state
+                              .onlineBankingCheckbox,
+                          })
+                        }
+                      />
+                    </View>
+                  ) : (
+                    this.CategoryPills(paymentMethods)
+                  )}
+                </View>
+              </View>
+            </CardItem>
+
+            <CardItem bordered>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Shipping Methods
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  {this.editMode ? (
+                    <View>
+                      <CheckBox
+                        title="Grab Express"
+                        checked={this.state.grabExpressCheckbox}
+                        onPress={() =>
+                          this.setState({
+                            grabExpressCheckbox: !this.state
+                              .grabExpressCheckbox,
+                          })
+                        }
+                      />
+                      <CheckBox
+                        title="Lalamove"
+                        checked={this.state.lalamoveCheckbox}
+                        onPress={() =>
+                          this.setState({
+                            lalamoveCheckbox: !this.state.lalamoveCheckbox,
+                          })
+                        }
+                      />
+                      <CheckBox
+                        title="Mr. Speedy"
+                        checked={this.state.mrSpeedyCheckbox}
+                        onPress={() =>
+                          this.setState({
+                            mrSpeedyCheckbox: !this.state.mrSpeedyCheckbox,
+                          })
+                        }
+                      />
+                      <CheckBox
+                        title="Own Service"
+                        checked={this.state.ownServiceCheckbox}
+                        onPress={() =>
+                          this.setState({
+                            ownServiceCheckbox: !this.state.ownServiceCheckbox,
+                          })
+                        }
+                      />
+                    </View>
+                  ) : (
+                    this.CategoryPills(shippingMethods)
                   )}
                 </View>
               </View>
