@@ -284,7 +284,7 @@ class StoreDetailsScreen extends Component {
                         title="Confirm"
                         titleStyle={{color: colors.icons, paddingRight: 5}}
                         onPress={() => this.handleConfirmDetails()}
-                        buttonStyle={{height: 25, paddingTop: 3}}
+                        buttonStyle={{height: 25, paddingTop: 6}}
                         containerStyle={{
                           borderRadius: 24,
                           borderColor: colors.icons,

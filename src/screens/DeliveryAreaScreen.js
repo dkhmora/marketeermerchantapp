@@ -325,6 +325,7 @@ class DeliveryAreaScreen extends Component {
                     icon={<Icon name="x" color={colors.icons} />}
                     iconRight
                     onPress={() => this.handleCancelChanges()}
+                    buttonStyle={{backgroundColor: colors.primary}}
                     style={{marginRight: 20}}
                   />
                   <Button
@@ -346,6 +347,7 @@ class DeliveryAreaScreen extends Component {
             icon={<Icon name="edit" color={colors.icons} />}
             iconRight
             onPress={() => this.handleEditDeliveryArea()}
+            buttonStyle={{backgroundColor: colors.primary}}
             containerStyle={{
               position: 'absolute',
               alignSelf: 'center',
