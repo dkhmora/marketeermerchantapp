@@ -21,7 +21,7 @@ class ItemsStore {
         const itemCats = documentSnapshot.data().itemCategories;
         this.itemCategories = itemCats.sort();
       } else {
-        merchantItemsRef.set({itemCategories: []});
+        merchantItemsRef.set({itemCategories: [], items: []});
       }
     });
   }
@@ -99,8 +99,10 @@ class ItemsStore {
       .collection('merchant_items')
       .doc(merchantId);
 
-    const fileExtension = imagePath.split('.').pop();
-    const imageRef = `/images/merchants/${merchantId}/items/${name}.${fileExtension}`;
+    const fileExtension = imagePath ? imagePath.split('.').pop() : null;
+    const imageRef = imagePath
+      ? `/images/merchants/${merchantId}/items/${name}.${fileExtension}`
+      : null;
 
     await merchantItemsRef
       .update({
