@@ -4,14 +4,10 @@ import {
   CardItem,
   Left,
   Body,
-  Text,
-  Button,
   Right,
-  Icon,
   Toast,
   View,
   Item,
-  Input,
   H3,
   Textarea,
 } from 'native-base';
@@ -19,8 +15,10 @@ import {ActionSheetIOS, Platform} from 'react-native';
 import moment, {ISO_8601} from 'moment';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
+import {Icon, Button, Text} from 'react-native-elements';
 import {observable, action} from 'mobx';
 import BaseOptionsMenu from './BaseOptionsMenu';
+import {colors} from '../../assets/colors';
 
 @inject('ordersStore')
 @observer
@@ -62,7 +60,7 @@ class OrderCard extends Component {
       orderStatus,
       userName,
       orderNumber,
-      numberOfItems,
+      quantity,
       shippingPrice,
       totalAmount,
       userAddress,
@@ -80,7 +78,7 @@ class OrderCard extends Component {
         cancelReason,
         userName,
         orderNumber,
-        numberOfItems,
+        quantity,
         shippingPrice,
         totalAmount,
         userAddress,
@@ -124,7 +122,7 @@ class OrderCard extends Component {
       orderNumber,
       userName,
       orderStatus,
-      numberOfItems,
+      quantity,
       totalAmount,
       orderId,
       paymentMethod,
@@ -164,26 +162,29 @@ class OrderCard extends Component {
               orderStatus,
             })
           }
-          style={{backgroundColor: '#E91E63'}}>
-          <View style={{flex: 3, flexDirection: 'row'}}>
+          style={{backgroundColor: colors.primary}}>
+          <View style={{flex: 3, flexDirection: 'row', alignItems: 'center'}}>
             {chatButton && (
-              <Item>
-                <Icon
-                  name="chatbubbles"
-                  style={{color: '#fff', fontSize: 27, margin: -5}}
-                />
-              </Item>
+              <View>
+                <Icon name="message-square" color={colors.icons} />
+                <Text style={{color: colors.icons}}>Chat</Text>
+              </View>
             )}
             <View style={{flexDirection: 'column', paddingHorizontal: 10}}>
-              <Text style={{color: '#fff'}}>{userName}</Text>
-              <Text note style={{color: '#ddd'}}>
-                Order # {orderNumber}
+              <Text
+                style={{
+                  color: '#fff',
+                  fontFamily: 'ProductSans-Regular',
+                  fontSize: 18,
+                }}>
+                {userName}
               </Text>
+              <Text style={{color: '#eee'}}>Order # {orderNumber}</Text>
               <View
                 key={index}
                 style={{
                   borderRadius: 20,
-                  backgroundColor: '#448AFF',
+                  backgroundColor: colors.accent,
                   alignItems: 'center',
                   paddingVertical: 3,
                   paddingHorizontal: 7,
@@ -194,13 +195,14 @@ class OrderCard extends Component {
                   style={{
                     fontSize: 16,
                     color: '#fff',
+                    textAlign: 'center',
                   }}>
                   {paymentMethod}
                 </Text>
               </View>
             </View>
           </View>
-          <View style={{flex: 5, alignItems: 'flex-end'}}>
+          <View style={{flex: 4, alignItems: 'flex-end'}}>
             <Card
               style={{
                 backgroundColor: '#F8BBD0',
@@ -220,8 +222,15 @@ class OrderCard extends Component {
                       style={{
                         flexDirection: 'row',
                       }}>
-                      <Text style={{color: '#212121'}}>Transaction Fee: </Text>
-                      <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
+                      <Text style={{fontSize: 16, color: colors.text_primary}}>
+                        Transaction Fee:{' '}
+                      </Text>
+                      <Text
+                        style={{
+                          color: colors.primary,
+                          fontFamily: 'ProductSans-Black',
+                          fontSize: 16,
+                        }}>
                         ₱{(totalAmount * 0.05).toPrecision(3)}
                       </Text>
                     </View>
@@ -346,34 +355,53 @@ class OrderCard extends Component {
           <CardHeader />
           <CardItem bordered>
             <Left>
-              <Text>Address:</Text>
+              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
+                Address:
+              </Text>
             </Left>
             <Right>
-              <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontFamily: 'ProductSans-Black',
+                  fontSize: 16,
+                }}>
                 {userAddress}
               </Text>
             </Right>
           </CardItem>
           <CardItem bordered>
             <Left>
-              <Text>Total Amount:</Text>
+              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
+                Total Amount:
+              </Text>
             </Left>
             <Right>
-              <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontFamily: 'ProductSans-Black',
+                  fontSize: 16,
+                }}>
                 ₱{totalAmount}
               </Text>
-              <Text note>{numberOfItems} items</Text>
+              <Text note>{quantity} items</Text>
             </Right>
           </CardItem>
           <CardItem>
             <Body>
               <Button
-                full
-                bordered
+                title="View Full Order"
                 onPress={this.handleViewOrderItems.bind(this)}
-                style={{borderRadius: 24}}>
-                <Text>View Full Order</Text>
-              </Button>
+                titleStyle={{color: colors.accent}}
+                buttonStyle={{backgroundColor: colors.icons}}
+                containerStyle={{
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: colors.accent,
+                  width: '100%',
+                }}
+              />
             </Body>
           </CardItem>
           <CardFooter />
