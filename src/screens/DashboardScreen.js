@@ -343,6 +343,7 @@ class StoreDetailsScreen extends Component {
       paymentMethods,
       shippingMethods,
       deliveryType,
+      creditData,
     } = this.props.detailsStore.storeDetails;
 
     return (
@@ -907,6 +908,62 @@ class StoreDetailsScreen extends Component {
                   ) : (
                     this.CategoryPills(shippingMethods)
                   )}
+                </View>
+              </View>
+            </CardItem>
+
+            <CardItem bordered>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Credits
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      fontFamily: 'ProductSans-Bold',
+                    }}>
+                    ₱ {creditData.credits}
+                  </Text>
+                </View>
+              </View>
+            </CardItem>
+
+            <CardItem bordered>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Credit Threshold
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      fontFamily: 'ProductSans-Bold',
+                    }}>
+                    ₱ {creditData.creditThreshold}
+                  </Text>
                 </View>
               </View>
             </CardItem>
