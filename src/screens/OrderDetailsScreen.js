@@ -1,19 +1,11 @@
 import React, {Component} from 'react';
-import {
-  Container,
-  Card,
-  CardItem,
-  Text,
-  Left,
-  Right,
-  Body,
-  Button,
-  Icon,
-} from 'native-base';
+import {Container, Card, CardItem, Left, Right, Body, Toast} from 'native-base';
+import {Text, Button, Icon} from 'react-native-elements';
 import {View, Platform, Linking} from 'react-native';
 import BaseHeader from '../components/BaseHeader';
 import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import OrderItemCard from '../components/OrderItemCard';
+import {colors} from '../../assets/colors';
 
 class OrderDetailsScreen extends Component {
   constructor(props) {
@@ -34,15 +26,26 @@ class OrderDetailsScreen extends Component {
 
   openInMaps() {
     const {coordinates, userName} = this.props.route.params;
-    const markerName = `Customer ${userName}'s Location`;
 
-    const latLng = `${coordinates._latitude},${coordinates._longitude}`;
-    const url = Platform.select({
-      ios: `http://maps.apple.com/?q=${markerName}&ll=${latLng}`,
-      android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
-    });
+    if (coordinates) {
+      const markerName = `Customer ${userName}'s Location`;
 
-    Linking.openURL(url);
+      const latLng = `${coordinates._latitude},${coordinates._longitude}`;
+      const url = Platform.select({
+        ios: `http://maps.apple.com/?q=${markerName}&ll=${latLng}`,
+        android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
+      });
+
+      Linking.openURL(url);
+    } else {
+      Toast.show({
+        text: 'Error, no user coordinates found!',
+        buttonText: 'Okay',
+        type: 'danger',
+        duration: 7000,
+        style: {margin: 20, borderRadius: 16},
+      });
+    }
   }
 
   render() {
@@ -91,54 +94,100 @@ class OrderDetailsScreen extends Component {
           }}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
-              <Text style={{color: '#fff'}}>Customer Details</Text>
+            <CardItem header bordered style={{backgroundColor: colors.primary}}>
+              <Text style={{color: colors.icons, fontSize: 20}}>
+                Customer Details
+              </Text>
             </CardItem>
             <CardItem bordered>
               <Left>
-                <Text>Customer Name:</Text>
+                <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                  Customer Name:
+                </Text>
               </Left>
+
               <Right>
-                <Text>{userName}</Text>
-              </Right>
-            </CardItem>
-            <CardItem bordered>
-              <Left>
-                <Text>User Address:</Text>
-              </Left>
-              <Right>
-                <Text>{userAddress}</Text>
-                <Text note>
-                  {coordinates._latitude}, {coordinates._longitude}
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 16,
+                    fontFamily: 'ProductSans-Bold',
+                    textAlign: 'right',
+                  }}>
+                  {userName}
                 </Text>
               </Right>
             </CardItem>
+
             <CardItem bordered>
-              <Body>
-                <Button
-                  iconRight
-                  full
-                  bordered
-                  onPress={() => this.openInMaps()}
-                  style={{borderRadius: 24}}>
-                  <Text>{mapButtonText}</Text>
-                  <Icon name="map" />
-                </Button>
-              </Body>
+              <Left>
+                <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                  User Address:
+                </Text>
+              </Left>
+              <Right>
+                {coordinates ? (
+                  <View style={{justifyContent: 'flex-end'}}>
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
+                      }}>
+                      {userAddress}
+                    </Text>
+
+                    <Text
+                      note
+                      style={{
+                        color: colors.text_secondary,
+                        fontSize: 14,
+                        textAlign: 'right',
+                      }}>
+                      {coordinates._latitude}, {coordinates._longitude}
+                    </Text>
+
+                    <Button
+                      title={mapButtonText}
+                      titleStyle={{color: colors.icons, paddingRight: 5}}
+                      icon={<Icon name="map" color={colors.icons} />}
+                      iconRight
+                      full
+                      bordered
+                      onPress={() => this.openInMaps()}
+                      style={{borderRadius: 24}}
+                    />
+                  </View>
+                ) : (
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      fontFamily: 'ProductSans-Bold',
+                      textAlign: 'right',
+                    }}>
+                    No user coordinates found
+                  </Text>
+                )}
+              </Right>
             </CardItem>
           </Card>
 
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
-              <Text style={{color: '#fff'}}>Order Items</Text>
+            <CardItem header bordered style={{backgroundColor: colors.primary}}>
+              <Text style={{color: colors.icons, fontSize: 20}}>
+                Order Items
+              </Text>
             </CardItem>
+
             <FlatList
               data={orderItems}
               renderItem={({item, index}) => (
@@ -155,31 +204,89 @@ class OrderDetailsScreen extends Component {
               keyExtractor={(item, index) => `${item.name}${index.toString()}`}
               showsVerticalScrollIndicator={false}
             />
+
             <CardItem bordered>
               <Left>
                 <Text note>{quantity} items</Text>
               </Left>
               <Right>
-                <Text>Subtotal: ₱{totalAmount}</Text>
-                <Text>Shipping Price: ₱{shippingPrice}</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: colors.text_primary,
+                      fontFamily: 'ProductSans-Light',
+                    }}>
+                    Subtotal:{' '}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      color: colors.primary,
+                      fontFamily: 'ProductSans-Black',
+                    }}>
+                    ₱{totalAmount}
+                  </Text>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: colors.text_primary,
+                      fontFamily: 'ProductSans-Light',
+                    }}>
+                    Estimated Shipping Price:{' '}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      color: colors.primary,
+                      fontFamily: 'ProductSans-Black',
+                    }}>
+                    ₱{shippingPrice}130-200
+                  </Text>
+                </View>
               </Right>
             </CardItem>
+
             <CardItem footer bordered>
               <Left />
+
               <Right>
-                <Text>Order Total: ₱{totalAmount + shippingPrice}</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: colors.text_primary,
+                      fontFamily: 'ProductSans-Light',
+                    }}>
+                    Order Total:{' '}
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      color: colors.primary,
+                      fontFamily: 'ProductSans-Black',
+                    }}>
+                    ₱{totalAmount + 130} - ₱{totalAmount + 200}
+                  </Text>
+                </View>
               </Right>
             </CardItem>
           </Card>
 
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
-              <Text style={{color: '#fff'}}>Reason for Cancellation</Text>
+            <CardItem header bordered style={{backgroundColor: colors.primary}}>
+              <Text style={{color: colors.icons, fontSize: 20}}>
+                Reason for Cancellation
+              </Text>
             </CardItem>
+
             <CardItem>
               <Body>
                 <Text style={{width: '100%', textAlign: 'justify'}}>
