@@ -12,6 +12,12 @@ class ItemsList extends Component {
     super(props);
   }
 
+  componentDidMount() {
+    const {category} = this.props;
+
+    this.props.itemsStore.setCategoryItems(category);
+  }
+
   formatData(data, numColumns) {
     const numberOfFullRows = Math.floor(data.length / numColumns);
 

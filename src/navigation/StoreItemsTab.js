@@ -248,7 +248,7 @@ class StoreItemsTab extends Component {
 
         <TabBase.Navigator
           tabBarOptions={{
-            scrollEnabled: true,
+            scrollEnabled: itemCategories.length > 2 ? true : false,
             style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
@@ -259,12 +259,9 @@ class StoreItemsTab extends Component {
             component={ItemsList}
             initialParams={{
               category: 'All',
-              navigation,
             }}
           />
           {itemCategories.map((category, index) => {
-            this.props.itemsStore.setCategoryItems(category);
-
             return (
               <TabBase.Screen
                 name={`${category}`}
@@ -272,7 +269,6 @@ class StoreItemsTab extends Component {
                 key={index}
                 initialParams={{
                   category,
-                  navigation,
                 }}
               />
             );
