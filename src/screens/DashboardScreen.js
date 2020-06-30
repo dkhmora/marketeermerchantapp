@@ -219,25 +219,29 @@ class StoreDetailsScreen extends Component {
       shippingMethods,
     } = this.props.detailsStore.storeDetails;
 
-    paymentMethods.includes('Online Banking')
-      ? this.setState({onlineBankingCheckbox: true})
-      : this.setState({onlineBankingCheckbox: false});
-    paymentMethods.includes('COD')
-      ? this.setState({CODCheckbox: true})
-      : this.setState({CODCheckbox: false});
+    if (paymentMethods) {
+      paymentMethods.includes('Online Banking')
+        ? this.setState({onlineBankingCheckbox: true})
+        : this.setState({onlineBankingCheckbox: false});
+      paymentMethods.includes('COD')
+        ? this.setState({CODCheckbox: true})
+        : this.setState({CODCheckbox: false});
+    }
 
-    shippingMethods.includes('Grab Express')
-      ? this.setState({grabExpressCheckbox: true})
-      : this.setState({grabExpressCheckbox: false});
-    shippingMethods.includes('Lalamove')
-      ? this.setState({lalamoveCheckbox: true})
-      : this.setState({lalamoveCheckbox: false});
-    shippingMethods.includes('Mr. Speedy')
-      ? this.setState({mrSpeedyCheckbox: true})
-      : this.setState({mrSpeedyCheckbox: false});
-    shippingMethods.includes('Own Service')
-      ? this.setState({ownServiceCheckbox: true})
-      : this.setState({ownServiceCheckbox: false});
+    if (shippingMethods) {
+      shippingMethods.includes('Grab Express')
+        ? this.setState({grabExpressCheckbox: true})
+        : this.setState({grabExpressCheckbox: false});
+      shippingMethods.includes('Lalamove')
+        ? this.setState({lalamoveCheckbox: true})
+        : this.setState({lalamoveCheckbox: false});
+      shippingMethods.includes('Mr. Speedy')
+        ? this.setState({mrSpeedyCheckbox: true})
+        : this.setState({mrSpeedyCheckbox: false});
+      shippingMethods.includes('Own Service')
+        ? this.setState({ownServiceCheckbox: true})
+        : this.setState({ownServiceCheckbox: false});
+    }
   }
 
   handleConfirmDetails() {
@@ -625,6 +629,7 @@ class StoreDetailsScreen extends Component {
                         color: colors.primary,
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
                       }}>
                       {storeDescription}
                     </Text>
@@ -1024,7 +1029,7 @@ class StoreDetailsScreen extends Component {
                       fontSize: 16,
                       fontFamily: 'ProductSans-Bold',
                     }}>
-                    {orderNumber}
+                    {orderNumber ? orderNumber : 0}
                   </Text>
                 </View>
               </View>

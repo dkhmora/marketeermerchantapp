@@ -12,15 +12,18 @@ class ItemsStore {
   }
 
   @action setItemCategories(merchantId) {
-    firestore()
+    const merchantItemsRef = firestore()
       .collection('merchant_items')
-      .doc(merchantId)
-      .onSnapshot((documentSnapshot) => {
-        if (documentSnapshot) {
-          const itemCats = documentSnapshot.data().itemCategories;
-          this.itemCategories = itemCats.sort();
-        }
-      });
+      .doc(merchantId);
+
+    merchantItemsRef.onSnapshot((documentSnapshot) => {
+      if (documentSnapshot.exists) {
+        const itemCats = documentSnapshot.data().itemCategories;
+        this.itemCategories = itemCats.sort();
+      } else {
+        merchantItemsRef.set({itemCategories: []});
+      }
+    });
   }
 
   @action async deleteItemCategory(merchantId, category) {
