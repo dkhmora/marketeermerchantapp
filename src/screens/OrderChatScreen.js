@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {View, Image} from 'react-native';
-import {Container, Text, Icon, Button, Input, Item} from 'native-base';
+import {Container, Text, Input, Item} from 'native-base';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import BaseHeader from '../components/BaseHeader';
 import {
@@ -11,8 +11,10 @@ import {
   MessageImage,
 } from 'react-native-gifted-chat';
 import {inject, observer} from 'mobx-react';
+import {Avatar, Icon, Button} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
 import {observable} from 'mobx';
+import {colors} from '../../assets/colors';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -106,7 +108,7 @@ class OrderChatScreen extends Component {
         {...props}
         wrapperStyle={{
           right: {
-            backgroundColor: '#E91E63',
+            backgroundColor: colors.primary,
           },
         }}
       />
@@ -115,31 +117,59 @@ class OrderChatScreen extends Component {
 
   renderComposer(props) {
     return (
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <Button transparent onPress={() => this.handleSelectImage()}>
-          <Icon name="image" />
-        </Button>
-        <Button transparent onPress={() => this.handleTakePhoto()}>
-          <Icon name="camera" />
-        </Button>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: 10,
+        }}>
+        <Button
+          type="clear"
+          onPress={() => this.handleSelectImage()}
+          color={colors.primary}
+          buttonStyle={{backgroundColor: colors.icons}}
+          containerStyle={{borderRadius: 24}}
+          icon={<Icon name="image" color={colors.primary} />}
+        />
+        <Button
+          type="clear"
+          onPress={() => this.handleTakePhoto()}
+          color={colors.primary}
+          buttonStyle={{backgroundColor: colors.icons}}
+          containerStyle={{borderRadius: 24}}
+          icon={<Icon name="camera" color={colors.primary} />}
+        />
         <View
           style={{
             flex: 1,
-            marginRight: 15,
+            marginLeft: 5,
             marginVertical: 10,
             borderWidth: 1,
-            borderColor: '#E91E63',
+            borderColor: colors.primary,
             borderRadius: 24,
           }}>
           <Composer {...props} />
         </View>
-        <Send {...props}>
-          <Icon
-            name="send"
-            style={{color: '#E91E63', marginBottom: 8, marginRight: 10}}
-          />
+        <Send {...props} containerStyle={{paddingHorizontal: 10}}>
+          <Icon name="send" color={colors.primary} style={{marginBottom: 8}} />
         </Send>
       </View>
+    );
+  }
+
+  renderAvatar(props) {
+    const userInitial = props.currentMessage.user.name.charAt(0);
+
+    return (
+      <Avatar
+        size="small"
+        rounded
+        overlayContainerStyle={{backgroundColor: colors.primary}}
+        titleStyle={{color: colors.icons}}
+        title={userInitial}
+        onPress={() => console.log('Works!')}
+        activeOpacity={0.7}
+      />
     );
   }
 
@@ -164,7 +194,8 @@ class OrderChatScreen extends Component {
 
         <View style={{flex: 1}}>
           <GiftedChat
-            textStyle={{color: '#E91E63'}}
+            textStyle={{color: colors.primary}}
+            renderAvatar={this.renderAvatar}
             renderBubble={this.renderBubble}
             renderComposer={this.renderComposer.bind(this)}
             maxComposerHeight={150}
