@@ -294,7 +294,7 @@ class DeliveryAreaScreen extends Component {
                   <Text style={{alignSelf: 'center'}}>{radius} KM</Text>
                 </View>
               </CardItem>
-              <CardItem>
+              <CardItem style={{alignSelf: 'center'}}>
                 <Card
                   style={{
                     borderRadius: 16,
@@ -326,7 +326,7 @@ class DeliveryAreaScreen extends Component {
                     iconRight
                     onPress={() => this.handleCancelChanges()}
                     buttonStyle={{backgroundColor: colors.primary}}
-                    style={{marginRight: 20}}
+                    containerStyle={{marginRight: 20}}
                   />
                   <Button
                     title="Save Changes"

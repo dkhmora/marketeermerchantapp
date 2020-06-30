@@ -247,76 +247,64 @@ class StoreDetailsScreen extends Component {
               borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem
-              header
-              bordered
+            <View
               style={{
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingHorizontal: 8,
+                paddingVertical: 8,
                 backgroundColor: this.storeDetailsHeaderColor,
+                paddingLeft: 25,
               }}>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  paddingHorizontal: 8,
-                }}>
-                <View>
-                  <Text style={{color: colors.icons, fontSize: 20}}>
-                    Store Details
-                  </Text>
-                </View>
+              <Text style={{color: colors.icons, fontSize: 20}}>
+                Store Details
+              </Text>
 
-                <View style={{alignItems: 'center'}}>
-                  {this.editMode ? (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        height: 25,
-                        alignItems: 'flex-end',
-                        justifyContent: 'center',
-                        padding: 0,
-                      }}>
-                      <Button
-                        type="clear"
-                        color={colors.icons}
-                        icon={<Icon name="check" color={colors.icons} />}
-                        iconRight
-                        title="Confirm"
-                        titleStyle={{color: colors.icons, paddingRight: 5}}
-                        onPress={() => this.handleConfirmDetails()}
-                        buttonStyle={{height: 25, paddingTop: 6}}
-                        containerStyle={{
-                          borderRadius: 24,
-                          borderColor: colors.icons,
-                          borderWidth: 1,
-                          paddingHorizontal: -20,
-                        }}
-                      />
-                      <Button
-                        type="clear"
-                        color={colors.icons}
-                        icon={<Icon name="x" color={colors.icons} />}
-                        onPress={() => this.cancelEditing()}
-                        titleStyle={{color: colors.icons}}
-                        buttonStyle={{
-                          height: 25,
-                        }}
-                        containerStyle={{
-                          borderRadius: 24,
-                          paddingBottom: 3,
-                        }}
-                      />
-                    </View>
-                  ) : (
-                    <BaseOptionsMenu
-                      iconStyle={{color: colors.icons, fontSize: 25}}
-                      options={['Toggle Editing']}
-                      actions={[this.toggleEditing.bind(this)]}
+              <View>
+                {this.editMode ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                    }}>
+                    <Button
+                      type="clear"
+                      color={colors.icons}
+                      icon={<Icon name="check" color={colors.icons} />}
+                      iconRight
+                      title="Confirm"
+                      titleStyle={{color: colors.icons, paddingRight: 5}}
+                      onPress={() => this.handleConfirmDetails()}
+                      buttonStyle={{paddingTop: 6}}
+                      containerStyle={{
+                        borderRadius: 24,
+                        borderColor: colors.icons,
+                        borderWidth: 1,
+                        paddingHorizontal: -20,
+                      }}
                     />
-                  )}
-                </View>
+                    <Button
+                      type="clear"
+                      color={colors.icons}
+                      icon={<Icon name="x" color={colors.icons} />}
+                      onPress={() => this.cancelEditing()}
+                      titleStyle={{color: colors.icons}}
+                      containerStyle={{
+                        borderRadius: 24,
+                        paddingBottom: 3,
+                      }}
+                    />
+                  </View>
+                ) : (
+                  <BaseOptionsMenu
+                    iconStyle={{color: colors.icons, fontSize: 25}}
+                    options={['Toggle Editing']}
+                    actions={[this.toggleEditing.bind(this)]}
+                  />
+                )}
               </View>
-            </CardItem>
+            </View>
 
             <CardItem bordered>
               <View
