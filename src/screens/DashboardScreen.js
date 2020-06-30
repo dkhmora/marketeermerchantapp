@@ -958,14 +958,16 @@ class StoreDetailsScreen extends Component {
                 </View>
 
                 <View style={{flex: 3, alignItems: 'flex-end'}}>
-                  <Text
-                    style={{
-                      color: colors.primary,
-                      fontSize: 16,
-                      fontFamily: 'ProductSans-Bold',
-                    }}>
-                    ₱ {creditData.credits}
-                  </Text>
+                  {creditData && (
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      ₱ {creditData.credits}
+                    </Text>
+                  )}
                 </View>
               </View>
             </CardItem>
@@ -986,14 +988,16 @@ class StoreDetailsScreen extends Component {
                 </View>
 
                 <View style={{flex: 3, alignItems: 'flex-end'}}>
-                  <Text
-                    style={{
-                      color: colors.primary,
-                      fontSize: 16,
-                      fontFamily: 'ProductSans-Bold',
-                    }}>
-                    ₱ {creditData.creditThreshold}
-                  </Text>
+                  {creditData && (
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      ₱ {creditData.creditThreshold}
+                    </Text>
+                  )}
                 </View>
               </View>
             </CardItem>
