@@ -9,8 +9,9 @@ import StoreItemsScreen from '../screens/StoreItemsScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
-import {Icon, View, Text, Item, Label, Button} from 'native-base';
+import {Button, Icon, Text} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
+import {colors} from '../../assets/colors';
 
 @inject('authStore')
 @observer
@@ -43,14 +44,17 @@ class MainDrawer extends Component {
               <DrawerItemList {...props} />
 
               <Button
+                title="Sign Out"
+                icon={<Icon name="log-out" color={colors.icons} />}
+                iconRight
                 onPress={() => this.handleSignOut()}
-                style={{
+                titleStyle={{color: colors.icons, paddingRight: 5}}
+                buttonStyle={{backgroundColor: colors.primary}}
+                containerStyle={{
                   borderRadius: 24,
                   marginHorizontal: 12,
-                }}>
-                <Text>Sign Out</Text>
-                <Icon name="log-out" />
-              </Button>
+                }}
+              />
             </DrawerContentScrollView>
           );
         }}>
