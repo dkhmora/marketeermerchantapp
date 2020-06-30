@@ -5,30 +5,33 @@ import {observer} from 'mobx-react';
 import {observable} from 'mobx';
 import storage from '@react-native-firebase/storage';
 import {colors} from '../../assets/colors';
+import FastImage from 'react-native-fast-image';
 
 @observer
 class OrderItemCard extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      url: require('../../assets/placeholder.jpg'),
+    };
   }
 
-  @observable url = null;
-
   getImage = async () => {
-    const ref = storage().ref(this.props.image);
+    const ref = storage().ref(this.props.item.image);
     const link = await ref.getDownloadURL();
-    this.url = link;
+    this.setState({url: {uri: link}});
   };
 
   componentDidMount() {
-    if (this.props.image) {
-      console.log(this.props.image);
+    if (this.props.item.image) {
       this.getImage();
     }
   }
 
   render() {
     const {item, ...otherProps} = this.props;
+    const {url} = this.state;
 
     return (
       <CardItem bordered>
@@ -37,33 +40,18 @@ class OrderItemCard extends Component {
             flexDirection: 'row',
             marginVertical: 8,
           }}>
-          {this.url ? (
-            <Image
-              source={{uri: this.url}}
-              style={{
-                height: 55,
-                aspectRatio: 1,
-                borderColor: colors.primary,
-                borderWidth: 1,
-                borderRadius: 10,
-                width: null,
-                backgroundColor: '#e1e4e8',
-              }}
-            />
-          ) : (
-            <Image
-              source={require('../../assets/placeholder.jpg')}
-              style={{
-                height: 55,
-                aspectRatio: 1,
-                borderColor: colors.primary,
-                borderWidth: 1,
-                borderRadius: 10,
-                width: null,
-                backgroundColor: '#e1e4e8',
-              }}
-            />
-          )}
+          <FastImage
+            key={item.name}
+            source={url}
+            style={{
+              height: 55,
+              width: 55,
+              borderColor: colors.primary,
+              borderWidth: 1,
+              borderRadius: 10,
+            }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
           <View
             style={{
               flex: 1,
