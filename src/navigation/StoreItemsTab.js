@@ -22,7 +22,7 @@ import ItemsList from '../components/ItemsList';
 import BaseHeader from '../components/BaseHeader';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
 import {colors} from '../../assets/colors';
 
 const TabBase = createMaterialTopTabNavigator();
@@ -64,6 +64,10 @@ class StoreItemsTab extends Component {
 
   @action closeDeleteCategoryModal() {
     this.deleteCategoryModal = false;
+  }
+
+  @computed get scrollEnabled() {
+    return this.props.itemsStore.itemCategories.length > 1 ? true : false;
   }
 
   onValueChange(value) {
@@ -127,8 +131,6 @@ class StoreItemsTab extends Component {
     const {itemCategories} = this.props.itemsStore;
     const {name} = this.props.route;
     const {navigation} = this.props;
-
-    const scroll = itemCategories.length > 1 ? true : false;
 
     return (
       <Container style={{flex: 1}}>
@@ -249,7 +251,7 @@ class StoreItemsTab extends Component {
 
         <TabBase.Navigator
           tabBarOptions={{
-            scrollEnabled: scroll,
+            scrollEnabled: this.scrollEnabled,
             style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
