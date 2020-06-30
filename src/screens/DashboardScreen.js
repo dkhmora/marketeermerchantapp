@@ -1,5 +1,5 @@
 import React, {Component, setState} from 'react';
-import {StyleSheet, Image} from 'react-native';
+import {StyleSheet, Image, ScrollView} from 'react-native';
 import {
   Container,
   List,
@@ -9,27 +9,24 @@ import {
   Content,
   Card,
   Body,
-  Text,
   CardItem,
   Left,
   Right,
-  Button,
   View,
-  Icon,
   Item,
-  Input,
   Toast,
-  Textarea,
 } from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
 // Mobx
 import {inject, observer} from 'mobx-react';
 import {observable, action} from 'mobx';
+import {Text, Input, Icon, Button} from 'react-native-elements';
 import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import BaseOptionsMenu from '../components/BaseOptionsMenu';
-import MapView from 'react-native-maps';
+import {colors} from '../../assets/colors';
+import {Switch} from 'react-native-gesture-handler';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -52,7 +49,8 @@ class StoreDetailsScreen extends Component {
   @observable newStoreDescription = '';
   @observable newDeliveryDescription = '';
   @observable newAddress = '';
-  @observable storeDetailsHeaderColor = '#E91E63';
+  @observable newVacationMode = null;
+  @observable storeDetailsHeaderColor = colors.primary;
 
   componentDidMount() {
     this.getImage();
@@ -69,7 +67,8 @@ class StoreDetailsScreen extends Component {
     this.newDeliveryDescription = '';
     this.newStoreDescription = '';
     this.newStoreName = '';
-    this.storeDetailsHeaderColor = '#E91E63';
+    this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
+    this.storeDetailsHeaderColor = colors.primary;
     this.editMode = !this.editMode;
   }
 
@@ -79,16 +78,18 @@ class StoreDetailsScreen extends Component {
       deliveryDescription,
       storeDescription,
       storeName,
+      vacationMode,
     } = this.props.detailsStore.storeDetails;
 
     if (this.editMode) {
       this.cancelEditing();
     } else {
-      this.storeDetailsHeaderColor = '#f0ad4e';
+      this.storeDetailsHeaderColor = colors.accent;
       this.newAddress = address;
       this.newDeliveryDescription = deliveryDescription;
       this.newStoreDescription = storeDescription;
       this.newStoreName = storeName;
+      this.newVacationMode = vacationMode;
       this.editMode = !this.editMode;
     }
   }
@@ -171,13 +172,15 @@ class StoreDetailsScreen extends Component {
       deliveryDescription,
       storeDescription,
       storeName,
+      vacationMode,
     } = this.props.detailsStore.storeDetails;
 
     if (
       address !== this.newAddress ||
       deliveryDescription !== this.newDeliveryDescription ||
       storeDescription !== this.newStoreDescription ||
-      storeName !== this.newStoreName
+      storeName !== this.newStoreName ||
+      vacationMode !== this.newVacationMode
     ) {
       updateStoreDetails(
         merchantId,
@@ -185,6 +188,7 @@ class StoreDetailsScreen extends Component {
         this.newStoreDescription,
         this.newDeliveryDescription,
         this.newAddress,
+        this.newVacationMode,
       ).then(() => {
         Toast.show({
           text: 'Store details successfully updated!',
@@ -213,303 +217,450 @@ class StoreDetailsScreen extends Component {
       storeDescription,
       storeName,
       visibleToPublic,
+      vacationMode,
     } = this.props.detailsStore.storeDetails;
 
     return (
-      <Container style={{flex: 1}}>
+      <View style={{flex: 1}}>
         <BaseHeader
           title={this.props.route.name}
           optionsButton
           navigation={this.props.navigation}
         />
 
-        <Content padder>
+        <ScrollView style={{paddingHorizontal: 10}}>
           <Card style={{borderRadius: 10, overflow: 'hidden'}}>
-            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
+            <CardItem header bordered style={{backgroundColor: colors.primary}}>
               <Left>
                 <Body>
-                  <Text style={{color: '#fff'}}>Store Card Preview</Text>
+                  <Text style={{color: colors.icons, fontSize: 20}}>
+                    Store Card Preview
+                  </Text>
                 </Body>
               </Left>
             </CardItem>
-            <CardItem bordered>
-              <Left>
-                <Text>Test</Text>
-              </Left>
-              <Right>
-                <Text>Text</Text>
-              </Right>
-            </CardItem>
+            <CardItem bordered></CardItem>
           </Card>
 
-          <Card style={{borderRadius: 10, overflow: 'hidden'}}>
+          <Card
+            style={{
+              borderRadius: 10,
+              overflow: 'hidden',
+            }}>
             <CardItem
               header
               bordered
-              style={{backgroundColor: this.storeDetailsHeaderColor}}>
-              <Left style={{flex: 4}}>
-                <Body>
-                  <Text style={{color: '#fff'}}>Store Details</Text>
-                </Body>
-              </Left>
-              <Body
-                style={{
-                  flex: 7,
-                  alignItems: 'flex-end',
-                  marginVertical: 5,
-                }}>
-                {this.editMode && (
-                  <Button
-                    iconRight
-                    small
-                    onPress={() => this.handleConfirmDetails()}
-                    style={{
-                      borderRadius: 24,
-                      borderColor: '#fff',
-                      borderWidth: 1,
-                      backgroundColor: 'transparent',
-                      marginVertical: -7,
-                    }}>
-                    <Text style={{color: '#fff'}}>Confirm</Text>
-                    <Icon name="checkmark" style={{color: '#fff'}} />
-                  </Button>
-                )}
-              </Body>
-              <Right
+              style={{
+                backgroundColor: this.storeDetailsHeaderColor,
+              }}>
+              <View
                 style={{
                   flex: 1,
-                  marginVertical: -9.5,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
                 }}>
-                {this.editMode ? (
-                  <Button
-                    transparent
-                    onPress={() => this.cancelEditing()}
-                    style={{marginVertical: -9.5}}>
-                    <Icon name="close" style={{color: '#fff', fontSize: 25}} />
-                  </Button>
-                ) : (
-                  <BaseOptionsMenu
-                    iconStyle={{color: '#fff', fontSize: 25}}
-                    options={['Toggle Editing']}
-                    actions={[this.toggleEditing.bind(this)]}
+                <View>
+                  <Text style={{color: colors.icons, fontSize: 20}}>
+                    Store Details
+                  </Text>
+                </View>
+
+                <View style={{alignItems: 'center'}}>
+                  {this.editMode ? (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        height: 25,
+                        alignItems: 'flex-end',
+                        justifyContent: 'center',
+                        padding: 0,
+                      }}>
+                      <Button
+                        type="clear"
+                        color={colors.icons}
+                        icon={<Icon name="check" color={colors.icons} />}
+                        iconRight
+                        title="Confirm"
+                        titleStyle={{color: colors.icons, paddingRight: 5}}
+                        onPress={() => this.handleConfirmDetails()}
+                        buttonStyle={{height: 25, paddingTop: 3}}
+                        containerStyle={{
+                          borderRadius: 24,
+                          borderColor: colors.icons,
+                          borderWidth: 1,
+                          paddingHorizontal: -20,
+                        }}
+                      />
+                      <Button
+                        type="clear"
+                        color={colors.icons}
+                        icon={<Icon name="x" color={colors.icons} />}
+                        onPress={() => this.cancelEditing()}
+                        titleStyle={{color: colors.icons}}
+                        buttonStyle={{
+                          height: 25,
+                        }}
+                        containerStyle={{
+                          borderRadius: 24,
+                          paddingBottom: 3,
+                        }}
+                      />
+                    </View>
+                  ) : (
+                    <BaseOptionsMenu
+                      iconStyle={{color: colors.icons, fontSize: 25}}
+                      options={['Toggle Editing']}
+                      actions={[this.toggleEditing.bind(this)]}
+                    />
+                  )}
+                </View>
+              </View>
+            </CardItem>
+
+            <CardItem bordered>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{paddingRight: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Display Image
+                  </Text>
+
+                  {this.editMode && (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                      }}>
+                      <Button
+                        type="clear"
+                        titleStyle={colors.accent}
+                        color={colors.icons}
+                        onPress={() => this.handleTakePhoto('display')}
+                        icon={<Icon name="camera" color={colors.accent} />}
+                        containerStyle={{borderRadius: 24}}
+                      />
+
+                      <Button
+                        type="clear"
+                        titleStyle={colors.accent}
+                        color={colors.icons}
+                        onPress={() => this.handleSelectImage('display')}
+                        icon={<Icon name="image" color={colors.accent} />}
+                        containerStyle={{borderRadius: 24}}
+                      />
+                    </View>
+                  )}
+                </View>
+
+                {this.displayUrl && (
+                  <Image
+                    source={{uri: this.displayUrl}}
+                    style={{
+                      height: 166.67,
+                      width: 166.67,
+                      backgroundColor: '#e1e4e8',
+                      borderRadius: 24,
+                      borderWidth: 1,
+                      borderColor: this.editMode
+                        ? this.storeDetailsHeaderColor
+                        : colors.primary,
+                    }}
                   />
                 )}
-              </Right>
+              </View>
             </CardItem>
+
             <CardItem bordered>
-              <Left>
-                <Body>
-                  <View
-                    style={{
-                      width: '100%',
-                      height: 40,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={{fontWeight: 'bold'}}>Display Image</Text>
-                    {this.editMode && (
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                        }}>
-                        <Button transparent>
-                          <Icon
-                            name="camera"
-                            onPress={() => this.handleTakePhoto('display')}
-                            style={{color: '#f0ad4e'}}
-                          />
-                        </Button>
-                        <Button transparent>
-                          <Icon
-                            name="image"
-                            onPress={() => this.handleSelectImage('display')}
-                            style={{color: '#f0ad4e'}}
-                          />
-                        </Button>
-                      </View>
-                    )}
-                  </View>
-                  {this.displayUrl && (
-                    <Image
-                      source={{uri: this.displayUrl}}
-                      style={{
-                        height: 150,
-                        width: 150,
-                        flex: 1,
-                        backgroundColor: '#e1e4e8',
-                        alignSelf: 'center',
-                        borderRadius: 24,
-                        borderWidth: 1,
-                        borderColor: '#E91E63',
-                      }}
-                    />
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{paddingRight: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Cover Image
+                  </Text>
+
+                  {this.editMode && (
+                    <View style={{flexDirection: 'row'}}>
+                      <Button
+                        type="clear"
+                        color={colors.icons}
+                        titleStyle={colors.accent}
+                        icon={<Icon name="camera" color={colors.accent} />}
+                        onPress={() => this.handleTakePhoto('cover')}
+                        containerStyle={{borderRadius: 24}}
+                      />
+                      <Button
+                        type="clear"
+                        color={colors.icons}
+                        titleStyle={colors.accent}
+                        icon={<Icon name="image" color={colors.accent} />}
+                        onPress={() => this.handleSelectImage('cover')}
+                        containerStyle={{borderRadius: 24}}
+                      />
+                    </View>
                   )}
-                </Body>
-              </Left>
-            </CardItem>
-            <CardItem bordered>
-              <Left>
-                <Body>
-                  <View
+                </View>
+
+                {this.coverUrl && (
+                  <Image
+                    source={{uri: this.coverUrl}}
                     style={{
-                      width: '100%',
-                      height: 40,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text style={{fontWeight: 'bold'}}>Cover Image</Text>
-                    {this.editMode && (
-                      <View style={{flexDirection: 'row'}}>
-                        <Button
-                          transparent
-                          onPress={() => this.handleTakePhoto('cover')}>
-                          <Icon name="camera" style={{color: '#f0ad4e'}} />
-                        </Button>
-                        <Button
-                          transparent
-                          onPress={() => this.handleSelectImage('cover')}>
-                          <Icon name="image" style={{color: '#f0ad4e'}} />
-                        </Button>
-                      </View>
-                    )}
-                  </View>
-                  {this.coverUrl && (
-                    <Image
-                      source={{uri: this.coverUrl}}
-                      style={{
-                        height: 200,
-                        width: 300,
-                        flex: 1,
-                        backgroundColor: '#e1e4e8',
-                        alignSelf: 'center',
-                        borderRadius: 24,
-                        borderWidth: 1,
-                        borderColor: '#E91E63',
-                      }}
-                    />
-                  )}
-                </Body>
-              </Left>
+                      width: 250,
+                      height: 166.67,
+                      backgroundColor: '#e1e4e8',
+                      alignSelf: 'center',
+                      borderRadius: 24,
+                      borderWidth: 1,
+                      borderColor: this.editMode
+                        ? this.storeDetailsHeaderColor
+                        : colors.primary,
+                      resizeMode: 'cover',
+                    }}
+                  />
+                )}
+              </View>
             </CardItem>
+
             <CardItem bordered>
-              <Left>
-                <Text style={{fontWeight: 'bold'}}>Display Name</Text>
-              </Left>
-              <Body style={{alignItems: 'flex-end'}}>
-                {this.editMode ? (
-                  <Item rounded>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Display Name
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  {this.editMode ? (
                     <Input
+                      maxLength={50}
                       value={this.newStoreName}
                       onChangeText={(value) => (this.newStoreName = value)}
-                      style={{textAlign: 'right'}}
+                      inputStyle={{
+                        textAlign: 'right',
+                      }}
+                      containerStyle={{
+                        borderColor: this.storeDetailsHeaderColor,
+                      }}
                     />
-                  </Item>
-                ) : (
-                  <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
-                    {storeName}
-                  </Text>
-                )}
-              </Body>
+                  ) : (
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      {storeName}
+                    </Text>
+                  )}
+                </View>
+              </View>
             </CardItem>
+
             <CardItem bordered>
-              <Left>
-                <Text style={{fontWeight: 'bold'}}>Description</Text>
-              </Left>
-              <Body style={{alignItems: 'flex-end'}}>
-                {this.editMode ? (
-                  <Item rounded>
-                    <Textarea
-                      rowSpan={4}
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Description
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  {this.editMode ? (
+                    <Input
+                      multiline
                       maxLength={200}
                       value={this.newStoreDescription}
                       onChangeText={(value) =>
                         (this.newStoreDescription = value)
                       }
-                      style={{textAlign: 'right', width: '100%'}}
+                      inputStyle={{textAlign: 'right'}}
+                      containerStyle={{
+                        borderColor: this.storeDetailsHeaderColor,
+                      }}
                     />
-                  </Item>
-                ) : (
-                  <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
-                    {storeDescription}
-                  </Text>
-                )}
-              </Body>
+                  ) : (
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      {storeDescription}
+                    </Text>
+                  )}
+                </View>
+              </View>
             </CardItem>
+
             <CardItem bordered>
-              <Left>
-                <Text style={{fontWeight: 'bold'}}>Delivery Description</Text>
-              </Left>
-              <Body style={{alignItems: 'flex-end'}}>
-                {this.editMode ? (
-                  <Item rounded>
-                    <Textarea
-                      rowSpan={4}
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Delivery Description
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  {this.editMode ? (
+                    <Input
+                      multiline
                       maxLength={200}
                       value={this.newDeliveryDescription}
                       onChangeText={(value) =>
                         (this.newDeliveryDescription = value)
                       }
-                      style={{textAlign: 'right', width: '100%'}}
+                      inputStyle={{textAlign: 'right'}}
+                      containerStyle={{
+                        borderColor: this.storeDetailsHeaderColor,
+                      }}
                     />
-                  </Item>
-                ) : (
-                  <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
-                    {deliveryDescription}
-                  </Text>
-                )}
-              </Body>
+                  ) : (
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      {deliveryDescription}
+                    </Text>
+                  )}
+                </View>
+              </View>
             </CardItem>
+
             <CardItem bordered>
-              <Left>
-                <Text style={{fontWeight: 'bold'}}>Address</Text>
-              </Left>
-              <Body style={{alignItems: 'flex-end'}}>
-                {this.editMode ? (
-                  <Item rounded>
-                    <Textarea
-                      rowSpan={4}
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Address
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  {this.editMode ? (
+                    <Input
+                      multiline
                       maxLength={200}
                       placeholder="Address"
                       value={this.newAddress}
                       onChangeText={(value) => (this.newAddress = value)}
-                      style={{textAlign: 'right', width: '100%'}}
+                      inputStyle={{textAlign: 'right'}}
+                      containerStyle={{
+                        borderColor: this.storeDetailsHeaderColor,
+                      }}
                     />
-                  </Item>
-                ) : (
-                  <Text
-                    style={{
-                      color: '#E91E63',
-                      fontWeight: 'bold',
-                      textAlign: 'right',
-                    }}>
-                    {address}
+                  ) : (
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      {address}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            </CardItem>
+
+            <CardItem bordered>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Vacation Mode
                   </Text>
-                )}
-              </Body>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  {this.editMode ? (
+                    <Switch
+                      trackColor={{false: '#767577', true: colors.dark_accent}}
+                      thumbColor={
+                        this.newVacationMode ? colors.accent : '#f4f3f4'
+                      }
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={() =>
+                        (this.newVacationMode = !this.newVacationMode)
+                      }
+                      value={this.newVacationMode}
+                    />
+                  ) : (
+                    <Switch
+                      trackColor={{false: '#767577', true: colors.dark}}
+                      thumbColor={vacationMode ? colors.primary : '#f4f3f4'}
+                      ios_backgroundColor="#3e3e3e"
+                      value={vacationMode}
+                      disabled
+                    />
+                  )}
+                </View>
+              </View>
             </CardItem>
           </Card>
 
-          <Card style={{borderRadius: 10, overflow: 'hidden'}}>
-            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
+          <Card
+            style={{
+              borderRadius: 10,
+              overflow: 'hidden',
+            }}>
+            <CardItem header bordered style={{backgroundColor: colors.primary}}>
               <Left>
                 <Body>
-                  <Text style={{color: '#fff'}}>Sales</Text>
+                  <Text style={{color: colors.icons, fontSize: 20}}>Sales</Text>
                 </Body>
               </Left>
             </CardItem>
-            <CardItem bordered>
-              <Left>
-                <Text>Test</Text>
-              </Left>
-              <Right>
-                <Text>Text</Text>
-              </Right>
-            </CardItem>
+
+            <CardItem bordered></CardItem>
           </Card>
-        </Content>
-      </Container>
+        </ScrollView>
+      </View>
     );
   }
 }
