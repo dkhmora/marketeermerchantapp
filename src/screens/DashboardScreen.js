@@ -224,7 +224,7 @@ class StoreDetailsScreen extends Component {
         />
 
         <Content padder>
-          <Card style={{borderRadius: 16, overflow: 'hidden'}}>
+          <Card style={{borderRadius: 10, overflow: 'hidden'}}>
             <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
               <Left>
                 <Body>
@@ -242,7 +242,7 @@ class StoreDetailsScreen extends Component {
             </CardItem>
           </Card>
 
-          <Card style={{borderRadius: 16, overflow: 'hidden'}}>
+          <Card style={{borderRadius: 10, overflow: 'hidden'}}>
             <CardItem
               header
               bordered
@@ -397,7 +397,7 @@ class StoreDetailsScreen extends Component {
               <Left>
                 <Text style={{fontWeight: 'bold'}}>Display Name</Text>
               </Left>
-              <Right>
+              <Body style={{alignItems: 'flex-end'}}>
                 {this.editMode ? (
                   <Item rounded>
                     <Input
@@ -411,13 +411,13 @@ class StoreDetailsScreen extends Component {
                     {storeName}
                   </Text>
                 )}
-              </Right>
+              </Body>
             </CardItem>
             <CardItem bordered>
               <Left>
                 <Text style={{fontWeight: 'bold'}}>Description</Text>
               </Left>
-              <Right>
+              <Body style={{alignItems: 'flex-end'}}>
                 {this.editMode ? (
                   <Item rounded>
                     <Textarea
@@ -427,7 +427,7 @@ class StoreDetailsScreen extends Component {
                       onChangeText={(value) =>
                         (this.newStoreDescription = value)
                       }
-                      style={{textAlign: 'right'}}
+                      style={{textAlign: 'right', width: '100%'}}
                     />
                   </Item>
                 ) : (
@@ -435,13 +435,13 @@ class StoreDetailsScreen extends Component {
                     {storeDescription}
                   </Text>
                 )}
-              </Right>
+              </Body>
             </CardItem>
             <CardItem bordered>
               <Left>
                 <Text style={{fontWeight: 'bold'}}>Delivery Description</Text>
               </Left>
-              <Right>
+              <Body style={{alignItems: 'flex-end'}}>
                 {this.editMode ? (
                   <Item rounded>
                     <Textarea
@@ -451,7 +451,7 @@ class StoreDetailsScreen extends Component {
                       onChangeText={(value) =>
                         (this.newDeliveryDescription = value)
                       }
-                      style={{textAlign: 'right'}}
+                      style={{textAlign: 'right', width: '100%'}}
                     />
                   </Item>
                 ) : (
@@ -459,13 +459,13 @@ class StoreDetailsScreen extends Component {
                     {deliveryDescription}
                   </Text>
                 )}
-              </Right>
+              </Body>
             </CardItem>
             <CardItem bordered>
               <Left>
                 <Text style={{fontWeight: 'bold'}}>Address</Text>
               </Left>
-              <Right>
+              <Body style={{alignItems: 'flex-end'}}>
                 {this.editMode ? (
                   <Item rounded>
                     <Textarea
@@ -474,7 +474,7 @@ class StoreDetailsScreen extends Component {
                       placeholder="Address"
                       value={this.newAddress}
                       onChangeText={(value) => (this.newAddress = value)}
-                      style={{textAlign: 'right'}}
+                      style={{textAlign: 'right', width: '100%'}}
                     />
                   </Item>
                 ) : (
@@ -487,11 +487,11 @@ class StoreDetailsScreen extends Component {
                     {address}
                   </Text>
                 )}
-              </Right>
+              </Body>
             </CardItem>
           </Card>
 
-          <Card style={{borderRadius: 16, overflow: 'hidden'}}>
+          <Card style={{borderRadius: 10, overflow: 'hidden'}}>
             <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
               <Left>
                 <Body>
