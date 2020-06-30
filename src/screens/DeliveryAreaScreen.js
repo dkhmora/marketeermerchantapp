@@ -7,12 +7,14 @@ import {
   PermissionsAndroid,
   Platform,
   Dimensions,
+  SafeAreaView,
 } from 'react-native';
-import {Button, Icon, Text, Item, Input, Card, CardItem} from 'native-base';
-import {Slider} from 'react-native-elements';
+import {Item, Input, Card, CardItem} from 'native-base';
+import {Slider, Button, Icon, Text} from 'react-native-elements';
 import {observer, inject} from 'mobx-react';
 import Geolocation from '@react-native-community/geolocation';
-
+import {colors} from '../../assets/colors';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 @inject('authStore')
 @inject('detailsStore')
 @observer
@@ -86,7 +88,6 @@ class DeliveryAreaScreen extends Component {
       },
       (err) => console.log(err),
       {
-        enableHighAccuracy: true,
         timeout: 20000,
       },
     );
@@ -230,14 +231,7 @@ class DeliveryAreaScreen extends Component {
                 tracksViewChanges={false}
                 coordinate={markerPosition}>
                 <View>
-                  <Icon
-                    style={{
-                      color: '#B11C01',
-                      fontSize: 34,
-                    }}
-                    name="pin"
-                    solid
-                  />
+                  <Icon color={colors.primary} name="map-pin" />
                 </View>
               </Marker>
             )}
@@ -262,113 +256,167 @@ class DeliveryAreaScreen extends Component {
               top: centerOfScreen,
               alignItems: 'center',
             }}>
-            <Icon
-              style={{
-                color: '#B11C01',
-                fontSize: 34,
-              }}
-              name="pin"
-              solid
-            />
+            <Icon color={colors.primary} name="map-pin" />
           </View>
         )}
-        <View
+
+        {editMode ? (
+          <View
+            style={{
+              padding: 20,
+              position: 'absolute',
+              alignSelf: 'center',
+              justifyContent: 'center',
+              bottom: 20,
+            }}>
+            <Card
+              style={{
+                borderRadius: 16,
+                overflow: 'hidden',
+                backgroundColor: 'rgba(255,255,255, 0.6)',
+              }}>
+              <CardItem style={{flexDirection: 'column'}}>
+                <Text style={{alignSelf: 'flex-start', marginBottom: 5}}>
+                  Delivery Radius
+                </Text>
+                <View
+                  style={{
+                    width: '100%',
+                  }}>
+                  <Slider
+                    step={1}
+                    minimumValue={0}
+                    maximumValue={100}
+                    value={radius}
+                    thumbTintColor={colors.accent}
+                    onValueChange={(value) => this.setState({radius: value})}
+                  />
+                  <Text style={{alignSelf: 'center'}}>{radius} KM</Text>
+                </View>
+              </CardItem>
+              <CardItem>
+                <Card
+                  style={{
+                    borderRadius: 16,
+                    overflow: 'hidden',
+                    backgroundColor: '#eee',
+                  }}>
+                  <CardItem
+                    style={{
+                      backgroundColor: '#eef',
+                    }}>
+                    <Text note style={{margin: 6, width: '100%'}}>
+                      Tip: Pan around the map to move your store's location!
+                    </Text>
+                  </CardItem>
+                </Card>
+              </CardItem>
+              <CardItem>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-evenly',
+                  }}>
+                  <Button
+                    title="Cancel Changes"
+                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    icon={<Icon name="x" color={colors.icons} />}
+                    iconRight
+                    onPress={() => this.handleCancelChanges()}
+                    style={{marginRight: 20}}
+                  />
+                  <Button
+                    title="Save Changes"
+                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    icon={<Icon name="save" color={colors.icons} />}
+                    iconRight
+                    buttonStyle={{backgroundColor: colors.accent}}
+                    onPress={() => this.handleSetStoreLocation()}
+                  />
+                </View>
+              </CardItem>
+            </Card>
+          </View>
+        ) : (
+          <Button
+            title="Change Store Delivery Area"
+            titleStyle={{color: colors.icons, paddingRight: 5}}
+            icon={<Icon name="edit" color={colors.icons} />}
+            iconRight
+            onPress={() => this.handleEditDeliveryArea()}
+            containerStyle={{
+              position: 'absolute',
+              alignSelf: 'center',
+              justifyContent: 'center',
+              bottom: '5%',
+            }}></Button>
+        )}
+
+        <SafeAreaView
           style={{
-            position: 'absolute',
-            alignSelf: 'flex-start',
-            justifyContent: 'flex-start',
-            top: '-7%',
+            flexDirection: 'row',
+            paddingHorizontal: 10,
+            paddingBottom: 10,
+            backgroundColor: colors.primary,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop:
+              Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 10,
           }}>
           <Button
-            transparent
+            type="clear"
+            titleStyle={{color: colors.icons}}
+            icon={<Icon name="menu" color={colors.icons} />}
             onPress={() => navigation.openDrawer()}
-            style={{marginTop: 100}}>
-            <Icon name="menu" style={{fontSize: 32}} />
-          </Button>
-        </View>
-        <View
-          style={{
-            position: 'absolute',
-            alignSelf: 'center',
-            justifyContent: 'center',
-            bottom: '5%',
-          }}>
-          {editMode ? (
-            <View style={{flexDirection: 'column'}}>
-              <Card
-                style={{
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                  backgroundColor: 'rgba(255,255,255, 0.6)',
-                }}>
-                <CardItem style={{flexDirection: 'column'}}>
-                  <Text style={{alignSelf: 'flex-start', marginBottom: 5}}>
-                    Delivery Radius
-                  </Text>
-                  <View
-                    style={{
-                      width: '100%',
-                    }}>
-                    <Slider
-                      step={1}
-                      minimumValue={0}
-                      maximumValue={100}
-                      value={radius}
-                      onValueChange={(value) => this.setState({radius: value})}
-                    />
-                    <Text style={{alignSelf: 'center'}}>{radius} KM</Text>
-                  </View>
-                </CardItem>
-                <CardItem>
-                  <Card
-                    style={{
-                      borderRadius: 16,
-                      overflow: 'hidden',
-                      backgroundColor: '#eee',
-                    }}>
-                    <CardItem
-                      style={{
-                        backgroundColor: '#eef',
-                      }}>
-                      <Text note style={{margin: 6, width: '100%'}}>
-                        Tip: Pan around the map to move your store's location!
-                      </Text>
-                    </CardItem>
-                  </Card>
-                </CardItem>
-                <CardItem>
-                  <View style={{flexDirection: 'row'}}>
-                    <Button
-                      iconLeft
-                      rounded
-                      danger
-                      onPress={() => this.handleCancelChanges()}
-                      style={{marginRight: 20}}>
-                      <Icon name="close" />
-                      <Text>Cancel Changes</Text>
-                    </Button>
-                    <Button
-                      iconLeft
-                      rounded
-                      success
-                      onPress={() => this.handleSetStoreLocation()}>
-                      <Icon name="save" />
-                      <Text>Save Changes</Text>
-                    </Button>
-                  </View>
-                </CardItem>
-              </Card>
-            </View>
-          ) : (
-            <Button
-              iconLeft
-              onPress={() => this.handleEditDeliveryArea()}
-              style={{borderRadius: 24, overflow: 'hidden'}}>
-              <Icon name="create" />
-              <Text>Edit Delivery Area</Text>
-            </Button>
-          )}
-        </View>
+          />
+
+          <GooglePlacesAutocomplete
+            placeholder="Search"
+            fetchDetails
+            onPress={(data, details = null) => {
+              // 'details' is provided when fetchDetails = true
+              console.log(data, details);
+            }}
+            query={{
+              key: 'AIzaSyDZqSAZvKVizDPaDhtzuzGtfyzCpViZvcs',
+              language: 'en',
+              components: 'country:ph',
+            }}
+            styles={{
+              container: {
+                alignSelf: 'flex-start',
+              },
+              textInputContainer: {
+                backgroundColor: 'rgba(0,0,0,0)',
+                borderRadius: 24,
+                marginTop: -7,
+                borderTopWidth: 0,
+                borderBottomWidth: 0,
+              },
+              textInput: {
+                alignSelf: 'flex-start',
+                margin: 0,
+                padding: 0,
+                height: 40,
+                color: '#5d5d5d',
+                fontFamily: 'ProductSans-Light',
+                fontSize: 16,
+                borderRadius: 24,
+              },
+              predefinedPlacesDescription: {
+                color: colors.accent,
+              },
+              listView: {
+                backgroundColor: colors.icons,
+                position: 'absolute',
+                marginTop: 40,
+              },
+            }}
+            onFail={(error) => console.warn(error)}
+          />
+        </SafeAreaView>
       </View>
     );
   }
