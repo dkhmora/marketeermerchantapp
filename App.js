@@ -32,6 +32,7 @@ YellowBox.ignoreWarnings([
   'Animated.event now requires a second argument for options',
   'Require cycle: node_modules',
   "Warning: Can't perform a React state update on an unmounted component.",
+  'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation',
 ]);
 
 export default class App extends React.Component {

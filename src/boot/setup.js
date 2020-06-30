@@ -29,6 +29,9 @@ const theme = {
     buttonStyle: {
       backgroundColor: colors.primary,
     },
+    containerStyle: {
+      borderRadius: 24,
+    },
   },
   Avatar: {
     titleStyle: {
