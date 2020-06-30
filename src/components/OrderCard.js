@@ -274,11 +274,17 @@ class OrderCard extends Component {
               <Text note>{footerStatus}</Text>
             ) : (
               <Button
-                success
-                rounded
-                onPress={this.handleChangeOrderStatus.bind(this)}>
-                <Text>{buttonText}</Text>
-              </Button>
+                title={buttonText}
+                titleStyle={{color: colors.icons}}
+                buttonStyle={{backgroundColor: colors.accent}}
+                containerStyle={{
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: colors.accent,
+                  width: '100%',
+                }}
+                onPress={this.handleChangeOrderStatus.bind(this)}
+              />
             )}
           </Right>
         </CardItem>
@@ -330,19 +336,34 @@ class OrderCard extends Component {
                 </Body>
               </CardItem>
               <CardItem footer>
-                <Left />
-                <Right style={{flexDirection: 'row', marginRight: 25}}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                  }}>
                   <Button
-                    transparent
-                    onPress={this.closeConfirmationModal.bind(this)}>
-                    <Text>Cancel</Text>
-                  </Button>
+                    title="Cancel"
+                    titleStyle={{color: colors.accent}}
+                    buttonStyle={{backgroundColor: colors.icons}}
+                    containerStyle={{
+                      borderRadius: 24,
+                      borderWidth: 1,
+                      borderColor: colors.accent,
+                      marginRight: 10,
+                    }}
+                    onPress={this.closeConfirmationModal.bind(this)}
+                  />
                   <Button
-                    transparent
-                    onPress={this.handleCancelOrder.bind(this)}>
-                    <Text>Confirm</Text>
-                  </Button>
-                </Right>
+                    title="Confirm"
+                    titleStyle={{color: colors.icons}}
+                    buttonStyle={{backgroundColor: colors.dark_accent}}
+                    containerStyle={{
+                      borderRadius: 24,
+                    }}
+                    onPress={this.handleCancelOrder.bind(this)}
+                  />
+                </View>
               </CardItem>
             </Card>
           </Modal>
