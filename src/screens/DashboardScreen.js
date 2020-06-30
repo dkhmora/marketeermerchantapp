@@ -344,6 +344,7 @@ class StoreDetailsScreen extends Component {
       shippingMethods,
       deliveryType,
       creditData,
+      orderNumber,
     } = this.props.detailsStore.storeDetails;
 
     return (
@@ -963,6 +964,34 @@ class StoreDetailsScreen extends Component {
                       fontFamily: 'ProductSans-Bold',
                     }}>
                     ₱ {creditData.creditThreshold}
+                  </Text>
+                </View>
+              </View>
+            </CardItem>
+
+            <CardItem bordered>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 8,
+                }}>
+                <View style={{flex: 2, paddingright: 10}}>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Number of Orders
+                  </Text>
+                </View>
+
+                <View style={{flex: 3, alignItems: 'flex-end'}}>
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      fontFamily: 'ProductSans-Bold',
+                    }}>
+                    {orderNumber}
                   </Text>
                 </View>
               </View>
