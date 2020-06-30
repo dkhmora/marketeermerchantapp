@@ -30,9 +30,18 @@ class DetailsStore {
       .collection('merchants')
       .doc(merchantId)
       .onSnapshot((documentSnapshot) => {
-        if (documentSnapshot) {
+        if (documentSnapshot.exists) {
           this.storeDetails = documentSnapshot.data();
         }
+      });
+  }
+
+  @action async deleteImage(image) {
+    await storage()
+      .ref(image)
+      .delete()
+      .then(() => {
+        console.log(`Image at ${image} successfully deleted!`);
       });
   }
 
@@ -63,16 +72,7 @@ class DetailsStore {
           this.deleteImage(currentImagePath);
         }
       })
-      .catch((err) => console.error(err));
-  }
-
-  @action async deleteImage(image) {
-    await storage()
-      .ref(image)
-      .delete()
-      .then(() => {
-        console.log(`Image at ${image} successfully deleted!`);
-      });
+      .catch((err) => console.log(err));
   }
 
   @action async updateStoreDetails(
