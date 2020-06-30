@@ -48,7 +48,9 @@ class AddItemScreen extends Component {
   @observable categories = this.props.itemsStore.itemCategories;
 
   componentDidMount() {
-    this.category = this.props.route.params.pageCategory;
+    const {pageCategory} = this.props.route.params;
+    const {itemCategories} = this.props.itemsStore;
+    this.category = pageCategory !== 'All' ? pageCategory : itemCategories[0];
 
     if (this.props.itemsStore.itemCategories.length <= 0) {
       this.props.navigation.goBack();
