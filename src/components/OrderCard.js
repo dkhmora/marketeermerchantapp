@@ -271,7 +271,7 @@ class OrderCard extends Component {
           </Left>
           <Right>
             {footerStatus && !buttonText ? (
-              <Text note>{footerStatus}</Text>
+              <Text style={{textAlign: 'right'}}>{footerStatus}</Text>
             ) : (
               <Button
                 title={buttonText}

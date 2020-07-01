@@ -792,6 +792,7 @@ class StoreDetailsScreen extends Component {
                         color: colors.primary,
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
                       }}>
                       {address}
                     </Text>
