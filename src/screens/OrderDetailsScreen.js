@@ -285,7 +285,7 @@ class OrderDetailsScreen extends Component {
               <CardItem>
                 <Body>
                   <Text style={{width: '100%', textAlign: 'justify'}}>
-                    {cancelReason}
+                    {orderStatus.cancelled.reason}
                   </Text>
                 </Body>
               </CardItem>
