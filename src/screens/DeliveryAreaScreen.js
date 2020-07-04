@@ -15,6 +15,9 @@ import {observer, inject} from 'mobx-react';
 import Geolocation from '@react-native-community/geolocation';
 import {colors} from '../../assets/colors';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import geohash from 'ngeohash';
+import * as geolib from 'geolib';
+
 @inject('authStore')
 @inject('detailsStore')
 @observer
@@ -30,34 +33,75 @@ class DeliveryAreaScreen extends Component {
       newMarkerPosition: null,
       centerOfScreen: (Dimensions.get('window').height - 17) / 2,
     };
-
-    const {coordinates, deliveryRadius} = this.props.detailsStore.storeDetails;
-
-    if (coordinates) {
-      const {_latitude, _longitude} = coordinates;
-      this.state.markerPosition = {latitude: _latitude, longitude: _longitude};
-      this.state.circlePosition = {latitude: _latitude, longitude: _longitude};
-      this.state.mapData = {
-        latitude: _latitude,
-        longitude: _longitude,
-        latitudeDelta: 0.04,
-        longitudeDelta: 0.05,
-      };
-    }
-
-    if (deliveryRadius) {
-      this.state.radius = deliveryRadius;
-    }
   }
 
   componentDidMount() {
-    const {coordinates} = this.props.detailsStore.storeDetails;
+    const {deliveryCoordinates} = this.props.detailsStore.storeDetails;
 
-    if (!coordinates) {
+    if (!deliveryCoordinates) {
       this.setInitialMarkerPosition();
     } else {
-      this.setState({mapReady: true});
+      this.decodeGeohash();
     }
+  }
+
+  getGeohashRange = (latitude, longitude, distance) => {
+    const bounds = geolib.getBoundsOfDistance(
+      {latitude, longitude},
+      distance * 1000,
+    );
+
+    const lower = geohash.encode(bounds[0].latitude, bounds[0].longitude, 20);
+    const upper = geohash.encode(bounds[1].latitude, bounds[1].longitude, 20);
+
+    return {
+      lower,
+      upper,
+    };
+  };
+
+  decodeGeohash() {
+    const {deliveryCoordinates} = this.props.detailsStore.storeDetails;
+    const {lowerRange, upperRange} = deliveryCoordinates;
+
+    const lower = geohash.decode(lowerRange);
+    const upper = geohash.decode(upperRange);
+
+    const radius = Math.round(
+      geolib.getDistance(
+        {
+          latitude: lower.latitude,
+          longitude: lower.longitude,
+        },
+        {
+          latitude: upper.latitude,
+          longitude: lower.longitude,
+        },
+      ) / 2000,
+    );
+
+    const coordinates = geolib.getCenterOfBounds([
+      {
+        latitude: lower.latitude,
+        longitude: lower.longitude,
+      },
+      {
+        latitude: upper.latitude,
+        longitude: upper.longitude,
+      },
+    ]);
+
+    this.setState({
+      markerPosition: {...coordinates},
+      circlePosition: {...coordinates},
+      mapData: {
+        ...coordinates,
+        latitudeDelta: 0.04,
+        longitudeDelta: 0.05,
+      },
+      radius,
+      mapReady: true,
+    });
   }
 
   async setInitialMarkerPosition() {
@@ -69,9 +113,6 @@ class DeliveryAreaScreen extends Component {
         };
 
         this.setState({
-          markerPosition: {
-            ...coords,
-          },
           newMarkerPosition: {
             ...coords,
           },
@@ -108,12 +149,13 @@ class DeliveryAreaScreen extends Component {
     const {merchantId} = this.props.authStore;
     const {newMarkerPosition, radius} = this.state;
 
-    updateCoordinates(
-      merchantId,
+    const range = this.getGeohashRange(
       newMarkerPosition.latitude,
       newMarkerPosition.longitude,
       radius,
     );
+
+    updateCoordinates(merchantId, range.lower, range.upper);
 
     this.setState({
       editMode: false,
@@ -223,7 +265,7 @@ class DeliveryAreaScreen extends Component {
               this._onMapReady();
             }}
             initialRegion={mapData}>
-            {!editMode && (
+            {!editMode && markerPosition && (
               <Marker
                 ref={(marker) => {
                   this.marker = marker;
