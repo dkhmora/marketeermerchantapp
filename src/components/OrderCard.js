@@ -254,9 +254,6 @@ class OrderCard extends Component {
     };
 
     const CardFooter = () => {
-      const cancellationStatus =
-        orderStatus.cancelled.status && orderStatus.cancelled.reason;
-
       const footerStatus =
         tabName === 'Shipped'
           ? 'Waiting for Customer to Confirm Receipt of Products'

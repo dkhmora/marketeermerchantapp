@@ -1,25 +1,19 @@
 import {observable, action} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
-import firebase from '@react-native-firebase/app';
 import storage from '@react-native-firebase/storage';
 
 class DetailsStore {
   @observable storeDetails = {};
 
-  @action async updateCoordinates(
-    merchantId,
-    latitude,
-    longitude,
-    deliveryRadius,
-  ) {
-    const coordinates = new firebase.firestore.GeoPoint(latitude, longitude);
-
+  @action async updateCoordinates(merchantId, lowerRange, upperRange) {
     await firestore()
       .collection('merchants')
       .doc(merchantId)
       .update({
-        coordinates,
-        deliveryRadius,
+        deliveryCoordinates: {
+          lowerRange,
+          upperRange,
+        },
       })
       .then(() => console.log('Successfully updated merchant coordinates'))
       .catch((err) => console.log(err));
