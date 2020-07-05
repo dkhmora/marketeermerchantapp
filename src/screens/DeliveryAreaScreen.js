@@ -62,7 +62,7 @@ class DeliveryAreaScreen extends Component {
 
   decodeGeohash() {
     const {deliveryCoordinates} = this.props.detailsStore.storeDetails;
-    const {lowerRange, upperRange} = deliveryCoordinates;
+    const {lowerRange, upperRange, latitude, longitude} = deliveryCoordinates;
 
     const lower = geohash.decode(lowerRange);
     const upper = geohash.decode(upperRange);
@@ -80,22 +80,12 @@ class DeliveryAreaScreen extends Component {
       ) / 2000,
     );
 
-    const coordinates = geolib.getCenterOfBounds([
-      {
-        latitude: lower.latitude,
-        longitude: lower.longitude,
-      },
-      {
-        latitude: upper.latitude,
-        longitude: upper.longitude,
-      },
-    ]);
-
     this.setState({
-      markerPosition: {...coordinates},
-      circlePosition: {...coordinates},
+      markerPosition: {latitude, longitude},
+      circlePosition: {latitude, longitude},
       mapData: {
-        ...coordinates,
+        latitude,
+        longitude,
         latitudeDelta: 0.04,
         longitudeDelta: 0.05,
       },
@@ -155,7 +145,7 @@ class DeliveryAreaScreen extends Component {
       radius,
     );
 
-    updateCoordinates(merchantId, range.lower, range.upper);
+    updateCoordinates(merchantId, range.lower, range.upper, newMarkerPosition);
 
     this.setState({
       editMode: false,
