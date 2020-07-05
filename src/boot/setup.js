@@ -1,10 +1,6 @@
 import React, {Component} from 'react';
 import App from '../App';
 // For theme
-import {StyleProvider, Button, Container, Text} from 'native-base';
-import getTheme from '../theme/components';
-import variables from '../theme/variables/commonColor';
-import material from '../theme/variables/material';
 import {ThemeProvider} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 

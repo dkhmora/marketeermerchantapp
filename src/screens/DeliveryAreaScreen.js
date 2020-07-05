@@ -7,6 +7,7 @@ import {
   PermissionsAndroid,
   Platform,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import {Card, CardItem} from 'native-base';
 import {Slider, Button, Icon, Text} from 'react-native-elements';
@@ -17,7 +18,7 @@ import geohash from 'ngeohash';
 import * as geolib from 'geolib';
 import BaseHeader from '../components/BaseHeader';
 import RNGooglePlaces from 'react-native-google-places';
-
+import Toast from '../components/Toast';
 @inject('authStore')
 @inject('detailsStore')
 @observer
@@ -28,6 +29,7 @@ class DeliveryAreaScreen extends Component {
     this.state = {
       mapReady: false,
       editMode: false,
+      updating: false,
       address: null,
       radius: 0,
       initialRadius: 0,
@@ -83,6 +85,7 @@ class DeliveryAreaScreen extends Component {
 
     this.setState({
       markerPosition: {latitude, longitude},
+      newMarkerPosition: {latitude, longitude},
       circlePosition: {latitude, longitude},
       mapData: {
         latitude,
@@ -146,6 +149,8 @@ class DeliveryAreaScreen extends Component {
       radius,
     );
 
+    this.setState({loading: true});
+
     if (!address) {
       this.setState(
         {
@@ -158,7 +163,12 @@ class DeliveryAreaScreen extends Component {
             range.upper,
             newMarkerPosition,
             this.state.address,
-          );
+          )
+            .then(() => {
+              Toast({text: 'Delivery Area successfully set!'});
+              this.setState({loading: false});
+            })
+            .catch((err) => Toast({text: err, type: 'danger'}));
         },
       );
     } else {
@@ -168,7 +178,12 @@ class DeliveryAreaScreen extends Component {
         range.upper,
         newMarkerPosition,
         this.state.address,
-      );
+      )
+        .then(() => {
+          Toast({text: 'Delivery Area successfully set!'});
+          this.setState({loading: false});
+        })
+        .catch((err) => Toast({text: err, type: 'danger'}));
     }
 
     this.setState({
@@ -250,7 +265,7 @@ class DeliveryAreaScreen extends Component {
 
     this.setState({
       mapData: {...markerPosition, latitudeDelta: 0.04, longitudeDelta: 0.05},
-      newMarkerPosition: null,
+      newMarkerPosition: {...markerPosition},
       radius: initialRadius,
       editMode: false,
     });
@@ -342,6 +357,7 @@ class DeliveryAreaScreen extends Component {
       mapData,
       mapReady,
       editMode,
+      loading,
     } = this.state;
 
     return (
@@ -509,6 +525,25 @@ class DeliveryAreaScreen extends Component {
             />
           }
         />
+
+        {loading && (
+          <View
+            style={[
+              StyleSheet.absoluteFillObject,
+              {
+                flex: 1,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+            ]}>
+            <ActivityIndicator animating color={colors.primary} size="large" />
+          </View>
+        )}
       </View>
     );
   }
