@@ -7,14 +7,12 @@ import {
   PermissionsAndroid,
   Platform,
   Dimensions,
-  SafeAreaView,
 } from 'react-native';
-import {Item, Input, Card, CardItem} from 'native-base';
+import {Card, CardItem} from 'native-base';
 import {Slider, Button, Icon, Text} from 'react-native-elements';
 import {observer, inject} from 'mobx-react';
 import Geolocation from '@react-native-community/geolocation';
 import {colors} from '../../assets/colors';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import geohash from 'ngeohash';
 import * as geolib from 'geolib';
 import BaseHeader from '../components/BaseHeader';
