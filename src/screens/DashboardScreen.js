@@ -1,5 +1,5 @@
 import React, {Component, setState} from 'react';
-import {StyleSheet, Image, ScrollView} from 'react-native';
+import {StyleSheet, Image, ScrollView, Platform} from 'react-native';
 import {
   Container,
   List,
@@ -58,7 +58,6 @@ class StoreDetailsScreen extends Component {
   @observable newStoreName = '';
   @observable newStoreDescription = '';
   @observable newFreeDelivery = '';
-  @observable newAddress = '';
   @observable newVacationMode = null;
   @observable newPaymentMethods = [];
   @observable newShippingMethods = [];
@@ -76,7 +75,6 @@ class StoreDetailsScreen extends Component {
   }
 
   @action cancelEditing() {
-    this.newAddress = '';
     this.newFreeDelivery = '';
     this.newStoreDescription = '';
     this.newStoreName = '';
@@ -89,7 +87,6 @@ class StoreDetailsScreen extends Component {
 
   @action toggleEditing() {
     const {
-      address,
       freeDelivery,
       storeDescription,
       storeName,
@@ -101,7 +98,6 @@ class StoreDetailsScreen extends Component {
       this.cancelEditing();
     } else {
       this.storeDetailsHeaderColor = colors.accent;
-      this.newAddress = address;
       this.newFreeDelivery = freeDelivery;
       this.newStoreDescription = storeDescription;
       this.newStoreName = storeName;
@@ -248,7 +244,6 @@ class StoreDetailsScreen extends Component {
     const {updateStoreDetails} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
     const {
-      address,
       freeDelivery,
       storeDescription,
       storeName,
@@ -262,7 +257,6 @@ class StoreDetailsScreen extends Component {
     this.handleDeliveryTypeCheckboxes();
 
     if (
-      address !== this.newAddress ||
       freeDelivery !== this.newFreeDelivery ||
       storeDescription !== this.newStoreDescription ||
       storeName !== this.newStoreName ||
@@ -276,7 +270,6 @@ class StoreDetailsScreen extends Component {
         this.newStoreName,
         this.newStoreDescription,
         this.newFreeDelivery,
-        this.newAddress,
         this.newVacationMode,
         this.newPaymentMethods,
         this.newShippingMethods,
@@ -336,7 +329,6 @@ class StoreDetailsScreen extends Component {
 
   render() {
     const {
-      address,
       cities,
       freeDelivery,
       itemCategories,
@@ -379,18 +371,25 @@ class StoreDetailsScreen extends Component {
               borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <View
+            <CardItem
+              header
+              bordered
               style={{
                 flex: 1,
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                paddingHorizontal: 8,
-                paddingVertical: Platform.OS === 'ios' ? 8 : 16,
                 backgroundColor: this.storeDetailsHeaderColor,
                 paddingLeft: 25,
+                paddingBottom: 0,
+                paddingTop: 0,
               }}>
-              <Text style={{color: colors.icons, fontSize: 20}}>
+              <Text
+                style={{
+                  color: colors.icons,
+                  fontSize: 20,
+                  paddingVertical: Platform.OS === 'android' ? 18 : 8,
+                }}>
                 Store Details
               </Text>
 
@@ -399,6 +398,8 @@ class StoreDetailsScreen extends Component {
                   <View
                     style={{
                       flexDirection: 'row',
+                      alignItems: 'flex-end',
+                      justifyContent: 'space-between',
                     }}>
                     <Button
                       type="clear"
@@ -406,9 +407,9 @@ class StoreDetailsScreen extends Component {
                       icon={<Icon name="check" color={colors.icons} />}
                       iconRight
                       title="Confirm"
-                      titleStyle={{color: colors.icons, paddingRight: 5}}
+                      titleStyle={{color: colors.icons, paddingRight: 15}}
                       onPress={() => this.handleConfirmDetails()}
-                      buttonStyle={{paddingTop: 6}}
+                      buttonStyle={{paddingTop: 10}}
                       containerStyle={{
                         borderRadius: 24,
                         borderColor: colors.icons,
@@ -424,7 +425,6 @@ class StoreDetailsScreen extends Component {
                       titleStyle={{color: colors.icons}}
                       containerStyle={{
                         borderRadius: 24,
-                        paddingBottom: 3,
                       }}
                     />
                   </View>
@@ -436,7 +436,7 @@ class StoreDetailsScreen extends Component {
                   />
                 )}
               </View>
-            </View>
+            </CardItem>
 
             <CardItem bordered>
               <View
@@ -752,49 +752,6 @@ class StoreDetailsScreen extends Component {
                         fontFamily: 'ProductSans-Bold',
                       }}>
                       {deliveryType}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </CardItem>
-
-            <CardItem bordered>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingHorizontal: 8,
-                }}>
-                <View style={{flex: 2, paddingright: 10}}>
-                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
-                    Address
-                  </Text>
-                </View>
-
-                <View style={{flex: 3, alignItems: 'flex-end'}}>
-                  {this.editMode ? (
-                    <Input
-                      multiline
-                      maxLength={200}
-                      placeholder="Address"
-                      value={this.newAddress}
-                      onChangeText={(value) => (this.newAddress = value)}
-                      inputStyle={{textAlign: 'right'}}
-                      containerStyle={{
-                        borderColor: this.storeDetailsHeaderColor,
-                      }}
-                    />
-                  ) : (
-                    <Text
-                      style={{
-                        color: colors.primary,
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                        textAlign: 'right',
-                      }}>
-                      {address}
                     </Text>
                   )}
                 </View>
