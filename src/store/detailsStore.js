@@ -12,7 +12,6 @@ class DetailsStore {
     locationCoordinates,
     address,
   ) {
-    console.log('yes', address);
     await firestore()
       .collection('merchants')
       .doc(merchantId)
