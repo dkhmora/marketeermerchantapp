@@ -19,6 +19,7 @@ class BaseHeader extends Component {
           onPress={() => navigation.openDrawer()}
           type="clear"
           color={colors.icons}
+          titleStyle={{color: colors.icons}}
           icon={<Icon name="menu" color={colors.icons} />}
           containerStyle={{borderRadius: 24}}
         />
@@ -37,6 +38,7 @@ class BaseHeader extends Component {
           onPress={() => navigation.goBack()}
           type="clear"
           color={colors.icons}
+          titleStyle={{color: colors.icons}}
           icon={<Icon name="arrow-left" color={colors.icons} />}
           containerStyle={{borderRadius: 24}}
         />
@@ -57,7 +59,7 @@ class BaseHeader extends Component {
   };
 
   rightComponent = () => {
-    const {actions, options, destructiveIndex} = this.props;
+    const {actions, options, destructiveIndex, rightComponent} = this.props;
 
     if (options && actions) {
       return (
@@ -69,6 +71,11 @@ class BaseHeader extends Component {
         />
       );
     }
+
+    if (rightComponent) {
+      return rightComponent;
+    }
+
     return null;
   };
 

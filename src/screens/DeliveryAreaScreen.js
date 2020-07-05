@@ -17,6 +17,8 @@ import {colors} from '../../assets/colors';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import geohash from 'ngeohash';
 import * as geolib from 'geolib';
+import BaseHeader from '../components/BaseHeader';
+import RNGooglePlaces from 'react-native-google-places';
 
 @inject('authStore')
 @inject('detailsStore')
@@ -28,6 +30,7 @@ class DeliveryAreaScreen extends Component {
     this.state = {
       mapReady: false,
       editMode: false,
+      address: null,
       radius: 0,
       initialRadius: 0,
       newMarkerPosition: null,
@@ -134,10 +137,10 @@ class DeliveryAreaScreen extends Component {
     }
   };
 
-  handleSetStoreLocation() {
+  async handleSetStoreLocation() {
     const {updateCoordinates} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
-    const {newMarkerPosition, radius} = this.state;
+    const {newMarkerPosition, radius, address} = this.state;
 
     const range = this.getGeohashRange(
       newMarkerPosition.latitude,
@@ -145,13 +148,62 @@ class DeliveryAreaScreen extends Component {
       radius,
     );
 
-    updateCoordinates(merchantId, range.lower, range.upper, newMarkerPosition);
+    if (!address) {
+      this.setState(
+        {
+          address: await this.getAddressFromCoordinates({...newMarkerPosition}),
+        },
+        () => {
+          updateCoordinates(
+            merchantId,
+            range.lower,
+            range.upper,
+            newMarkerPosition,
+            this.state.address,
+          );
+        },
+      );
+    } else {
+      updateCoordinates(
+        merchantId,
+        range.lower,
+        range.upper,
+        newMarkerPosition,
+        this.state.address,
+      );
+    }
 
     this.setState({
       editMode: false,
       circlePosition: newMarkerPosition,
       markerPosition: newMarkerPosition,
     });
+  }
+
+  panMapToLocation(position) {
+    if (Platform.OS === 'ios') {
+      this.map.animateCamera(
+        {
+          center: position,
+          pitch: 2,
+          heading: 20,
+          altitude: 6000,
+          zoom: 5,
+        },
+        150,
+      );
+    } else {
+      this.map.animateCamera(
+        {
+          center: position,
+          pitch: 2,
+          heading: 1,
+          altitude: 200,
+          zoom: 18,
+        },
+        150,
+      );
+    }
   }
 
   panMapToMarker() {
@@ -173,7 +225,7 @@ class DeliveryAreaScreen extends Component {
           pitch: 2,
           heading: 1,
           altitude: 500,
-          zoom: 15,
+          zoom: 18,
         },
         150,
       );
@@ -225,6 +277,62 @@ class DeliveryAreaScreen extends Component {
       });
     }
   };
+
+  async getAddressFromCoordinates({latitude, longitude}) {
+    const HERE_API_KEY = '1VW7QLMp_GdQMOkjyBDpnKd8j6W5g049H7A1mUkpQmY';
+
+    console.log(latitude, longitude);
+
+    const details = await new Promise((resolve) => {
+      const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=${HERE_API_KEY}&mode=retrieveAddresses&prox=${latitude},${longitude}`;
+      fetch(url)
+        .then((res) => res.json())
+        .then((resJson) => {
+          // the response had a deeply nested structure :/
+          if (
+            resJson &&
+            resJson.Response &&
+            resJson.Response.View &&
+            resJson.Response.View[0] &&
+            resJson.Response.View[0].Result &&
+            resJson.Response.View[0].Result[0]
+          ) {
+            resolve(resJson.Response.View[0].Result[0].Location.Address.Label);
+          } else {
+            resolve();
+          }
+        })
+        .catch((e) => {
+          console.log('Error in getAddressFromCoordinates', e);
+          resolve();
+        });
+    });
+
+    console.log(details);
+    return details;
+  }
+
+  openSearchModal() {
+    RNGooglePlaces.openAutocompleteModal({country: 'PH'}, [
+      'address',
+      'location',
+    ])
+      .then((place) => {
+        const address = place.address;
+        const coordinates = place.location;
+
+        this.panMapToLocation(coordinates);
+
+        this.setState({
+          address,
+          newMarkerPosition: {...coordinates},
+          editMode: true,
+        });
+        // place represents user's selection from the
+        // suggestions and it is a simplified Google Place object.
+      })
+      .catch((error) => console.log(error.message)); // error is a Javascript Error object
+  }
 
   render() {
     const {navigation} = this.props;
@@ -385,72 +493,24 @@ class DeliveryAreaScreen extends Component {
               alignSelf: 'center',
               justifyContent: 'center',
               bottom: '5%',
-            }}></Button>
+            }}
+          />
         )}
 
-        <SafeAreaView
-          style={{
-            flexDirection: 'row',
-            paddingHorizontal: 10,
-            paddingBottom: 10,
-            backgroundColor: colors.primary,
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingTop:
-              Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 10,
-          }}>
-          <Button
-            type="clear"
-            titleStyle={{color: colors.icons}}
-            icon={<Icon name="menu" color={colors.icons} />}
-            onPress={() => navigation.openDrawer()}
-          />
-
-          <GooglePlacesAutocomplete
-            placeholder="Search"
-            fetchDetails
-            onPress={(data, details = null) => {
-              // 'details' is provided when fetchDetails = true
-              console.log(data, details);
-            }}
-            query={{
-              key: 'AIzaSyDZqSAZvKVizDPaDhtzuzGtfyzCpViZvcs',
-              language: 'en',
-              components: 'country:ph',
-            }}
-            styles={{
-              container: {
-                alignSelf: 'flex-start',
-              },
-              textInputContainer: {
-                backgroundColor: 'rgba(0,0,0,0)',
-                borderRadius: 24,
-                marginTop: -7,
-                borderTopWidth: 0,
-                borderBottomWidth: 0,
-              },
-              textInput: {
-                alignSelf: 'flex-start',
-                margin: 0,
-                padding: 0,
-                height: 40,
-                color: '#5d5d5d',
-                fontFamily: 'ProductSans-Light',
-                fontSize: 16,
-                borderRadius: 24,
-              },
-              predefinedPlacesDescription: {
-                color: colors.accent,
-              },
-              listView: {
-                backgroundColor: colors.icons,
-                position: 'absolute',
-                marginTop: 40,
-              },
-            }}
-            onFail={(error) => console.warn(error)}
-          />
-        </SafeAreaView>
+        <BaseHeader
+          backButton
+          navigation={navigation}
+          title="Delivery Area"
+          rightComponent={
+            <Button
+              type="clear"
+              icon={<Icon name="search" color={colors.icons} />}
+              titleStyle={{color: colors.icons}}
+              buttonStyle={{borderRadius: 24}}
+              onPress={() => this.openSearchModal()}
+            />
+          }
+        />
       </View>
     );
   }

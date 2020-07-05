@@ -10,7 +10,9 @@ class DetailsStore {
     lowerRange,
     upperRange,
     locationCoordinates,
+    address,
   ) {
+    console.log('yes', address);
     await firestore()
       .collection('merchants')
       .doc(merchantId)
@@ -19,6 +21,7 @@ class DetailsStore {
           lowerRange,
           upperRange,
           ...locationCoordinates,
+          address,
         },
       })
       .then(() => console.log('Successfully updated merchant coordinates'))
