@@ -5,7 +5,12 @@ import storage from '@react-native-firebase/storage';
 class DetailsStore {
   @observable storeDetails = {};
 
-  @action async updateCoordinates(merchantId, lowerRange, upperRange) {
+  @action async updateCoordinates(
+    merchantId,
+    lowerRange,
+    upperRange,
+    locationCoordinates,
+  ) {
     await firestore()
       .collection('merchants')
       .doc(merchantId)
@@ -13,6 +18,7 @@ class DetailsStore {
         deliveryCoordinates: {
           lowerRange,
           upperRange,
+          ...locationCoordinates,
         },
       })
       .then(() => console.log('Successfully updated merchant coordinates'))
