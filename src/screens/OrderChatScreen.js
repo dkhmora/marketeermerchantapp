@@ -222,6 +222,7 @@ class OrderChatScreen extends Component {
             maxComposerHeight={150}
             listViewProps={{marginBottom: 20}}
             alwaysShowSend
+            showAvatarForEveryMessage
             messages={dataSource}
             onSend={(messages) => this.onSend(messages)}
             user={this.state.user}
