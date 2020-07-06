@@ -3,11 +3,16 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "pod": "cd ios && pod install",
+    "clean": "cd android && gradlew clean",
+    "android": "cd android && gradlew clean && cd .. && react-native run-android",
     "ios": "react-native run-ios",
+    "iphone8": "react-native run-ios --simulator='iPhone 8'",
+    "iphonese": "react-native run-ios --simulator='iPhone SE (2nd generation)'",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.10.1",
