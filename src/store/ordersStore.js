@@ -108,8 +108,9 @@ class OrdersStore {
   }
 
   @action setPendingOrders(merchantId) {
+    console.log(merchantId);
     ordersCollection
-      .where('storeDetails.merchantId', '==', merchantId)
+      .where('merchantId', '==', merchantId)
       .where('orderStatus.pending.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -123,7 +124,7 @@ class OrdersStore {
 
   @action setUnpaidOrders(merchantId) {
     ordersCollection
-      .where('storeDetails.merchantId', '==', merchantId)
+      .where('merchantId', '==', merchantId)
       .where('orderStatus.unpaid.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -137,7 +138,7 @@ class OrdersStore {
 
   @action setPaidOrders(merchantId) {
     ordersCollection
-      .where('storeDetails.merchantId', '==', merchantId)
+      .where('merchantId', '==', merchantId)
       .where('orderStatus.paid.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -151,7 +152,7 @@ class OrdersStore {
 
   @action setShippedOrders(merchantId) {
     ordersCollection
-      .where('storeDetails.merchantId', '==', merchantId)
+      .where('merchantId', '==', merchantId)
       .where('orderStatus.shipped.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -165,7 +166,7 @@ class OrdersStore {
 
   @action setCompletedOrders(merchantId) {
     ordersCollection
-      .where('storeDetails.merchantId', '==', merchantId)
+      .where('merchantId', '==', merchantId)
       .where('orderStatus.completed.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];
@@ -179,7 +180,7 @@ class OrdersStore {
 
   @action setCancelledOrders(merchantId) {
     ordersCollection
-      .where('storeDetails.merchantId', '==', merchantId)
+      .where('merchantId', '==', merchantId)
       .where('orderStatus.cancelled.status', '==', true)
       .onSnapshot((querySnapshot) => {
         const data = [];

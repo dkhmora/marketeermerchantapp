@@ -160,14 +160,21 @@ class OrderCard extends Component {
             })
           }
           style={{backgroundColor: colors.primary}}>
-          <View style={{flex: 3, flexDirection: 'row', alignItems: 'center'}}>
+          <View
+            style={{
+              flex: 2,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
             {chatButton && (
               <View>
                 <Icon name="message-square" color={colors.icons} />
                 <Text style={{color: colors.icons}}>Chat</Text>
               </View>
             )}
-            <View style={{flexDirection: 'column', paddingHorizontal: 10}}>
+
+            <View
+              style={{flex: 1, flexDirection: 'column', paddingHorizontal: 10}}>
               <Text
                 style={{
                   color: '#fff',
@@ -176,7 +183,9 @@ class OrderCard extends Component {
                 }}>
                 {userName}
               </Text>
+
               <Text style={{color: '#eee'}}>Order # {orderNumber}</Text>
+
               <View
                 key={index}
                 style={{
@@ -189,6 +198,7 @@ class OrderCard extends Component {
                   alignSelf: 'flex-start',
                 }}>
                 <Text
+                  adjustsFontSizeToFit
                   style={{
                     fontSize: 16,
                     color: '#fff',
@@ -199,55 +209,51 @@ class OrderCard extends Component {
               </View>
             </View>
           </View>
-          <View style={{flex: 4, alignItems: 'flex-end'}}>
-            <Card
+
+          <Card
+            style={{
+              flex: 1,
+              backgroundColor: '#F8BBD0',
+              borderRadius: 16,
+              paddingVertical: 10,
+              paddingHorizontal: 5,
+            }}>
+            <View
               style={{
-                backgroundColor: '#F8BBD0',
-                borderRadius: 16,
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
-              <CardItem
+              <Text
                 style={{
-                  backgroundColor: 'transparent',
+                  color: colors.primary,
+                  fontFamily: 'ProductSans-Black',
+                  fontSize: 16,
+                  textAlign: 'center',
                 }}>
-                <View
-                  style={{
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start',
-                  }}>
-                  <Body>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                      }}>
-                      <Text style={{fontSize: 16, color: colors.text_primary}}>
-                        Transaction Fee:{' '}
-                      </Text>
-                      <Text
-                        style={{
-                          color: colors.primary,
-                          fontFamily: 'ProductSans-Black',
-                          fontSize: 16,
-                        }}>
-                        ₱{(totalAmount * 0.05).toPrecision(3)}
-                      </Text>
-                    </View>
-                    <Text note style={{color: '#757575', textAlign: 'center'}}>
-                      {transactionFeeStatus}
-                    </Text>
-                  </Body>
-                </View>
-              </CardItem>
-            </Card>
-          </View>
+                ₱{(totalAmount * 0.05).toPrecision(3)}
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: colors.text_primary,
+                  textAlign: 'center',
+                }}>
+                Transaction Fee
+              </Text>
+            </View>
+          </Card>
+
           {optionsButton && (
-            <Right style={{flex: 1}}>
+            <View>
               <BaseOptionsMenu
                 iconStyle={{color: '#fff', fontSize: 27}}
                 destructiveIndex={1}
                 options={['Cancel Order']}
                 actions={[this.openConfirmationModal.bind(this)]}
               />
-            </Right>
+            </View>
           )}
         </CardItem>
       );
