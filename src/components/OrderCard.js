@@ -132,12 +132,9 @@ class OrderCard extends Component {
     } = this.props;
 
     const buttonText =
-      (tabName === 'Paid' && 'Ship') || (tabName === 'Pending' && 'Accept');
-
-    const transactionFeeStatus =
-      tabName === 'Pending'
-        ? 'To be charged when Accepted'
-        : 'Charged to account';
+      (tabName === 'Paid' && 'Ship') ||
+      (tabName === 'Pending' && 'Accept') ||
+      (tabName === 'Shipped' && 'Complete');
 
     const CardHeader = () => {
       const optionsButton = tabName === 'Pending' ? true : false;
@@ -260,10 +257,7 @@ class OrderCard extends Component {
     };
 
     const CardFooter = () => {
-      const footerStatus =
-        tabName === 'Shipped'
-          ? 'Waiting for Customer to Confirm Receipt of Products'
-          : `Order ${tabName}`;
+      const footerStatus = `Order ${tabName}`;
 
       const timeStamp = moment(createdAt, ISO_8601).fromNow();
 

@@ -46,7 +46,6 @@ class AuthStore {
       const authorizationStatus = await messaging().requestPermission();
 
       if (authorizationStatus) {
-        console.log('Permission status:', authorizationStatus);
         await messaging()
           .getToken()
           .then((token) =>
