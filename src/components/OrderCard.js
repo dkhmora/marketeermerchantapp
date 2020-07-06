@@ -16,7 +16,7 @@ import moment, {ISO_8601} from 'moment';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
 import {Icon, Button, Text} from 'react-native-elements';
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 
@@ -36,6 +36,20 @@ class OrderCard extends Component {
 
   @action closeConfirmationModal() {
     this.confirmationModal = false;
+  }
+
+  @computed get orderStatus() {
+    const {orderStatus} = this.props;
+
+    const statusLabel = Object.entries(orderStatus).map(([key, value]) => {
+      if (value.status) {
+        return key.toUpperCase();
+      }
+
+      return;
+    });
+
+    return statusLabel.filter((item) => item != null);
   }
 
   handleChangeOrderStatus() {
@@ -118,7 +132,6 @@ class OrderCard extends Component {
     const {
       orderNumber,
       userName,
-      orderStatus,
       quantity,
       totalAmount,
       orderId,
@@ -139,21 +152,18 @@ class OrderCard extends Component {
     const CardHeader = () => {
       const optionsButton = tabName === 'Pending' ? true : false;
 
-      const chatButton =
-        tabName === 'Completed' || tabName === 'Cancelled' ? false : true;
-
       return (
         <CardItem
           header
           bordered
-          button={chatButton}
+          button
           onPress={() =>
             navigation.navigate('Order Chat', {
               userName,
               userAddress,
               orderId,
               orderNumber,
-              orderStatus,
+              orderStatus: this.orderStatus,
             })
           }
           style={{backgroundColor: colors.primary}}>
@@ -163,12 +173,10 @@ class OrderCard extends Component {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            {chatButton && (
-              <View>
-                <Icon name="message-square" color={colors.icons} />
-                <Text style={{color: colors.icons}}>Chat</Text>
-              </View>
-            )}
+            <View>
+              <Icon name="message-square" color={colors.icons} />
+              <Text style={{color: colors.icons}}>Chat</Text>
+            </View>
 
             <View
               style={{flex: 1, flexDirection: 'column', paddingHorizontal: 10}}>
