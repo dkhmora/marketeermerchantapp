@@ -1,10 +1,10 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {Platform, ActionSheetIOS} from 'react-native';
 import {Button, Icon} from 'react-native-elements';
 import OptionsMenu from 'react-native-options-menu';
 import {colors} from '../../assets/colors';
 
-class BaseOptionsMenu extends Component {
+class BaseOptionsMenu extends PureComponent {
   constructor(props) {
     super(props);
 
