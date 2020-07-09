@@ -5,6 +5,7 @@ class ItemsStore {
   @observable storeItems = [];
   @observable itemCategories = [];
   @observable categoryItems = new Map();
+  @observable unsubscribeSetItemCategories = null;
 
   @action setCategoryItems(category) {
     const items = this.storeItems.filter((item) => item.category === category);
@@ -12,18 +13,24 @@ class ItemsStore {
   }
 
   @action setItemCategories(merchantId) {
-    const merchantItemsRef = firestore()
-      .collection('merchant_items')
-      .doc(merchantId);
+    if (merchantId) {
+      const merchantItemsRef = firestore()
+        .collection('merchant_items')
+        .doc(merchantId);
 
-    merchantItemsRef.onSnapshot((documentSnapshot) => {
-      if (documentSnapshot.exists) {
-        const itemCats = documentSnapshot.data().itemCategories;
-        this.itemCategories = itemCats.sort();
-      } else {
-        merchantItemsRef.set({itemCategories: [], items: []});
-      }
-    });
+      this.unsubscribeSetItemCategories = merchantItemsRef.onSnapshot(
+        (documentSnapshot) => {
+          if (documentSnapshot) {
+            if (documentSnapshot.exists) {
+              const itemCats = documentSnapshot.data().itemCategories;
+              this.itemCategories = itemCats.sort();
+            } else {
+              merchantItemsRef.set({itemCategories: [], items: []});
+            }
+          }
+        },
+      );
+    }
   }
 
   @action async deleteItemCategory(merchantId, category) {

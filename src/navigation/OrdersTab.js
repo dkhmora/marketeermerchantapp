@@ -10,6 +10,7 @@ import {colors} from '../../assets/colors';
 const TabOrders = createMaterialTopTabNavigator();
 
 @inject('authStore')
+@inject('ordersStore')
 @observer
 class OrdersTab extends Component {
   constructor(props) {
@@ -38,6 +39,21 @@ class OrdersTab extends Component {
 
     this.props.authStore.checkNotificationSubscriptionStatus();
   };
+
+  componentWillUnmount() {
+    this.props.ordersStore.unsubscribeSetCancelledOrders &&
+      this.props.ordersStore.unsubscribeSetCancelledOrders();
+    this.props.ordersStore.unsubscribeSetCompletedOrders &&
+      this.props.ordersStore.unsubscribeSetCompletedOrders();
+    this.props.ordersStore.unsubscribeSetPendingOrders &&
+      this.props.ordersStore.unsubscribeSetPendingOrders();
+    this.props.ordersStore.unsubscribeSetPaidOrders &&
+      this.props.ordersStore.unsubscribeSetPaidOrders();
+    this.props.ordersStore.unsubscribeSetUnpaidOrders &&
+      this.props.ordersStore.unsubscribeSetUnpaidOrders();
+    this.props.ordersStore.unsubscribeSetShippedOrders &&
+      this.props.ordersStore.unsubscribeSetShippedOrders();
+  }
 
   render() {
     const {name} = this.props.route;

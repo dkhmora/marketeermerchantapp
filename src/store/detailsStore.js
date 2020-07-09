@@ -4,6 +4,7 @@ import storage from '@react-native-firebase/storage';
 
 class DetailsStore {
   @observable storeDetails = {};
+  @observable unsubscribeSetStoreDetails = null;
 
   @action updateCoordinates(
     merchantId,
@@ -26,14 +27,18 @@ class DetailsStore {
   }
 
   @action setStoreDetails(merchantId) {
-    firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .onSnapshot((documentSnapshot) => {
-        if (documentSnapshot.exists) {
-          this.storeDetails = documentSnapshot.data();
-        }
-      });
+    if (merchantId) {
+      this.unsubscribeSetStoreDetails = firestore()
+        .collection('merchants')
+        .doc(merchantId)
+        .onSnapshot((documentSnapshot) => {
+          if (documentSnapshot) {
+            if (documentSnapshot.exists) {
+              this.storeDetails = documentSnapshot.data();
+            }
+          }
+        });
+    }
   }
 
   @action async deleteImage(image) {

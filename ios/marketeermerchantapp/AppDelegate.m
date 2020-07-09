@@ -1,6 +1,8 @@
-#import "AppDelegate.h"
+#import <GoogleMaps/GoogleMaps.h>
+#import <GooglePlaces/GooglePlaces.h>
 
 #import <Firebase.h>
+#import "AppDelegate.h"
 
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
@@ -13,8 +15,6 @@
 #import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
-
-#import <GoogleMaps/GoogleMaps.h>
 
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
@@ -31,8 +31,9 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-
   [GMSServices provideAPIKey:@"AIzaSyDm8mCUY6ht6s2k_3S62CStnF3QiA4wVqM"];
+  [GMSPlacesClient provideAPIKey:@"AIzaSyATHEQKHS5d1taeUBbfsP-IYgJWPLcPBTU"];
+
   if ([FIRApp defaultApp] == nil) {
     [FIRApp configure];
   }

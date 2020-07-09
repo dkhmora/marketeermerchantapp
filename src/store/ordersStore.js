@@ -17,6 +17,12 @@ class OrdersStore {
   @observable cancelledOrders = [];
   @observable orderMessages = [];
   @observable unsubscribeGetMessages = null;
+  @observable unsubscribeSetCancelledOrders = null;
+  @observable unsubscribeSetCompletedOrders = null;
+  @observable unsubscribeSetPaidOrders = null;
+  @observable unsubscribeSetPendingOrders = null;
+  @observable unsubscribeSetShippedOrders = null;
+  @observable unsubscribeSetUnpaidOrders = null;
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
@@ -72,29 +78,33 @@ class OrdersStore {
   }
 
   @action getMessages(orderId) {
-    this.unsubscribeGetMessages = firestore()
-      .collection('order_chats')
-      .doc(orderId)
-      .onSnapshot((documentSnapshot) => {
-        if (documentSnapshot.exists) {
-          if (
-            documentSnapshot.data().messages.length <= 0 &&
-            this.orderMessages.length > 0
-          ) {
-            this.orderMessages = GiftedChat.append(
-              this.orderMessages,
-              documentSnapshot.data().messages,
-            );
-          } else {
-            this.orderMessages = documentSnapshot.data().messages.reverse();
+    if (orderId) {
+      this.unsubscribeGetMessages = firestore()
+        .collection('order_chats')
+        .doc(orderId)
+        .onSnapshot((documentSnapshot) => {
+          if (documentSnapshot) {
+            if (documentSnapshot.exists) {
+              if (
+                documentSnapshot.data().messages.length <= 0 &&
+                this.orderMessages.length > 0
+              ) {
+                this.orderMessages = GiftedChat.append(
+                  this.orderMessages,
+                  documentSnapshot.data().messages,
+                );
+              } else {
+                this.orderMessages = documentSnapshot.data().messages.reverse();
+              }
+            } else {
+              firestore()
+                .collection('order_chats')
+                .doc(orderId)
+                .set({messages: []});
+            }
           }
-        } else {
-          firestore()
-            .collection('order_chats')
-            .doc(orderId)
-            .set({messages: []});
-        }
-      });
+        });
+    }
   }
 
   @action async setOrderItems(orderId) {
@@ -109,7 +119,7 @@ class OrdersStore {
 
   @action setPendingOrders(merchantId) {
     console.log(merchantId);
-    ordersCollection
+    this.unsubscribeSetPendingOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.pending.status', '==', true)
       .onSnapshot((querySnapshot) => {
@@ -123,7 +133,7 @@ class OrdersStore {
   }
 
   @action setUnpaidOrders(merchantId) {
-    ordersCollection
+    this.unsubscribeSetUnpaidOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.unpaid.status', '==', true)
       .onSnapshot((querySnapshot) => {
@@ -137,7 +147,7 @@ class OrdersStore {
   }
 
   @action setPaidOrders(merchantId) {
-    ordersCollection
+    this.unsubscribeSetPaidOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.paid.status', '==', true)
       .onSnapshot((querySnapshot) => {
@@ -151,7 +161,7 @@ class OrdersStore {
   }
 
   @action setShippedOrders(merchantId) {
-    ordersCollection
+    this.unsubscribeSetShippedOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.shipped.status', '==', true)
       .onSnapshot((querySnapshot) => {
@@ -165,7 +175,7 @@ class OrdersStore {
   }
 
   @action setCompletedOrders(merchantId) {
-    ordersCollection
+    this.unsubscribeSetCompletedOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.completed.status', '==', true)
       .onSnapshot((querySnapshot) => {
@@ -179,7 +189,7 @@ class OrdersStore {
   }
 
   @action setCancelledOrders(merchantId) {
-    ordersCollection
+    this.unsubscribeSetCancelledOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.cancelled.status', '==', true)
       .onSnapshot((querySnapshot) => {
