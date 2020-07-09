@@ -388,7 +388,7 @@ class StoreDetailsScreen extends Component {
                 style={{
                   color: colors.icons,
                   fontSize: 20,
-                  paddingVertical: Platform.OS === 'android' ? 18 : 8,
+                  paddingVertical: 16,
                 }}>
                 Store Details
               </Text>
@@ -479,19 +479,26 @@ class StoreDetailsScreen extends Component {
                 </View>
 
                 {this.displayUrl && (
-                  <Image
-                    source={{uri: this.displayUrl}}
+                  <View
                     style={{
-                      height: 166.67,
-                      width: 166.67,
-                      backgroundColor: '#e1e4e8',
-                      borderRadius: 24,
-                      borderWidth: 1,
-                      borderColor: this.editMode
-                        ? this.storeDetailsHeaderColor
-                        : colors.primary,
-                    }}
-                  />
+                      flex: 1,
+                      alignSelf: 'flex-start',
+                      alignItems: 'flex-end',
+                    }}>
+                    <Image
+                      source={{uri: this.displayUrl}}
+                      style={{
+                        width: '70%',
+                        aspectRatio: 1,
+                        backgroundColor: '#e1e4e8',
+                        borderRadius: 24,
+                        borderWidth: 1,
+                        borderColor: this.editMode
+                          ? this.storeDetailsHeaderColor
+                          : colors.primary,
+                      }}
+                    />
+                  </View>
                 )}
               </View>
             </CardItem>
@@ -533,21 +540,28 @@ class StoreDetailsScreen extends Component {
                 </View>
 
                 {this.coverUrl && (
-                  <Image
-                    source={{uri: this.coverUrl}}
+                  <View
                     style={{
-                      width: 250,
-                      height: 166.67,
-                      backgroundColor: '#e1e4e8',
-                      alignSelf: 'center',
-                      borderRadius: 24,
-                      borderWidth: 1,
-                      borderColor: this.editMode
-                        ? this.storeDetailsHeaderColor
-                        : colors.primary,
-                      resizeMode: 'cover',
-                    }}
-                  />
+                      flex: 1,
+                      alignSelf: 'flex-start',
+                      alignItems: 'flex-end',
+                    }}>
+                    <Image
+                      source={{uri: this.coverUrl}}
+                      style={{
+                        width: '100%',
+                        aspectRatio: 1620 / 1080,
+                        backgroundColor: '#e1e4e8',
+                        alignSelf: 'center',
+                        borderRadius: 24,
+                        borderWidth: 1,
+                        borderColor: this.editMode
+                          ? this.storeDetailsHeaderColor
+                          : colors.primary,
+                        resizeMode: 'cover',
+                      }}
+                    />
+                  </View>
                 )}
               </View>
             </CardItem>
@@ -586,6 +600,7 @@ class StoreDetailsScreen extends Component {
                         color: colors.primary,
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
                       }}>
                       {storeName}
                     </Text>
@@ -659,6 +674,7 @@ class StoreDetailsScreen extends Component {
                       color: colors.primary,
                       fontSize: 16,
                       fontFamily: 'ProductSans-Bold',
+                      textAlign: 'right',
                     }}>
                     {storeCategory}
                   </Text>
@@ -750,6 +766,7 @@ class StoreDetailsScreen extends Component {
                         color: colors.primary,
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
                       }}>
                       {deliveryType}
                     </Text>
@@ -927,6 +944,7 @@ class StoreDetailsScreen extends Component {
                         color: colors.primary,
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
                       }}>
                       ₱ {creditData.credits}
                     </Text>
@@ -957,6 +975,7 @@ class StoreDetailsScreen extends Component {
                         color: colors.primary,
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
                       }}>
                       ₱ {creditData.creditThreshold}
                     </Text>
@@ -986,6 +1005,7 @@ class StoreDetailsScreen extends Component {
                       color: colors.primary,
                       fontSize: 16,
                       fontFamily: 'ProductSans-Bold',
+                      textAlign: 'right',
                     }}>
                     {orderNumber ? orderNumber : 0}
                   </Text>

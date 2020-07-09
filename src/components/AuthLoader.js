@@ -3,11 +3,13 @@ import {StyleSheet} from 'react-native';
 import AnimatedLoader from 'react-native-animated-loader';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {inject} from 'mobx-react';
+import {inject, observer} from 'mobx-react';
 
 @inject('authStore')
 @inject('ordersStore')
+@inject('itemsStore')
 @inject('detailsStore')
+@observer
 class AuthLoader extends React.Component {
   constructor(props) {
     super(props);
@@ -19,6 +21,7 @@ class AuthLoader extends React.Component {
     const {visible} = this.state;
 
     if (auth().currentUser != null) {
+      console.log('auth', auth().currentUser);
       const currentUserId = auth().currentUser.uid;
 
       merchantAdminsCollection
@@ -26,7 +29,7 @@ class AuthLoader extends React.Component {
         .get()
         .then((snapshot) => {
           if (snapshot.empty) {
-            auth().signOut();
+            this.props.authStore.signOut();
 
             console.log('Error: The user does not match with any merchants');
           } else {

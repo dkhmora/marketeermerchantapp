@@ -66,6 +66,7 @@
     "babel-jest": "^26.0.1",
     "eslint": "^7.1.0",
     "jest": "^26.0.1",
+    "patch-package": "^6.2.2",
     "metro-react-native-babel-preset": "^0.59.0",
     "react-test-renderer": "16.11.0"
   },

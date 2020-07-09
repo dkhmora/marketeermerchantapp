@@ -23,7 +23,13 @@ class MainDrawer extends Component {
   }
 
   handleSignOut() {
-    this.props.authStore.signOut();
+    this.props.authStore.signOut().then(() => {
+      this.props.detailsStore.unsubscribeSetStoreDetails &&
+        this.props.detailsStore.unsubscribeSetStoreDetails();
+
+      this.props.itemsStore.unsubscribeSetItemCategories &&
+        this.props.itemsStore.unsubscribeSetItemCategories();
+    });
     this.props.navigation.navigate('Auth');
   }
 

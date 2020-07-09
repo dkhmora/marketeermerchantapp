@@ -135,6 +135,8 @@ class DeliveryAreaScreen extends Component {
       ).then((granted) => {
         console.log(granted); // just to ensure that permissions were granted
       });
+    } else {
+      Geolocation.requestAuthorization();
     }
   };
 

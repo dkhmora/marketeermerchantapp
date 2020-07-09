@@ -21,10 +21,15 @@ class AuthStore {
   }
 
   @action async signOut() {
-    await auth().signOut();
+    await messaging()
+      .deleteToken()
+      .then(() => {
+        auth().signOut();
+      });
   }
 
   @action async checkNotificationSubscriptionStatus() {
+    console.log(this.merchantId);
     await messaging()
       .getToken()
       .then((token) =>
@@ -32,50 +37,43 @@ class AuthStore {
           .doc(this.merchantId)
           .get()
           .then((document) => {
-            if (document.data().fcmTokens.includes(token)) {
-              this.subscribedToNotifications = true;
+            if (document.exists) {
+              console.log('exists');
+              if (document.data().fcmTokens.includes(token)) {
+                this.subscribedToNotifications = true;
+              } else {
+                this.subscribedToNotifications = false;
+              }
             } else {
-              this.subscribedToNotifications = false;
+              console.log('test');
+              fcmCollection.doc(this.merchantId).set({fcmTokens: []});
             }
           }),
       );
   }
 
   @action async subscribeToNotifications() {
-    if (Platform.OS === 'ios') {
-      const authorizationStatus = await messaging().requestPermission();
+    let authorizationStatus = null;
 
+    if (Platform.OS === 'ios') {
+      authorizationStatus = await messaging().requestPermission();
+    } else {
+      authorizationStatus = true;
+    }
+
+    await this.checkNotificationSubscriptionStatus();
+
+    if (!this.subscribedToNotifications) {
       if (authorizationStatus) {
         await messaging()
           .getToken()
-          .then((token) =>
+          .then((token) => {
             fcmCollection
               .doc(this.merchantId)
-              .get()
-              .then((document) => {
-                if (document.exists) {
-                  fcmCollection
-                    .doc(this.merchantId)
-                    .update(
-                      'fcmTokens',
-                      firestore.FieldValue.arrayUnion(token),
-                    );
-                } else {
-                  fcmCollection.doc(this.merchantId).set({fcmTokens: [token]});
-                }
-              }),
-          )
+              .update('fcmTokens', firestore.FieldValue.arrayUnion(token));
+          })
           .catch((err) => console.log(err));
       }
-    } else {
-      await messaging()
-        .getToken()
-        .then((token) =>
-          fcmCollection
-            .doc(this.merchantId)
-            .update('fcmTokens', firestore.FieldValue.arrayUnion(token)),
-        )
-        .catch((err) => console.log(err));
     }
   }
 
