@@ -42,6 +42,7 @@ class OrderChatScreen extends Component {
       .setOptions({gestureEnabled: false});
 
     const {orderId} = this.props.route.params;
+
     this.props.ordersStore.getMessages(orderId);
   }
 
@@ -198,12 +199,12 @@ class OrderChatScreen extends Component {
     const {navigation} = this.props;
     const {
       userName,
-      userAddress,
-      orderNumber,
+      deliveryAddress,
+      merchantOrderNumber,
       orderId,
     } = this.props.route.params;
 
-    const headerTitle = `Order # ${orderNumber} | ${userName}`;
+    const headerTitle = `Order # ${merchantOrderNumber} | ${userName}`;
 
     const {orderMessages} = this.props.ordersStore;
 

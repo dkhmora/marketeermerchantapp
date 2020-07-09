@@ -78,6 +78,8 @@ class OrdersStore {
   }
 
   @action getMessages(orderId) {
+    this.orderMessages = [];
+
     if (orderId) {
       this.unsubscribeGetMessages = firestore()
         .collection('order_chats')

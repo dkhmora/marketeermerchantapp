@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {FlatList, RefreshControl, ActivityIndicator} from 'react-native';
-import {Container, View} from 'native-base';
+import {View} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components
 import OrderCard from './OrderCard';
@@ -69,29 +69,33 @@ class OrdersList extends Component {
   };
 
   renderFooter = () => {
+    const {storeVarName} = this.props.route.params;
+
     return (
       <View style={{bottom: 50, width: '100%'}}>
-        {this.state.onEndReachedCalledDuringMomentum && (
-          <Animatable.View
-            animation="slideInUp"
-            duration={400}
-            useNativeDriver
-            style={{
-              alignItems: 'center',
-              flex: 1,
-            }}>
-            <ActivityIndicator
-              size="large"
-              color={colors.primary}
+        {this.state.onEndReachedCalledDuringMomentum &&
+          this.props.ordersStore[`${storeVarName}`].length >=
+            this.state.limit && (
+            <Animatable.View
+              animation="slideInUp"
+              duration={400}
+              useNativeDriver
               style={{
-                backgroundColor: colors.icons,
-                borderRadius: 30,
-                padding: 5,
-                elevation: 5,
-              }}
-            />
-          </Animatable.View>
-        )}
+                alignItems: 'center',
+                flex: 1,
+              }}>
+              <ActivityIndicator
+                size="large"
+                color={colors.primary}
+                style={{
+                  backgroundColor: colors.icons,
+                  borderRadius: 30,
+                  padding: 5,
+                  elevation: 5,
+                }}
+              />
+            </Animatable.View>
+          )}
       </View>
     );
   };
@@ -111,20 +115,20 @@ class OrdersList extends Component {
       <View style={{flex: 1}}>
         <FlatList
           data={dataSource}
-          style={{paddingHorizontal: 10}}
+          style={{flex: 1, paddingHorizontal: 10}}
           renderItem={({item, index}) => (
             <OrderCard
               merchantId={merchantId}
               merchantOrderNumber={item.merchantOrderNumber}
               orderStatus={item.orderStatus}
-              coordinates={item.coordinates}
+              deliveryCoordinates={item.deliveryCoordinates}
               userName={`${item.userName}`}
               quantity={item.quantity}
               shippingPrice={item.shippingPrice}
               paymentMethod={item.paymentMethod}
               totalAmount={item.totalAmount}
               orderId={item.orderId}
-              userAddress={item.userAddress}
+              deliveryAddress={item.deliveryAddress}
               createdAt={item.createdAt}
               tabName={name}
               navigation={navigation}
