@@ -117,89 +117,250 @@ class OrdersStore {
       });
   }
 
-  @action setPendingOrders(merchantId) {
-    console.log(merchantId);
-    this.unsubscribeSetPendingOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.pending.status', '==', true)
-      .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.pendingOrders = data;
-      });
+  @action async setPendingOrders(merchantId, limit, lastVisible) {
+    if (lastVisible === undefined) {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.pending.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.pendingOrders = data;
+        })
+        .catch((err) => console.log(err));
+    } else {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.pending.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .startAfter(lastVisible)
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.pendingOrders = [...this.pendingOrders, ...data];
+        })
+        .catch((err) => console.log(err));
+    }
   }
 
-  @action setUnpaidOrders(merchantId) {
-    this.unsubscribeSetUnpaidOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.unpaid.status', '==', true)
-      .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.unpaidOrders = data;
-      });
+  @action async setUnpaidOrders(merchantId, limit, lastVisible) {
+    if (lastVisible === undefined) {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.unpaid.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.unpaidOrders = data;
+        })
+        .catch((err) => console.log(err));
+    } else {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.unpaid.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .startAfter(lastVisible)
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.unpaidOrders = [...this.unpaidOrders, ...data];
+        })
+        .catch((err) => console.log(err));
+    }
   }
 
-  @action setPaidOrders(merchantId) {
-    this.unsubscribeSetPaidOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.paid.status', '==', true)
-      .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.paidOrders = data;
-      });
+  @action async setPaidOrders(merchantId, limit, lastVisible) {
+    if (lastVisible === undefined) {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.paid.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.paidOrders = data;
+        })
+        .catch((err) => console.log(err));
+    } else {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.paid.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .startAfter(lastVisible)
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.paidOrders = [...this.paidOrders, ...data];
+        })
+        .catch((err) => console.log(err));
+    }
   }
 
-  @action setShippedOrders(merchantId) {
-    this.unsubscribeSetShippedOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.shipped.status', '==', true)
-      .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.shippedOrders = data;
-      });
+  @action async setShippedOrders(merchantId, limit, lastVisible) {
+    if (lastVisible === undefined) {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.shipped.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.shippedOrders = data;
+        })
+        .catch((err) => console.log(err));
+    } else {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.shipped.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .startAfter(lastVisible)
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.shippedOrders = [...this.shippedOrders, ...data];
+        })
+        .catch((err) => console.log(err));
+    }
   }
 
-  @action setCompletedOrders(merchantId) {
-    this.unsubscribeSetCompletedOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.completed.status', '==', true)
-      .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.completedOrders = data;
-      });
+  @action async setCompletedOrders(merchantId, limit, lastVisible) {
+    if (lastVisible === undefined) {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.completed.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.completedOrders = data;
+        })
+        .catch((err) => console.log(err));
+    } else {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.completed.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .startAfter(lastVisible)
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.completedOrders = [...this.completedOrders, ...data];
+        })
+        .catch((err) => console.log(err));
+    }
   }
 
-  @action setCancelledOrders(merchantId) {
-    this.unsubscribeSetCancelledOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.cancelled.status', '==', true)
-      .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.cancelledOrders = data;
-      });
+  @action async setCancelledOrders(merchantId, limit, lastVisible) {
+    if (lastVisible === undefined) {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.cancelled.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.cancelledOrders = data;
+        })
+        .catch((err) => console.log(err));
+    } else {
+      return ordersCollection
+        .where('merchantId', '==', merchantId)
+        .where('orderStatus.cancelled.status', '==', true)
+        .orderBy('merchantOrderNumber', 'desc')
+        .startAfter(lastVisible)
+        .limit(limit)
+        .get()
+        .then((querySnapshot) => {
+          const data = [];
+
+          querySnapshot.forEach((doc, index) => {
+            data.push(doc.data());
+            data[index].orderId = doc.id;
+          });
+
+          this.cancelledOrders = [...this.cancelledOrders, ...data];
+        })
+        .catch((err) => console.log(err));
+    }
   }
 
   @action async setOrderStatus(orderId) {

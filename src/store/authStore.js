@@ -38,14 +38,12 @@ class AuthStore {
           .get()
           .then((document) => {
             if (document.exists) {
-              console.log('exists');
               if (document.data().fcmTokens.includes(token)) {
                 this.subscribedToNotifications = true;
               } else {
                 this.subscribedToNotifications = false;
               }
             } else {
-              console.log('test');
               fcmCollection.doc(this.merchantId).set({fcmTokens: []});
             }
           }),

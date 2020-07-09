@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {
   Card,
   CardItem,
@@ -22,7 +22,7 @@ import {colors} from '../../assets/colors';
 
 @inject('ordersStore')
 @observer
-class OrderCard extends Component {
+class OrderCard extends PureComponent {
   constructor(props) {
     super(props);
   }
@@ -53,10 +53,10 @@ class OrderCard extends Component {
   }
 
   handleChangeOrderStatus() {
-    const {orderId, orderNumber} = this.props;
+    const {orderId, merchantOrderNumber} = this.props;
     this.props.ordersStore.setOrderStatus(orderId).then(() => {
       Toast.show({
-        text: `Successfully changed Order # ${orderNumber} status!`,
+        text: `Successfully changed Order # ${merchantOrderNumber} status!`,
         buttonText: 'Okay',
         type: 'success',
         duration: 3500,
@@ -73,7 +73,7 @@ class OrderCard extends Component {
       orderId,
       orderStatus,
       userName,
-      orderNumber,
+      merchantOrderNumber,
       quantity,
       shippingPrice,
       totalAmount,
@@ -88,7 +88,7 @@ class OrderCard extends Component {
         coordinates,
         orderStatus,
         userName,
-        orderNumber,
+        merchantOrderNumber,
         quantity,
         shippingPrice,
         totalAmount,
@@ -99,10 +99,10 @@ class OrderCard extends Component {
   }
 
   handleCancelOrder() {
-    const {orderId, orderNumber} = this.props;
+    const {orderId, merchantOrderNumber} = this.props;
     this.props.ordersStore.cancelOrder(orderId, this.cancelReason).then(() => {
       Toast.show({
-        text: `Order # ${orderNumber} successfully cancelled!`,
+        text: `Order # ${merchantOrderNumber} successfully cancelled!`,
         buttonText: 'Okay',
         type: 'success',
         duration: 3500,
@@ -130,7 +130,7 @@ class OrderCard extends Component {
 
   render() {
     const {
-      orderNumber,
+      merchantOrderNumber,
       userName,
       quantity,
       totalAmount,
@@ -162,7 +162,7 @@ class OrderCard extends Component {
               userName,
               userAddress,
               orderId,
-              orderNumber,
+              merchantOrderNumber,
               orderStatus: this.orderStatus,
             })
           }
@@ -189,7 +189,7 @@ class OrderCard extends Component {
                 {userName}
               </Text>
 
-              <Text style={{color: '#eee'}}>Order # {orderNumber}</Text>
+              <Text style={{color: '#eee'}}>Order # {merchantOrderNumber}</Text>
 
               <View
                 key={index}
