@@ -25,12 +25,12 @@ class OrderDetailsScreen extends Component {
   }
 
   openInMaps() {
-    const {coordinates, userName} = this.props.route.params;
+    const {deliveryCoordinates, userName} = this.props.route.params;
 
-    if (coordinates) {
+    if (deliveryCoordinates) {
       const markerName = `Customer ${userName}'s Location`;
 
-      const latLng = `${coordinates._latitude},${coordinates._longitude}`;
+      const latLng = `${deliveryCoordinates.latitude},${deliveryCoordinates.longitude}`;
       const url = Platform.select({
         ios: `http://maps.apple.com/?q=${markerName}&ll=${latLng}`,
         android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
@@ -39,7 +39,7 @@ class OrderDetailsScreen extends Component {
       Linking.openURL(url);
     } else {
       Toast.show({
-        text: 'Error, no user coordinates found!',
+        text: 'Error, no user deliveryCoordinates found!',
         buttonText: 'Okay',
         type: 'danger',
         duration: 7000,
@@ -50,16 +50,16 @@ class OrderDetailsScreen extends Component {
 
   render() {
     const {
-      coordinates,
+      deliveryCoordinates,
       orderId,
       orderItems,
       userName,
-      orderNumber,
+      merchantOrderNumber,
       orderStatus,
       quantity,
       shippingPrice,
       totalAmount,
-      userAddress,
+      deliveryAddress,
       createdAt,
     } = this.props.route.params;
     const {navigation} = this.props;
@@ -77,7 +77,7 @@ class OrderDetailsScreen extends Component {
     return (
       <Container>
         <BaseHeader
-          title={`Order #${orderNumber} Details`}
+          title={`Order #${merchantOrderNumber} Details`}
           backButton
           optionsButton
           actions={actions}
@@ -125,11 +125,11 @@ class OrderDetailsScreen extends Component {
             <CardItem bordered>
               <Left>
                 <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
-                  User Address:
+                  Delivery Address:
                 </Text>
               </Left>
               <Right>
-                {coordinates ? (
+                {deliveryCoordinates ? (
                   <View style={{justifyContent: 'flex-end'}}>
                     <Text
                       style={{
@@ -138,17 +138,7 @@ class OrderDetailsScreen extends Component {
                         fontFamily: 'ProductSans-Bold',
                         textAlign: 'right',
                       }}>
-                      {userAddress}
-                    </Text>
-
-                    <Text
-                      note
-                      style={{
-                        color: colors.text_secondary,
-                        fontSize: 14,
-                        textAlign: 'right',
-                      }}>
-                      {coordinates._latitude}, {coordinates._longitude}
+                      {deliveryAddress}
                     </Text>
 
                     <Button
@@ -159,7 +149,11 @@ class OrderDetailsScreen extends Component {
                       full
                       bordered
                       onPress={() => this.openInMaps()}
-                      style={{borderRadius: 24}}
+                      buttonStyle={{
+                        borderRadius: 24,
+                        paddingHorizontal: 20,
+                        backgroundColor: colors.accent,
+                      }}
                     />
                   </View>
                 ) : (
@@ -170,7 +164,7 @@ class OrderDetailsScreen extends Component {
                       fontFamily: 'ProductSans-Bold',
                       textAlign: 'right',
                     }}>
-                    No user coordinates found
+                    No user location details found. Please cancel this order.
                   </Text>
                 )}
               </Right>

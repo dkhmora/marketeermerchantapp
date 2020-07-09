@@ -1,4 +1,4 @@
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import {
   Card,
   CardItem,
@@ -22,7 +22,7 @@ import {colors} from '../../assets/colors';
 
 @inject('ordersStore')
 @observer
-class OrderCard extends PureComponent {
+class OrderCard extends Component {
   constructor(props) {
     super(props);
   }
@@ -69,7 +69,7 @@ class OrderCard extends PureComponent {
   handleViewOrderItems() {
     const {
       navigation,
-      coordinates,
+      deliveryCoordinates,
       orderId,
       orderStatus,
       userName,
@@ -77,22 +77,24 @@ class OrderCard extends PureComponent {
       quantity,
       shippingPrice,
       totalAmount,
-      userAddress,
+      deliveryAddress,
       createdAt,
     } = this.props;
+
+    console.log(deliveryAddress, deliveryCoordinates);
 
     this.props.ordersStore.setOrderItems(orderId).then(() => {
       navigation.dangerouslyGetParent().navigate('Order Details', {
         orderId,
         orderItems: this.props.ordersStore.orderItems,
-        coordinates,
+        deliveryCoordinates,
         orderStatus,
         userName,
         merchantOrderNumber,
         quantity,
         shippingPrice,
         totalAmount,
-        userAddress,
+        deliveryAddress,
         createdAt,
       });
     });
@@ -136,7 +138,8 @@ class OrderCard extends PureComponent {
       totalAmount,
       orderId,
       paymentMethod,
-      userAddress,
+      deliveryAddress,
+      deliveryCoordinates,
       createdAt,
       index,
       tabName,
@@ -160,7 +163,7 @@ class OrderCard extends PureComponent {
           onPress={() =>
             navigation.navigate('Order Chat', {
               userName,
-              userAddress,
+              deliveryAddress,
               orderId,
               merchantOrderNumber,
               orderStatus: this.orderStatus,
@@ -379,7 +382,7 @@ class OrderCard extends PureComponent {
           <CardItem bordered>
             <Left>
               <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
-                Address:
+                Delivery Address:
               </Text>
             </Left>
             <Right>
@@ -388,8 +391,9 @@ class OrderCard extends PureComponent {
                   color: colors.primary,
                   fontFamily: 'ProductSans-Black',
                   fontSize: 16,
+                  textAlign: 'right',
                 }}>
-                {userAddress}
+                {deliveryAddress}
               </Text>
             </Right>
           </CardItem>

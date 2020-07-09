@@ -1,14 +1,12 @@
-import React, {Component} from 'react';
-import {Card, CardItem, Left, Body, Right, Text, View, H3} from 'native-base';
-import {Image} from 'react-native';
+import React, {PureComponent} from 'react';
+import {CardItem, Text, View} from 'native-base';
 import {observer} from 'mobx-react';
-import {observable} from 'mobx';
 import storage from '@react-native-firebase/storage';
 import {colors} from '../../assets/colors';
 import FastImage from 'react-native-fast-image';
 
 @observer
-class OrderItemCard extends Component {
+class OrderItemCard extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -81,7 +79,7 @@ class OrderItemCard extends Component {
               style={{
                 fontFamily: 'ProductSans-Black',
                 fontSize: 16,
-                color: colors.text_secondary,
+                color: colors.text_primary,
               }}>
               ₱ {item.price}
             </Text>
@@ -95,7 +93,12 @@ class OrderItemCard extends Component {
               }}>
               x {item.quantity}
             </Text>
-            <Text style={{fontFamily: 'ProductSans-Black', fontSize: 18}}>
+            <Text
+              style={{
+                fontFamily: 'ProductSans-Black',
+                fontSize: 18,
+                color: colors.primary,
+              }}>
               ₱ {item.price * item.quantity}
             </Text>
           </View>
