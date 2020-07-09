@@ -1,10 +1,24 @@
 import {observable, action} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
+import firebase from '@react-native-firebase/app';
+import '@react-native-firebase/functions';
 
+const functions = firebase.app().functions('asia-northeast1');
 class DetailsStore {
   @observable storeDetails = {};
   @observable unsubscribeSetStoreDetails = null;
+
+  @action async getAddressFromCoordinates({latitude, longitude}) {
+    return await functions
+      .httpsCallable('getAddressFromCoordinates')({latitude, longitude})
+      .then((response) => {
+        return response.data.locationDetails;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   @action updateCoordinates(
     merchantId,
