@@ -4,6 +4,7 @@ import {Container, View, Fab, Icon, Button} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components
 import ItemCard from './ItemCard';
+import {colors} from '../../assets/colors';
 
 @inject('itemsStore')
 @observer
@@ -80,7 +81,7 @@ class ItemsList extends Component {
         <Fab
           containerStyle={{}}
           position="bottomRight"
-          style={{backgroundColor: '#5cb85c'}}
+          style={{backgroundColor: colors.accent}}
           onPress={() =>
             navigation.navigate('Add Item', {pageCategory: category})
           }>
