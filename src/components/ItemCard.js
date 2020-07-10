@@ -1,22 +1,13 @@
 import React, {Component} from 'react';
-import {
-  Card,
-  CardItem,
-  Left,
-  Body,
-  Text,
-  Button,
-  Right,
-  Icon,
-  View,
-} from 'native-base';
-import {Image, ActionSheetIOS, Platform} from 'react-native';
+import {Card, CardItem, Body, View} from 'native-base';
+import {Image, ActionSheetIOS, Text} from 'react-native';
 import moment, {ISO_8601} from 'moment';
 import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
 import {observable} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
 import BaseOptionsMenu from './BaseOptionsMenu';
+import {colors} from '../../assets/colors';
 
 @inject('itemsStore')
 @inject('authStore')
@@ -112,26 +103,29 @@ class ItemCard extends Component {
         <Card
           {...otherProps}
           style={{
-            borderRadius: 16,
+            borderRadius: 10,
             overflow: 'hidden',
           }}>
-          <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
-            <Left>
-              <Body>
-                <Text style={{color: '#fff'}}>{name}</Text>
-                <Text note style={{color: '#ddd'}}>
-                  Left Stock: {stock}
-                </Text>
-              </Body>
-            </Left>
-            <Right style={{marginLeft: '-50%'}}>
-              <BaseOptionsMenu
-                destructiveIndex={1}
-                iconStyle={{color: '#fff', fontSize: 24}}
-                options={['Delete Item']}
-                actions={[this.handleDelete.bind(this)]}
-              />
-            </Right>
+          <CardItem
+            header
+            bordered
+            style={{
+              backgroundColor: colors.primary,
+              justifyContent: 'space-between',
+            }}>
+            <View style={{flexDirection: 'column'}}>
+              <Text style={{color: '#fff'}}>{name}</Text>
+              <Text note style={{color: '#ddd'}}>
+                Stock: {stock}
+              </Text>
+            </View>
+
+            <BaseOptionsMenu
+              destructiveIndex={1}
+              iconStyle={{color: '#fff', fontSize: 24}}
+              options={['Delete Item']}
+              actions={[this.handleDelete.bind(this)]}
+            />
           </CardItem>
           <CardItem cardBody>
             {this.url ? (
@@ -142,7 +136,7 @@ class ItemCard extends Component {
                 source={{uri: this.url}}
                 style={{
                   height: 150,
-                  width: null,
+                  aspectRatio: 1,
                   flex: 1,
                   backgroundColor: '#e1e4e8',
                 }}
@@ -159,13 +153,11 @@ class ItemCard extends Component {
               />
             )}
           </CardItem>
+
           <CardItem
             bordered
             style={{
-              borderTopLeftRadius: 8,
-              borderTopRightRadius: 8,
               position: 'relative',
-              bottom: 20,
               elevation: 5,
             }}>
             <Body
@@ -181,15 +173,28 @@ class ItemCard extends Component {
               </ScrollView>
             </Body>
           </CardItem>
+
           <CardItem bordered style={{bottom: 20, elevation: 5}}>
             <Body
               style={{
                 flexDirection: 'row',
                 justifyContent: 'center',
               }}>
-              <Text>
-                ₱{price}/{unit}
-              </Text>
+              <View
+                style={{
+                  borderRadius: 10,
+                  padding: 8,
+                  backgroundColor: colors.primary,
+                  elevation: 3,
+                }}>
+                <Text
+                  style={{
+                    fontFamily: 'ProductSans-Black',
+                    color: colors.icons,
+                  }}>
+                  ₱ {price}/{unit}
+                </Text>
+              </View>
             </Body>
           </CardItem>
           <CardItem
@@ -197,7 +202,9 @@ class ItemCard extends Component {
             bordered
             style={{bottom: 20, marginBottom: -20, elevation: 5}}>
             <Body>
-              <Text note>Added {timeStamp}</Text>
+              <Text style={{color: colors.text_secondary}}>
+                Added {timeStamp}
+              </Text>
             </Body>
           </CardItem>
         </Card>
