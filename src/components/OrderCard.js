@@ -81,8 +81,6 @@ class OrderCard extends Component {
       createdAt,
     } = this.props;
 
-    console.log(deliveryAddress, deliveryCoordinates);
-
     this.props.ordersStore.setOrderItems(orderId).then(() => {
       navigation.dangerouslyGetParent().navigate('Order Details', {
         orderId,
