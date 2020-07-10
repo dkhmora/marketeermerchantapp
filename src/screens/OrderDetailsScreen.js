@@ -1,19 +1,11 @@
 import React, {Component} from 'react';
-import {
-  Container,
-  Card,
-  CardItem,
-  Text,
-  Left,
-  Right,
-  Body,
-  Button,
-  Icon,
-} from 'native-base';
+import {Container, Card, CardItem, Left, Right, Body, Toast} from 'native-base';
+import {Text, Button, Icon} from 'react-native-elements';
 import {View, Platform, Linking} from 'react-native';
 import BaseHeader from '../components/BaseHeader';
 import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import OrderItemCard from '../components/OrderItemCard';
+import {colors} from '../../assets/colors';
 
 class OrderDetailsScreen extends Component {
   constructor(props) {
@@ -33,30 +25,41 @@ class OrderDetailsScreen extends Component {
   }
 
   openInMaps() {
-    const {coordinates, userName} = this.props.route.params;
-    const markerName = `Customer ${userName}'s Location`;
+    const {deliveryCoordinates, userName} = this.props.route.params;
 
-    const latLng = `${coordinates._latitude},${coordinates._longitude}`;
-    const url = Platform.select({
-      ios: `http://maps.apple.com/?q=${markerName}&ll=${latLng}`,
-      android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
-    });
+    if (deliveryCoordinates) {
+      const markerName = `Customer ${userName}'s Location`;
 
-    Linking.openURL(url);
+      const latLng = `${deliveryCoordinates.latitude},${deliveryCoordinates.longitude}`;
+      const url = Platform.select({
+        ios: `http://maps.apple.com/?q=${markerName}&ll=${latLng}`,
+        android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
+      });
+
+      Linking.openURL(url);
+    } else {
+      Toast.show({
+        text: 'Error, no user deliveryCoordinates found!',
+        buttonText: 'Okay',
+        type: 'danger',
+        duration: 7000,
+        style: {margin: 20, borderRadius: 16},
+      });
+    }
   }
 
   render() {
     const {
-      coordinates,
+      deliveryCoordinates,
       orderId,
       orderItems,
-      cancelReason,
       userName,
-      orderNumber,
-      numberOfItems,
+      merchantOrderNumber,
+      orderStatus,
+      quantity,
       shippingPrice,
       totalAmount,
-      userAddress,
+      deliveryAddress,
       createdAt,
     } = this.props.route.params;
     const {navigation} = this.props;
@@ -74,7 +77,7 @@ class OrderDetailsScreen extends Component {
     return (
       <Container>
         <BaseHeader
-          title={`Order #${orderNumber} Details`}
+          title={`Order #${merchantOrderNumber} Details`}
           backButton
           optionsButton
           actions={actions}
@@ -91,103 +94,197 @@ class OrderDetailsScreen extends Component {
           }}>
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
-              <Text style={{color: '#fff'}}>Customer Details</Text>
+            <CardItem header bordered style={{backgroundColor: colors.primary}}>
+              <Text style={{color: colors.icons, fontSize: 20}}>
+                Customer Details
+              </Text>
             </CardItem>
             <CardItem bordered>
               <Left>
-                <Text>Customer Name:</Text>
+                <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                  Customer Name:
+                </Text>
               </Left>
+
               <Right>
-                <Text>{userName}</Text>
-              </Right>
-            </CardItem>
-            <CardItem bordered>
-              <Left>
-                <Text>User Address:</Text>
-              </Left>
-              <Right>
-                <Text>{userAddress}</Text>
-                <Text note>
-                  {coordinates._latitude}, {coordinates._longitude}
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 16,
+                    fontFamily: 'ProductSans-Bold',
+                    textAlign: 'right',
+                  }}>
+                  {userName}
                 </Text>
               </Right>
             </CardItem>
+
             <CardItem bordered>
-              <Body>
-                <Button
-                  iconRight
-                  full
-                  bordered
-                  onPress={() => this.openInMaps()}
-                  style={{borderRadius: 24}}>
-                  <Text>{mapButtonText}</Text>
-                  <Icon name="map" />
-                </Button>
-              </Body>
+              <Left>
+                <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                  Delivery Address:
+                </Text>
+              </Left>
+              <Right>
+                {deliveryCoordinates ? (
+                  <View style={{justifyContent: 'flex-end'}}>
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
+                      }}>
+                      {deliveryAddress}
+                    </Text>
+
+                    <Button
+                      title={mapButtonText}
+                      titleStyle={{color: colors.icons, paddingRight: 5}}
+                      icon={<Icon name="map" color={colors.icons} />}
+                      iconRight
+                      full
+                      bordered
+                      onPress={() => this.openInMaps()}
+                      buttonStyle={{
+                        borderRadius: 24,
+                        paddingHorizontal: 20,
+                        backgroundColor: colors.accent,
+                      }}
+                    />
+                  </View>
+                ) : (
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      fontFamily: 'ProductSans-Bold',
+                      textAlign: 'right',
+                    }}>
+                    No user location details found. Please cancel this order.
+                  </Text>
+                )}
+              </Right>
             </CardItem>
           </Card>
 
           <Card
             style={{
-              borderRadius: 16,
+              borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
-              <Text style={{color: '#fff'}}>Order Items</Text>
+            <CardItem header bordered style={{backgroundColor: colors.primary}}>
+              <Text style={{color: colors.icons, fontSize: 20}}>
+                Order Items
+              </Text>
             </CardItem>
+
             <FlatList
               data={orderItems}
               renderItem={({item, index}) => (
-                <OrderItemCard
-                  name={item.name}
-                  image={item.image}
-                  price={item.price}
-                  unit={item.unit}
-                  quantity={item.quantity}
-                  createdAt={item.createdAt}
-                  key={index}
-                />
+                <OrderItemCard item={item} key={index} />
               )}
               keyExtractor={(item, index) => `${item.name}${index.toString()}`}
               showsVerticalScrollIndicator={false}
             />
+
             <CardItem bordered>
               <Left>
-                <Text note>{numberOfItems} items</Text>
+                <Text note>{quantity} items</Text>
               </Left>
               <Right>
-                <Text>Subtotal: ₱{totalAmount}</Text>
-                <Text>Shipping Price: ₱{shippingPrice}</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: colors.text_primary,
+                      fontFamily: 'ProductSans-Light',
+                    }}>
+                    Subtotal:{' '}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      color: colors.primary,
+                      fontFamily: 'ProductSans-Black',
+                    }}>
+                    ₱{totalAmount}
+                  </Text>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: colors.text_primary,
+                      fontFamily: 'ProductSans-Light',
+                    }}>
+                    Estimated Shipping Price:{' '}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      color: colors.primary,
+                      fontFamily: 'ProductSans-Black',
+                    }}>
+                    ₱{shippingPrice}130-200
+                  </Text>
+                </View>
               </Right>
             </CardItem>
+
             <CardItem footer bordered>
               <Left />
+
               <Right>
-                <Text>Order Total: ₱{totalAmount + shippingPrice}</Text>
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: colors.text_primary,
+                      fontFamily: 'ProductSans-Light',
+                    }}>
+                    Order Total:{' '}
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      color: colors.primary,
+                      fontFamily: 'ProductSans-Black',
+                    }}>
+                    ₱{totalAmount + 130} - ₱{totalAmount + 200}
+                  </Text>
+                </View>
               </Right>
             </CardItem>
           </Card>
 
-          <Card
-            style={{
-              borderRadius: 16,
-              overflow: 'hidden',
-            }}>
-            <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
-              <Text style={{color: '#fff'}}>Reason for Cancellation</Text>
-            </CardItem>
-            <CardItem>
-              <Body>
-                <Text style={{width: '100%', textAlign: 'justify'}}>
-                  {cancelReason}
+          {orderStatus.cancelled.status && (
+            <Card
+              style={{
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}>
+              <CardItem
+                header
+                bordered
+                style={{backgroundColor: colors.primary}}>
+                <Text style={{color: colors.icons, fontSize: 20}}>
+                  Reason for Cancellation
                 </Text>
-              </Body>
-            </CardItem>
-          </Card>
+              </CardItem>
+              <CardItem>
+                <Body>
+                  <Text style={{width: '100%', textAlign: 'justify'}}>
+                    {orderStatus.cancelled.reason}
+                  </Text>
+                </Body>
+              </CardItem>
+            </Card>
+          )}
         </ScrollView>
       </Container>
     );

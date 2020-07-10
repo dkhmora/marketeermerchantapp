@@ -22,7 +22,8 @@ import ItemsList from '../components/ItemsList';
 import BaseHeader from '../components/BaseHeader';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
+import {colors} from '../../assets/colors';
 
 const TabBase = createMaterialTopTabNavigator();
 @inject('itemsStore')
@@ -50,6 +51,7 @@ class StoreItemsTab extends Component {
   @action showDeleteCategoryModal() {
     if (this.props.itemsStore.itemCategories.length > 0) {
       this.deleteCategoryModal = true;
+      this.selectedCategory = this.props.itemsStore.itemCategories[0];
     } else {
       Toast.show({
         text: `There are no categories to be deleted.`,
@@ -62,6 +64,10 @@ class StoreItemsTab extends Component {
 
   @action closeDeleteCategoryModal() {
     this.deleteCategoryModal = false;
+  }
+
+  @computed get scrollEnabled() {
+    return this.props.itemsStore.itemCategories.length > 1 ? true : false;
   }
 
   onValueChange(value) {
@@ -125,8 +131,6 @@ class StoreItemsTab extends Component {
     const {itemCategories} = this.props.itemsStore;
     const {name} = this.props.route;
     const {navigation} = this.props;
-
-    const scroll = itemCategories.length > 2 ? true : false;
 
     return (
       <Container style={{flex: 1}}>
@@ -247,23 +251,20 @@ class StoreItemsTab extends Component {
 
         <TabBase.Navigator
           tabBarOptions={{
-            scrollEnabled: scroll,
-            style: {backgroundColor: '#E91E63'},
-            activeTintColor: '#fff',
+            scrollEnabled: this.scrollEnabled,
+            style: {backgroundColor: colors.icons},
+            activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
-            indicatorStyle: {backgroundColor: '#FFC107'},
+            indicatorStyle: {backgroundColor: colors.primary},
           }}>
           <TabBase.Screen
             name="All"
             component={ItemsList}
             initialParams={{
               category: 'All',
-              navigation,
             }}
           />
           {itemCategories.map((category, index) => {
-            this.props.itemsStore.setCategoryItems(category);
-
             return (
               <TabBase.Screen
                 name={`${category}`}
@@ -271,7 +272,6 @@ class StoreItemsTab extends Component {
                 key={index}
                 initialParams={{
                   category,
-                  navigation,
                 }}
               />
             );

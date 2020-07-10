@@ -7,6 +7,7 @@
  */
 import 'react-native-gesture-handler';
 import React from 'react';
+import {YellowBox} from 'react-native';
 import _ from 'lodash';
 import moment from 'moment';
 import SplashScreen from 'react-native-splash-screen';
@@ -25,6 +26,10 @@ const ordersStore = (window.store = new OrdersStore());
 const authStore = (window.store = new AuthStore());
 const detailsStore = (window.store = new DetailsStore());
 const itemsStore = (window.store = new ItemsStore());
+
+YellowBox.ignoreWarnings([
+  'Animated: `useNativeDriver` was not specified. This is a required option and must be explicitly set to `true` or `false`',
+]);
 
 export default class App extends React.Component {
   componentDidMount() {

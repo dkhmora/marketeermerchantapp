@@ -3,16 +3,13 @@ import {Image} from 'react-native';
 import {
   Container,
   Input,
-  Button,
   Item,
   Grid,
   Content,
   Row,
-  Text,
   Col,
   Textarea,
   Picker,
-  Icon,
   Card,
   CardItem,
   H3,
@@ -20,9 +17,11 @@ import {
   Toast,
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';
+import {Button, Text, Icon} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
 import {inject, observer} from 'mobx-react';
 import {observable} from 'mobx';
+import {colors} from '../../assets/colors';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -49,7 +48,9 @@ class AddItemScreen extends Component {
   @observable categories = this.props.itemsStore.itemCategories;
 
   componentDidMount() {
-    this.category = this.props.route.params.pageCategory;
+    const {pageCategory} = this.props.route.params;
+    const {itemCategories} = this.props.itemsStore;
+    this.category = pageCategory !== 'All' ? pageCategory : itemCategories[0];
 
     if (this.props.itemsStore.itemCategories.length <= 0) {
       this.props.navigation.goBack();
@@ -95,7 +96,7 @@ class AddItemScreen extends Component {
         this.setState({imageDisplay: {uri: image.path}});
       })
       .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.error(err));
+      .catch((err) => console.log(err));
   }
 
   handleSelectImage() {
@@ -109,7 +110,7 @@ class AddItemScreen extends Component {
         this.setState({imageDisplay: {uri: image.path}});
       })
       .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.error(err));
+      .catch((err) => console.log(err));
   }
 
   render() {
@@ -144,26 +145,24 @@ class AddItemScreen extends Component {
                   marginHorizontal: 12,
                 }}>
                 <Button
-                  full
-                  bordered
+                  title="Select Photo"
+                  titleStyle={{color: colors.icons, marginLeft: 5}}
+                  icon={<Icon name="image" color={colors.icons} />}
                   iconLeft
-                  style={{borderRadius: 24}}
-                  onPress={() => this.handleSelectImage()}>
-                  <Icon name="images" />
-                  <Text>Select Image</Text>
-                </Button>
+                  buttonStyle={{backgroundColor: colors.primary}}
+                  onPress={() => this.handleSelectImage()}
+                />
                 <Text style={{textAlign: 'center', marginVertical: 12}}>
                   or
                 </Text>
                 <Button
-                  full
-                  bordered
+                  title="Take Photo"
+                  titleStyle={{color: colors.icons, marginLeft: 5}}
+                  icon={<Icon name="camera" color={colors.icons} />}
                   iconLeft
-                  style={{borderRadius: 24}}
-                  onPress={() => this.handleTakePhoto()}>
-                  <Icon name="camera" />
-                  <Text>Take Photo</Text>
-                </Button>
+                  buttonStyle={{backgroundColor: colors.primary}}
+                  onPress={() => this.handleTakePhoto()}
+                />
               </Col>
             </Row>
             <Row>
@@ -249,11 +248,12 @@ class AddItemScreen extends Component {
                 </Item>
               </View>
               <Button
-                full
-                style={{marginTop: 30, borderRadius: 24}}
-                onPress={() => this.onSubmit()}>
-                <Text>Submit</Text>
-              </Button>
+                title="Submit"
+                titleStyle={{color: colors.icons}}
+                buttonStyle={{backgroundColor: colors.primary, height: 50}}
+                containerStyle={{marginTop: 20}}
+                onPress={() => this.onSubmit()}
+              />
             </Row>
           </Grid>
         </Content>

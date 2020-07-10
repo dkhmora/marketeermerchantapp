@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import MapView, {Circle, Marker} from 'react-native-maps';
+import MapView, {Circle, Marker, Polygon} from 'react-native-maps';
 import {
   View,
   StatusBar,
@@ -7,11 +7,19 @@ import {
   PermissionsAndroid,
   Platform,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
-import {Button, Icon, Text, Item, Input, Card, CardItem} from 'native-base';
-import {Slider} from 'react-native-elements';
+import {Card, CardItem} from 'native-base';
+import {Slider, Button, Icon, Text} from 'react-native-elements';
 import {observer, inject} from 'mobx-react';
 import Geolocation from '@react-native-community/geolocation';
+import {colors} from '../../assets/colors';
+import geohash from 'ngeohash';
+import * as geolib from 'geolib';
+import BaseHeader from '../components/BaseHeader';
+import RNGooglePlaces from 'react-native-google-places';
+import Toast from '../components/Toast';
+import * as turf from '@turf/turf';
 
 @inject('authStore')
 @inject('detailsStore')
@@ -23,39 +31,110 @@ class DeliveryAreaScreen extends Component {
     this.state = {
       mapReady: false,
       editMode: false,
-      radius: 0,
-      initialRadius: 0,
+      updating: false,
+      boundingBox: null,
+      address: null,
+      distance: 0,
+      initialdistance: 0,
       newMarkerPosition: null,
       centerOfScreen: (Dimensions.get('window').height - 17) / 2,
     };
-
-    const {coordinates, deliveryRadius} = this.props.detailsStore.storeDetails;
-
-    if (coordinates) {
-      const {_latitude, _longitude} = coordinates;
-      this.state.markerPosition = {latitude: _latitude, longitude: _longitude};
-      this.state.circlePosition = {latitude: _latitude, longitude: _longitude};
-      this.state.mapData = {
-        latitude: _latitude,
-        longitude: _longitude,
-        latitudeDelta: 0.04,
-        longitudeDelta: 0.05,
-      };
-    }
-
-    if (deliveryRadius) {
-      this.state.radius = deliveryRadius;
-    }
   }
 
   componentDidMount() {
-    const {coordinates} = this.props.detailsStore.storeDetails;
+    const {deliveryCoordinates} = this.props.detailsStore.storeDetails;
 
-    if (!coordinates) {
+    if (!deliveryCoordinates) {
       this.setInitialMarkerPosition();
     } else {
-      this.setState({mapReady: true});
+      this.decodeGeohash();
     }
+  }
+
+  getBoundsOfDistance({latitude, longitude}, distance) {
+    const bounds = geolib.getBoundsOfDistance(
+      {latitude, longitude},
+      distance * 1000,
+    );
+
+    return bounds;
+  }
+
+  getGeohashRange = (latitude, longitude, distance) => {
+    const bounds = this.getBoundsOfDistance({latitude, longitude}, distance);
+
+    const lower = geohash.encode(bounds[0].latitude, bounds[0].longitude, 12);
+    const upper = geohash.encode(bounds[1].latitude, bounds[1].longitude, 12);
+
+    console.log(bounds);
+
+    return {
+      lower,
+      upper,
+    };
+  };
+
+  getBoundingBox(lower, upper) {
+    const line = turf.lineString([
+      [lower.latitude, lower.longitude],
+      [upper.latitude, upper.longitude],
+    ]);
+    const bbox = turf.bbox(line);
+    const bboxPolygon = turf.bboxPolygon(bbox);
+
+    let boundingBox = [];
+
+    bboxPolygon.geometry.coordinates.map((coordinate) => {
+      coordinate.map((latLng, index) => {
+        if (index <= 3) {
+          boundingBox.push({
+            latitude: latLng[0],
+            longitude: latLng[1],
+          });
+        }
+      });
+    });
+
+    console.log(boundingBox);
+
+    return boundingBox;
+  }
+
+  decodeGeohash() {
+    const {deliveryCoordinates} = this.props.detailsStore.storeDetails;
+    const {lowerRange, upperRange, latitude, longitude} = deliveryCoordinates;
+
+    const lower = geohash.decode(lowerRange);
+    const upper = geohash.decode(upperRange);
+
+    const distance = Math.round(
+      geolib.getDistance(
+        {
+          latitude: lower.latitude,
+          longitude: lower.longitude,
+        },
+        {
+          latitude: upper.latitude,
+          longitude: lower.longitude,
+        },
+      ) / 2000,
+    );
+
+    const boundingBox = this.getBoundingBox(lower, upper);
+
+    this.setState({
+      markerPosition: {latitude, longitude},
+      newMarkerPosition: {latitude, longitude},
+      boundingBox,
+      mapData: {
+        latitude,
+        longitude,
+        latitudeDelta: 0.04,
+        longitudeDelta: 0.05,
+      },
+      distance,
+      mapReady: true,
+    });
   }
 
   async setInitialMarkerPosition() {
@@ -67,9 +146,6 @@ class DeliveryAreaScreen extends Component {
         };
 
         this.setState({
-          markerPosition: {
-            ...coords,
-          },
           newMarkerPosition: {
             ...coords,
           },
@@ -78,17 +154,12 @@ class DeliveryAreaScreen extends Component {
             latitudeDelta: 0.04,
             longitudeDelta: 0.05,
           },
-          circlePosition: {
-            ...coords,
-          },
           mapReady: true,
         });
       },
       (err) => console.log(err),
       {
-        enableHighAccuracy: true,
         timeout: 20000,
-        maximumAge: 1000,
       },
     );
   }
@@ -100,26 +171,96 @@ class DeliveryAreaScreen extends Component {
       ).then((granted) => {
         console.log(granted); // just to ensure that permissions were granted
       });
+    } else {
+      Geolocation.requestAuthorization();
     }
   };
 
-  handleSetStoreLocation() {
+  async handleSetStoreLocation() {
     const {updateCoordinates} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
-    const {newMarkerPosition, radius} = this.state;
+    const {newMarkerPosition, distance, address} = this.state;
 
-    updateCoordinates(
-      merchantId,
+    const range = this.getGeohashRange(
       newMarkerPosition.latitude,
       newMarkerPosition.longitude,
-      radius,
+      distance,
     );
+
+    const bounds = this.getBoundsOfDistance({...newMarkerPosition}, distance);
+    const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
+
+    this.setState({loading: true});
+
+    if (!address) {
+      this.setState(
+        {
+          address: await this.props.detailsStore.getAddressFromCoordinates({
+            ...newMarkerPosition,
+          }),
+          boundingBox,
+        },
+        () => {
+          updateCoordinates(
+            merchantId,
+            range.lower,
+            range.upper,
+            newMarkerPosition,
+            boundingBox,
+            this.state.address,
+          )
+            .then(() => {
+              Toast({text: 'Delivery Area successfully set!'});
+              this.setState({loading: false});
+            })
+            .catch((err) => Toast({text: err, type: 'danger'}));
+        },
+      );
+    } else {
+      updateCoordinates(
+        merchantId,
+        range.lower,
+        range.upper,
+        newMarkerPosition,
+        this.state.address,
+      )
+        .then(() => {
+          Toast({text: 'Delivery Area successfully set!'});
+          this.setState({loading: false});
+        })
+        .catch((err) => Toast({text: err, type: 'danger'}));
+    }
 
     this.setState({
       editMode: false,
-      circlePosition: newMarkerPosition,
       markerPosition: newMarkerPosition,
     });
+  }
+
+  panMapToLocation(position) {
+    if (Platform.OS === 'ios') {
+      this.map.animateCamera(
+        {
+          center: position,
+          pitch: 2,
+          heading: 20,
+          altitude: 6000,
+          zoom: 5,
+        },
+        150,
+      );
+    } else {
+      this.map.animateCamera(
+        {
+          center: position,
+          pitch: 2,
+          heading: 1,
+          altitude: 200,
+          zoom: 18,
+        },
+        150,
+      );
+    }
   }
 
   panMapToMarker() {
@@ -141,7 +282,7 @@ class DeliveryAreaScreen extends Component {
           pitch: 2,
           heading: 1,
           altitude: 500,
-          zoom: 15,
+          zoom: 18,
         },
         150,
       );
@@ -156,7 +297,7 @@ class DeliveryAreaScreen extends Component {
         longitudeDelta: 0.05,
       },
       newMarkerPosition: this.state.markerPosition,
-      initialRadius: this.state.radius,
+      initialdistance: this.state.distance,
       editMode: true,
     });
 
@@ -164,12 +305,12 @@ class DeliveryAreaScreen extends Component {
   }
 
   handleCancelChanges() {
-    const {markerPosition, initialRadius} = this.state;
+    const {markerPosition, initialdistance} = this.state;
 
     this.setState({
       mapData: {...markerPosition, latitudeDelta: 0.04, longitudeDelta: 0.05},
-      newMarkerPosition: null,
-      radius: initialRadius,
+      newMarkerPosition: {...markerPosition},
+      distance: initialdistance,
       editMode: false,
     });
 
@@ -180,39 +321,64 @@ class DeliveryAreaScreen extends Component {
     const {editMode} = this.state;
     const {latitude, longitude} = mapData;
 
+    const bounds = this.getBoundsOfDistance(
+      {latitude, longitude},
+      this.state.distance,
+    );
+
+    const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
+
     if (editMode) {
       this.setState({
         newMarkerPosition: {
           latitude,
           longitude,
         },
-        circlePosition: {
-          latitude,
-          longitude,
-        },
+        boundingBox,
       });
     }
   };
+
+  openSearchModal() {
+    RNGooglePlaces.openAutocompleteModal({country: 'PH'}, [
+      'address',
+      'location',
+    ])
+      .then((place) => {
+        const address = place.address;
+        const coordinates = place.location;
+
+        this.panMapToLocation(coordinates);
+
+        this.setState({
+          address,
+          newMarkerPosition: {...coordinates},
+          editMode: true,
+        });
+      })
+      .catch((error) => console.log(error.message));
+  }
 
   render() {
     const {navigation} = this.props;
     const {
       markerPosition,
-      radius,
-      circlePosition,
+      distance,
       centerOfScreen,
       mapData,
       mapReady,
       editMode,
+      loading,
+      boundingBox,
     } = this.state;
 
     return (
-      <View style={StyleSheet.absoluteFillObject}>
+      <View style={{flex: 1}}>
         <StatusBar translucent backgroundColor="transparent" />
 
         {mapReady && (
           <MapView
-            style={{flex: 1}}
+            style={{...StyleSheet.absoluteFillObject}}
             ref={(map) => {
               this.map = map;
             }}
@@ -223,7 +389,7 @@ class DeliveryAreaScreen extends Component {
               this._onMapReady();
             }}
             initialRegion={mapData}>
-            {!editMode && (
+            {!editMode && markerPosition && (
               <Marker
                 ref={(marker) => {
                   this.marker = marker;
@@ -231,25 +397,18 @@ class DeliveryAreaScreen extends Component {
                 tracksViewChanges={false}
                 coordinate={markerPosition}>
                 <View>
-                  <Icon
-                    style={{
-                      color: '#B11C01',
-                      fontSize: 34,
-                    }}
-                    name="pin"
-                    solid
-                  />
+                  <Icon color={colors.primary} name="map-pin" />
                 </View>
               </Marker>
             )}
-            <Circle
-              center={circlePosition}
-              radius={radius * 1000}
-              fillColor="rgba(233, 30, 99, 0.3)"
-              strokeColor="rgba(0,0,0,0.5)"
-              zIndex={2}
-              strokeWidth={2}
-            />
+            {boundingBox && (
+              <Polygon
+                coordinates={boundingBox}
+                fillColor="rgba(233, 30, 99, 0.3)"
+                strokeColor="rgba(0,0,0,0.5)"
+                strokeWidth={1}
+              />
+            )}
           </MapView>
         )}
         {editMode && (
@@ -263,113 +422,140 @@ class DeliveryAreaScreen extends Component {
               top: centerOfScreen,
               alignItems: 'center',
             }}>
-            <Icon
-              style={{
-                color: '#B11C01',
-                fontSize: 34,
-              }}
-              name="pin"
-              solid
-            />
+            <Icon color={colors.primary} name="map-pin" />
           </View>
         )}
-        <View
-          style={{
-            position: 'absolute',
-            alignSelf: 'flex-start',
-            justifyContent: 'flex-start',
-            top: '-7%',
-          }}>
+
+        {editMode ? (
+          <View
+            style={{
+              padding: 20,
+              position: 'absolute',
+              alignSelf: 'center',
+              justifyContent: 'center',
+              bottom: 20,
+            }}>
+            <Card
+              style={{
+                borderdistance: 16,
+                overflow: 'hidden',
+                backgroundColor: 'rgba(255,255,255, 0.6)',
+              }}>
+              <CardItem style={{flexDirection: 'column'}}>
+                <Text style={{alignSelf: 'flex-start', marginBottom: 5}}>
+                  Delivery distance
+                </Text>
+                <View
+                  style={{
+                    width: '100%',
+                  }}>
+                  <Slider
+                    step={1}
+                    minimumValue={0}
+                    maximumValue={100}
+                    value={distance}
+                    thumbTintColor={colors.accent}
+                    onValueChange={(value) => this.setState({distance: value})}
+                  />
+                  <Text style={{alignSelf: 'center'}}>{distance} KM</Text>
+                </View>
+              </CardItem>
+              <CardItem style={{alignSelf: 'center'}}>
+                <Card
+                  style={{
+                    borderdistance: 16,
+                    overflow: 'hidden',
+                    backgroundColor: '#eee',
+                  }}>
+                  <CardItem
+                    style={{
+                      backgroundColor: '#eef',
+                    }}>
+                    <Text note style={{margin: 6, width: '100%'}}>
+                      Tip: Pan around the map to move your store's location!
+                    </Text>
+                  </CardItem>
+                </Card>
+              </CardItem>
+              <CardItem>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-evenly',
+                  }}>
+                  <Button
+                    title="Cancel Changes"
+                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    icon={<Icon name="x" color={colors.icons} />}
+                    iconRight
+                    onPress={() => this.handleCancelChanges()}
+                    buttonStyle={{backgroundColor: colors.primary}}
+                    containerStyle={{marginRight: 20}}
+                  />
+                  <Button
+                    title="Save Changes"
+                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    icon={<Icon name="save" color={colors.icons} />}
+                    iconRight
+                    buttonStyle={{backgroundColor: colors.accent}}
+                    onPress={() => this.handleSetStoreLocation()}
+                  />
+                </View>
+              </CardItem>
+            </Card>
+          </View>
+        ) : (
           <Button
-            transparent
-            onPress={() => navigation.openDrawer()}
-            style={{marginTop: 100}}>
-            <Icon name="menu" style={{fontSize: 32}} />
-          </Button>
-        </View>
-        <View
-          style={{
-            position: 'absolute',
-            alignSelf: 'center',
-            justifyContent: 'center',
-            bottom: '5%',
-          }}>
-          {editMode ? (
-            <View style={{flexDirection: 'column'}}>
-              <Card
-                style={{
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                  backgroundColor: 'rgba(255,255,255, 0.6)',
-                }}>
-                <CardItem style={{flexDirection: 'column'}}>
-                  <Text style={{alignSelf: 'flex-start', marginBottom: 5}}>
-                    Delivery Radius
-                  </Text>
-                  <View
-                    style={{
-                      width: '100%',
-                    }}>
-                    <Slider
-                      step={1}
-                      minimumValue={0}
-                      maximumValue={100}
-                      value={radius}
-                      onValueChange={(value) => this.setState({radius: value})}
-                    />
-                    <Text style={{alignSelf: 'center'}}>{radius} KM</Text>
-                  </View>
-                </CardItem>
-                <CardItem>
-                  <Card
-                    style={{
-                      borderRadius: 16,
-                      overflow: 'hidden',
-                      backgroundColor: '#eee',
-                    }}>
-                    <CardItem
-                      style={{
-                        backgroundColor: '#eef',
-                      }}>
-                      <Text note style={{margin: 6, width: '100%'}}>
-                        Tip: Pan around the map to move your store's location!
-                      </Text>
-                    </CardItem>
-                  </Card>
-                </CardItem>
-                <CardItem>
-                  <View style={{flexDirection: 'row'}}>
-                    <Button
-                      iconLeft
-                      rounded
-                      danger
-                      onPress={() => this.handleCancelChanges()}
-                      style={{marginRight: 20}}>
-                      <Icon name="close" />
-                      <Text>Cancel Changes</Text>
-                    </Button>
-                    <Button
-                      iconLeft
-                      rounded
-                      success
-                      onPress={() => this.handleSetStoreLocation()}>
-                      <Icon name="save" />
-                      <Text>Save Changes</Text>
-                    </Button>
-                  </View>
-                </CardItem>
-              </Card>
-            </View>
-          ) : (
+            title="Change Store Delivery Area"
+            titleStyle={{color: colors.icons, paddingRight: 5}}
+            icon={<Icon name="edit" color={colors.icons} />}
+            iconRight
+            onPress={() => this.handleEditDeliveryArea()}
+            buttonStyle={{backgroundColor: colors.primary}}
+            containerStyle={{
+              position: 'absolute',
+              alignSelf: 'center',
+              justifyContent: 'center',
+              bottom: '5%',
+            }}
+          />
+        )}
+
+        <BaseHeader
+          backButton
+          navigation={navigation}
+          title="Delivery Area"
+          rightComponent={
             <Button
-              iconLeft
-              onPress={() => this.handleEditDeliveryArea()}
-              style={{borderRadius: 24, overflow: 'hidden'}}>
-              <Icon name="create" />
-              <Text>Edit Delivery Area</Text>
-            </Button>
-          )}
-        </View>
+              type="clear"
+              icon={<Icon name="search" color={colors.icons} />}
+              titleStyle={{color: colors.icons}}
+              buttonStyle={{borderdistance: 24}}
+              onPress={() => this.openSearchModal()}
+            />
+          }
+        />
+
+        {loading && (
+          <View
+            style={[
+              StyleSheet.absoluteFillObject,
+              {
+                flex: 1,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                alignItems: 'center',
+                justifyContent: 'center',
+              },
+            ]}>
+            <ActivityIndicator animating color={colors.primary} size="large" />
+          </View>
+        )}
       </View>
     );
   }

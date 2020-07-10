@@ -9,8 +9,11 @@ import StoreItemsScreen from '../screens/StoreItemsScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
-import {Icon, View, Text, Item, Label, Button} from 'native-base';
+import {Button, Icon, Text} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
+import {colors} from '../../assets/colors';
+import {View, Platform} from 'react-native';
+import {SafeAreaConsumer, SafeAreaView} from 'react-native-safe-area-context';
 
 @inject('authStore')
 @observer
@@ -20,7 +23,13 @@ class MainDrawer extends Component {
   }
 
   handleSignOut() {
-    this.props.authStore.signOut();
+    this.props.authStore.signOut().then(() => {
+      this.props.detailsStore.unsubscribeSetStoreDetails &&
+        this.props.detailsStore.unsubscribeSetStoreDetails();
+
+      this.props.itemsStore.unsubscribeSetItemCategories &&
+        this.props.itemsStore.unsubscribeSetItemCategories();
+    });
     this.props.navigation.navigate('Auth');
   }
 
@@ -42,15 +51,24 @@ class MainDrawer extends Component {
               }}>
               <DrawerItemList {...props} />
 
-              <Button
-                onPress={() => this.handleSignOut()}
-                style={{
-                  borderRadius: 24,
-                  marginHorizontal: 12,
-                }}>
-                <Text>Sign Out</Text>
-                <Icon name="log-out" />
-              </Button>
+              <View style={{flex: 1}} />
+
+              <SafeAreaView
+                style={{paddingBottom: Platform.OS === 'android' ? 50 : 0}}>
+                <Button
+                  title="Sign Out"
+                  icon={<Icon name="log-out" color={colors.icons} />}
+                  iconRight
+                  onPress={() => this.handleSignOut()}
+                  titleStyle={{color: colors.icons, paddingRight: 5}}
+                  buttonStyle={{backgroundColor: colors.primary}}
+                  containerStyle={{
+                    borderRadius: 24,
+                    marginHorizontal: 12,
+                    marginVertical: 10,
+                  }}
+                />
+              </SafeAreaView>
             </DrawerContentScrollView>
           );
         }}>

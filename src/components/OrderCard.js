@@ -4,14 +4,10 @@ import {
   CardItem,
   Left,
   Body,
-  Text,
-  Button,
   Right,
-  Icon,
   Toast,
   View,
   Item,
-  Input,
   H3,
   Textarea,
 } from 'native-base';
@@ -19,8 +15,10 @@ import {ActionSheetIOS, Platform} from 'react-native';
 import moment, {ISO_8601} from 'moment';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
-import {observable, action} from 'mobx';
+import {Icon, Button, Text} from 'react-native-elements';
+import {observable, action, computed} from 'mobx';
 import BaseOptionsMenu from './BaseOptionsMenu';
+import {colors} from '../../assets/colors';
 
 @inject('ordersStore')
 @observer
@@ -40,11 +38,25 @@ class OrderCard extends Component {
     this.confirmationModal = false;
   }
 
+  @computed get orderStatus() {
+    const {orderStatus} = this.props;
+
+    const statusLabel = Object.entries(orderStatus).map(([key, value]) => {
+      if (value.status) {
+        return key.toUpperCase();
+      }
+
+      return;
+    });
+
+    return statusLabel.filter((item) => item != null);
+  }
+
   handleChangeOrderStatus() {
-    const {merchantId, orderId, orderNumber} = this.props;
-    this.props.ordersStore.setOrderStatus(merchantId, orderId).then(() => {
+    const {orderId, merchantOrderNumber} = this.props;
+    this.props.ordersStore.setOrderStatus(orderId).then(() => {
       Toast.show({
-        text: `Successfully changed Order # ${orderNumber} status!`,
+        text: `Successfully changed Order # ${merchantOrderNumber} status!`,
         buttonText: 'Okay',
         type: 'success',
         duration: 3500,
@@ -57,51 +69,46 @@ class OrderCard extends Component {
   handleViewOrderItems() {
     const {
       navigation,
-      coordinates,
+      deliveryCoordinates,
       orderId,
       orderStatus,
       userName,
-      orderNumber,
-      numberOfItems,
+      merchantOrderNumber,
+      quantity,
       shippingPrice,
       totalAmount,
-      userAddress,
+      deliveryAddress,
       createdAt,
     } = this.props;
-
-    const cancelReason =
-      orderStatus.cancelled.status && orderStatus.cancelled.reason;
 
     this.props.ordersStore.setOrderItems(orderId).then(() => {
       navigation.dangerouslyGetParent().navigate('Order Details', {
         orderId,
         orderItems: this.props.ordersStore.orderItems,
-        coordinates,
-        cancelReason,
+        deliveryCoordinates,
+        orderStatus,
         userName,
-        orderNumber,
-        numberOfItems,
+        merchantOrderNumber,
+        quantity,
         shippingPrice,
         totalAmount,
-        userAddress,
+        deliveryAddress,
         createdAt,
       });
     });
   }
 
   handleCancelOrder() {
-    const {merchantId, orderId, orderNumber} = this.props;
-    this.props.ordersStore
-      .cancelOrder(merchantId, orderId, this.cancelReason)
-      .then(() => {
-        Toast.show({
-          text: `Order # ${orderNumber} successfully cancelled!`,
-          buttonText: 'Okay',
-          type: 'success',
-          duration: 3500,
-          style: {margin: 20, borderRadius: 16},
-        });
+    const {orderId, merchantOrderNumber} = this.props;
+    this.props.ordersStore.cancelOrder(orderId, this.cancelReason).then(() => {
+      Toast.show({
+        text: `Order # ${merchantOrderNumber} successfully cancelled!`,
+        buttonText: 'Okay',
+        type: 'success',
+        duration: 3500,
+        style: {margin: 20, borderRadius: 16},
       });
+    });
   }
 
   openOptions() {
@@ -123,13 +130,14 @@ class OrderCard extends Component {
 
   render() {
     const {
-      orderNumber,
+      merchantOrderNumber,
       userName,
-      orderStatus,
-      numberOfItems,
+      quantity,
       totalAmount,
       orderId,
-      userAddress,
+      paymentMethod,
+      deliveryAddress,
+      deliveryCoordinates,
       createdAt,
       index,
       tabName,
@@ -138,105 +146,127 @@ class OrderCard extends Component {
     } = this.props;
 
     const buttonText =
-      (tabName === 'Accepted' && 'Ship') || (tabName === 'Pending' && 'Accept');
-
-    const transactionFeeStatus =
-      tabName === 'Pending'
-        ? 'To be charged when Accepted'
-        : 'Charged to account';
+      (tabName === 'Paid' && 'Ship') ||
+      (tabName === 'Pending' && 'Accept') ||
+      (tabName === 'Shipped' && 'Complete');
 
     const CardHeader = () => {
       const optionsButton = tabName === 'Pending' ? true : false;
-
-      const chatButton =
-        tabName === 'Completed' || tabName === 'Cancelled' ? false : true;
 
       return (
         <CardItem
           header
           bordered
-          button={chatButton}
+          button
           onPress={() =>
             navigation.navigate('Order Chat', {
               userName,
-              userAddress,
+              deliveryAddress,
               orderId,
-              orderNumber,
-              orderStatus,
+              merchantOrderNumber,
+              orderStatus: this.orderStatus,
             })
           }
-          style={{backgroundColor: '#E91E63'}}>
-          <Left style={{flex: 3}}>
-            {chatButton && (
-              <Item>
-                <Icon
-                  name="chatbubbles"
-                  style={{color: '#fff', fontSize: 27, margin: -5}}
-                />
-              </Item>
-            )}
-            <Body>
-              <Text style={{color: '#fff'}}>{userName}</Text>
-              <Text note style={{color: '#ddd'}}>
-                Order # {orderNumber}
-              </Text>
-            </Body>
-          </Left>
-          <Body style={{flex: 5, alignItems: 'flex-end'}}>
-            <Card
-              style={{
-                backgroundColor: '#F8BBD0',
-                borderRadius: 16,
-              }}>
-              <CardItem
+          style={{backgroundColor: colors.primary}}>
+          <View
+            style={{
+              flex: 2,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <View>
+              <Icon name="message-square" color={colors.icons} />
+              <Text style={{color: colors.icons}}>Chat</Text>
+            </View>
+
+            <View
+              style={{flex: 1, flexDirection: 'column', paddingHorizontal: 10}}>
+              <Text
                 style={{
-                  backgroundColor: 'transparent',
+                  color: '#fff',
+                  fontFamily: 'ProductSans-Regular',
+                  fontSize: 18,
                 }}>
-                <View
+                {userName}
+              </Text>
+
+              <Text style={{color: '#eee'}}>Order # {merchantOrderNumber}</Text>
+
+              <View
+                key={index}
+                style={{
+                  borderRadius: 20,
+                  backgroundColor: colors.accent,
+                  alignItems: 'center',
+                  paddingVertical: 3,
+                  paddingHorizontal: 7,
+                  marginRight: 2,
+                  alignSelf: 'flex-start',
+                }}>
+                <Text
+                  adjustsFontSizeToFit
                   style={{
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start',
+                    fontSize: 16,
+                    color: '#fff',
+                    textAlign: 'center',
                   }}>
-                  <Body>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                      }}>
-                      <Text style={{color: '#212121'}}>Transaction Fee: </Text>
-                      <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
-                        ₱{(totalAmount * 0.05).toPrecision(5)}
-                      </Text>
-                    </View>
-                    <Text note style={{color: '#757575', textAlign: 'center'}}>
-                      {transactionFeeStatus}
-                    </Text>
-                  </Body>
-                </View>
-              </CardItem>
-            </Card>
-          </Body>
+                  {paymentMethod}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <Card
+            style={{
+              flex: 1,
+              backgroundColor: '#F8BBD0',
+              borderRadius: 16,
+              paddingVertical: 10,
+              paddingHorizontal: 5,
+            }}>
+            <View
+              style={{
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontFamily: 'ProductSans-Black',
+                  fontSize: 16,
+                  textAlign: 'center',
+                }}>
+                ₱{(totalAmount * 0.05).toPrecision(3)}
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: colors.text_primary,
+                  textAlign: 'center',
+                }}>
+                Transaction Fee
+              </Text>
+            </View>
+          </Card>
+
           {optionsButton && (
-            <Right style={{flex: 1}}>
+            <View>
               <BaseOptionsMenu
                 iconStyle={{color: '#fff', fontSize: 27}}
                 destructiveIndex={1}
                 options={['Cancel Order']}
                 actions={[this.openConfirmationModal.bind(this)]}
               />
-            </Right>
+            </View>
           )}
         </CardItem>
       );
     };
 
     const CardFooter = () => {
-      const cancellationStatus =
-        orderStatus.cancelled.status && orderStatus.cancelled.reason;
-
-      const footerStatus =
-        tabName === 'Shipped'
-          ? 'Waiting for Customer to Confirm Receipt of Products'
-          : `Order ${tabName}`;
+      const footerStatus = `Order ${tabName}`;
 
       const timeStamp = moment(createdAt, ISO_8601).fromNow();
 
@@ -247,14 +277,20 @@ class OrderCard extends Component {
           </Left>
           <Right>
             {footerStatus && !buttonText ? (
-              <Text note>{footerStatus}</Text>
+              <Text style={{textAlign: 'right'}}>{footerStatus}</Text>
             ) : (
               <Button
-                success
-                rounded
-                onPress={this.handleChangeOrderStatus.bind(this)}>
-                <Text>{buttonText}</Text>
-              </Button>
+                title={buttonText}
+                titleStyle={{color: colors.icons}}
+                buttonStyle={{backgroundColor: colors.accent}}
+                containerStyle={{
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: colors.accent,
+                  width: '100%',
+                }}
+                onPress={this.handleChangeOrderStatus.bind(this)}
+              />
             )}
           </Right>
         </CardItem>
@@ -270,7 +306,7 @@ class OrderCard extends Component {
             style={{alignItems: 'center'}}>
             <Card
               style={{
-                borderRadius: 16,
+                borderRadius: 10,
                 overflow: 'hidden',
                 width: '100%',
               }}>
@@ -306,56 +342,91 @@ class OrderCard extends Component {
                 </Body>
               </CardItem>
               <CardItem footer>
-                <Left />
-                <Right style={{flexDirection: 'row', marginRight: 25}}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                  }}>
                   <Button
-                    transparent
-                    onPress={this.closeConfirmationModal.bind(this)}>
-                    <Text>Cancel</Text>
-                  </Button>
+                    title="Cancel"
+                    titleStyle={{color: colors.accent}}
+                    buttonStyle={{backgroundColor: colors.icons}}
+                    containerStyle={{
+                      borderRadius: 24,
+                      borderWidth: 1,
+                      borderColor: colors.accent,
+                      marginRight: 10,
+                    }}
+                    onPress={this.closeConfirmationModal.bind(this)}
+                  />
                   <Button
-                    transparent
-                    onPress={this.handleCancelOrder.bind(this)}>
-                    <Text>Confirm</Text>
-                  </Button>
-                </Right>
+                    title="Confirm"
+                    titleStyle={{color: colors.icons}}
+                    buttonStyle={{backgroundColor: colors.dark_accent}}
+                    containerStyle={{
+                      borderRadius: 24,
+                    }}
+                    onPress={this.handleCancelOrder.bind(this)}
+                  />
+                </View>
               </CardItem>
             </Card>
           </Modal>
         </View>
 
-        <Card {...otherProps} style={{borderRadius: 16, overflow: 'hidden'}}>
+        <Card {...otherProps} style={{borderRadius: 10, overflow: 'hidden'}}>
           <CardHeader />
           <CardItem bordered>
             <Left>
-              <Text>Address:</Text>
+              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
+                Delivery Address:
+              </Text>
             </Left>
             <Right>
-              <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
-                {userAddress}
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontFamily: 'ProductSans-Black',
+                  fontSize: 16,
+                  textAlign: 'right',
+                }}>
+                {deliveryAddress}
               </Text>
             </Right>
           </CardItem>
           <CardItem bordered>
             <Left>
-              <Text>Total Amount:</Text>
+              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
+                Total Amount:
+              </Text>
             </Left>
             <Right>
-              <Text style={{color: '#E91E63', fontWeight: 'bold'}}>
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontFamily: 'ProductSans-Black',
+                  fontSize: 16,
+                }}>
                 ₱{totalAmount}
               </Text>
-              <Text note>{numberOfItems} items</Text>
+              <Text note>{quantity} items</Text>
             </Right>
           </CardItem>
           <CardItem>
             <Body>
               <Button
-                full
-                bordered
+                title="View Full Order"
                 onPress={this.handleViewOrderItems.bind(this)}
-                style={{borderRadius: 24}}>
-                <Text>View Full Order</Text>
-              </Button>
+                titleStyle={{color: colors.accent}}
+                buttonStyle={{backgroundColor: colors.icons}}
+                containerStyle={{
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: colors.accent,
+                  width: '100%',
+                }}
+              />
             </Body>
           </CardItem>
           <CardFooter />

@@ -5,6 +5,7 @@ class ItemsStore {
   @observable storeItems = [];
   @observable itemCategories = [];
   @observable categoryItems = new Map();
+  @observable unsubscribeSetItemCategories = null;
 
   @action setCategoryItems(category) {
     const items = this.storeItems.filter((item) => item.category === category);
@@ -12,15 +13,24 @@ class ItemsStore {
   }
 
   @action setItemCategories(merchantId) {
-    firestore()
-      .collection('merchant_items')
-      .doc(merchantId)
-      .onSnapshot((documentSnapshot) => {
-        if (documentSnapshot) {
-          const itemCats = documentSnapshot.data().itemCategories;
-          this.itemCategories = itemCats.sort();
-        }
-      });
+    if (merchantId) {
+      const merchantItemsRef = firestore()
+        .collection('merchant_items')
+        .doc(merchantId);
+
+      this.unsubscribeSetItemCategories = merchantItemsRef.onSnapshot(
+        (documentSnapshot) => {
+          if (documentSnapshot) {
+            if (documentSnapshot.exists) {
+              const itemCats = documentSnapshot.data().itemCategories;
+              this.itemCategories = itemCats.sort();
+            } else {
+              merchantItemsRef.set({itemCategories: [], items: []});
+            }
+          }
+        },
+      );
+    }
   }
 
   @action async deleteItemCategory(merchantId, category) {
@@ -96,8 +106,10 @@ class ItemsStore {
       .collection('merchant_items')
       .doc(merchantId);
 
-    const fileExtension = imagePath.split('.').pop();
-    const imageRef = `/images/merchants/${merchantId}/items/${name}.${fileExtension}`;
+    const fileExtension = imagePath ? imagePath.split('.').pop() : null;
+    const imageRef = imagePath
+      ? `/images/merchants/${merchantId}/items/${name}.${fileExtension}`
+      : null;
 
     await merchantItemsRef
       .update({
