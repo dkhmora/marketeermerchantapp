@@ -1,9 +1,10 @@
 import React, {setState} from 'react';
-import {StyleSheet} from 'react-native';
-import AnimatedLoader from 'react-native-animated-loader';
+import {StyleSheet, ActivityIndicator} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {inject, observer} from 'mobx-react';
+import {View} from 'native-base';
+import {colors} from '../../assets/colors';
 
 @inject('authStore')
 @inject('ordersStore')
@@ -84,25 +85,18 @@ class AuthLoader extends React.Component {
   }
 
   render() {
-    const {visible} = this.state;
-
     return (
-      <AnimatedLoader
-        visible={visible}
-        overlayColor="rgba(255,255,255,0.75)"
-        source={require('../../assets/loader.json')}
-        animationStyle={styles.lottie}
-        speed={1}
-      />
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+        }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  lottie: {
-    width: 100,
-    height: 100,
-  },
-});
 
 export default AuthLoader;

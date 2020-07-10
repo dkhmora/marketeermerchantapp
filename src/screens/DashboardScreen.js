@@ -1065,7 +1065,13 @@ class StoreDetailsScreen extends Component {
     }
 
     return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+        }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
