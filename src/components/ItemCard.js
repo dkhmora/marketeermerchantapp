@@ -115,6 +115,7 @@ class ItemCard extends Component {
             }}>
             <View style={{flexDirection: 'column'}}>
               <Text style={{color: '#fff'}}>{name}</Text>
+
               <Text note style={{color: '#ddd'}}>
                 Stock: {stock}
               </Text>
@@ -127,6 +128,7 @@ class ItemCard extends Component {
               actions={[this.handleDelete.bind(this)]}
             />
           </CardItem>
+
           <CardItem cardBody>
             {this.url ? (
               <Image
@@ -174,29 +176,26 @@ class ItemCard extends Component {
             </Body>
           </CardItem>
 
-          <CardItem bordered style={{bottom: 20, elevation: 5}}>
-            <Body
+          <CardItem
+            bordered
+            style={{bottom: 20, elevation: 5, justifyContent: 'center'}}>
+            <View
               style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
+                borderRadius: 10,
+                padding: 8,
+                backgroundColor: colors.primary,
+                elevation: 3,
               }}>
-              <View
+              <Text
                 style={{
-                  borderRadius: 10,
-                  padding: 8,
-                  backgroundColor: colors.primary,
-                  elevation: 3,
+                  fontFamily: 'ProductSans-Black',
+                  color: colors.icons,
                 }}>
-                <Text
-                  style={{
-                    fontFamily: 'ProductSans-Black',
-                    color: colors.icons,
-                  }}>
-                  ₱ {price}/{unit}
-                </Text>
-              </View>
-            </Body>
+                ₱ {price}/{unit}
+              </Text>
+            </View>
           </CardItem>
+
           <CardItem
             footer
             bordered
