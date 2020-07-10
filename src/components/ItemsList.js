@@ -53,6 +53,7 @@ class ItemsList extends Component {
           <FlatList
             data={this.formatData(dataSource, numColumns)}
             numColumns={numColumns}
+            initialNumToRender={4}
             renderItem={({item, index}) =>
               item.empty ? (
                 <View
