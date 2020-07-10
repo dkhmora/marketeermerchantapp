@@ -90,6 +90,7 @@ class AddItemScreen extends Component {
       width: 400,
       height: 400,
       cropping: true,
+      compressImageQuality: 0.85,
     })
       .then((image) => {
         this.imagePath = image.path;
@@ -104,6 +105,7 @@ class AddItemScreen extends Component {
       width: 400,
       height: 400,
       cropping: true,
+      compressImageQuality: 0.85,
     })
       .then((image) => {
         this.imagePath = image.path;

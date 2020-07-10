@@ -20,6 +20,7 @@ import BaseOptionsMenu from '../components/BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import {Switch} from 'react-native-gesture-handler';
 import StoreCard from '../components/StoreCard';
+import FastImage from 'react-native-fast-image';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -33,6 +34,7 @@ class StoreDetailsScreen extends Component {
     this.props.itemsStore.setItemCategories(this.props.authStore.merchantId);
 
     this.state = {
+      loading: false,
       CODCheckbox: false,
       onlineBankingCheckbox: false,
       grabExpressCheckbox: false,
@@ -40,13 +42,13 @@ class StoreDetailsScreen extends Component {
       mrSpeedyCheckbox: false,
       ownServiceCheckbox: false,
       sameDayDeliveryCheckbox: false,
+      displayImageUrl: null,
+      coverImageUrl: null,
+      oldDisplayImageUrl: null,
+      oldCoverImageUrl: null,
     };
   }
 
-  @observable displayUrl = null;
-  @observable coverUrl = null;
-  @observable displayPath = null;
-  @observable coverPath = null;
   @observable editMode = false;
   @observable newStoreName = '';
   @observable newStoreDescription = '';
@@ -62,7 +64,9 @@ class StoreDetailsScreen extends Component {
   }
 
   componentDidUpdate() {
-    if (!this.displayUrl || !this.coverUrl) {
+    const {displayImageUrl, coverImageUrl} = this.state;
+
+    if (!displayImageUrl || !coverImageUrl) {
       this.getImage();
     }
   }
@@ -75,6 +79,12 @@ class StoreDetailsScreen extends Component {
     this.newPaymentMethods = [];
     this.newShippingMethods = [];
     this.storeDetailsHeaderColor = colors.primary;
+
+    this.setState({
+      displayImageUrl: this.state.oldDisplayImageUrl,
+      coverImageUrl: this.state.oldCoverImageUrl,
+    });
+
     this.editMode = !this.editMode;
   }
 
@@ -98,8 +108,15 @@ class StoreDetailsScreen extends Component {
       this.newDeliveryType = deliveryType;
       this.handleEditCheckBoxes();
       this.handleEditDeliveryTypeCheckboxes();
+
+      this.setState({
+        oldDisplayImageUrl: this.state.displayImageUrl,
+        oldCoverImageUrl: this.state.coverImageUrl,
+      });
       this.editMode = !this.editMode;
     }
+
+    this.setState({loading: false});
   }
 
   handleEditDeliveryTypeCheckboxes() {
@@ -126,67 +143,55 @@ class StoreDetailsScreen extends Component {
     if (displayImage) {
       const displayRef = storage().ref(displayImage);
       const displayLink = await displayRef.getDownloadURL();
-      this.displayUrl = displayLink;
+
+      this.setState({displayImageUrl: {uri: displayLink}});
     }
 
     if (coverImage) {
       const coverRef = storage().ref(coverImage);
       const coverLink = await coverRef.getDownloadURL();
-      this.coverUrl = coverLink;
+
+      this.setState({coverImageUrl: {uri: coverLink}});
     }
   };
 
   handleTakePhoto(type) {
-    const {uploadImage} = this.props.detailsStore;
-    const {merchantId} = this.props.authStore;
-    const {displayImage, coverImage} = this.props.detailsStore.storeDetails;
-
-    const currentImagePath = type === 'display' ? displayImage : coverImage;
     const width = type === 'display' ? 1080 : 1620;
 
     ImagePicker.openCamera({
       width,
       height: 1080,
       cropping: true,
+      compressImageQuality: 0.85,
     })
       .then((image) => {
-        this[`${type}Path`] = image.path;
+        if (type === 'display') {
+          this.setState({displayImageUrl: {uri: image.path}});
+        } else {
+          this.setState({coverImageUrl: {uri: image.path}});
+        }
       })
       .then(() => console.log('Image path successfully set!'))
-      .then(() =>
-        uploadImage(merchantId, this[`${type}Path`], type, currentImagePath),
-      )
-      .then(() => {
-        this[`${type}Path`] = null;
-        this[`${type}Url`] = null;
-      })
       .catch((err) => console.log(err));
   }
 
   handleSelectImage(type) {
-    const {uploadImage} = this.props.detailsStore;
-    const {merchantId} = this.props.authStore;
-    const {displayImage, coverImage} = this.props.detailsStore.storeDetails;
-
-    const currentImagePath = type === 'display' ? displayImage : coverImage;
     const width = type === 'display' ? 1080 : 1620;
 
     ImagePicker.openPicker({
       width,
       height: 1080,
       cropping: true,
+      compressImageQuality: 0.85,
     })
       .then((image) => {
-        this[`${type}Path`] = image.path;
+        if (type === 'display') {
+          this.setState({displayImageUrl: {uri: image.path}});
+        } else {
+          this.setState({coverImageUrl: {uri: image.path}});
+        }
       })
       .then(() => console.log('Image path successfully set!'))
-      .then(() =>
-        uploadImage(merchantId, this[`${type}Path`], type, currentImagePath),
-      )
-      .then(() => {
-        this[`${type}Path`] = null;
-        this[`${type}Url`] = null;
-      })
       .catch((err) => console.log(err));
   }
 
@@ -233,9 +238,15 @@ class StoreDetailsScreen extends Component {
     }
   }
 
-  handleConfirmDetails() {
-    const {updateStoreDetails} = this.props.detailsStore;
+  async handleConfirmDetails() {
+    const {updateStoreDetails, uploadImage} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
+    const {
+      displayImageUrl,
+      coverImageUrl,
+      oldDisplayImageUrl,
+      oldCoverImageUrl,
+    } = this.state;
     const {
       freeDelivery,
       storeDescription,
@@ -246,8 +257,32 @@ class StoreDetailsScreen extends Component {
       deliveryType,
     } = this.props.detailsStore.storeDetails;
 
+    this.setState({loading: true});
+
     this.handleCheckBoxes();
     this.handleDeliveryTypeCheckboxes();
+
+    if (coverImageUrl !== oldCoverImageUrl) {
+      await uploadImage(
+        merchantId,
+        coverImageUrl.uri,
+        'cover',
+        oldCoverImageUrl,
+      ).then(() => {
+        this.setState({oldCoverImageUrl: coverImageUrl});
+      });
+    }
+
+    if (displayImageUrl !== oldDisplayImageUrl) {
+      await uploadImage(
+        merchantId,
+        displayImageUrl.uri,
+        'display',
+        oldDisplayImageUrl,
+      ).then(() => {
+        this.setState({oldDisplayImageUrl: displayImageUrl});
+      });
+    }
 
     if (
       freeDelivery !== this.newFreeDelivery ||
@@ -258,7 +293,7 @@ class StoreDetailsScreen extends Component {
       shippingMethods !== this.newShippingMethods ||
       deliveryType !== this.newDeliveryType
     ) {
-      updateStoreDetails(
+      await updateStoreDetails(
         merchantId,
         this.newStoreName,
         this.newStoreDescription,
@@ -322,12 +357,9 @@ class StoreDetailsScreen extends Component {
 
   render() {
     const {
-      cities,
       freeDelivery,
-      itemCategories,
       storeDescription,
       storeName,
-      visibleToPublic,
       vacationMode,
       paymentMethods,
       shippingMethods,
@@ -336,6 +368,8 @@ class StoreDetailsScreen extends Component {
       orderNumber,
       storeCategory,
     } = this.props.detailsStore.storeDetails;
+
+    const {coverImageUrl, displayImageUrl, loading} = this.state;
 
     if (Object.keys(this.props.detailsStore.storeDetails).length > 0) {
       return (
@@ -400,22 +434,36 @@ class StoreDetailsScreen extends Component {
                         alignItems: 'flex-end',
                         justifyContent: 'space-between',
                       }}>
-                      <Button
-                        type="clear"
-                        color={colors.icons}
-                        icon={<Icon name="check" color={colors.icons} />}
-                        iconRight
-                        title="Confirm"
-                        titleStyle={{color: colors.icons, paddingRight: 15}}
-                        onPress={() => this.handleConfirmDetails()}
-                        buttonStyle={{paddingTop: 10}}
-                        containerStyle={{
-                          borderRadius: 24,
-                          borderColor: colors.icons,
-                          borderWidth: 1,
-                          paddingHorizontal: -20,
-                        }}
-                      />
+                      {loading ? (
+                        <View
+                          style={{
+                            height: '100%',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                          <ActivityIndicator
+                            size="small"
+                            color={colors.icons}
+                          />
+                        </View>
+                      ) : (
+                        <Button
+                          type="clear"
+                          color={colors.icons}
+                          icon={<Icon name="check" color={colors.icons} />}
+                          iconRight
+                          title="Confirm"
+                          titleStyle={{color: colors.icons, paddingRight: 15}}
+                          onPress={() => this.handleConfirmDetails()}
+                          buttonStyle={{paddingTop: 10}}
+                          containerStyle={{
+                            borderRadius: 24,
+                            borderColor: colors.icons,
+                            borderWidth: 1,
+                            paddingHorizontal: -20,
+                          }}
+                        />
+                      )}
                       <Button
                         type="clear"
                         color={colors.icons}
@@ -448,7 +496,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{paddingRight: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Display Image
                     </Text>
 
@@ -478,28 +529,26 @@ class StoreDetailsScreen extends Component {
                     )}
                   </View>
 
-                  {this.displayUrl && (
-                    <View
+                  <View
+                    style={{
+                      flex: 1,
+                      alignSelf: 'flex-start',
+                      alignItems: 'flex-end',
+                    }}>
+                    <FastImage
+                      source={displayImageUrl}
                       style={{
-                        flex: 1,
-                        alignSelf: 'flex-start',
-                        alignItems: 'flex-end',
-                      }}>
-                      <Image
-                        source={{uri: this.displayUrl}}
-                        style={{
-                          width: '70%',
-                          aspectRatio: 1,
-                          backgroundColor: '#e1e4e8',
-                          borderRadius: 10,
-                          borderWidth: 1,
-                          borderColor: this.editMode
-                            ? this.storeDetailsHeaderColor
-                            : colors.primary,
-                        }}
-                      />
-                    </View>
-                  )}
+                        width: '70%',
+                        aspectRatio: 1,
+                        backgroundColor: '#e1e4e8',
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        borderColor: this.editMode
+                          ? this.storeDetailsHeaderColor
+                          : colors.primary,
+                      }}
+                    />
+                  </View>
                 </View>
               </CardItem>
 
@@ -514,7 +563,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{paddingRight: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Cover Image
                     </Text>
 
@@ -540,30 +592,28 @@ class StoreDetailsScreen extends Component {
                     )}
                   </View>
 
-                  {this.coverUrl && (
-                    <View
+                  <View
+                    style={{
+                      flex: 1,
+                      alignSelf: 'flex-start',
+                      alignItems: 'flex-end',
+                    }}>
+                    <FastImage
+                      source={coverImageUrl}
                       style={{
-                        flex: 1,
-                        alignSelf: 'flex-start',
-                        alignItems: 'flex-end',
-                      }}>
-                      <Image
-                        source={{uri: this.coverUrl}}
-                        style={{
-                          width: '100%',
-                          aspectRatio: 1620 / 1080,
-                          backgroundColor: '#e1e4e8',
-                          alignSelf: 'center',
-                          borderRadius: 10,
-                          borderWidth: 1,
-                          borderColor: this.editMode
-                            ? this.storeDetailsHeaderColor
-                            : colors.primary,
-                          resizeMode: 'cover',
-                        }}
-                      />
-                    </View>
-                  )}
+                        width: '100%',
+                        aspectRatio: 1620 / 1080,
+                        backgroundColor: '#e1e4e8',
+                        alignSelf: 'center',
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        borderColor: this.editMode
+                          ? this.storeDetailsHeaderColor
+                          : colors.primary,
+                        resizeMode: 'cover',
+                      }}
+                    />
+                  </View>
                 </View>
               </CardItem>
 
@@ -578,7 +628,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Display Name
                     </Text>
                   </View>
@@ -622,7 +675,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Description
                     </Text>
                   </View>
@@ -667,7 +723,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Store Category
                     </Text>
                   </View>
@@ -697,7 +756,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Free Delivery
                     </Text>
                   </View>
@@ -742,7 +804,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Delivery Type
                     </Text>
                   </View>
@@ -795,7 +860,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Vacation Mode
                     </Text>
                   </View>
@@ -840,7 +908,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Payment Methods
                     </Text>
                   </View>
@@ -886,7 +957,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Shipping Methods
                     </Text>
                   </View>
@@ -951,7 +1025,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Credits
                     </Text>
                   </View>
@@ -983,7 +1060,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Credit Threshold
                     </Text>
                   </View>
@@ -1015,7 +1095,10 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <View style={{flex: 2, paddingright: 10}}>
                     <Text
-                      style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
                       Number of Orders
                     </Text>
                   </View>
