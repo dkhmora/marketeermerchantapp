@@ -25,6 +25,7 @@ class DetailsStore {
     lowerRange,
     upperRange,
     locationCoordinates,
+    boundingBox,
     address,
   ) {
     return firestore()
@@ -35,6 +36,7 @@ class DetailsStore {
           lowerRange,
           upperRange,
           ...locationCoordinates,
+          boundingBox,
           address,
         },
       });
