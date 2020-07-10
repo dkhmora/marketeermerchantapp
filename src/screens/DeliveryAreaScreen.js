@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import MapView, {Circle, Marker} from 'react-native-maps';
+import MapView, {Circle, Marker, Polygon} from 'react-native-maps';
 import {
   View,
   StatusBar,
@@ -19,6 +19,8 @@ import * as geolib from 'geolib';
 import BaseHeader from '../components/BaseHeader';
 import RNGooglePlaces from 'react-native-google-places';
 import Toast from '../components/Toast';
+import * as turf from '@turf/turf';
+
 @inject('authStore')
 @inject('detailsStore')
 @observer
@@ -30,9 +32,10 @@ class DeliveryAreaScreen extends Component {
       mapReady: false,
       editMode: false,
       updating: false,
+      boundingBox: null,
       address: null,
-      radius: 0,
-      initialRadius: 0,
+      distance: 0,
+      initialdistance: 0,
       newMarkerPosition: null,
       centerOfScreen: (Dimensions.get('window').height - 17) / 2,
     };
@@ -48,20 +51,54 @@ class DeliveryAreaScreen extends Component {
     }
   }
 
-  getGeohashRange = (latitude, longitude, distance) => {
+  getBoundsOfDistance({latitude, longitude}, distance) {
     const bounds = geolib.getBoundsOfDistance(
       {latitude, longitude},
       distance * 1000,
     );
 
-    const lower = geohash.encode(bounds[0].latitude, bounds[0].longitude, 20);
-    const upper = geohash.encode(bounds[1].latitude, bounds[1].longitude, 20);
+    return bounds;
+  }
+
+  getGeohashRange = (latitude, longitude, distance) => {
+    const bounds = this.getBoundsOfDistance({latitude, longitude}, distance);
+
+    const lower = geohash.encode(bounds[0].latitude, bounds[0].longitude, 12);
+    const upper = geohash.encode(bounds[1].latitude, bounds[1].longitude, 12);
+
+    console.log(bounds);
 
     return {
       lower,
       upper,
     };
   };
+
+  getBoundingBox(lower, upper) {
+    const line = turf.lineString([
+      [lower.latitude, lower.longitude],
+      [upper.latitude, upper.longitude],
+    ]);
+    const bbox = turf.bbox(line);
+    const bboxPolygon = turf.bboxPolygon(bbox);
+
+    let boundingBox = [];
+
+    bboxPolygon.geometry.coordinates.map((coordinate) => {
+      coordinate.map((latLng, index) => {
+        if (index <= 3) {
+          boundingBox.push({
+            latitude: latLng[0],
+            longitude: latLng[1],
+          });
+        }
+      });
+    });
+
+    console.log(boundingBox);
+
+    return boundingBox;
+  }
 
   decodeGeohash() {
     const {deliveryCoordinates} = this.props.detailsStore.storeDetails;
@@ -70,7 +107,7 @@ class DeliveryAreaScreen extends Component {
     const lower = geohash.decode(lowerRange);
     const upper = geohash.decode(upperRange);
 
-    const radius = Math.round(
+    const distance = Math.round(
       geolib.getDistance(
         {
           latitude: lower.latitude,
@@ -83,17 +120,19 @@ class DeliveryAreaScreen extends Component {
       ) / 2000,
     );
 
+    const boundingBox = this.getBoundingBox(lower, upper);
+
     this.setState({
       markerPosition: {latitude, longitude},
       newMarkerPosition: {latitude, longitude},
-      circlePosition: {latitude, longitude},
+      boundingBox,
       mapData: {
         latitude,
         longitude,
         latitudeDelta: 0.04,
         longitudeDelta: 0.05,
       },
-      radius,
+      distance,
       mapReady: true,
     });
   }
@@ -114,9 +153,6 @@ class DeliveryAreaScreen extends Component {
             ...coords,
             latitudeDelta: 0.04,
             longitudeDelta: 0.05,
-          },
-          circlePosition: {
-            ...coords,
           },
           mapReady: true,
         });
@@ -143,13 +179,16 @@ class DeliveryAreaScreen extends Component {
   async handleSetStoreLocation() {
     const {updateCoordinates} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
-    const {newMarkerPosition, radius, address} = this.state;
+    const {newMarkerPosition, distance, address} = this.state;
 
     const range = this.getGeohashRange(
       newMarkerPosition.latitude,
       newMarkerPosition.longitude,
-      radius,
+      distance,
     );
+
+    const bounds = this.getBoundsOfDistance({...newMarkerPosition}, distance);
+    const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
 
     this.setState({loading: true});
 
@@ -159,6 +198,7 @@ class DeliveryAreaScreen extends Component {
           address: await this.props.detailsStore.getAddressFromCoordinates({
             ...newMarkerPosition,
           }),
+          boundingBox,
         },
         () => {
           updateCoordinates(
@@ -166,6 +206,7 @@ class DeliveryAreaScreen extends Component {
             range.lower,
             range.upper,
             newMarkerPosition,
+            boundingBox,
             this.state.address,
           )
             .then(() => {
@@ -192,7 +233,6 @@ class DeliveryAreaScreen extends Component {
 
     this.setState({
       editMode: false,
-      circlePosition: newMarkerPosition,
       markerPosition: newMarkerPosition,
     });
   }
@@ -257,7 +297,7 @@ class DeliveryAreaScreen extends Component {
         longitudeDelta: 0.05,
       },
       newMarkerPosition: this.state.markerPosition,
-      initialRadius: this.state.radius,
+      initialdistance: this.state.distance,
       editMode: true,
     });
 
@@ -265,12 +305,12 @@ class DeliveryAreaScreen extends Component {
   }
 
   handleCancelChanges() {
-    const {markerPosition, initialRadius} = this.state;
+    const {markerPosition, initialdistance} = this.state;
 
     this.setState({
       mapData: {...markerPosition, latitudeDelta: 0.04, longitudeDelta: 0.05},
       newMarkerPosition: {...markerPosition},
-      radius: initialRadius,
+      distance: initialdistance,
       editMode: false,
     });
 
@@ -281,16 +321,20 @@ class DeliveryAreaScreen extends Component {
     const {editMode} = this.state;
     const {latitude, longitude} = mapData;
 
+    const bounds = this.getBoundsOfDistance(
+      {latitude, longitude},
+      this.state.distance,
+    );
+
+    const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
+
     if (editMode) {
       this.setState({
         newMarkerPosition: {
           latitude,
           longitude,
         },
-        circlePosition: {
-          latitude,
-          longitude,
-        },
+        boundingBox,
       });
     }
   };
@@ -311,23 +355,21 @@ class DeliveryAreaScreen extends Component {
           newMarkerPosition: {...coordinates},
           editMode: true,
         });
-        // place represents user's selection from the
-        // suggestions and it is a simplified Google Place object.
       })
-      .catch((error) => console.log(error.message)); // error is a Javascript Error object
+      .catch((error) => console.log(error.message));
   }
 
   render() {
     const {navigation} = this.props;
     const {
       markerPosition,
-      radius,
-      circlePosition,
+      distance,
       centerOfScreen,
       mapData,
       mapReady,
       editMode,
       loading,
+      boundingBox,
     } = this.state;
 
     return (
@@ -359,14 +401,14 @@ class DeliveryAreaScreen extends Component {
                 </View>
               </Marker>
             )}
-            <Circle
-              center={circlePosition}
-              radius={radius * 1000}
-              fillColor="rgba(233, 30, 99, 0.3)"
-              strokeColor="rgba(0,0,0,0.5)"
-              zIndex={2}
-              strokeWidth={2}
-            />
+            {boundingBox && (
+              <Polygon
+                coordinates={boundingBox}
+                fillColor="rgba(233, 30, 99, 0.3)"
+                strokeColor="rgba(0,0,0,0.5)"
+                strokeWidth={1}
+              />
+            )}
           </MapView>
         )}
         {editMode && (
@@ -395,13 +437,13 @@ class DeliveryAreaScreen extends Component {
             }}>
             <Card
               style={{
-                borderRadius: 16,
+                borderdistance: 16,
                 overflow: 'hidden',
                 backgroundColor: 'rgba(255,255,255, 0.6)',
               }}>
               <CardItem style={{flexDirection: 'column'}}>
                 <Text style={{alignSelf: 'flex-start', marginBottom: 5}}>
-                  Delivery Radius
+                  Delivery distance
                 </Text>
                 <View
                   style={{
@@ -411,17 +453,17 @@ class DeliveryAreaScreen extends Component {
                     step={1}
                     minimumValue={0}
                     maximumValue={100}
-                    value={radius}
+                    value={distance}
                     thumbTintColor={colors.accent}
-                    onValueChange={(value) => this.setState({radius: value})}
+                    onValueChange={(value) => this.setState({distance: value})}
                   />
-                  <Text style={{alignSelf: 'center'}}>{radius} KM</Text>
+                  <Text style={{alignSelf: 'center'}}>{distance} KM</Text>
                 </View>
               </CardItem>
               <CardItem style={{alignSelf: 'center'}}>
                 <Card
                   style={{
-                    borderRadius: 16,
+                    borderdistance: 16,
                     overflow: 'hidden',
                     backgroundColor: '#eee',
                   }}>
@@ -490,7 +532,7 @@ class DeliveryAreaScreen extends Component {
               type="clear"
               icon={<Icon name="search" color={colors.icons} />}
               titleStyle={{color: colors.icons}}
-              buttonStyle={{borderRadius: 24}}
+              buttonStyle={{borderdistance: 24}}
               onPress={() => this.openSearchModal()}
             />
           }
