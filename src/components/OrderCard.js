@@ -25,6 +25,10 @@ import {colors} from '../../assets/colors';
 class OrderCard extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      loading: false,
+    };
   }
 
   @observable confirmationModal = false;
@@ -39,30 +43,41 @@ class OrderCard extends Component {
   }
 
   @computed get orderStatus() {
-    const {orderStatus} = this.props;
+    const {order} = this.props;
 
-    const statusLabel = Object.entries(orderStatus).map(([key, value]) => {
-      if (value.status) {
-        return key.toUpperCase();
-      }
+    const statusLabel = Object.entries(order.orderStatus).map(
+      ([key, value]) => {
+        if (value.status) {
+          return key.toUpperCase();
+        }
 
-      return;
-    });
+        return;
+      },
+    );
 
     return statusLabel.filter((item) => item != null);
   }
 
   handleChangeOrderStatus() {
-    const {orderId, merchantOrderNumber} = this.props;
-    this.props.ordersStore.setOrderStatus(orderId).then(() => {
-      Toast.show({
-        text: `Successfully changed Order # ${merchantOrderNumber} status!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 3500,
-        style: {margin: 20, borderRadius: 16},
+    const {order} = this.props;
+    const orderFetchLimit = 5;
+
+    this.setState({loading: true});
+
+    this.props.ordersStore
+      .setOrderStatus(order.orderId, order.merchantId, orderFetchLimit)
+      .then(() => {
+        Toast.show({
+          text: `Successfully changed Order # ${order.merchantOrderNumber} status!`,
+          buttonText: 'Okay',
+          type: 'success',
+          duration: 3500,
+          style: {margin: 20, borderRadius: 16},
+        });
+      })
+      .then(() => {
+        this.setState({loading: false});
       });
-    });
     this.closeConfirmationModal();
   }
 
@@ -75,16 +90,18 @@ class OrderCard extends Component {
   }
 
   handleCancelOrder() {
-    const {orderId, merchantOrderNumber} = this.props;
-    this.props.ordersStore.cancelOrder(orderId, this.cancelReason).then(() => {
-      Toast.show({
-        text: `Order # ${merchantOrderNumber} successfully cancelled!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 3500,
-        style: {margin: 20, borderRadius: 16},
+    const {order} = this.props;
+    this.props.ordersStore
+      .cancelOrder(order.orderId, this.cancelReason)
+      .then(() => {
+        Toast.show({
+          text: `Order # ${order.merchantOrderNumber} successfully cancelled!`,
+          buttonText: 'Okay',
+          type: 'success',
+          duration: 3500,
+          style: {margin: 20, borderRadius: 16},
+        });
       });
-    });
   }
 
   openOptions() {
@@ -242,6 +259,7 @@ class OrderCard extends Component {
               <Button
                 title={buttonText}
                 titleStyle={{color: colors.icons}}
+                loading={this.state.loading}
                 buttonStyle={{backgroundColor: colors.accent}}
                 containerStyle={{
                   borderRadius: 24,

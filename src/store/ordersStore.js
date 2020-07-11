@@ -372,7 +372,16 @@ class OrdersStore {
     }
   }
 
-  @action async setOrderStatus(orderId) {
+  @action async refreshOrders(merchantId, limit) {
+    this.setCancelledOrders(merchantId, limit);
+    this.setCompletedOrders(merchantId, limit);
+    this.setPaidOrders(merchantId, limit);
+    this.setPendingOrders(merchantId, limit);
+    this.setUnpaidOrders(merchantId, limit);
+    this.setShippedOrders(merchantId, limit);
+  }
+
+  @action async setOrderStatus(orderId, merchantId, limit) {
     const statusArray = [
       'pending',
       'unpaid',
@@ -382,11 +391,14 @@ class OrdersStore {
       'cancelled',
     ];
     const orderRef = firestore().collection('orders').doc(orderId);
+    console.log(orderId);
 
     await orderRef
       .get()
       .then((documentReference) => {
         const {orderStatus, paymentMethod} = documentReference.data();
+        console.log('what');
+        console.log(documentReference.data());
         let newOrderStatus = {};
         let currentStatus;
         Object.keys(orderStatus).map((item, index) => {
@@ -412,10 +424,33 @@ class OrdersStore {
           updatedAt: new Date().toISOString(),
         };
 
-        return newOrderStatus;
+        return {newOrderStatus, currentStatus, nextStatus};
       })
-      .then((newOrderStatus) => {
-        orderRef.update({orderStatus: newOrderStatus});
+      .then(({newOrderStatus, currentStatus, nextStatus}) => {
+        console.log(currentStatus, nextStatus);
+
+        orderRef.update({orderStatus: newOrderStatus}).then(() => {
+          (currentStatus === 'pending' || nextStatus === 'pending') &&
+            this.setPendingOrders(merchantId, limit);
+
+          (currentStatus === 'paid' || nextStatus === 'paid') &&
+            this.setPaidOrders(merchantId, limit);
+
+          (currentStatus === 'unpaid' || nextStatus === 'unpaid') &&
+            this.setUnpaidOrders(merchantId, limit);
+
+          (currentStatus === 'shipped' || nextStatus === 'shipped') &&
+            this.setShippedOrders(merchantId, limit);
+
+          (currentStatus === 'completed' || nextStatus === 'completed') &&
+            this.setCompletedOrders(merchantId, limit);
+
+          (currentStatus === 'cancelled' || nextStatus === 'cancelled') &&
+            this.setCancelledOrders(merchantId, limit);
+        });
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }
 
