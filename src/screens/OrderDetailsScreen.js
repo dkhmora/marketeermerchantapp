@@ -49,7 +49,6 @@ class OrderDetailsScreen extends Component {
         orderItems: await getOrderItems(order.orderId),
       },
       () => {
-        console.log(this.state.orderItems);
         this.setState({loading: false});
       },
     );

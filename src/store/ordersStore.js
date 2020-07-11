@@ -116,7 +116,6 @@ class OrdersStore {
       .get()
       .then((documentReference) => {
         if (documentReference.exists) {
-          console.log('docref', documentReference.data().items);
           return documentReference.data().items;
         } else {
           return null;
