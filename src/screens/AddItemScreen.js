@@ -125,14 +125,14 @@ class AddItemScreen extends Component {
         <BaseHeader title={name} backButton navigation={navigation} />
         <Content>
           <Grid style={{padding: 18}}>
-            <Row size={3} style={{marginBottom: '2%'}}>
+            <Row size={3} style={{marginBottom: 10}}>
               <Col style={{justifyContent: 'center'}}>
                 <Image
                   source={imageDisplay}
                   style={{
                     alignSelf: 'flex-start',
                     borderColor: '#BDBDBD',
-                    borderRadius: 24,
+                    borderRadius: 10,
                     borderWidth: 1,
                     aspectRatio: 1,
                     height: '100%',
@@ -168,7 +168,7 @@ class AddItemScreen extends Component {
               </Col>
             </Row>
             <Row>
-              <Card style={{borderRadius: 16, overflow: 'hidden'}}>
+              <Card style={{borderRadius: 10, overflow: 'hidden'}}>
                 <CardItem>
                   <Text note style={{textAlign: 'left'}}>
                     Tip: Uploading a photo makes customers more likely to buy
