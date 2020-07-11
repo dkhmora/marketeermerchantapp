@@ -66,8 +66,6 @@ class DeliveryAreaScreen extends Component {
     const lower = geohash.encode(bounds[0].latitude, bounds[0].longitude, 12);
     const upper = geohash.encode(bounds[1].latitude, bounds[1].longitude, 12);
 
-    console.log(bounds);
-
     return {
       lower,
       upper,
@@ -94,8 +92,6 @@ class DeliveryAreaScreen extends Component {
         }
       });
     });
-
-    console.log(boundingBox);
 
     return boundingBox;
   }

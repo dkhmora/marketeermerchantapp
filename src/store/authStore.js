@@ -29,7 +29,6 @@ class AuthStore {
   }
 
   @action async checkNotificationSubscriptionStatus() {
-    console.log(this.merchantId);
     await messaging()
       .getToken()
       .then((token) =>
