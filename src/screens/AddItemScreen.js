@@ -44,7 +44,7 @@ class AddItemScreen extends Component {
   @observable description = '';
   @observable unit = '';
   @observable price = '';
-  @observable stock = 0;
+  @observable stock = '';
   @observable categories = this.props.itemsStore.itemCategories;
 
   componentDidMount() {
@@ -73,8 +73,8 @@ class AddItemScreen extends Component {
         this.name,
         this.description,
         this.unit,
-        this.price,
-        this.stock,
+        Math.ceil(this.price),
+        Number(Math.trunc(this.stock)),
       )
       .then(() => {
         this.props.navigation.goBack();
