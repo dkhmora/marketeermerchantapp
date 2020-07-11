@@ -141,37 +141,14 @@ class ItemsStore {
       });
   }
 
-  @action async deleteStoreItem(
-    merchantId,
-    category,
-    name,
-    description,
-    unit,
-    price,
-    stock,
-    sales,
-    image,
-    createdAt,
-  ) {
+  @action async deleteStoreItem(merchantId, item) {
     const merchantItemsRef = firestore()
       .collection('merchant_items')
       .doc(merchantId);
 
     await merchantItemsRef
-      .update(
-        'items',
-        firestore.FieldValue.arrayRemove({
-          category,
-          name,
-          description,
-          unit,
-          price,
-          stock,
-          sales,
-          image,
-          createdAt,
-        }),
-      )
+      .update('items', firestore.FieldValue.arrayRemove(item))
+      .then(() => this.deleteImage(item.image))
       .then(() => console.log('Item deleted!'))
       .catch((err) => console.error(err));
   }

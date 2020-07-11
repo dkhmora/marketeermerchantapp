@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Card, CardItem, Body, View} from 'native-base';
-import {Image, ActionSheetIOS, Text} from 'react-native';
+import {Image, ActionSheetIOS} from 'react-native';
+import {Text} from 'react-native-elements';
 import moment, {ISO_8601} from 'moment';
 import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
@@ -8,6 +9,8 @@ import {observable} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
+import Toast from './Toast';
+import FastImage from 'react-native-fast-image';
 
 @inject('itemsStore')
 @inject('authStore')
@@ -20,38 +23,19 @@ class ItemCard extends Component {
   @observable url = null;
 
   getImage = async () => {
-    const ref = storage().ref(this.props.image);
+    const ref = storage().ref(this.props.item.image);
     const link = await ref.getDownloadURL();
     this.url = link;
   };
 
   handleDelete() {
     const {merchantId} = this.props.authStore;
-    const {deleteStoreItem, deleteImage} = this.props.itemsStore;
-    const {
-      category,
-      name,
-      image,
-      description,
-      price,
-      stock,
-      sales,
-      unit,
-      createdAt,
-    } = this.props;
+    const {deleteStoreItem} = this.props.itemsStore;
+    const {item} = this.props;
 
-    deleteStoreItem(
-      merchantId,
-      category,
-      name,
-      description,
-      unit,
-      price,
-      stock,
-      sales,
-      image,
-      createdAt,
-    ).then(() => deleteImage(image));
+    deleteStoreItem(merchantId, item).then(() => {
+      Toast({text: `${item.name} successfully deleted`});
+    });
   }
 
   openOptions() {
@@ -72,25 +56,15 @@ class ItemCard extends Component {
   }
 
   componentDidMount() {
-    if (this.props.image) {
+    if (this.props.item.image) {
       this.getImage();
     }
   }
 
   render() {
-    const {
-      name,
-      image,
-      description,
-      price,
-      stock,
-      sales,
-      unit,
-      createdAt,
-      ...otherProps
-    } = this.props;
+    const {item, ...otherProps} = this.props;
 
-    const timeStamp = moment(createdAt, ISO_8601).fromNow();
+    const timeStamp = moment(item.createdAt, ISO_8601).fromNow();
 
     return (
       <View
@@ -114,11 +88,21 @@ class ItemCard extends Component {
               justifyContent: 'space-between',
             }}>
             <View style={{flexDirection: 'column'}}>
-              <Text style={{color: '#fff'}}>{name}</Text>
-
-              <Text note style={{color: '#ddd'}}>
-                Stock: {stock}
+              <Text
+                style={{
+                  color: colors.icons,
+                  fontFamily: 'ProductSans-Regular',
+                }}>
+                {item.name}
               </Text>
+
+              <Text
+                note
+                style={{fontFamily: 'ProductSans-Black', color: colors.icons}}>
+                Stock: {item.stock}
+              </Text>
+
+              <Text style={{color: '#ddd'}}>{item.sales} Sold</Text>
             </View>
 
             <BaseOptionsMenu
@@ -131,10 +115,7 @@ class ItemCard extends Component {
 
           <CardItem cardBody>
             {this.url ? (
-              <Image
-                loadingIndicatorSource={
-                  (require('../../assets/placeholder.jpg'), 2)
-                }
+              <FastImage
                 source={{uri: this.url}}
                 style={{
                   height: 150,
@@ -144,11 +125,11 @@ class ItemCard extends Component {
                 }}
               />
             ) : (
-              <Image
+              <FastImage
                 source={require('../../assets/placeholder.jpg')}
                 style={{
                   height: 150,
-                  width: null,
+                  aspectRatio: 1,
                   flex: 1,
                   backgroundColor: '#e1e4e8',
                 }}
@@ -171,14 +152,21 @@ class ItemCard extends Component {
                 flexShrink: 1,
               }}>
               <ScrollView style={{flex: 1}}>
-                <Text>{description ? description : 'No description'}</Text>
+                <Text>
+                  {item.description ? item.description : 'No description'}
+                </Text>
               </ScrollView>
             </Body>
           </CardItem>
 
           <CardItem
             bordered
-            style={{bottom: 20, elevation: 5, justifyContent: 'center'}}>
+            style={{
+              bottom: 20,
+              elevation: 5,
+              justifyContent: 'center',
+              flexDirection: 'column',
+            }}>
             <View
               style={{
                 borderRadius: 10,
@@ -191,7 +179,7 @@ class ItemCard extends Component {
                   fontFamily: 'ProductSans-Black',
                   color: colors.icons,
                 }}>
-                ₱ {price}/{unit}
+                ₱ {item.price}/{item.unit}
               </Text>
             </View>
           </CardItem>
