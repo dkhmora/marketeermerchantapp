@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import {Card, CardItem, Body, View} from 'native-base';
-import {Image, ActionSheetIOS} from 'react-native';
+import {Card, CardItem, Body} from 'native-base';
+import {View} from 'react-native';
 import {Text} from 'react-native-elements';
 import moment, {ISO_8601} from 'moment';
 import storage from '@react-native-firebase/storage';
@@ -24,8 +24,11 @@ class ItemCard extends Component {
 
   getImage = async () => {
     const ref = storage().ref(this.props.item.image);
-    const link = await ref.getDownloadURL();
-    this.url = link;
+    const link = await ref.getDownloadURL().catch((err) => console.log(err));
+
+    if (link) {
+      this.url = link;
+    }
   };
 
   handleDelete() {
@@ -36,23 +39,6 @@ class ItemCard extends Component {
     deleteStoreItem(merchantId, item).then(() => {
       Toast({text: `${item.name} successfully deleted`});
     });
-  }
-
-  openOptions() {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: ['Cancel', 'Delete'],
-        destructiveIndex: 1,
-        cancelButtonIndex: 0,
-      },
-      (buttonIndex) => {
-        if (buttonIndex === 0) {
-          // cancel action
-        } else {
-          this.handleDelete();
-        }
-      },
-    );
   }
 
   componentDidMount() {

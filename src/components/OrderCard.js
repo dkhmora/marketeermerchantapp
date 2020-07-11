@@ -67,34 +67,10 @@ class OrderCard extends Component {
   }
 
   handleViewOrderItems() {
-    const {
-      navigation,
-      deliveryCoordinates,
-      orderId,
-      orderStatus,
-      userName,
-      merchantOrderNumber,
-      quantity,
-      shippingPrice,
-      totalAmount,
-      deliveryAddress,
-      createdAt,
-    } = this.props;
+    const {navigation, order} = this.props;
 
-    this.props.ordersStore.setOrderItems(orderId).then(() => {
-      navigation.dangerouslyGetParent().navigate('Order Details', {
-        orderId,
-        orderItems: this.props.ordersStore.orderItems,
-        deliveryCoordinates,
-        orderStatus,
-        userName,
-        merchantOrderNumber,
-        quantity,
-        shippingPrice,
-        totalAmount,
-        deliveryAddress,
-        createdAt,
-      });
+    navigation.dangerouslyGetParent().navigate('Order Details', {
+      order,
     });
   }
 
@@ -129,21 +105,7 @@ class OrderCard extends Component {
   }
 
   render() {
-    const {
-      merchantOrderNumber,
-      userName,
-      quantity,
-      totalAmount,
-      orderId,
-      paymentMethod,
-      deliveryAddress,
-      deliveryCoordinates,
-      createdAt,
-      index,
-      tabName,
-      navigation,
-      ...otherProps
-    } = this.props;
+    const {order, tabName, navigation, ...otherProps} = this.props;
 
     const buttonText =
       (tabName === 'Paid' && 'Ship') ||
@@ -160,10 +122,7 @@ class OrderCard extends Component {
           button
           onPress={() =>
             navigation.navigate('Order Chat', {
-              userName,
-              deliveryAddress,
-              orderId,
-              merchantOrderNumber,
+              order,
               orderStatus: this.orderStatus,
             })
           }
@@ -187,13 +146,14 @@ class OrderCard extends Component {
                   fontFamily: 'ProductSans-Regular',
                   fontSize: 18,
                 }}>
-                {userName}
+                {order.userName}
               </Text>
 
-              <Text style={{color: '#eee'}}>Order # {merchantOrderNumber}</Text>
+              <Text style={{color: '#eee'}}>
+                Order # {order.merchantOrderNumber}
+              </Text>
 
               <View
-                key={index}
                 style={{
                   borderRadius: 20,
                   backgroundColor: colors.accent,
@@ -210,7 +170,7 @@ class OrderCard extends Component {
                     color: '#fff',
                     textAlign: 'center',
                   }}>
-                  {paymentMethod}
+                  {order.paymentMethod}
                 </Text>
               </View>
             </View>
@@ -237,7 +197,7 @@ class OrderCard extends Component {
                   fontSize: 16,
                   textAlign: 'center',
                 }}>
-                ₱{(totalAmount * 0.05).toPrecision(3)}
+                ₱{(order.totalAmount * 0.05).toPrecision(3)}
               </Text>
 
               <Text
@@ -268,7 +228,7 @@ class OrderCard extends Component {
     const CardFooter = () => {
       const footerStatus = `Order ${tabName}`;
 
-      const timeStamp = moment(createdAt, ISO_8601).fromNow();
+      const timeStamp = moment(order.createdAt, ISO_8601).fromNow();
 
       return (
         <CardItem footer bordered>
@@ -391,7 +351,7 @@ class OrderCard extends Component {
                   fontSize: 16,
                   textAlign: 'right',
                 }}>
-                {deliveryAddress}
+                {order.deliveryAddress}
               </Text>
             </Right>
           </CardItem>
@@ -408,9 +368,9 @@ class OrderCard extends Component {
                   fontFamily: 'ProductSans-Black',
                   fontSize: 16,
                 }}>
-                ₱{totalAmount}
+                ₱ {order.totalAmount}
               </Text>
-              <Text note>{quantity} items</Text>
+              <Text note>{order.quantity} items</Text>
             </Right>
           </CardItem>
           <CardItem>

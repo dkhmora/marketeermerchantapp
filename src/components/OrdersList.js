@@ -118,18 +118,7 @@ class OrdersList extends Component {
           style={{flex: 1, paddingHorizontal: 10}}
           renderItem={({item, index}) => (
             <OrderCard
-              merchantId={merchantId}
-              merchantOrderNumber={item.merchantOrderNumber}
-              orderStatus={item.orderStatus}
-              deliveryCoordinates={item.deliveryCoordinates}
-              userName={`${item.userName}`}
-              quantity={item.quantity}
-              shippingPrice={item.shippingPrice}
-              paymentMethod={item.paymentMethod}
-              totalAmount={item.totalAmount}
-              orderId={item.orderId}
-              deliveryAddress={item.deliveryAddress}
-              createdAt={item.createdAt}
+              order={item}
               tabName={name}
               navigation={navigation}
               key={index}

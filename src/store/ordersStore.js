@@ -8,7 +8,6 @@ import {v4 as uuidv4} from 'uuid';
 const ordersCollection = firestore().collection('orders');
 class OrdersStore {
   @observable orders = [];
-  @observable orderItems = [];
   @observable pendingOrders = [];
   @observable paidOrders = [];
   @observable unpaidOrders = [];
@@ -109,13 +108,22 @@ class OrdersStore {
     }
   }
 
-  @action async setOrderItems(orderId) {
-    await firestore()
+  @action async getOrderItems(orderId) {
+    console.log(orderId);
+    return await firestore()
       .collection('order_items')
       .doc(orderId)
       .get()
       .then((documentReference) => {
-        return (this.orderItems = documentReference.data().items);
+        if (documentReference.exists) {
+          console.log('docref', documentReference.data().items);
+          return documentReference.data().items;
+        } else {
+          return null;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }
 
