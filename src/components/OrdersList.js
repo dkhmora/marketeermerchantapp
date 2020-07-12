@@ -6,6 +6,7 @@ import {observer, inject} from 'mobx-react';
 import OrderCard from './OrderCard';
 import {colors} from '../../assets/colors';
 import * as Animatable from 'react-native-animatable';
+import {computed} from 'mobx';
 
 @inject('authStore')
 @inject('ordersStore')
@@ -16,99 +17,35 @@ class OrdersList extends Component {
 
     this.state = {
       refreshing: true,
-      loading: false,
-      lastVisible: null,
-      limit: 5,
-      onEndReachedCalledDuringMomentum: true,
+      loading: true,
     };
   }
 
   componentDidMount() {
-    this.retrieveInitial();
+    this.retrieveOrders().then(() => {
+      this.setState({loading: false});
+    });
   }
 
-  retrieveInitial = () => {
-    const {storeVarName} = this.props.route.params;
-
-    this.setState({loading: true});
-
-    this.props.ordersStore[`${this.props.route.params.storeFunctionName}`](
-      this.props.authStore.merchantId,
-      this.state.limit,
-    ).then(() => {
-      this.setState({
-        loading: false,
-        lastVisible:
-          this.props.ordersStore[`${storeVarName}`].length > 0 &&
-          this.props.ordersStore[`${storeVarName}`][0].merchantOrderNumber -
-            this.state.limit +
-            1,
-      });
-    });
-  };
-
-  retrieveMore = () => {
-    if (
-      !this.state.onEndReachedCalledDuringMomentum &&
-      this.state.lastVisible >= 1
-    ) {
-      this.setState({refreshing: true, onEndReachedCalledDuringMomentum: true});
-
-      this.props.ordersStore[`${this.props.route.params.storeFunctionName}`](
-        this.props.authStore.merchantId,
-        this.state.limit,
-        this.state.lastVisible,
-      ).then(() => {
-        this.setState({
-          refreshing: false,
-          lastVisible: this.state.lastVisible - this.state.limit,
-          onEndReachedCalledDuringMomentum: false,
-        });
-      });
-    }
-  };
-
-  renderFooter = () => {
-    const {storeVarName} = this.props.route.params;
-
-    return (
-      <View style={{bottom: 50, width: '100%'}}>
-        {this.state.onEndReachedCalledDuringMomentum &&
-          this.props.ordersStore[`${storeVarName}`].length >=
-            this.state.limit && (
-            <Animatable.View
-              animation="slideInUp"
-              duration={400}
-              useNativeDriver
-              style={{
-                alignItems: 'center',
-                flex: 1,
-              }}>
-              <ActivityIndicator
-                size="large"
-                color={colors.primary}
-                style={{
-                  backgroundColor: colors.icons,
-                  borderRadius: 30,
-                  padding: 5,
-                  elevation: 5,
-                }}
-              />
-            </Animatable.View>
-          )}
-      </View>
-    );
-  };
+  async retrieveOrders() {
+    return await this.props.ordersStore[
+      `${this.props.route.params.storeFunctionName}`
+    ](this.props.authStore.merchantId);
+  }
 
   onRefresh() {
-    this.retrieveInitial();
+    this.setState({loading: true});
+
+    this.retrieveOrders().then(() => {
+      this.setState({loading: false});
+    });
   }
 
   render() {
     const {navigation} = this.props;
     const {storeVarName} = this.props.route.params;
     const {name} = this.props.route;
-    const {merchantId} = this.props.authStore;
+    const {loading} = this.state;
     const dataSource = this.props.ordersStore[`${storeVarName}`].slice();
 
     return (
@@ -126,20 +63,13 @@ class OrdersList extends Component {
           )}
           keyExtractor={(item) => item.orderId}
           showsVerticalScrollIndicator={false}
-          onEndReached={this.retrieveMore}
-          onEndReachedThreshold={0.01}
-          onMomentumScrollBegin={() => {
-            this.state.onEndReachedCalledDuringMomentum = false;
-          }}
           refreshControl={
             <RefreshControl
               colors={[colors.primary, colors.dark]}
-              refreshing={this.state.loading}
+              refreshing={loading}
               onRefresh={this.onRefresh.bind(this)}
             />
           }
-          refreshing={this.state.onEndReachedCalledDuringMomentum}
-          ListFooterComponent={this.renderFooter}
         />
       </View>
     );
