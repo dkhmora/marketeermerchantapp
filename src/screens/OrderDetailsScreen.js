@@ -13,8 +13,10 @@ import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import OrderItemListItem from '../components/OrderItemListItem';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
+import MapView, {Marker} from 'react-native-maps';
 
 @inject('ordersStore')
+@inject('detailsStore')
 @observer
 class OrderDetailsScreen extends Component {
   constructor(props) {
@@ -38,6 +40,32 @@ class OrderDetailsScreen extends Component {
     this.props.navigation
       .dangerouslyGetParent()
       .setOptions({gestureEnabled: true});
+  }
+
+  onMapReady() {
+    this.fitMarkers();
+  }
+
+  fitMarkers() {
+    const {order} = this.props.route.params;
+    const {storeDetails} = this.props.detailsStore;
+
+    this.map.fitToCoordinates(
+      [
+        {
+          latitude: order.deliveryCoordinates.latitude,
+          longitude: order.deliveryCoordinates.longitude,
+        },
+        {
+          latitude: storeDetails.deliveryCoordinates.latitude,
+          longitude: storeDetails.deliveryCoordinates.longitude,
+        },
+      ],
+      {
+        edgePadding: {left: 0, right: 40, top: 100, bottom: 100},
+        animated: true,
+      },
+    );
   }
 
   async getOrderItems() {
@@ -114,7 +142,6 @@ class OrderDetailsScreen extends Component {
         />
 
         <ScrollView
-          nestedScrollEnabled={true}
           showsVerticalScrollIndicator={false}
           style={{
             flex: 1,
@@ -173,7 +200,7 @@ class OrderDetailsScreen extends Component {
               </Right>
             </CardItem>
 
-            <CardItem bordered>
+            <CardItem>
               <Left>
                 <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
                   Delivery Address:
@@ -191,21 +218,6 @@ class OrderDetailsScreen extends Component {
                       }}>
                       {order.deliveryAddress}
                     </Text>
-
-                    <Button
-                      title={mapButtonText}
-                      titleStyle={{color: colors.icons, paddingRight: 5}}
-                      icon={<Icon name="map" color={colors.icons} />}
-                      iconRight
-                      full
-                      bordered
-                      onPress={() => this.openInMaps()}
-                      buttonStyle={{
-                        borderRadius: 24,
-                        paddingHorizontal: 20,
-                        backgroundColor: colors.accent,
-                      }}
-                    />
                   </View>
                 ) : (
                   <Text
@@ -219,6 +231,50 @@ class OrderDetailsScreen extends Component {
                   </Text>
                 )}
               </Right>
+            </CardItem>
+
+            <CardItem
+              style={{
+                paddingLeft: 0,
+                paddingRight: 0,
+                paddingTop: 0,
+                paddingBottom: 0,
+              }}>
+              <View style={{flex: 1, borderRadius: 10, overflow: 'hidden'}}>
+                <MapView
+                  style={{
+                    height: 300,
+                    width: '100%',
+                  }}
+                  ref={(map) => {
+                    this.map = map;
+                  }}
+                  onMapReady={() => this.onMapReady()}
+                  showsUserLocation
+                  initialRegion={{
+                    latitude: order.deliveryCoordinates.latitude,
+                    longitude: order.deliveryCoordinates.longitude,
+                    latitudeDelta: 0.009,
+                    longitudeDelta: 0.009,
+                  }}>
+                  {order.deliveryCoordinates.latitude &&
+                    order.deliveryCoordinates.longitude && (
+                      <Marker
+                        ref={(marker) => {
+                          this.marker = marker;
+                        }}
+                        tracksViewChanges={false}
+                        coordinate={{
+                          latitude: order.deliveryCoordinates.latitude,
+                          longitude: order.deliveryCoordinates.longitude,
+                        }}>
+                        <View>
+                          <Icon color={colors.primary} name="map-pin" />
+                        </View>
+                      </Marker>
+                    )}
+                </MapView>
+              </View>
             </CardItem>
           </Card>
 
