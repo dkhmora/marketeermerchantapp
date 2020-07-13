@@ -14,6 +14,7 @@ import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
 import {View, Platform} from 'react-native';
 import {SafeAreaConsumer, SafeAreaView} from 'react-native-safe-area-context';
+import ReviewsScreen from '../screens/ReviewsScreen';
 
 @inject('authStore')
 @observer
@@ -87,6 +88,12 @@ class MainDrawer extends Component {
         <Drawer.Screen
           name="Orders"
           component={OrdersScreen}
+          initialParams={{merchantId}}
+        />
+
+        <Drawer.Screen
+          name="Reviews"
+          component={ReviewsScreen}
           initialParams={{merchantId}}
         />
 
