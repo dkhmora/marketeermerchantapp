@@ -20,6 +20,7 @@ import BaseHeader from '../components/BaseHeader';
 import RNGooglePlaces from 'react-native-google-places';
 import Toast from '../components/Toast';
 import * as turf from '@turf/turf';
+import {computed} from 'mobx';
 
 @inject('authStore')
 @inject('detailsStore')
@@ -39,6 +40,23 @@ class DeliveryAreaScreen extends Component {
       newMarkerPosition: null,
       centerOfScreen: (Dimensions.get('window').height - 17) / 2,
     };
+  }
+
+  @computed get boundingBox() {
+    const {newMarkerPosition, initialdistance} = this.state;
+
+    if (newMarkerPosition) {
+      const bounds = this.getBoundsOfDistance(
+        {...newMarkerPosition},
+        initialdistance,
+      );
+
+      const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
+
+      return boundingBox;
+    }
+
+    return [];
   }
 
   componentDidMount() {
@@ -116,6 +134,8 @@ class DeliveryAreaScreen extends Component {
       ) / 2000,
     );
 
+    console.log(distance);
+
     const boundingBox = this.getBoundingBox(lower, upper);
 
     this.setState({
@@ -129,6 +149,7 @@ class DeliveryAreaScreen extends Component {
         longitudeDelta: 0.05,
       },
       distance,
+      initialdistance: distance,
       mapReady: true,
     });
   }
@@ -175,15 +196,18 @@ class DeliveryAreaScreen extends Component {
   async handleSetStoreLocation() {
     const {updateCoordinates} = this.props.detailsStore;
     const {merchantId} = this.props.authStore;
-    const {newMarkerPosition, distance, address} = this.state;
+    const {newMarkerPosition, initialdistance, address} = this.state;
 
     const range = this.getGeohashRange(
       newMarkerPosition.latitude,
       newMarkerPosition.longitude,
-      distance,
+      initialdistance,
     );
 
-    const bounds = this.getBoundsOfDistance({...newMarkerPosition}, distance);
+    const bounds = this.getBoundsOfDistance(
+      {...newMarkerPosition},
+      initialdistance,
+    );
     const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
 
     this.setState({loading: true});
@@ -218,6 +242,7 @@ class DeliveryAreaScreen extends Component {
         range.lower,
         range.upper,
         newMarkerPosition,
+        boundingBox,
         this.state.address,
       )
         .then(() => {
@@ -317,20 +342,12 @@ class DeliveryAreaScreen extends Component {
     const {editMode} = this.state;
     const {latitude, longitude} = mapData;
 
-    const bounds = this.getBoundsOfDistance(
-      {latitude, longitude},
-      this.state.distance,
-    );
-
-    const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
-
     if (editMode) {
       this.setState({
         newMarkerPosition: {
           latitude,
           longitude,
         },
-        boundingBox,
       });
     }
   };
@@ -365,8 +382,10 @@ class DeliveryAreaScreen extends Component {
       mapReady,
       editMode,
       loading,
-      boundingBox,
+      initialdistance,
     } = this.state;
+
+    const {boundingBox} = this;
 
     return (
       <View style={{flex: 1}}>
@@ -449,11 +468,15 @@ class DeliveryAreaScreen extends Component {
                     step={1}
                     minimumValue={0}
                     maximumValue={100}
-                    value={distance}
+                    value={initialdistance}
                     thumbTintColor={colors.accent}
-                    onValueChange={(value) => this.setState({distance: value})}
+                    onValueChange={(value) =>
+                      this.setState({initialdistance: value})
+                    }
                   />
-                  <Text style={{alignSelf: 'center'}}>{distance} KM</Text>
+                  <Text style={{alignSelf: 'center'}}>
+                    {initialdistance} KM
+                  </Text>
                 </View>
               </CardItem>
               <CardItem style={{alignSelf: 'center'}}>
