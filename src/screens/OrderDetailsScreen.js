@@ -44,6 +44,8 @@ class OrderDetailsScreen extends Component {
 
   onMapReady() {
     this.fitMarkers();
+
+    this.customerMarker.showCallout();
   }
 
   fitMarkers() {
@@ -62,7 +64,7 @@ class OrderDetailsScreen extends Component {
         },
       ],
       {
-        edgePadding: {left: 0, right: 40, top: 100, bottom: 100},
+        edgePadding: {left: 40, right: 40, top: 150, bottom: 150},
         animated: true,
       },
     );
@@ -120,6 +122,7 @@ class OrderDetailsScreen extends Component {
     const {order} = this.props.route.params;
     const {navigation} = this.props;
     const {orderItems, loading} = this.state;
+    const {storeDetails} = this.props.detailsStore;
 
     const mapButtonText =
       Platform.OS === 'ios' ? 'Open in Apple Maps' : 'Open in Google Maps';
@@ -261,12 +264,31 @@ class OrderDetailsScreen extends Component {
                     order.deliveryCoordinates.longitude && (
                       <Marker
                         ref={(marker) => {
-                          this.marker = marker;
+                          this.customerMarker = marker;
                         }}
+                        title="Customer Delivery Location"
                         tracksViewChanges={false}
                         coordinate={{
                           latitude: order.deliveryCoordinates.latitude,
                           longitude: order.deliveryCoordinates.longitude,
+                        }}>
+                        <View>
+                          <Icon color={colors.accent} name="map-pin" />
+                        </View>
+                      </Marker>
+                    )}
+
+                  {storeDetails.deliveryCoordinates.latitude &&
+                    storeDetails.deliveryCoordinates.longitude && (
+                      <Marker
+                        ref={(marker) => {
+                          this.storeMarker = marker;
+                        }}
+                        title={`${storeDetails.storeName} Set Location`}
+                        tracksViewChanges={false}
+                        coordinate={{
+                          latitude: storeDetails.deliveryCoordinates.latitude,
+                          longitude: storeDetails.deliveryCoordinates.longitude,
                         }}>
                         <View>
                           <Icon color={colors.primary} name="map-pin" />
