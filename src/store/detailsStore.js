@@ -9,6 +9,30 @@ class DetailsStore {
   @observable storeDetails = {};
   @observable unsubscribeSetStoreDetails = null;
 
+  @action async getStoreReviews(merchantId) {
+    const storeOrderReviewsRef = firestore()
+      .collection('merchants')
+      .doc(merchantId)
+      .collection('order_reviews');
+
+    return await storeOrderReviewsRef
+      .get()
+      .then((querySnapshot) => {
+        const data = [];
+
+        querySnapshot.forEach((doc, index) => {
+          if (doc.id !== 'reviewNumber') {
+            data.push(...doc.data().reviews);
+          }
+        });
+
+        return data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
   @action async getAddressFromCoordinates({latitude, longitude}) {
     return await functions
       .httpsCallable('getAddressFromCoordinates')({latitude, longitude})
