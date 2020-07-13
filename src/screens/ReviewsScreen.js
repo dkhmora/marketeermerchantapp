@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {ActivityIndicator, View} from 'react-native';
+import {ActivityIndicator, View, RefreshControl} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {Text, Avatar} from 'react-native-elements';
 import {colors} from '../../assets/colors';
@@ -22,18 +22,20 @@ class ReviewsScreen extends Component {
 
   async getReviews() {
     const {merchantId} = this.props.route.params;
-    const {reviews} = this.state;
 
-    if (reviews.length <= 0) {
-      this.setState(
-        {
-          reviews: await this.props.detailsStore.getStoreReviews(merchantId),
-        },
-        () => {
-          this.setState({reviewsLoading: false});
-        },
-      );
-    }
+    this.setState(
+      {
+        reviews: await this.props.detailsStore.getStoreReviews(merchantId),
+        reviewsLoading: true,
+      },
+      () => {
+        this.setState({reviewsLoading: false});
+      },
+    );
+  }
+
+  onRefresh() {
+    this.getReviews();
   }
 
   ReviewListItem({item}) {
@@ -107,6 +109,43 @@ class ReviewsScreen extends Component {
     );
   }
 
+  AverageRatingHeader({storeDetails}) {
+    return (
+      <View
+        style={{
+          alignItems: 'center',
+          paddingVertical: 10,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.divider,
+        }}>
+        <Text
+          style={{
+            fontSize: 20,
+            fontFamily: 'ProductSans-Regular',
+            marginBottom: 10,
+          }}>
+          {storeDetails.storeName}'s Average Rating
+        </Text>
+        <Rating
+          type="custom"
+          direction="row"
+          rated={storeDetails.ratingAverage}
+          selectedIconImage={require('../../assets/images/feather_filled.png')}
+          emptyIconImage={require('../../assets/images/feather_unfilled.png')}
+          size={30}
+          tintColor={colors.primary}
+          ratingColor={colors.accent}
+          ratingBackgroundColor="#455A64"
+          onIconTap={() => {}}
+        />
+
+        <Text style={{fontSize: 18, fontFamily: 'ProductSans-Regular'}}>
+          {storeDetails.ratingAverage && storeDetails.ratingAverage.toFixed(1)}
+        </Text>
+      </View>
+    );
+  }
+
   render() {
     const {reviewsLoading, reviews} = this.state;
     const {storeDetails} = this.props.detailsStore;
@@ -116,54 +155,26 @@ class ReviewsScreen extends Component {
       <View style={{flex: 1}}>
         <BaseHeader title="Customer Reviews" navigation={navigation} />
 
-        {reviewsLoading ? (
-          <ActivityIndicator size="large" color={colors.primary} />
-        ) : (
-          <FlatList
-            style={{flex: 1}}
-            data={reviews}
-            initialNumToRender={30}
-            ListHeaderComponent={
-              <View
-                style={{
-                  alignItems: 'center',
-                  paddingVertical: 10,
-                  borderBottomWidth: 1,
-                  borderBottomColor: colors.divider,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontFamily: 'ProductSans-Regular',
-                    marginBottom: 10,
-                  }}>
-                  {storeDetails.storeName}'s Average Rating
-                </Text>
-                <Rating
-                  type="custom"
-                  direction="row"
-                  rated={storeDetails.ratingAverage}
-                  selectedIconImage={require('../../assets/images/feather_filled.png')}
-                  emptyIconImage={require('../../assets/images/feather_unfilled.png')}
-                  size={30}
-                  tintColor={colors.primary}
-                  ratingColor={colors.accent}
-                  ratingBackgroundColor="#455A64"
-                  onIconTap={() => {}}
-                />
-
-                <Text style={{fontSize: 18, fontFamily: 'ProductSans-Regular'}}>
-                  {storeDetails.ratingAverage.toFixed(1)}
-                </Text>
-              </View>
-            }
-            renderItem={({item, index}) => (
-              <this.ReviewListItem item={item} key={index} />
-            )}
-            keyExtractor={(item) => item.orderId}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
+        <FlatList
+          style={{flex: 1}}
+          data={reviews}
+          initialNumToRender={30}
+          ListHeaderComponent={
+            <this.AverageRatingHeader storeDetails={storeDetails} />
+          }
+          renderItem={({item, index}) => (
+            <this.ReviewListItem item={item} key={index} />
+          )}
+          refreshControl={
+            <RefreshControl
+              colors={[colors.primary, colors.dark]}
+              refreshing={reviewsLoading}
+              onRefresh={this.onRefresh.bind(this)}
+            />
+          }
+          keyExtractor={(item) => item.orderId}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
     );
   }
