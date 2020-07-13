@@ -95,6 +95,8 @@ class StoreDetailsScreen extends Component {
       storeName,
       vacationMode,
       deliveryType,
+      paymentMethods,
+      shippingMethods,
     } = this.props.detailsStore.storeDetails;
 
     if (this.editMode) {
@@ -106,6 +108,8 @@ class StoreDetailsScreen extends Component {
       this.newStoreName = storeName;
       this.newVacationMode = vacationMode;
       this.newDeliveryType = deliveryType;
+      this.newPaymentMethods = paymentMethods;
+      this.newShippingMethods = shippingMethods;
 
       this.setState({
         oldDisplayImageUrl: this.state.displayImageUrl,
@@ -175,46 +179,27 @@ class StoreDetailsScreen extends Component {
       .catch((err) => console.log(err));
   }
 
-  handleCheckBoxes() {
-    this.state.CODCheckbox && this.newPaymentMethods.push('COD');
-    this.state.onlineBankingCheckbox &&
-      this.newPaymentMethods.push('Online Banking');
-    this.state.grabExpressCheckbox &&
-      this.newShippingMethods.push('Grab Express');
-    this.state.lalamoveCheckbox && this.newShippingMethods.push('Lalamove');
-    this.state.mrSpeedyCheckbox && this.newShippingMethods.push('Mr. Speedy');
-    this.state.ownServiceCheckbox &&
-      this.newShippingMethods.push('Own Service');
+  handlePaymentMethods(paymentMethod) {
+    const {newPaymentMethods} = this;
+
+    if (newPaymentMethods.includes(paymentMethod)) {
+      this.newPaymentMethods = newPaymentMethods.filter(
+        (item) => item !== paymentMethod,
+      );
+    } else {
+      newPaymentMethods.push(paymentMethod);
+    }
   }
 
-  handleEditCheckBoxes() {
-    const {
-      paymentMethods,
-      shippingMethods,
-    } = this.props.detailsStore.storeDetails;
+  handleShippingMethods(shippingMethod) {
+    const {newShippingMethods} = this;
 
-    if (paymentMethods) {
-      paymentMethods.includes('Online Banking')
-        ? this.setState({onlineBankingCheckbox: true})
-        : this.setState({onlineBankingCheckbox: false});
-      paymentMethods.includes('COD')
-        ? this.setState({CODCheckbox: true})
-        : this.setState({CODCheckbox: false});
-    }
-
-    if (shippingMethods) {
-      shippingMethods.includes('Grab Express')
-        ? this.setState({grabExpressCheckbox: true})
-        : this.setState({grabExpressCheckbox: false});
-      shippingMethods.includes('Lalamove')
-        ? this.setState({lalamoveCheckbox: true})
-        : this.setState({lalamoveCheckbox: false});
-      shippingMethods.includes('Mr. Speedy')
-        ? this.setState({mrSpeedyCheckbox: true})
-        : this.setState({mrSpeedyCheckbox: false});
-      shippingMethods.includes('Own Service')
-        ? this.setState({ownServiceCheckbox: true})
-        : this.setState({ownServiceCheckbox: false});
+    if (newShippingMethods.includes(shippingMethod)) {
+      this.newShippingMethods = newShippingMethods.filter(
+        (item) => item !== shippingMethod,
+      );
+    } else {
+      newShippingMethods.push(shippingMethod);
     }
   }
 
@@ -348,7 +333,7 @@ class StoreDetailsScreen extends Component {
 
     const {coverImageUrl, displayImageUrl, loading} = this.state;
 
-    const {editMode} = this;
+    const {editMode, newPaymentMethods, newShippingMethods} = this;
 
     if (Object.keys(this.props.detailsStore.storeDetails).length > 0) {
       return (
@@ -901,21 +886,14 @@ class StoreDetailsScreen extends Component {
                       <View>
                         <CheckBox
                           title="COD"
-                          checked={this.state.CODCheckbox}
-                          onPress={() =>
-                            this.setState({
-                              CODCheckbox: !this.state.CODCheckbox,
-                            })
-                          }
+                          checked={newPaymentMethods.includes('COD')}
+                          onPress={() => this.handlePaymentMethods('COD')}
                         />
                         <CheckBox
                           title="Online Banking"
-                          checked={this.state.onlineBankingCheckbox}
+                          checked={newPaymentMethods.includes('Online Banking')}
                           onPress={() =>
-                            this.setState({
-                              onlineBankingCheckbox: !this.state
-                                .onlineBankingCheckbox,
-                            })
+                            this.handlePaymentMethods('Online Banking')
                           }
                         />
                       </View>
@@ -950,40 +928,33 @@ class StoreDetailsScreen extends Component {
                       <View>
                         <CheckBox
                           title="Grab Express"
-                          checked={this.state.grabExpressCheckbox}
-                          onPress={() =>
-                            this.setState({
-                              grabExpressCheckbox: !this.state
-                                .grabExpressCheckbox,
-                            })
-                          }
+                          checked={newShippingMethods.includes('Grab Express')}
+                          onPress={() => this.handleShippingMethods('COD')}
                         />
                         <CheckBox
                           title="Lalamove"
-                          checked={this.state.lalamoveCheckbox}
-                          onPress={() =>
-                            this.setState({
-                              lalamoveCheckbox: !this.state.lalamoveCheckbox,
-                            })
-                          }
+                          checked={newShippingMethods.includes('Lalamove')}
+                          onPress={() => this.handleShippingMethods('Lalamove')}
                         />
                         <CheckBox
                           title="Mr. Speedy"
-                          checked={this.state.mrSpeedyCheckbox}
+                          checked={newShippingMethods.includes('Mr. Speedy')}
                           onPress={() =>
-                            this.setState({
-                              mrSpeedyCheckbox: !this.state.mrSpeedyCheckbox,
-                            })
+                            this.handleShippingMethods('Mr. Speedy')
+                          }
+                        />
+                        <CheckBox
+                          title="Angkas Padala"
+                          checked={newShippingMethods.includes('Angkas Padala')}
+                          onPress={() =>
+                            this.handleShippingMethods('Angkas Padala')
                           }
                         />
                         <CheckBox
                           title="Own Service"
-                          checked={this.state.ownServiceCheckbox}
+                          checked={newShippingMethods.includes('Own Service')}
                           onPress={() =>
-                            this.setState({
-                              ownServiceCheckbox: !this.state
-                                .ownServiceCheckbox,
-                            })
+                            this.handleShippingMethods('Own Service')
                           }
                         />
                       </View>
