@@ -452,7 +452,7 @@ class DeliveryAreaScreen extends Component {
             }}>
             <Card
               style={{
-                borderdistance: 16,
+                borderRadius: 10,
                 overflow: 'hidden',
                 backgroundColor: 'rgba(255,255,255, 0.6)',
               }}>
@@ -482,7 +482,7 @@ class DeliveryAreaScreen extends Component {
               <CardItem style={{alignSelf: 'center'}}>
                 <Card
                   style={{
-                    borderdistance: 16,
+                    borderRadius: 10,
                     overflow: 'hidden',
                     backgroundColor: '#eee',
                   }}>
@@ -551,7 +551,7 @@ class DeliveryAreaScreen extends Component {
               type="clear"
               icon={<Icon name="search" color={colors.icons} />}
               titleStyle={{color: colors.icons}}
-              buttonStyle={{borderdistance: 24}}
+              buttonStyle={{borderRadius: 24}}
               onPress={() => this.openSearchModal()}
             />
           }
