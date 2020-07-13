@@ -106,8 +106,6 @@ class StoreDetailsScreen extends Component {
       this.newStoreName = storeName;
       this.newVacationMode = vacationMode;
       this.newDeliveryType = deliveryType;
-      this.handleEditCheckBoxes();
-      this.handleEditDeliveryTypeCheckboxes();
 
       this.setState({
         oldDisplayImageUrl: this.state.displayImageUrl,
@@ -117,24 +115,6 @@ class StoreDetailsScreen extends Component {
     }
 
     this.setState({loading: false});
-  }
-
-  handleEditDeliveryTypeCheckboxes() {
-    const {deliveryType} = this.props.detailsStore.storeDetails;
-
-    if (deliveryType === 'Same Day Delivery') {
-      this.setState({sameDayDeliveryCheckbox: true});
-    } else {
-      this.setState({sameDayDeliveryCheckbox: false});
-    }
-  }
-
-  handleDeliveryTypeCheckboxes() {
-    if (this.state.sameDayDeliveryCheckbox) {
-      this.newDeliveryType = 'Same Day Delivery';
-    } else {
-      this.newDeliveryType = 'Next Day Delivery';
-    }
   }
 
   getImage = async () => {
@@ -259,9 +239,6 @@ class StoreDetailsScreen extends Component {
 
     this.setState({loading: true});
 
-    this.handleCheckBoxes();
-    this.handleDeliveryTypeCheckboxes();
-
     if (coverImageUrl !== oldCoverImageUrl) {
       await uploadImage(
         merchantId,
@@ -371,13 +348,35 @@ class StoreDetailsScreen extends Component {
 
     const {coverImageUrl, displayImageUrl, loading} = this.state;
 
+    const {editMode} = this;
+
     if (Object.keys(this.props.detailsStore.storeDetails).length > 0) {
       return (
         <View style={{flex: 1}}>
           <BaseHeader
             title={this.props.route.name}
-            optionsButton
             navigation={this.props.navigation}
+            rightComponent={
+              editMode && (
+                <View style={{flexDirection: 'row'}}>
+                  <Button
+                    type="clear"
+                    title="Cancel"
+                    titleStyle={{color: colors.icons}}
+                    onPress={() => this.cancelEditing()}
+                  />
+
+                  <Button
+                    type="clear"
+                    title="Confirm"
+                    titleStyle={{color: colors.icons}}
+                    loading={loading}
+                    loadingProps={{color: colors.icons}}
+                    onPress={() => this.handleConfirmDetails()}
+                  />
+                </View>
+              )
+            }
           />
 
           <ScrollView style={{paddingHorizontal: 10}}>
@@ -434,36 +433,6 @@ class StoreDetailsScreen extends Component {
                         alignItems: 'flex-end',
                         justifyContent: 'space-between',
                       }}>
-                      {loading ? (
-                        <View
-                          style={{
-                            height: '100%',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}>
-                          <ActivityIndicator
-                            size="small"
-                            color={colors.icons}
-                          />
-                        </View>
-                      ) : (
-                        <Button
-                          type="clear"
-                          color={colors.icons}
-                          icon={<Icon name="check" color={colors.icons} />}
-                          iconRight
-                          title="Confirm"
-                          titleStyle={{color: colors.icons, paddingRight: 15}}
-                          onPress={() => this.handleConfirmDetails()}
-                          buttonStyle={{paddingTop: 10}}
-                          containerStyle={{
-                            borderRadius: 24,
-                            borderColor: colors.icons,
-                            borderWidth: 1,
-                            paddingHorizontal: -20,
-                          }}
-                        />
-                      )}
                       <Button
                         type="clear"
                         color={colors.icons}
@@ -817,20 +786,31 @@ class StoreDetailsScreen extends Component {
                       <View>
                         <CheckBox
                           title="Same Day Delivery"
-                          checked={this.state.sameDayDeliveryCheckbox}
+                          checked={this.newDeliveryType === 'Same Day Delivery'}
                           checkedIcon="dot-circle-o"
                           uncheckedIcon="circle-o"
                           onPress={() =>
-                            this.setState({sameDayDeliveryCheckbox: true})
+                            (this.newDeliveryType = 'Same Day Delivery')
                           }
                         />
                         <CheckBox
                           title="Next Day Delivery"
-                          checked={!this.state.sameDayDeliveryCheckbox}
+                          checked={this.newDeliveryType === 'Next Day Delivery'}
                           checkedIcon="dot-circle-o"
                           uncheckedIcon="circle-o"
                           onPress={() =>
-                            this.setState({sameDayDeliveryCheckbox: false})
+                            (this.newDeliveryType = 'Next Day Delivery')
+                          }
+                        />
+                        <CheckBox
+                          title="Scheduled Delivery"
+                          checked={
+                            this.newDeliveryType === 'Scheduled Delivery'
+                          }
+                          checkedIcon="dot-circle-o"
+                          uncheckedIcon="circle-o"
+                          onPress={() =>
+                            (this.newDeliveryType = 'Scheduled Delivery')
                           }
                         />
                       </View>
