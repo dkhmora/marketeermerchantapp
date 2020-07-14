@@ -4,16 +4,16 @@ import storage from '@react-native-firebase/storage';
 import {GiftedChat} from 'react-native-gifted-chat';
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
+import {create, persist} from 'mobx-persist';
 
 const ordersCollection = firestore().collection('orders');
 class OrdersStore {
-  @observable orders = [];
-  @observable pendingOrders = [];
-  @observable paidOrders = [];
-  @observable unpaidOrders = [];
-  @observable shippedOrders = [];
-  @observable completedOrders = [];
-  @observable cancelledOrders = [];
+  @persist('list') @observable pendingOrders = [];
+  @persist('list') @observable paidOrders = [];
+  @persist('list') @observable unpaidOrders = [];
+  @persist('list') @observable shippedOrders = [];
+  @persist('list') @observable completedOrders = [];
+  @persist('list') @observable cancelledOrders = [];
   @observable orderMessages = [];
   @observable unsubscribeGetMessages = null;
   @observable unsubscribeSetCancelledOrders = null;
@@ -127,86 +127,133 @@ class OrdersStore {
   }
 
   @action setPendingOrders(merchantId) {
+    const startPoint =
+      this.pendingOrders.length > 0
+        ? this.pendingOrders[0].merchantOrderNumber
+        : 0;
+
     this.unsubscribeSetPendingOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.pending.status', '==', true)
+      .orderBy('merchantOrderNumber', 'desc')
+      .endBefore(startPoint)
       .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.pendingOrders = data;
+        if (querySnapshot) {
+          querySnapshot.forEach((doc, index) => {
+            const item = {...doc.data(), orderId: doc.id};
+
+            this.pendingOrders.push(item);
+          });
+        }
       });
   }
 
   @action setUnpaidOrders(merchantId) {
+    const startPoint =
+      this.unpaidOrders.length > 0
+        ? this.unpaidOrders[0].merchantOrderNumber
+        : 0;
+    console.log(this.unpaidOrders, startPoint);
+
     this.unsubscribeSetUnpaidOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.unpaid.status', '==', true)
+      .orderBy('merchantOrderNumber', 'desc')
+      .endBefore(startPoint)
       .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.unpaidOrders = data;
+        if (querySnapshot) {
+          querySnapshot.forEach((doc, index) => {
+            const item = {...doc.data(), orderId: doc.id};
+
+            this.unpaidOrders.push(item);
+          });
+        }
       });
   }
 
   @action setPaidOrders(merchantId) {
+    const startPoint =
+      this.paidOrders.length > 0 ? this.paidOrders[0].merchantOrderNumber : 0;
+
     this.unsubscribeSetPaidOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.paid.status', '==', true)
+      .orderBy('merchantOrderNumber', 'desc')
+      .endBefore(startPoint)
       .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.paidOrders = data;
+        if (querySnapshot) {
+          querySnapshot.forEach((doc, index) => {
+            const item = {...doc.data(), orderId: doc.id};
+
+            this.paidOrders.push(item);
+          });
+        }
       });
   }
 
   @action setShippedOrders(merchantId) {
+    const startPoint =
+      this.shippedOrders.length > 0
+        ? this.shippedOrders[0].merchantOrderNumber
+        : 0;
+
     this.unsubscribeSetShippedOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.shipped.status', '==', true)
+      .orderBy('merchantOrderNumber', 'desc')
+      .endBefore(startPoint)
       .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.shippedOrders = data;
+        if (querySnapshot) {
+          querySnapshot.forEach((doc, index) => {
+            const item = {...doc.data(), orderId: doc.id};
+
+            this.shippedOrders.push(item);
+          });
+        }
       });
   }
 
   @action setCompletedOrders(merchantId) {
+    const startPoint =
+      this.completedOrders.length > 0
+        ? this.completedOrders[0].merchantOrderNumber
+        : 0;
+
     this.unsubscribeSetCompletedOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.completed.status', '==', true)
+      .orderBy('merchantOrderNumber', 'desc')
+      .endBefore(startPoint)
       .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.completedOrders = data;
+        if (querySnapshot) {
+          querySnapshot.forEach((doc, index) => {
+            const item = {...doc.data(), orderId: doc.id};
+
+            this.completedOrders.push(item);
+          });
+        }
       });
   }
 
   @action setCancelledOrders(merchantId) {
+    const startPoint =
+      this.cancelledOrders.length > 0
+        ? this.cancelledOrders[0].merchantOrderNumber
+        : 0;
+
     this.unsubscribeSetCancelledOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('orderStatus.cancelled.status', '==', true)
+      .orderBy('merchantOrderNumber', 'desc')
+      .endBefore(startPoint)
       .onSnapshot((querySnapshot) => {
-        const data = [];
-        querySnapshot.forEach((doc, index) => {
-          data.push(doc.data());
-          data[index].orderId = doc.id;
-        });
-        this.cancelledOrders = data;
+        if (querySnapshot) {
+          querySnapshot.forEach((doc, index) => {
+            const item = {...doc.data(), orderId: doc.id};
+
+            this.cancelledOrders.push(item);
+          });
+        }
       });
   }
 
