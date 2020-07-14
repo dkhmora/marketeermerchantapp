@@ -112,7 +112,12 @@ class ItemsStore {
             }),
           });
         })
-        .then(() => console.log('Item added!'))
+        .then(() =>
+          Toast({
+            text: `"${name}" successfully added to Item List!`,
+            buttonText: 'Okay',
+          }),
+        )
         .catch((err) => console.error(err));
     } else {
       return Toast({
