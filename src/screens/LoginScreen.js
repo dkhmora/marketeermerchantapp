@@ -29,6 +29,10 @@ class LoginScreen extends Component {
     };
   }
 
+  componentDidMount() {
+    this.props.authStore.appReady = true;
+  }
+
   handleEmailChange = (email) => {
     const regexp = new RegExp(
       /^([a-zA-Z0-9_\-.]+)@([a-zA-Z0-9_\-.]+)\.([a-zA-Z]{2,5})$/,
@@ -62,7 +66,11 @@ class LoginScreen extends Component {
   handleSignIn() {
     const {email, password} = this.state;
 
-    this.props.authStore.signIn(email, password);
+    this.props.authStore.appReady = false;
+
+    this.props.authStore.signIn(email, password).then(() => {
+      this.props.authStore.appReady = true;
+    });
   }
 
   openMerchantSignUpForm() {

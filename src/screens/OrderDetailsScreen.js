@@ -123,10 +123,6 @@ class OrderDetailsScreen extends Component {
     const {navigation} = this.props;
     const {orderItems, loading} = this.state;
     const {storeDetails} = this.props.detailsStore;
-
-    const mapButtonText =
-      Platform.OS === 'ios' ? 'Open in Apple Maps' : 'Open in Google Maps';
-
     const actions = [
       {
         name: 'Accept Order',

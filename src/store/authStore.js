@@ -8,20 +8,21 @@ const fcmCollection = firestore().collection('merchant_fcm');
 class AuthStore {
   @observable merchantId = '';
   @observable subscribedToNotifications = false;
+  @observable appReady = true;
 
   @action setMerchantId(id) {
     this.merchantId = id;
   }
 
   @action async signIn(email, password) {
-    await auth()
+    return await auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => console.log('signed in succesfully'))
       .catch((err) => console.log(err));
   }
 
   @action async signOut() {
-    await messaging()
+    return await messaging()
       .deleteToken()
       .then(() => {
         auth().signOut();
