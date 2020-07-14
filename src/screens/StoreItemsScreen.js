@@ -1,21 +1,13 @@
 import React, {Component} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {observer, inject} from 'mobx-react';
 // Custom Components
 import StoreItemsTab from '../navigation/StoreItemsTab';
 import AddItemScreen from './AddItemScreen';
 
 const StackOrder = createStackNavigator();
-@inject('authStore')
-@inject('itemsStore')
-@observer
 class StoreItemsScreen extends Component {
   constructor(props) {
     super(props);
-  }
-
-  componentDidMount() {
-    this.props.itemsStore.setStoreItems(this.props.authStore.merchantId);
   }
 
   render() {

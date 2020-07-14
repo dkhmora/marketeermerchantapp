@@ -36,6 +36,10 @@ class StoreItemsTab extends Component {
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
 
+  @computed get scrollEnabled() {
+    return this.props.itemsStore.itemCategories.length > 1;
+  }
+
   @action closeAddCategoryModal() {
     this.addCategoryModal = false;
     this.newCategory = '';
@@ -61,10 +65,6 @@ class StoreItemsTab extends Component {
 
   @action closeDeleteCategoryModal() {
     this.deleteCategoryModal = false;
-  }
-
-  @computed get scrollEnabled() {
-    return this.props.itemsStore.itemCategories.length > 2 ? true : false;
   }
 
   onValueChange(value) {
@@ -280,18 +280,19 @@ class StoreItemsTab extends Component {
               category: 'All',
             }}
           />
-          {itemCategories.map((category, index) => {
-            return (
-              <TabBase.Screen
-                name={`${category}`}
-                component={ItemsList}
-                key={index}
-                initialParams={{
-                  category,
-                }}
-              />
-            );
-          })}
+          {itemCategories.length > 0 &&
+            itemCategories.map((category, index) => {
+              return (
+                <TabBase.Screen
+                  name={`${category}`}
+                  component={ItemsList}
+                  key={index}
+                  initialParams={{
+                    category,
+                  }}
+                />
+              );
+            })}
         </TabBase.Navigator>
       </Container>
     );
