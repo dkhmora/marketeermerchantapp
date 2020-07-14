@@ -48,6 +48,7 @@ class AuthLoader extends React.Component {
 
               this.props.authStore.setMerchantId(merchantId);
               this.props.detailsStore.setStoreDetails(merchantId);
+              this.props.itemsStore.setStoreItems(merchantId);
 
               console.log(
                 `Current user is assigned to Merchant with doc id "${merchantId}"`,

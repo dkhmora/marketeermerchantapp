@@ -57,9 +57,9 @@ class ItemsStore {
       .doc(merchantId)
       .onSnapshot((documentSnapshot) => {
         this.storeItems = documentSnapshot.data().items;
-        this.itemCategories = documentSnapshot.data().itemCategories.sort();
+        this.itemCategories = documentSnapshot.data().itemCategories;
 
-        this.itemCategories.map((category) => {
+        documentSnapshot.data().itemCategories.map((category) => {
           this.setCategoryItems(category);
         });
       });
