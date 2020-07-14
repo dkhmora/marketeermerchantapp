@@ -5,7 +5,7 @@ import {Text} from 'react-native-elements';
 import moment, {ISO_8601} from 'moment';
 import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
-import {observable} from 'mobx';
+import {observable, computed} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
@@ -18,17 +18,15 @@ import FastImage from 'react-native-fast-image';
 class ItemCard extends Component {
   constructor(props) {
     super(props);
-  }
 
-  @observable url = null;
+    this.state = {url: require('../../assets/placeholder.jpg')};
+  }
 
   getImage = async () => {
     const ref = storage().ref(this.props.item.image);
     const link = await ref.getDownloadURL().catch((err) => console.log(err));
 
-    if (link) {
-      this.url = link;
-    }
+    this.setState({url: {uri: link}});
   };
 
   handleDelete() {
@@ -42,13 +40,19 @@ class ItemCard extends Component {
   }
 
   componentDidMount() {
-    if (this.props.item.image) {
+    const {url} = this.state;
+
+    if (
+      url === require('../../assets/placeholder.jpg') &&
+      this.props.item.image
+    ) {
       this.getImage();
     }
   }
 
   render() {
     const {item, ...otherProps} = this.props;
+    const {url} = this.state;
 
     const timeStamp = moment(item.createdAt, ISO_8601).fromNow();
 
@@ -100,27 +104,14 @@ class ItemCard extends Component {
           </CardItem>
 
           <CardItem cardBody>
-            {this.url ? (
-              <FastImage
-                source={{uri: this.url}}
-                style={{
-                  height: 150,
-                  aspectRatio: 1,
-                  flex: 1,
-                  backgroundColor: '#e1e4e8',
-                }}
-              />
-            ) : (
-              <FastImage
-                source={require('../../assets/placeholder.jpg')}
-                style={{
-                  height: 150,
-                  aspectRatio: 1,
-                  flex: 1,
-                  backgroundColor: '#e1e4e8',
-                }}
-              />
-            )}
+            <FastImage
+              source={url}
+              style={{
+                height: 150,
+                aspectRatio: 1,
+                flex: 1,
+              }}
+            />
           </CardItem>
 
           <CardItem

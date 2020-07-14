@@ -1,5 +1,9 @@
 import React, {Component} from 'react';
-import {FlatList} from 'react-native';
+import {
+  FlatList,
+  ActivityIndicator,
+  TouchableHighlightBase,
+} from 'react-native';
 import {Container, View, Fab, Icon, Button} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components
@@ -11,12 +15,6 @@ import {colors} from '../../assets/colors';
 class ItemsList extends Component {
   constructor(props) {
     super(props);
-  }
-
-  componentDidMount() {
-    const {category} = this.props;
-
-    this.props.itemsStore.setCategoryItems(category);
   }
 
   formatData(data, numColumns) {
@@ -37,12 +35,13 @@ class ItemsList extends Component {
   render() {
     const {category} = this.props.route.params;
     const {navigation} = this.props;
-    let dataSource;
+    let dataSource = [];
 
-    if (category !== 'All') {
+    if (category !== 'All' && this.props.itemsStore.categoryItems.size > 0) {
+      console.log('size', this.props.itemsStore.categoryItems.size, category);
       dataSource = this.props.itemsStore.categoryItems.get(category).slice();
-    } else {
-      dataSource = this.props.itemsStore.storeItems;
+    } else if (this.props.itemsStore.storeItems.length > 0) {
+      dataSource = this.props.itemsStore.storeItems.slice();
     }
 
     const numColumns = 2;
@@ -50,23 +49,36 @@ class ItemsList extends Component {
     return (
       <Container style={{flex: 1}}>
         <View style={{paddingHorizontal: 10, flex: 1}}>
-          <FlatList
-            data={this.formatData(dataSource, numColumns)}
-            numColumns={numColumns}
-            initialNumToRender={4}
-            renderItem={({item, index}) =>
-              item.empty ? (
-                <View
-                  style={{flex: 1, backgroundColor: 'transparent'}}
-                  key={index}
-                />
-              ) : (
-                <ItemCard item={item} key={index} />
-              )
-            }
-            keyExtractor={(item, index) => `${item.name}${index.toString()}`}
-            showsVerticalScrollIndicator={false}
-          />
+          {dataSource.length > 0 &&
+          this.props.itemsStore.categoryItems.size > 0 ? (
+            <FlatList
+              data={this.formatData(dataSource, numColumns)}
+              numColumns={numColumns}
+              initialNumToRender={4}
+              renderItem={({item, index}) =>
+                item.empty ? (
+                  <View
+                    style={{flex: 1, backgroundColor: 'transparent'}}
+                    key={index}
+                  />
+                ) : (
+                  <ItemCard item={item} key={`${item.name}${category}`} />
+                )
+              }
+              keyExtractor={(item, index) => `${item.name}${category}`}
+              showsVerticalScrollIndicator={false}
+            />
+          ) : (
+            <View
+              style={{
+                height: '100%',
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+          )}
         </View>
         <Fab
           containerStyle={{}}

@@ -64,7 +64,7 @@ class StoreItemsTab extends Component {
   }
 
   @computed get scrollEnabled() {
-    return this.props.itemsStore.itemCategories.length > 1 ? true : false;
+    return this.props.itemsStore.itemCategories.length > 2 ? true : false;
   }
 
   onValueChange(value) {

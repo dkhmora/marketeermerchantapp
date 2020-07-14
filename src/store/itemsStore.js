@@ -1,36 +1,16 @@
 import {observable, action, computed} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
+import Toast from '../components/Toast';
 class ItemsStore {
   @observable storeItems = [];
   @observable itemCategories = [];
   @observable categoryItems = new Map();
-  @observable unsubscribeSetItemCategories = null;
+  @observable unsubscribeSetStoreItems = null;
 
   @action setCategoryItems(category) {
     const items = this.storeItems.filter((item) => item.category === category);
     this.categoryItems.set(category, items);
-  }
-
-  @action setItemCategories(merchantId) {
-    if (merchantId) {
-      const merchantItemsRef = firestore()
-        .collection('merchant_items')
-        .doc(merchantId);
-
-      this.unsubscribeSetItemCategories = merchantItemsRef.onSnapshot(
-        (documentSnapshot) => {
-          if (documentSnapshot) {
-            if (documentSnapshot.exists) {
-              const itemCats = documentSnapshot.data().itemCategories;
-              this.itemCategories = itemCats.sort();
-            } else {
-              merchantItemsRef.set({itemCategories: [], items: []});
-            }
-          }
-        },
-      );
-    }
   }
 
   @action async deleteItemCategory(merchantId, category) {
@@ -72,11 +52,12 @@ class ItemsStore {
   }
 
   @action setStoreItems(merchantId) {
-    firestore()
+    this.unsubscribeSetStoreItems = firestore()
       .collection('merchant_items')
       .doc(merchantId)
       .onSnapshot((documentSnapshot) => {
         this.storeItems = documentSnapshot.data().items;
+        this.itemCategories = documentSnapshot.data().itemCategories.sort();
 
         this.itemCategories.map((category) => {
           this.setCategoryItems(category);
@@ -85,7 +66,7 @@ class ItemsStore {
   }
 
   @action async uploadImage(imageRef, imagePath) {
-    await storage()
+    return await storage()
       .ref(imageRef)
       .putFile(imagePath)
       .then(() => console.log('Image successfully uploaded!'))
@@ -105,31 +86,40 @@ class ItemsStore {
     const merchantItemsRef = firestore()
       .collection('merchant_items')
       .doc(merchantId);
-
     const fileExtension = imagePath ? imagePath.split('.').pop() : null;
     const imageRef = imagePath
       ? `/images/merchants/${merchantId}/items/${name}.${fileExtension}`
       : null;
+    const itemExists = this.storeItems
+      .slice()
+      .findIndex((item) => item.name === name);
 
-    await merchantItemsRef
-      .update({
-        items: firestore.FieldValue.arrayUnion({
-          category,
-          name,
-          description,
-          unit,
-          price,
-          stock,
-          sales: 0,
-          image: imageRef,
-          createdAt: new Date().toISOString(),
-        }),
-      })
-      .then(() => {
-        this.uploadImage(imageRef, imagePath);
-      })
-      .then(() => console.log('Item added!'))
-      .catch((err) => console.error(err));
+    if (itemExists === -1) {
+      console.log('yes');
+      return await this.uploadImage(imageRef, imagePath)
+        .then(async () => {
+          await merchantItemsRef.update({
+            items: firestore.FieldValue.arrayUnion({
+              category,
+              name,
+              description,
+              unit,
+              price,
+              stock,
+              sales: 0,
+              image: imageRef,
+              createdAt: new Date().toISOString(),
+            }),
+          });
+        })
+        .then(() => console.log('Item added!'))
+        .catch((err) => console.error(err));
+    } else {
+      return Toast({
+        text: `Error: You already have an item named "${name}"!`,
+        type: 'danger',
+      });
+    }
   }
 
   @action async deleteImage(image) {

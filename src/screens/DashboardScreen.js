@@ -31,7 +31,6 @@ class StoreDetailsScreen extends Component {
     super(props);
 
     this.props.detailsStore.setStoreDetails(this.props.authStore.merchantId);
-    this.props.itemsStore.setItemCategories(this.props.authStore.merchantId);
 
     this.state = {
       loading: false,
@@ -58,10 +57,6 @@ class StoreDetailsScreen extends Component {
   @observable newShippingMethods = [];
   @observable newDeliveryType = '';
   @observable storeDetailsHeaderColor = colors.primary;
-
-  componentDidMount() {
-    this.getImage();
-  }
 
   componentDidUpdate() {
     const {displayImageUrl, coverImageUrl} = this.state;
