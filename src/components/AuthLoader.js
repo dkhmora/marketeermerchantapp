@@ -73,6 +73,13 @@ class AuthLoader extends React.Component {
       this.props.itemsStore.unsubscribeSetStoreItems &&
         this.props.itemsStore.unsubscribeSetStoreItems();
 
+      this.props.ordersStore.pendingOrders = [];
+      this.props.ordersStore.paidOrders = [];
+      this.props.ordersStore.unpaidOrders = [];
+      this.props.ordersStore.shippedOrders = [];
+      this.props.ordersStore.completedOrders = [];
+      this.props.ordersStore.cancelledOrders = [];
+
       this.props.navigation.navigate('Login');
 
       this.props.authStore.appReady = true;
