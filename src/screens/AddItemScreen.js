@@ -64,21 +64,22 @@ class AddItemScreen extends Component {
     }
   }
 
-  onSubmit() {
-    this.props.itemsStore
-      .addStoreItem(
-        this.props.authStore.merchantId,
-        this.imagePath,
-        this.category,
-        this.name,
-        this.description,
-        this.unit,
-        Math.ceil(this.price),
-        Number(Math.trunc(this.stock)),
-      )
-      .then(() => {
-        this.props.navigation.goBack();
-      });
+  async onSubmit() {
+    this.props.authStore.appReady = false;
+
+    await this.props.itemsStore.addStoreItem(
+      this.props.authStore.merchantId,
+      this.imagePath,
+      this.category,
+      this.name,
+      this.description,
+      this.unit,
+      Math.ceil(this.price),
+      Number(Math.trunc(this.stock)),
+    );
+
+    this.props.authStore.appReady = true;
+    this.props.navigation.goBack();
   }
 
   onValueChange(value) {

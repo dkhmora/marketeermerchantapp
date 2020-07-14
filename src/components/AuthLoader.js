@@ -70,8 +70,8 @@ class AuthLoader extends React.Component {
       this.props.detailsStore.unsubscribeSetStoreDetails &&
         this.props.detailsStore.unsubscribeSetStoreDetails();
 
-      this.props.itemsStore.unsubscribeSetItemCategories &&
-        this.props.itemsStore.unsubscribeSetItemCategories();
+      this.props.itemsStore.unsubscribeSetStoreItems &&
+        this.props.itemsStore.unsubscribeSetStoreItems();
 
       this.props.navigation.navigate('Login');
 
