@@ -343,14 +343,11 @@ class StoreDetailsScreen extends Component {
             navigation={this.props.navigation}
             rightComponent={
               editMode && (
-                <View style={{flexDirection: 'row'}}>
-                  <Button
-                    type="clear"
-                    title="Cancel"
-                    titleStyle={{color: colors.icons}}
-                    onPress={() => this.cancelEditing()}
-                  />
-
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginLeft: -10,
+                  }}>
                   <Button
                     type="clear"
                     title="Confirm"
@@ -378,7 +375,7 @@ class StoreDetailsScreen extends Component {
                   </Body>
                 </Left>
               </CardItem>
-              <CardItem bordered>
+              <CardItem bordered style={{flex: 1}}>
                 <StoreCard store={this.props.detailsStore.storeDetails} />
               </CardItem>
             </Card>
@@ -719,30 +716,21 @@ class StoreDetailsScreen extends Component {
                   </View>
 
                   <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <Switch
-                        trackColor={{
-                          false: '#767577',
-                          true: colors.dark_accent,
-                        }}
-                        thumbColor={
-                          this.newFreeDelivery ? colors.accent : '#f4f3f4'
-                        }
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={() =>
-                          (this.newFreeDelivery = !this.newFreeDelivery)
-                        }
-                        value={this.newFreeDelivery}
-                      />
-                    ) : (
-                      <Switch
-                        trackColor={{false: '#767577', true: colors.dark}}
-                        thumbColor={freeDelivery ? colors.primary : '#f4f3f4'}
-                        ios_backgroundColor="#3e3e3e"
-                        value={freeDelivery}
-                        disabled
-                      />
-                    )}
+                    <Switch
+                      trackColor={{
+                        false: '#767577',
+                        true: this.editMode ? colors.accent : colors.primary,
+                      }}
+                      thumbColor={'#f4f3f4'}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={() =>
+                        (this.newFreeDelivery = !this.newFreeDelivery)
+                      }
+                      value={
+                        this.editMode ? this.newFreeDelivery : freeDelivery
+                      }
+                      disabled={!this.editMode}
+                    />
                   </View>
                 </View>
               </CardItem>
@@ -834,30 +822,21 @@ class StoreDetailsScreen extends Component {
                   </View>
 
                   <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <Switch
-                        trackColor={{
-                          false: '#767577',
-                          true: colors.dark_accent,
-                        }}
-                        thumbColor={
-                          this.newVacationMode ? colors.accent : '#f4f3f4'
-                        }
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={() =>
-                          (this.newVacationMode = !this.newVacationMode)
-                        }
-                        value={this.newVacationMode}
-                      />
-                    ) : (
-                      <Switch
-                        trackColor={{false: '#767577', true: colors.dark}}
-                        thumbColor={vacationMode ? colors.primary : '#f4f3f4'}
-                        ios_backgroundColor="#3e3e3e"
-                        value={vacationMode}
-                        disabled
-                      />
-                    )}
+                    <Switch
+                      trackColor={{
+                        false: '#767577',
+                        true: this.editMode ? colors.accent : colors.primary,
+                      }}
+                      thumbColor={'#f4f3f4'}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={() =>
+                        (this.newVacationMode = !this.newVacationMode)
+                      }
+                      value={
+                        this.editMode ? this.newVacationMode : vacationMode
+                      }
+                      disabled={!this.editMode}
+                    />
                   </View>
                 </View>
               </CardItem>
@@ -929,7 +908,9 @@ class StoreDetailsScreen extends Component {
                         <CheckBox
                           title="Grab Express"
                           checked={newShippingMethods.includes('Grab Express')}
-                          onPress={() => this.handleShippingMethods('COD')}
+                          onPress={() =>
+                            this.handleShippingMethods('Grab Express')
+                          }
                         />
                         <CheckBox
                           title="Lalamove"
