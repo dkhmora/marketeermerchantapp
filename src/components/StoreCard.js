@@ -85,6 +85,7 @@ class StoreCard extends Component {
           borderRadius: 8,
           elevation: 2,
           height: 266,
+          width: '100%',
         }}>
         {ready ? (
           <TouchableOpacity activeOpacity={0.85}>
@@ -256,7 +257,7 @@ class StoreCard extends Component {
             )}
           </TouchableOpacity>
         ) : (
-          <View style={{height: 266}}>
+          <View style={{height: 266, width: '100%'}}>
             <StoreCardLoader />
           </View>
         )}
