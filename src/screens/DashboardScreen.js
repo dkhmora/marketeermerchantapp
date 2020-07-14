@@ -241,10 +241,15 @@ class StoreDetailsScreen extends Component {
       });
     }
 
+    const validStoreName = this.newStoreName.replace(
+      /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+      '',
+    );
+
     if (
       freeDelivery !== this.newFreeDelivery ||
       storeDescription !== this.newStoreDescription ||
-      storeName !== this.newStoreName ||
+      storeName !== validStoreName ||
       vacationMode !== this.newVacationMode ||
       paymentMethods !== this.newPaymentMethods ||
       shippingMethods !== this.newShippingMethods ||
@@ -252,7 +257,7 @@ class StoreDetailsScreen extends Component {
     ) {
       await updateStoreDetails(
         merchantId,
-        this.newStoreName,
+        validStoreName,
         this.newStoreDescription,
         this.newFreeDelivery,
         this.newVacationMode,
