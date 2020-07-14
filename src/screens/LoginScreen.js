@@ -7,6 +7,7 @@ import {
   ScrollView,
   StatusBar,
   Image,
+  Linking,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {observer, inject} from 'mobx-react';
@@ -64,6 +65,19 @@ class LoginScreen extends Component {
     this.props.authStore.signIn(email, password);
   }
 
+  openMerchantSignUpForm() {
+    const merchantFormUrl =
+      'https://docs.google.com/forms/d/e/1FAIpQLSfH5koRomOIcJgDrluuEOQ7GpB7q77lThZuFivSYfz7Ec8tag/viewform?usp=sf_link';
+
+    Linking.canOpenURL(merchantFormUrl).then((supported) => {
+      if (supported) {
+        Linking.openURL(merchantFormUrl);
+      } else {
+        console.log("Don't know how to open URI: " + merchantFormUrl);
+      }
+    });
+  }
+
   render() {
     const {navigation} = this.props;
     const {emailCheck} = this.state;
@@ -111,12 +125,7 @@ class LoginScreen extends Component {
 
               {this.state.emailCheck ? (
                 <Animatable.View useNativeDriver animation="bounceIn">
-                  <Icon
-                    name="check-circle"
-                    color="#388e3c"
-                    size={20}
-                    style={{marginRight: 25}}
-                  />
+                  <Icon name="check-circle" color="#388e3c" size={20} />
                 </Animatable.View>
               ) : null}
             </View>
@@ -179,7 +188,7 @@ class LoginScreen extends Component {
                 Are you a merchant? Come and join us! Register
               </Text>
 
-              <TouchableOpacity onPress={() => navigation.navigate('Sign Up')}>
+              <TouchableOpacity onPress={() => this.openMerchantSignUpForm()}>
                 <Text style={styles.touchable_text}> here</Text>
               </TouchableOpacity>
             </View>
