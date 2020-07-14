@@ -153,7 +153,6 @@ class OrdersStore {
       this.unpaidOrders.length > 0
         ? this.unpaidOrders[0].merchantOrderNumber
         : 0;
-    console.log(this.unpaidOrders, startPoint);
 
     this.unsubscribeSetUnpaidOrders = ordersCollection
       .where('merchantId', '==', merchantId)
