@@ -6,6 +6,7 @@ import OrdersList from '../components/OrdersList';
 import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
+import {computed} from 'mobx';
 
 const TabOrders = createMaterialTopTabNavigator();
 
@@ -19,25 +20,43 @@ class OrdersTab extends Component {
     this.props.authStore.checkNotificationSubscriptionStatus();
   }
 
-  handleNotificationSubscription = () => {
-    const status = this.props.authStore.subscribedToNotifications
+  @computed get notificationSubscriptionStatus() {
+    return this.props.authStore.subscribedToNotifications
       ? 'Unsubscribed'
       : 'Subscribed';
+  }
 
-    (this.props.authStore.subscribedToNotifications
-      ? this.props.authStore.unsubscribeToNotifications()
-      : this.props.authStore.subscribeToNotifications()
-    ).then(() => {
-      Toast.show({
-        text: `Successfully ${status} to Order Notifications!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 3500,
-        style: {margin: 20, borderRadius: 16},
+  @computed get optionsLabel() {
+    return this.props.authStore.subscribedToNotifications
+      ? 'Unsubscribe to Order Notifications'
+      : 'Subscribe to Order Notifications';
+  }
+
+  handleNotificationSubscription = () => {
+    const {notificationSubscriptionStatus} = this;
+
+    this.subscribeToNotificationsTimeout &&
+      clearTimeout(this.subscribeToNotificationsTimeout);
+
+    this.props.authStore.appReady = false;
+
+    this.subscribeToNotificationsTimeout = setTimeout(() => {
+      (this.props.authStore.subscribedToNotifications
+        ? this.props.authStore.unsubscribeToNotifications()
+        : this.props.authStore.subscribeToNotifications()
+      ).then(() => {
+        this.props.authStore.checkNotificationSubscriptionStatus();
+        this.props.authStore.appReady = true;
+
+        Toast.show({
+          text: `Successfully ${notificationSubscriptionStatus} to Order Notifications!`,
+          buttonText: 'Okay',
+          type: 'success',
+          duration: 3500,
+          style: {margin: 20, borderRadius: 16},
+        });
       });
-    });
-
-    this.props.authStore.checkNotificationSubscriptionStatus();
+    }, 500);
   };
 
   componentWillUnmount() {
@@ -58,9 +77,7 @@ class OrdersTab extends Component {
   render() {
     const {name} = this.props.route;
     const {navigation} = this.props;
-    const optionsLabel = this.props.authStore.subscribedToNotifications
-      ? 'Unsubscribe to Order Notifications'
-      : 'Subscribe to Order Notifications';
+    const {optionsLabel} = this;
 
     return (
       <Container>
