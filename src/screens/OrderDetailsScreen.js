@@ -245,6 +245,7 @@ class OrderDetailsScreen extends Component {
               }}>
               <View style={{flex: 1, borderRadius: 10, overflow: 'hidden'}}>
                 <MapView
+                  provider="google"
                   style={{
                     height: 300,
                     width: '100%',
