@@ -17,6 +17,7 @@ import {SafeAreaConsumer, SafeAreaView} from 'react-native-safe-area-context';
 import ReviewsScreen from '../screens/ReviewsScreen';
 
 @inject('authStore')
+@inject('detailsStore')
 @observer
 class MainDrawer extends Component {
   constructor(props) {
@@ -24,14 +25,11 @@ class MainDrawer extends Component {
   }
 
   handleSignOut() {
-    this.props.authStore.signOut().then(() => {
-      this.props.detailsStore.unsubscribeSetStoreDetails &&
-        this.props.detailsStore.unsubscribeSetStoreDetails();
+    this.props.authStore.appReady = false;
 
-      this.props.itemsStore.unsubscribeSetItemCategories &&
-        this.props.itemsStore.unsubscribeSetItemCategories();
+    this.props.authStore.signOut().then(() => {
+      this.props.authStore.appReady = true;
     });
-    this.props.navigation.navigate('Auth');
   }
 
   render() {

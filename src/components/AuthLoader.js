@@ -5,6 +5,7 @@ import firestore from '@react-native-firebase/firestore';
 import {inject, observer} from 'mobx-react';
 import {View} from 'native-base';
 import {colors} from '../../assets/colors';
+import Toast from './Toast';
 
 @inject('authStore')
 @inject('ordersStore')
@@ -21,6 +22,8 @@ class AuthLoader extends React.Component {
     const merchantAdminsCollection = firestore().collection('merchant_admins');
     const {visible} = this.state;
 
+    this.props.authStore.appReady = false;
+
     if (auth().currentUser != null) {
       console.log('auth', auth().currentUser);
       const currentUserId = auth().currentUser.uid;
@@ -32,7 +35,13 @@ class AuthLoader extends React.Component {
           if (snapshot.empty) {
             this.props.authStore.signOut();
 
-            console.log('Error: The user does not match with any merchants');
+            Toast({
+              text: 'Error: The user does not match with any merchants',
+              type: 'danger',
+              duration: 8000,
+            });
+
+            this.props.authStore.appReady = true;
           } else {
             snapshot.forEach((doc) => {
               const merchantId = doc.id.trim();
@@ -50,11 +59,23 @@ class AuthLoader extends React.Component {
             if (visible) {
               this.setState({visible: false});
             }
+
+            this.props.authStore.appReady = true;
           }
         })
         .catch((err) => {
           console.log(`Error: Cannot read documents - ${err}`);
         });
+    } else {
+      this.props.detailsStore.unsubscribeSetStoreDetails &&
+        this.props.detailsStore.unsubscribeSetStoreDetails();
+
+      this.props.itemsStore.unsubscribeSetItemCategories &&
+        this.props.itemsStore.unsubscribeSetItemCategories();
+
+      this.props.navigation.navigate('Login');
+
+      this.props.authStore.appReady = true;
     }
 
     if (visible) {
@@ -76,7 +97,7 @@ class AuthLoader extends React.Component {
     const {user} = this.state;
 
     if (!user) {
-      navigation.navigate('Auth');
+      navigation.navigate('Login');
     } else {
       navigation.navigate('Home', {
         merchantId,
