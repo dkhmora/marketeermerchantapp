@@ -8,6 +8,7 @@ const fcmCollection = firestore().collection('merchant_fcm');
 class AuthStore {
   @observable merchantId = '';
   @observable subscribedToNotifications = false;
+  @observable unsubscribeCheckOrderNotificationStatus = null;
   @observable appReady = true;
 
   @action setMerchantId(id) {
@@ -29,25 +30,23 @@ class AuthStore {
       });
   }
 
-  @action async checkNotificationSubscriptionStatus() {
-    await messaging()
-      .getToken()
-      .then((token) =>
-        fcmCollection
-          .doc(this.merchantId)
-          .get()
-          .then((document) => {
-            if (document.exists) {
-              if (document.data().fcmTokens.includes(token)) {
-                this.subscribedToNotifications = true;
-              } else {
-                this.subscribedToNotifications = false;
-              }
+  @action checkNotificationSubscriptionStatus() {
+    this.unsubscribeCheckOrderNotificationStatus = firestore()
+      .collection('merchant_fcm')
+      .doc(this.merchantId)
+      .onSnapshot(async (documentSnapshot) => {
+        if (documentSnapshot) {
+          if (documentSnapshot.exists) {
+            const token = await messaging().getToken();
+
+            if (documentSnapshot.data().fcmTokens.includes(token)) {
+              this.subscribedToNotifications = true;
             } else {
-              fcmCollection.doc(this.merchantId).set({fcmTokens: []});
+              this.subscribedToNotifications = false;
             }
-          }),
-      );
+          }
+        }
+      });
   }
 
   @action async subscribeToNotifications() {

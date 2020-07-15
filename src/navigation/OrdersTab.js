@@ -17,7 +17,13 @@ class OrdersTab extends Component {
   constructor(props) {
     super(props);
 
-    this.props.authStore.checkNotificationSubscriptionStatus();
+    !this.props.authStore.unsubscribeCheckOrderNotificationStatus &&
+      this.props.authStore.checkNotificationSubscriptionStatus();
+  }
+
+  componentWillUnmount() {
+    this.props.authStore.unsubscribeCheckOrderNotificationStatus &&
+      this.props.authStore.unsubscribeCheckOrderNotificationStatus();
   }
 
   @computed get notificationSubscriptionStatus() {
