@@ -81,7 +81,7 @@ class AddItemScreen extends Component {
     this.props.authStore.appReady = false;
 
     await this.props.itemsStore.addStoreItem(
-      this.props.authStore.merchantId,
+      this.props.detailsStore.storeDetails.merchantId,
       this.imagePath,
       this.category,
       this.name,

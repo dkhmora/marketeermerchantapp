@@ -10,6 +10,7 @@ import {computed} from 'mobx';
 
 @inject('authStore')
 @inject('ordersStore')
+@inject('detailsStore')
 @observer
 class OrdersList extends Component {
   constructor(props) {
@@ -30,7 +31,7 @@ class OrdersList extends Component {
   async retrieveOrders() {
     return await this.props.ordersStore[
       `${this.props.route.params.storeFunctionName}`
-    ](this.props.authStore.merchantId);
+    ](this.props.detailsStore.storeDetails.merchantId);
   }
 
   onRefresh() {

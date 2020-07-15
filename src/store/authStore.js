@@ -6,14 +6,9 @@ import {Platform} from 'react-native';
 
 const fcmCollection = firestore().collection('merchant_fcm');
 class AuthStore {
-  @observable merchantId = '';
   @observable subscribedToNotifications = false;
   @observable unsubscribeCheckOrderNotificationStatus = null;
   @observable appReady = true;
-
-  @action setMerchantId(id) {
-    this.merchantId = id;
-  }
 
   @action async signIn(email, password) {
     return await auth()
@@ -30,10 +25,10 @@ class AuthStore {
       });
   }
 
-  @action checkNotificationSubscriptionStatus() {
+  @action checkNotificationSubscriptionStatus(merchantId) {
     this.unsubscribeCheckOrderNotificationStatus = firestore()
       .collection('merchant_fcm')
-      .doc(this.merchantId)
+      .doc(merchantId)
       .onSnapshot(async (documentSnapshot) => {
         if (documentSnapshot) {
           if (documentSnapshot.exists) {
@@ -49,7 +44,7 @@ class AuthStore {
       });
   }
 
-  @action async subscribeToNotifications() {
+  @action async subscribeToNotifications(merchantId) {
     let authorizationStatus = null;
 
     if (Platform.OS === 'ios') {
@@ -58,15 +53,13 @@ class AuthStore {
       authorizationStatus = true;
     }
 
-    await this.checkNotificationSubscriptionStatus();
-
     if (!this.subscribedToNotifications) {
       if (authorizationStatus) {
         await messaging()
           .getToken()
           .then((token) => {
             fcmCollection
-              .doc(this.merchantId)
+              .doc(merchantId)
               .update('fcmTokens', firestore.FieldValue.arrayUnion(token));
           })
           .catch((err) => console.log(err));
@@ -74,15 +67,17 @@ class AuthStore {
     }
   }
 
-  @action async unsubscribeToNotifications() {
-    await messaging()
-      .getToken()
-      .then((token) =>
-        fcmCollection
-          .doc(this.merchantId)
-          .update('fcmTokens', firestore.FieldValue.arrayRemove(token)),
-      )
-      .catch((err) => console.log(err));
+  @action async unsubscribeToNotifications(merchantId) {
+    if (this.subscribedToNotifications) {
+      await messaging()
+        .getToken()
+        .then((token) =>
+          fcmCollection
+            .doc(merchantId)
+            .update('fcmTokens', firestore.FieldValue.arrayRemove(token)),
+        )
+        .catch((err) => console.log(err));
+    }
   }
 }
 
