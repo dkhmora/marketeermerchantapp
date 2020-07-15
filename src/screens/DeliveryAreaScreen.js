@@ -195,7 +195,7 @@ class DeliveryAreaScreen extends Component {
 
   async handleSetStoreLocation() {
     const {updateCoordinates} = this.props.detailsStore;
-    const {merchantId} = this.props.authStore;
+    const {merchantId} = this.props.detailsStore.storeDetails;
     const {newMarkerPosition, initialdistance, address} = this.state;
 
     const range = this.getGeohashRange(

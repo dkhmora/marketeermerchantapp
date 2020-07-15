@@ -30,7 +30,9 @@ class StoreDetailsScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.props.detailsStore.setStoreDetails(this.props.authStore.merchantId);
+    this.props.detailsStore.setStoreDetails(
+      this.props.detailsStore.storeDetails.merchantId,
+    );
 
     this.state = {
       loading: false,
@@ -60,10 +62,13 @@ class StoreDetailsScreen extends Component {
 
   componentDidUpdate() {
     const {displayImageUrl, coverImageUrl} = this.state;
+    const {merchantId} = this.props.detailsStore.storeDetails;
 
     if (!displayImageUrl || !coverImageUrl) {
       this.getImage();
     }
+
+    this.props.itemsStore.setStoreItems(merchantId);
   }
 
   @action cancelEditing() {
@@ -200,7 +205,7 @@ class StoreDetailsScreen extends Component {
 
   async handleConfirmDetails() {
     const {updateStoreDetails, uploadImage} = this.props.detailsStore;
-    const {merchantId} = this.props.authStore;
+    const {merchantId} = this.props.detailsStore.storeDetails;
     const {
       displayImageUrl,
       coverImageUrl,

@@ -81,7 +81,7 @@ class OrdersStore {
 
     if (orderId) {
       this.unsubscribeGetMessages = firestore()
-        .collection('order_chats')
+        .collection('orders')
         .doc(orderId)
         .onSnapshot((documentSnapshot) => {
           if (documentSnapshot) {
@@ -97,11 +97,6 @@ class OrdersStore {
               } else {
                 this.orderMessages = documentSnapshot.data().messages.reverse();
               }
-            } else {
-              firestore()
-                .collection('order_chats')
-                .doc(orderId)
-                .set({messages: []});
             }
           }
         });
@@ -131,6 +126,8 @@ class OrdersStore {
       this.pendingOrders.length > 0
         ? this.pendingOrders[0].merchantOrderNumber
         : 0;
+
+    console.log('pendingstart', startPoint);
 
     this.unsubscribeSetPendingOrders = ordersCollection
       .where('merchantId', '==', merchantId)
@@ -173,6 +170,8 @@ class OrdersStore {
   @action setPaidOrders(merchantId) {
     const startPoint =
       this.paidOrders.length > 0 ? this.paidOrders[0].merchantOrderNumber : 0;
+
+    console.log(startPoint);
 
     this.unsubscribeSetPaidOrders = ordersCollection
       .where('merchantId', '==', merchantId)

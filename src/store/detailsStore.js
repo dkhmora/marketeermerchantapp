@@ -2,7 +2,9 @@ import {observable, action} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import firebase from '@react-native-firebase/app';
+import auth from '@react-native-firebase/auth';
 import '@react-native-firebase/functions';
+import Toast from '../components/Toast';
 
 const functions = firebase.app().functions('asia-northeast1');
 class DetailsStore {
@@ -66,19 +68,33 @@ class DetailsStore {
       });
   }
 
-  @action setStoreDetails(merchantId) {
-    if (merchantId) {
-      this.unsubscribeSetStoreDetails = firestore()
-        .collection('merchants')
-        .doc(merchantId)
-        .onSnapshot((documentSnapshot) => {
-          if (documentSnapshot) {
-            if (documentSnapshot.exists) {
-              this.storeDetails = documentSnapshot.data();
-            }
-          }
-        });
-    }
+  @action async setStoreDetails() {
+    const userId = auth().currentUser.uid;
+
+    this.unsubscribeSetStoreDetails = firestore()
+      .collection('merchants')
+      .where(`admins.${userId}`, '==', true)
+      .onSnapshot((querySnapshot) => {
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc, index) => {
+            this.storeDetails = {
+              ...doc.data(),
+              merchantId: doc.id,
+            };
+          });
+        } else {
+          auth()
+            .signOut()
+            .then(() => {
+              Toast({
+                text:
+                  'Error, user account is not set as admin. Please contact Marketeer support.',
+                type: 'danger',
+                duration: 10000,
+              });
+            });
+        }
+      });
   }
 
   @action async deleteImage(image) {

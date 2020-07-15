@@ -26,7 +26,7 @@ class OrderChatScreen extends Component {
 
     this.state = {
       user: {
-        _id: this.props.authStore.merchantId,
+        _id: this.props.detailsStore.storeDetails.merchantId,
         name: this.props.detailsStore.storeDetails.storeName,
       },
     };
