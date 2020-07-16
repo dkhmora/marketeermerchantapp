@@ -90,6 +90,8 @@ class DetailsStore {
 
             const token = await messaging().getToken();
 
+            console.log(token, doc.data().fcmTokens);
+
             if (doc.data().fcmTokens) {
               if (doc.data().fcmTokens.includes(token)) {
                 this.subscribedToNotifications = true;

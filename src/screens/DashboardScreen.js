@@ -204,7 +204,6 @@ class StoreDetailsScreen extends Component {
   }
 
   async handleConfirmDetails() {
-    const {updateStoreDetails, uploadImage} = this.props.detailsStore;
     const {
       displayImageUrl,
       coverImageUrl,
@@ -224,21 +223,19 @@ class StoreDetailsScreen extends Component {
     this.setState({loading: true});
 
     if (coverImageUrl !== oldCoverImageUrl) {
-      await uploadImage(coverImageUrl.uri, 'cover', oldCoverImageUrl).then(
-        () => {
+      await this.props.detailsStore
+        .uploadImage(coverImageUrl.uri, 'cover', oldCoverImageUrl)
+        .then(() => {
           this.setState({oldCoverImageUrl: coverImageUrl});
-        },
-      );
+        });
     }
 
     if (displayImageUrl !== oldDisplayImageUrl) {
-      await uploadImage(
-        displayImageUrl.uri,
-        'display',
-        oldDisplayImageUrl,
-      ).then(() => {
-        this.setState({oldDisplayImageUrl: displayImageUrl});
-      });
+      await this.props.detailsStore
+        .uploadImage(displayImageUrl.uri, 'display', oldDisplayImageUrl)
+        .then(() => {
+          this.setState({oldDisplayImageUrl: displayImageUrl});
+        });
     }
 
     const validStoreName = this.newStoreName.replace(
@@ -255,22 +252,24 @@ class StoreDetailsScreen extends Component {
       shippingMethods !== this.newShippingMethods ||
       deliveryType !== this.newDeliveryType
     ) {
-      await updateStoreDetails(
-        validStoreName,
-        this.newStoreDescription,
-        this.newFreeDelivery,
-        this.newVacationMode,
-        this.newPaymentMethods,
-        this.newShippingMethods,
-        this.newDeliveryType,
-      ).then(() => {
-        Toast.show({
-          text: 'Store details successfully updated!',
-          type: 'success',
-          style: {margin: 20, borderRadius: 16},
-          duration: 3000,
+      await this.props.detailsStore
+        .updateStoreDetails(
+          validStoreName,
+          this.newStoreDescription,
+          this.newFreeDelivery,
+          this.newVacationMode,
+          this.newPaymentMethods,
+          this.newShippingMethods,
+          this.newDeliveryType,
+        )
+        .then(() => {
+          Toast.show({
+            text: 'Store details successfully updated!',
+            type: 'success',
+            style: {margin: 20, borderRadius: 16},
+            duration: 3000,
+          });
         });
-      });
     } else {
       Toast.show({
         text: 'Store details successfully updated!',
