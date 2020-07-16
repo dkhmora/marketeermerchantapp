@@ -90,8 +90,6 @@ class DetailsStore {
 
             const token = await messaging().getToken();
 
-            console.log(token, doc.data().fcmTokens);
-
             if (doc.data().fcmTokens) {
               if (doc.data().fcmTokens.includes(token)) {
                 this.subscribedToNotifications = true;
@@ -165,10 +163,9 @@ class DetailsStore {
   }
 
   @action async uploadImage(imagePath, type, currentImagePath) {
+    const {merchantId} = this.storeDetails;
     const fileExtension = imagePath.split('.').pop();
     const imageRef = `/images/merchants/${merchantId}/${type}.${fileExtension}`;
-
-    const {merchantId} = this.storeDetails;
 
     await storage()
       .ref(imageRef)
