@@ -19,54 +19,17 @@ class AuthLoader extends React.Component {
   }
 
   onAuthStateChanged(user) {
-    const merchantAdminsCollection = firestore().collection('merchant_admins');
     const {visible} = this.state;
 
     this.props.authStore.appReady = false;
 
     if (auth().currentUser != null) {
-      console.log('auth', auth().currentUser);
-      const currentUserId = auth().currentUser.uid;
+      !this.props.detailsStore.unsubscribeSetStoreDetails &&
+        this.props.detailsStore.setStoreDetails();
 
-      merchantAdminsCollection
-        .where(`${currentUserId}`, '==', true)
-        .get()
-        .then((snapshot) => {
-          if (snapshot.empty) {
-            this.props.authStore.signOut();
+      this.setState({user});
 
-            Toast({
-              text: 'Error: The user does not match with any merchants',
-              type: 'danger',
-              duration: 8000,
-            });
-
-            this.props.authStore.appReady = true;
-          } else {
-            snapshot.forEach((doc) => {
-              const merchantId = doc.id.trim();
-
-              this.props.authStore.setMerchantId(merchantId);
-              this.props.detailsStore.setStoreDetails(merchantId);
-              this.props.itemsStore.setStoreItems(merchantId);
-
-              console.log(
-                `Current user is assigned to Merchant with doc id "${merchantId}"`,
-              );
-            });
-
-            this.setState({user});
-
-            if (visible) {
-              this.setState({visible: false});
-            }
-
-            this.props.authStore.appReady = true;
-          }
-        })
-        .catch((err) => {
-          console.log(`Error: Cannot read documents - ${err}`);
-        });
+      this.props.authStore.appReady = true;
     } else {
       this.props.detailsStore.unsubscribeSetStoreDetails &&
         this.props.detailsStore.unsubscribeSetStoreDetails();
@@ -101,7 +64,7 @@ class AuthLoader extends React.Component {
 
   componentDidUpdate() {
     const {navigation} = this.props;
-    const {merchantId} = this.props.authStore;
+    const {merchantId} = this.props.detailsStore.storeDetails;
     const {user} = this.state;
 
     if (!user) {

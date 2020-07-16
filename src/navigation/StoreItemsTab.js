@@ -73,7 +73,7 @@ class StoreItemsTab extends Component {
 
   handleAddCategory() {
     const {addItemCategory, itemCategories} = this.props.itemsStore;
-    const {merchantId} = this.props.authStore;
+    const {merchantId} = this.props.detailsStore.storeDetails;
 
     if (!itemCategories.includes(this.newCategory)) {
       addItemCategory(merchantId, this.newCategory)
@@ -103,7 +103,7 @@ class StoreItemsTab extends Component {
 
   handleDeleteCategory() {
     const {deleteItemCategory, itemCategories} = this.props.itemsStore;
-    const {merchantId} = this.props.authStore;
+    const {merchantId} = this.props.detailsStore.storeDetails;
 
     if (itemCategories.includes(this.selectedCategory)) {
       deleteItemCategory(merchantId, this.selectedCategory);

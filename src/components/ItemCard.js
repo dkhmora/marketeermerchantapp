@@ -30,7 +30,7 @@ class ItemCard extends Component {
   };
 
   handleDelete() {
-    const {merchantId} = this.props.authStore;
+    const {merchantId} = this.props.detailsStore.storeDetails;
     const {deleteStoreItem} = this.props.itemsStore;
     const {item} = this.props;
 

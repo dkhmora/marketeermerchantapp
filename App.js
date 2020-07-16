@@ -7,7 +7,8 @@
  */
 import 'react-native-gesture-handler';
 import React from 'react';
-import {YellowBox, AsyncStorage} from 'react-native';
+import {YellowBox} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import _ from 'lodash';
 import moment from 'moment';
 import SplashScreen from 'react-native-splash-screen';
