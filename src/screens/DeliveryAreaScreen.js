@@ -222,7 +222,6 @@ class DeliveryAreaScreen extends Component {
         },
         () => {
           updateCoordinates(
-            merchantId,
             range.lower,
             range.upper,
             newMarkerPosition,
@@ -238,7 +237,6 @@ class DeliveryAreaScreen extends Component {
       );
     } else {
       updateCoordinates(
-        merchantId,
         range.lower,
         range.upper,
         newMarkerPosition,

@@ -21,11 +21,9 @@ class ReviewsScreen extends Component {
   }
 
   async getReviews() {
-    const {merchantId} = this.props.route.params;
-
     this.setState(
       {
-        reviews: await this.props.detailsStore.getStoreReviews(merchantId),
+        reviews: await this.props.detailsStore.getStoreReviews(),
         reviewsLoading: true,
       },
       () => {
