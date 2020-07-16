@@ -24,7 +24,8 @@ class AuthLoader extends React.Component {
     this.props.authStore.appReady = false;
 
     if (auth().currentUser != null) {
-      this.props.detailsStore.setStoreDetails();
+      !this.props.detailsStore.unsubscribeSetStoreDetails &&
+        this.props.detailsStore.setStoreDetails();
 
       this.setState({user});
 

@@ -19,26 +19,22 @@ class OrdersTab extends Component {
     super(props);
 
     const {merchantId} = this.props.detailsStore.storeDetails;
-
-    !this.props.authStore.unsubscribeCheckOrderNotificationStatus &&
-      this.props.authStore.checkNotificationSubscriptionStatus(merchantId);
   }
 
   @computed get notificationSubscriptionStatus() {
-    return this.props.authStore.subscribedToNotifications
+    return this.props.detailsStore.subscribedToNotifications
       ? 'Unsubscribed'
       : 'Subscribed';
   }
 
   @computed get optionsLabel() {
-    return this.props.authStore.subscribedToNotifications
+    return this.props.detailsStore.subscribedToNotifications
       ? 'Unsubscribe to Order Notifications'
       : 'Subscribe to Order Notifications';
   }
 
   handleNotificationSubscription = () => {
     const {notificationSubscriptionStatus} = this;
-    const {merchantId} = this.props.detailsStore.storeDetails;
 
     this.subscribeToNotificationsTimeout &&
       clearTimeout(this.subscribeToNotificationsTimeout);
@@ -46,11 +42,10 @@ class OrdersTab extends Component {
     this.props.authStore.appReady = false;
 
     this.subscribeToNotificationsTimeout = setTimeout(() => {
-      (this.props.authStore.subscribedToNotifications
-        ? this.props.authStore.unsubscribeToNotifications(merchantId)
-        : this.props.authStore.subscribeToNotifications(merchantId)
+      (this.props.detailsStore.subscribedToNotifications
+        ? this.props.detailsStore.unsubscribeToNotifications()
+        : this.props.detailsStore.subscribeToNotifications()
       ).then(() => {
-        this.props.authStore.checkNotificationSubscriptionStatus(merchantId);
         this.props.authStore.appReady = true;
 
         Toast.show({
@@ -77,8 +72,6 @@ class OrdersTab extends Component {
       this.props.ordersStore.unsubscribeSetUnpaidOrders();
     this.props.ordersStore.unsubscribeSetShippedOrders &&
       this.props.ordersStore.unsubscribeSetShippedOrders();
-    this.props.authStore.unsubscribeCheckOrderNotificationStatus &&
-      this.props.authStore.unsubscribeCheckOrderNotificationStatus();
   }
 
   render() {

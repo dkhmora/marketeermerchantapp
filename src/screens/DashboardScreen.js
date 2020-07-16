@@ -24,7 +24,6 @@ import FastImage from 'react-native-fast-image';
 
 @inject('detailsStore')
 @inject('itemsStore')
-@inject('authStore')
 @observer
 class StoreDetailsScreen extends Component {
   constructor(props) {
@@ -68,7 +67,8 @@ class StoreDetailsScreen extends Component {
       this.getImage();
     }
 
-    this.props.itemsStore.setStoreItems(merchantId);
+    !this.props.itemsStore.unsubscribeSetStoreItems &&
+      this.props.itemsStore.setStoreItems(merchantId);
   }
 
   @action cancelEditing() {
@@ -205,7 +205,6 @@ class StoreDetailsScreen extends Component {
 
   async handleConfirmDetails() {
     const {updateStoreDetails, uploadImage} = this.props.detailsStore;
-    const {merchantId} = this.props.detailsStore.storeDetails;
     const {
       displayImageUrl,
       coverImageUrl,
@@ -225,19 +224,15 @@ class StoreDetailsScreen extends Component {
     this.setState({loading: true});
 
     if (coverImageUrl !== oldCoverImageUrl) {
-      await uploadImage(
-        merchantId,
-        coverImageUrl.uri,
-        'cover',
-        oldCoverImageUrl,
-      ).then(() => {
-        this.setState({oldCoverImageUrl: coverImageUrl});
-      });
+      await uploadImage(coverImageUrl.uri, 'cover', oldCoverImageUrl).then(
+        () => {
+          this.setState({oldCoverImageUrl: coverImageUrl});
+        },
+      );
     }
 
     if (displayImageUrl !== oldDisplayImageUrl) {
       await uploadImage(
-        merchantId,
         displayImageUrl.uri,
         'display',
         oldDisplayImageUrl,
@@ -261,7 +256,6 @@ class StoreDetailsScreen extends Component {
       deliveryType !== this.newDeliveryType
     ) {
       await updateStoreDetails(
-        merchantId,
         validStoreName,
         this.newStoreDescription,
         this.newFreeDelivery,
