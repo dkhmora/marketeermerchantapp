@@ -127,7 +127,7 @@ class ReviewsScreen extends Component {
         <Rating
           type="custom"
           direction="row"
-          rated={storeDetails.ratingAverage}
+          rated={storeDetails.ratingAverage ? storeDetails.ratingAverage : 0}
           selectedIconImage={require('../../assets/images/feather_filled.png')}
           emptyIconImage={require('../../assets/images/feather_unfilled.png')}
           size={30}
@@ -138,7 +138,9 @@ class ReviewsScreen extends Component {
         />
 
         <Text style={{fontSize: 18, fontFamily: 'ProductSans-Regular'}}>
-          {storeDetails.ratingAverage && storeDetails.ratingAverage.toFixed(1)}
+          {storeDetails.ratingAverage
+            ? storeDetails.ratingAverage.toFixed(1)
+            : 'No Rating Yet'}
         </Text>
       </View>
     );
