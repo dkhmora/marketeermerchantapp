@@ -194,8 +194,6 @@ class DeliveryAreaScreen extends Component {
   };
 
   async handleSetStoreLocation() {
-    const {updateCoordinates} = this.props.detailsStore;
-    const {merchantId} = this.props.detailsStore.storeDetails;
     const {newMarkerPosition, initialdistance, address} = this.state;
 
     const range = this.getGeohashRange(
@@ -221,13 +219,14 @@ class DeliveryAreaScreen extends Component {
           boundingBox,
         },
         () => {
-          updateCoordinates(
-            range.lower,
-            range.upper,
-            newMarkerPosition,
-            boundingBox,
-            this.state.address,
-          )
+          this.props.detailsStore
+            .updateCoordinates(
+              range.lower,
+              range.upper,
+              newMarkerPosition,
+              boundingBox,
+              this.state.address,
+            )
             .then(() => {
               Toast({text: 'Delivery Area successfully set!'});
               this.setState({loading: false});

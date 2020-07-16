@@ -17,8 +17,6 @@ const TabOrders = createMaterialTopTabNavigator();
 class OrdersTab extends Component {
   constructor(props) {
     super(props);
-
-    const {merchantId} = this.props.detailsStore.storeDetails;
   }
 
   @computed get notificationSubscriptionStatus() {
