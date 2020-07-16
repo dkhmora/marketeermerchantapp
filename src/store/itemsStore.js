@@ -52,6 +52,7 @@ class ItemsStore {
   }
 
   @action setStoreItems(merchantId) {
+    console.log('storeitems', merchantId);
     this.unsubscribeSetStoreItems = firestore()
       .collection('merchant_items')
       .doc(merchantId)

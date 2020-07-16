@@ -24,13 +24,14 @@ import FastImage from 'react-native-fast-image';
 
 @inject('detailsStore')
 @inject('itemsStore')
-@inject('authStore')
 @observer
 class StoreDetailsScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.props.detailsStore.setStoreDetails(this.props.authStore.merchantId);
+    this.props.detailsStore.setStoreDetails(
+      this.props.detailsStore.storeDetails.merchantId,
+    );
 
     this.state = {
       loading: false,
@@ -60,10 +61,14 @@ class StoreDetailsScreen extends Component {
 
   componentDidUpdate() {
     const {displayImageUrl, coverImageUrl} = this.state;
+    const {merchantId} = this.props.detailsStore.storeDetails;
 
     if (!displayImageUrl || !coverImageUrl) {
       this.getImage();
     }
+
+    !this.props.itemsStore.unsubscribeSetStoreItems &&
+      this.props.itemsStore.setStoreItems(merchantId);
   }
 
   @action cancelEditing() {
@@ -199,8 +204,6 @@ class StoreDetailsScreen extends Component {
   }
 
   async handleConfirmDetails() {
-    const {updateStoreDetails, uploadImage} = this.props.detailsStore;
-    const {merchantId} = this.props.authStore;
     const {
       displayImageUrl,
       coverImageUrl,
@@ -220,25 +223,19 @@ class StoreDetailsScreen extends Component {
     this.setState({loading: true});
 
     if (coverImageUrl !== oldCoverImageUrl) {
-      await uploadImage(
-        merchantId,
-        coverImageUrl.uri,
-        'cover',
-        oldCoverImageUrl,
-      ).then(() => {
-        this.setState({oldCoverImageUrl: coverImageUrl});
-      });
+      await this.props.detailsStore
+        .uploadImage(coverImageUrl.uri, 'cover', oldCoverImageUrl)
+        .then(() => {
+          this.setState({oldCoverImageUrl: coverImageUrl});
+        });
     }
 
     if (displayImageUrl !== oldDisplayImageUrl) {
-      await uploadImage(
-        merchantId,
-        displayImageUrl.uri,
-        'display',
-        oldDisplayImageUrl,
-      ).then(() => {
-        this.setState({oldDisplayImageUrl: displayImageUrl});
-      });
+      await this.props.detailsStore
+        .uploadImage(displayImageUrl.uri, 'display', oldDisplayImageUrl)
+        .then(() => {
+          this.setState({oldDisplayImageUrl: displayImageUrl});
+        });
     }
 
     const validStoreName = this.newStoreName.replace(
@@ -255,23 +252,24 @@ class StoreDetailsScreen extends Component {
       shippingMethods !== this.newShippingMethods ||
       deliveryType !== this.newDeliveryType
     ) {
-      await updateStoreDetails(
-        merchantId,
-        validStoreName,
-        this.newStoreDescription,
-        this.newFreeDelivery,
-        this.newVacationMode,
-        this.newPaymentMethods,
-        this.newShippingMethods,
-        this.newDeliveryType,
-      ).then(() => {
-        Toast.show({
-          text: 'Store details successfully updated!',
-          type: 'success',
-          style: {margin: 20, borderRadius: 16},
-          duration: 3000,
+      await this.props.detailsStore
+        .updateStoreDetails(
+          validStoreName,
+          this.newStoreDescription,
+          this.newFreeDelivery,
+          this.newVacationMode,
+          this.newPaymentMethods,
+          this.newShippingMethods,
+          this.newDeliveryType,
+        )
+        .then(() => {
+          Toast.show({
+            text: 'Store details successfully updated!',
+            type: 'success',
+            style: {margin: 20, borderRadius: 16},
+            duration: 3000,
+          });
         });
-      });
     } else {
       Toast.show({
         text: 'Store details successfully updated!',

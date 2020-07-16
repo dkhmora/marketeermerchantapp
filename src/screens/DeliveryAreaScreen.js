@@ -36,19 +36,19 @@ class DeliveryAreaScreen extends Component {
       boundingBox: null,
       address: null,
       distance: 0,
-      initialdistance: 0,
+      newDistance: 0,
       newMarkerPosition: null,
       centerOfScreen: (Dimensions.get('window').height - 17) / 2,
     };
   }
 
   @computed get boundingBox() {
-    const {newMarkerPosition, initialdistance} = this.state;
+    const {newMarkerPosition, newDistance} = this.state;
 
     if (newMarkerPosition) {
       const bounds = this.getBoundsOfDistance(
         {...newMarkerPosition},
-        initialdistance,
+        newDistance,
       );
 
       const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
@@ -149,7 +149,7 @@ class DeliveryAreaScreen extends Component {
         longitudeDelta: 0.05,
       },
       distance,
-      initialdistance: distance,
+      newDistance: distance,
       mapReady: true,
     });
   }
@@ -194,23 +194,21 @@ class DeliveryAreaScreen extends Component {
   };
 
   async handleSetStoreLocation() {
-    const {updateCoordinates} = this.props.detailsStore;
-    const {merchantId} = this.props.authStore;
-    const {newMarkerPosition, initialdistance, address} = this.state;
+    const {newMarkerPosition, newDistance, address} = this.state;
 
     const range = this.getGeohashRange(
       newMarkerPosition.latitude,
       newMarkerPosition.longitude,
-      initialdistance,
+      newDistance,
     );
 
     const bounds = this.getBoundsOfDistance(
       {...newMarkerPosition},
-      initialdistance,
+      newDistance,
     );
     const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
 
-    this.setState({loading: true});
+    this.props.authStore.appReady = false;
 
     if (!address) {
       this.setState(
@@ -221,33 +219,33 @@ class DeliveryAreaScreen extends Component {
           boundingBox,
         },
         () => {
-          updateCoordinates(
-            merchantId,
-            range.lower,
-            range.upper,
-            newMarkerPosition,
-            boundingBox,
-            this.state.address,
-          )
+          this.props.detailsStore
+            .updateCoordinates(
+              range.lower,
+              range.upper,
+              newMarkerPosition,
+              boundingBox,
+              this.state.address,
+            )
             .then(() => {
               Toast({text: 'Delivery Area successfully set!'});
-              this.setState({loading: false});
+              this.props.authStore.appReady = true;
             })
             .catch((err) => Toast({text: err, type: 'danger'}));
         },
       );
     } else {
-      updateCoordinates(
-        merchantId,
-        range.lower,
-        range.upper,
-        newMarkerPosition,
-        boundingBox,
-        this.state.address,
-      )
+      this.props.detailsStore
+        .updateCoordinates(
+          range.lower,
+          range.upper,
+          newMarkerPosition,
+          boundingBox,
+          this.state.address,
+        )
         .then(() => {
           Toast({text: 'Delivery Area successfully set!'});
-          this.setState({loading: false});
+          this.props.authStore.appReady = true;
         })
         .catch((err) => Toast({text: err, type: 'danger'}));
     }
@@ -255,6 +253,7 @@ class DeliveryAreaScreen extends Component {
     this.setState({
       editMode: false,
       markerPosition: newMarkerPosition,
+      distance: newDistance,
     });
   }
 
@@ -292,7 +291,7 @@ class DeliveryAreaScreen extends Component {
         longitudeDelta: 0.05,
       },
       newMarkerPosition: this.state.markerPosition,
-      initialdistance: this.state.distance,
+      newDistance: this.state.distance,
       editMode: true,
     });
 
@@ -300,12 +299,12 @@ class DeliveryAreaScreen extends Component {
   }
 
   handleCancelChanges() {
-    const {markerPosition, initialdistance} = this.state;
+    const {markerPosition, distance} = this.state;
 
     this.setState({
       mapData: {...markerPosition, latitudeDelta: 0.04, longitudeDelta: 0.05},
       newMarkerPosition: {...markerPosition},
-      distance: initialdistance,
+      newDistance: distance,
       editMode: false,
     });
 
@@ -355,8 +354,7 @@ class DeliveryAreaScreen extends Component {
       mapData,
       mapReady,
       editMode,
-      loading,
-      initialdistance,
+      newDistance,
     } = this.state;
 
     const {boundingBox} = this;
@@ -443,15 +441,13 @@ class DeliveryAreaScreen extends Component {
                     step={1}
                     minimumValue={0}
                     maximumValue={100}
-                    value={initialdistance}
+                    value={newDistance}
                     thumbTintColor={colors.accent}
                     onValueChange={(value) =>
-                      this.setState({initialdistance: value})
+                      this.setState({newDistance: value})
                     }
                   />
-                  <Text style={{alignSelf: 'center'}}>
-                    {initialdistance} KM
-                  </Text>
+                  <Text style={{alignSelf: 'center'}}>{newDistance} KM</Text>
                 </View>
               </CardItem>
               <CardItem style={{alignSelf: 'center'}}>
@@ -531,25 +527,6 @@ class DeliveryAreaScreen extends Component {
             />
           }
         />
-
-        {loading && (
-          <View
-            style={[
-              StyleSheet.absoluteFillObject,
-              {
-                flex: 1,
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                alignItems: 'center',
-                justifyContent: 'center',
-              },
-            ]}>
-            <ActivityIndicator animating color={colors.primary} size="large" />
-          </View>
-        )}
       </View>
     );
   }

@@ -12,28 +12,21 @@ const TabOrders = createMaterialTopTabNavigator();
 
 @inject('authStore')
 @inject('ordersStore')
+@inject('detailsStore')
 @observer
 class OrdersTab extends Component {
   constructor(props) {
     super(props);
-
-    !this.props.authStore.unsubscribeCheckOrderNotificationStatus &&
-      this.props.authStore.checkNotificationSubscriptionStatus();
-  }
-
-  componentWillUnmount() {
-    this.props.authStore.unsubscribeCheckOrderNotificationStatus &&
-      this.props.authStore.unsubscribeCheckOrderNotificationStatus();
   }
 
   @computed get notificationSubscriptionStatus() {
-    return this.props.authStore.subscribedToNotifications
+    return this.props.detailsStore.subscribedToNotifications
       ? 'Unsubscribed'
       : 'Subscribed';
   }
 
   @computed get optionsLabel() {
-    return this.props.authStore.subscribedToNotifications
+    return this.props.detailsStore.subscribedToNotifications
       ? 'Unsubscribe to Order Notifications'
       : 'Subscribe to Order Notifications';
   }
@@ -47,11 +40,10 @@ class OrdersTab extends Component {
     this.props.authStore.appReady = false;
 
     this.subscribeToNotificationsTimeout = setTimeout(() => {
-      (this.props.authStore.subscribedToNotifications
-        ? this.props.authStore.unsubscribeToNotifications()
-        : this.props.authStore.subscribeToNotifications()
+      (this.props.detailsStore.subscribedToNotifications
+        ? this.props.detailsStore.unsubscribeToNotifications()
+        : this.props.detailsStore.subscribeToNotifications()
       ).then(() => {
-        this.props.authStore.checkNotificationSubscriptionStatus();
         this.props.authStore.appReady = true;
 
         Toast.show({
