@@ -245,7 +245,7 @@ class OrderCard extends Component {
     const CardFooter = () => {
       const footerStatus = `Order ${tabName}`;
 
-      const timeStamp = moment(order.createdAt, ISO_8601).fromNow();
+      const timeStamp = moment(new Date(order.createdAt)).fromNow();
 
       return (
         <CardItem footer bordered>

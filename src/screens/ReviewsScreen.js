@@ -37,7 +37,7 @@ class ReviewsScreen extends Component {
   }
 
   ReviewListItem({item}) {
-    const timeStamp = moment(item.createdAt, ISO_8601).format(
+    const timeStamp = moment(new Date(item.createdAt)).format(
       'MM-DD-YYYY hh:MM A',
     );
 
