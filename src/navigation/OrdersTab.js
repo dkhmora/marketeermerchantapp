@@ -57,19 +57,15 @@ class OrdersTab extends Component {
     }, 500);
   };
 
+  componentDidMount() {
+    const {merchantId} = this.props.detailsStore.storeDetails;
+
+    this.props.ordersStore.setOrders(merchantId);
+  }
+
   componentWillUnmount() {
-    this.props.ordersStore.unsubscribeSetCancelledOrders &&
-      this.props.ordersStore.unsubscribeSetCancelledOrders();
-    this.props.ordersStore.unsubscribeSetCompletedOrders &&
-      this.props.ordersStore.unsubscribeSetCompletedOrders();
-    this.props.ordersStore.unsubscribeSetPendingOrders &&
-      this.props.ordersStore.unsubscribeSetPendingOrders();
-    this.props.ordersStore.unsubscribeSetPaidOrders &&
-      this.props.ordersStore.unsubscribeSetPaidOrders();
-    this.props.ordersStore.unsubscribeSetUnpaidOrders &&
-      this.props.ordersStore.unsubscribeSetUnpaidOrders();
-    this.props.ordersStore.unsubscribeSetShippedOrders &&
-      this.props.ordersStore.unsubscribeSetShippedOrders();
+    this.props.ordersStore.unsubscribeSetOrders &&
+      this.props.ordersStore.unsubscribeSetOrders();
   }
 
   render() {
@@ -95,54 +91,12 @@ class OrdersTab extends Component {
             indicatorStyle: {backgroundColor: colors.primary},
           }}
           headerMode="none">
-          <TabOrders.Screen
-            name="Pending"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setPendingOrders',
-              storeVarName: 'pendingOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Unpaid"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setUnpaidOrders',
-              storeVarName: 'unpaidOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Paid"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setPaidOrders',
-              storeVarName: 'paidOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Shipped"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setShippedOrders',
-              storeVarName: 'shippedOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Completed"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setCompletedOrders',
-              storeVarName: 'completedOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Cancelled"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setCancelledOrders',
-              storeVarName: 'cancelledOrders',
-            }}
-          />
+          <TabOrders.Screen name="Pending" component={OrdersList} />
+          <TabOrders.Screen name="Unpaid" component={OrdersList} />
+          <TabOrders.Screen name="Paid" component={OrdersList} />
+          <TabOrders.Screen name="Shipped" component={OrdersList} />
+          <TabOrders.Screen name="Completed" component={OrdersList} />
+          <TabOrders.Screen name="Cancelled" component={OrdersList} />
         </TabOrders.Navigator>
       </Container>
     );

@@ -4,24 +4,15 @@ import storage from '@react-native-firebase/storage';
 import {GiftedChat} from 'react-native-gifted-chat';
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
-import {create, persist} from 'mobx-persist';
+import {persist} from 'mobx-persist';
 
 const ordersCollection = firestore().collection('orders');
 class OrdersStore {
-  @persist('list') @observable pendingOrders = [];
-  @persist('list') @observable paidOrders = [];
-  @persist('list') @observable unpaidOrders = [];
-  @persist('list') @observable shippedOrders = [];
-  @persist('list') @observable completedOrders = [];
-  @persist('list') @observable cancelledOrders = [];
+  @persist('list') @observable orders = [];
+  @persist @observable maxOrderUpdatedAt = 0;
   @observable orderMessages = [];
   @observable unsubscribeGetMessages = null;
-  @observable unsubscribeSetCancelledOrders = null;
-  @observable unsubscribeSetCompletedOrders = null;
-  @observable unsubscribeSetPaidOrders = null;
-  @observable unsubscribeSetUnpaidOrders = null;
-  @observable unsubscribeSetPendingOrders = null;
-  @observable unsubscribeSetAcceptedOrders = null;
+  @observable unsubscribeSetOrders = null;
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
@@ -121,136 +112,54 @@ class OrdersStore {
       });
   }
 
-  @action setPendingOrders(merchantId) {
-    const startPoint =
-      this.pendingOrders.length > 0
-        ? this.pendingOrders[0].merchantOrderNumber
-        : 0;
+  @action async setOrders(merchantId) {
+    console.log(
+      'this.maxOrderUpdatedAt',
+      this.maxOrderUpdatedAt,
+      this.orderMessages,
+      merchantId,
+    );
 
-    console.log('pendingstart', startPoint);
+    console.log(this.maxOrderUpdatedAt < firestore.Timestamp.now().toMillis());
+    console.log(firestore.Timestamp.now().toMillis());
 
-    this.unsubscribeSetPendingOrders = ordersCollection
+    this.unsubscribeSetOrders = ordersCollection
       .where('merchantId', '==', merchantId)
-      .where('orderStatus.pending.status', '==', true)
-      .orderBy('merchantOrderNumber', 'desc')
-      .endBefore(startPoint)
+      .where('updatedAt', '>', this.maxOrderUpdatedAt)
+      .orderBy('updatedAt', 'desc')
       .onSnapshot((querySnapshot) => {
         if (querySnapshot) {
           querySnapshot.forEach((doc, index) => {
-            const item = {...doc.data(), orderId: doc.id};
+            const order = {...doc.data(), orderId: doc.id};
 
-            this.pendingOrders.push(item);
+            console.log(order);
+
+            if (order.updatedAt > this.maxOrderUpdatedAt) {
+              this.maxOrderUpdatedAt = order.updatedAt;
+            }
+
+            const existingOrderIndex = this.orders
+              .slice()
+              .findIndex((existingOrder) => existingOrder.orderId === doc.id);
+
+            if (this.orders.length > 0) {
+              console.log(
+                this.orders[0].orderId,
+                doc.id,
+                this.orders[0].orderId === doc.id,
+              );
+            }
+
+            console.log('existingOrderIndex', existingOrderIndex);
+
+            if (existingOrderIndex >= 0) {
+              this.orders[existingOrderIndex] = order;
+            } else {
+              this.orders.push(order);
+            }
           });
-        }
-      });
-  }
 
-  @action setUnpaidOrders(merchantId) {
-    const startPoint =
-      this.unpaidOrders.length > 0
-        ? this.unpaidOrders[0].merchantOrderNumber
-        : 0;
-
-    this.unsubscribeSetUnpaidOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.unpaid.status', '==', true)
-      .orderBy('merchantOrderNumber', 'desc')
-      .endBefore(startPoint)
-      .onSnapshot((querySnapshot) => {
-        if (querySnapshot) {
-          querySnapshot.forEach((doc, index) => {
-            const item = {...doc.data(), orderId: doc.id};
-
-            this.unpaidOrders.push(item);
-          });
-        }
-      });
-  }
-
-  @action setPaidOrders(merchantId) {
-    const startPoint =
-      this.paidOrders.length > 0 ? this.paidOrders[0].merchantOrderNumber : 0;
-
-    console.log(startPoint);
-
-    this.unsubscribeSetPaidOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.paid.status', '==', true)
-      .orderBy('merchantOrderNumber', 'desc')
-      .endBefore(startPoint)
-      .onSnapshot((querySnapshot) => {
-        if (querySnapshot) {
-          querySnapshot.forEach((doc, index) => {
-            const item = {...doc.data(), orderId: doc.id};
-
-            this.paidOrders.push(item);
-          });
-        }
-      });
-  }
-
-  @action setShippedOrders(merchantId) {
-    const startPoint =
-      this.shippedOrders.length > 0
-        ? this.shippedOrders[0].merchantOrderNumber
-        : 0;
-
-    this.unsubscribeSetShippedOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.shipped.status', '==', true)
-      .orderBy('merchantOrderNumber', 'desc')
-      .endBefore(startPoint)
-      .onSnapshot((querySnapshot) => {
-        if (querySnapshot) {
-          querySnapshot.forEach((doc, index) => {
-            const item = {...doc.data(), orderId: doc.id};
-
-            this.shippedOrders.push(item);
-          });
-        }
-      });
-  }
-
-  @action setCompletedOrders(merchantId) {
-    const startPoint =
-      this.completedOrders.length > 0
-        ? this.completedOrders[0].merchantOrderNumber
-        : 0;
-
-    this.unsubscribeSetCompletedOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.completed.status', '==', true)
-      .orderBy('merchantOrderNumber', 'desc')
-      .endBefore(startPoint)
-      .onSnapshot((querySnapshot) => {
-        if (querySnapshot) {
-          querySnapshot.forEach((doc, index) => {
-            const item = {...doc.data(), orderId: doc.id};
-
-            this.completedOrders.push(item);
-          });
-        }
-      });
-  }
-
-  @action setCancelledOrders(merchantId) {
-    const startPoint =
-      this.cancelledOrders.length > 0
-        ? this.cancelledOrders[0].merchantOrderNumber
-        : 0;
-
-    this.unsubscribeSetCancelledOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
-      .where('orderStatus.cancelled.status', '==', true)
-      .orderBy('merchantOrderNumber', 'desc')
-      .endBefore(startPoint)
-      .onSnapshot((querySnapshot) => {
-        if (querySnapshot) {
-          querySnapshot.forEach((doc, index) => {
-            const item = {...doc.data(), orderId: doc.id};
-
-            this.cancelledOrders.push(item);
-          });
+          console.log(this.orders);
         }
       });
   }
@@ -295,14 +204,17 @@ class OrdersStore {
 
         newOrderStatus[`${nextStatus}`] = {
           status: true,
-          updatedAt: new Date().toISOString(),
+          updatedAt: firestore.Timestamp.now().toMillis(),
         };
 
         return {newOrderStatus};
       })
       .then(({newOrderStatus}) => {
         orderRef
-          .update({orderStatus: newOrderStatus})
+          .update({
+            orderStatus: newOrderStatus,
+            updatedAt: firestore.Timestamp.now().toMillis(),
+          })
           .catch((err) => console.log(err));
       })
       .catch((err) => {
@@ -332,7 +244,7 @@ class OrdersStore {
         newOrderStatus.cancelled = {
           status: true,
           reason: cancelReason,
-          updatedAt: new Date().toISOString(),
+          updatedAt: firestore.Timestamp.now().toMillis(),
         };
 
         return newOrderStatus;

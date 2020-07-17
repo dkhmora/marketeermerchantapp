@@ -5,10 +5,8 @@ import {observer, inject} from 'mobx-react';
 // Custom Components
 import OrderCard from './OrderCard';
 import {colors} from '../../assets/colors';
-import * as Animatable from 'react-native-animatable';
 import {computed} from 'mobx';
 
-@inject('authStore')
 @inject('ordersStore')
 @inject('detailsStore')
 @observer
@@ -17,21 +15,30 @@ class OrdersList extends Component {
     super(props);
 
     this.state = {
-      refreshing: true,
-      loading: true,
+      loading: false,
+      listOrderStatus: this.props.route.name.toLowerCase(),
     };
   }
 
-  componentDidMount() {
-    this.retrieveOrders().then(() => {
-      this.setState({loading: false});
-    });
+  @computed get orders() {
+    if (this.state.listOrderStatus) {
+      const orderList = this.props.ordersStore.orders.filter((order) => {
+        return order.orderStatus[this.state.listOrderStatus].status === true;
+      });
+
+      return orderList;
+    }
+
+    return [];
   }
 
   async retrieveOrders() {
-    return await this.props.ordersStore[
-      `${this.props.route.params.storeFunctionName}`
-    ](this.props.detailsStore.storeDetails.merchantId);
+    const {merchantId} = this.props.detailsStore.storeDetails;
+
+    this.props.ordersStore.unsubscribeSetStoreDetails &&
+      this.props.ordersStore.unsubscribeSetStoreDetails();
+
+    return this.props.ordersStore.setOrders(merchantId);
   }
 
   onRefresh() {
@@ -44,10 +51,9 @@ class OrdersList extends Component {
 
   render() {
     const {navigation} = this.props;
-    const {storeVarName} = this.props.route.params;
     const {name} = this.props.route;
     const {loading} = this.state;
-    const dataSource = this.props.ordersStore[`${storeVarName}`].slice();
+    const dataSource = this.orders.slice();
 
     return (
       <View style={{flex: 1}}>
