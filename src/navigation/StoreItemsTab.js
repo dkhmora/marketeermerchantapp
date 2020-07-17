@@ -2,21 +2,18 @@ import React, {Component} from 'react';
 import {
   Container,
   View,
-  Text,
   Card,
   CardItem,
   Input,
   Item,
   Right,
-  Button,
   Left,
   Body,
   H3,
   Toast,
   Picker,
-  Icon,
 } from 'native-base';
-import {ActionSheetIOS} from 'react-native';
+import {Text, Button, Icon} from 'react-native-elements';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import ItemsList from '../components/ItemsList';
 import BaseHeader from '../components/BaseHeader';
@@ -38,6 +35,10 @@ class StoreItemsTab extends Component {
   @observable selectedCategory = this.props.itemsStore.itemCategories.slice[0];
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
+
+  @computed get scrollEnabled() {
+    return this.props.itemsStore.itemCategories.length > 1;
+  }
 
   @action closeAddCategoryModal() {
     this.addCategoryModal = false;
@@ -66,28 +67,28 @@ class StoreItemsTab extends Component {
     this.deleteCategoryModal = false;
   }
 
-  @computed get scrollEnabled() {
-    return this.props.itemsStore.itemCategories.length > 1 ? true : false;
-  }
-
   onValueChange(value) {
     this.selectedCategory = value;
   }
 
   handleAddCategory() {
     const {addItemCategory, itemCategories} = this.props.itemsStore;
-    const {merchantId} = this.props.authStore;
+    const {merchantId} = this.props.detailsStore.storeDetails;
 
     if (!itemCategories.includes(this.newCategory)) {
-      addItemCategory(merchantId, this.newCategory);
-      this.closeAddCategoryModal();
-      Toast.show({
-        text: `Category "${this.newCategory}" successfully added!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 5000,
-        style: {margin: 20, borderRadius: 16},
-      });
+      addItemCategory(merchantId, this.newCategory)
+        .then(() => {
+          Toast.show({
+            text: `Category "${this.newCategory}" successfully added!`,
+            buttonText: 'Okay',
+            type: 'success',
+            duration: 5000,
+            style: {margin: 20, borderRadius: 16},
+          });
+        })
+        .then(() => {
+          this.closeAddCategoryModal();
+        });
     } else {
       Toast.show({
         text: `Category "${this.newCategory}" already exists!`,
@@ -102,11 +103,10 @@ class StoreItemsTab extends Component {
 
   handleDeleteCategory() {
     const {deleteItemCategory, itemCategories} = this.props.itemsStore;
-    const {merchantId} = this.props.authStore;
+    const {merchantId} = this.props.detailsStore.storeDetails;
 
     if (itemCategories.includes(this.selectedCategory)) {
       deleteItemCategory(merchantId, this.selectedCategory);
-      this.selectedCategory = this.props.itemsStore.itemCategories[0];
       this.closeDeleteCategoryModal();
       Toast.show({
         text: `Category "${this.selectedCategory}" successfully deleted!`,
@@ -148,20 +148,20 @@ class StoreItemsTab extends Component {
         <View>
           <Modal
             isVisible={this.addCategoryModal}
+            onBackdropPress={() => (this.addCategoryModal = false)}
             transparent={true}
             style={{alignItems: 'center'}}>
             <Card
               style={{
-                borderRadius: 16,
+                borderRadius: 10,
                 overflow: 'hidden',
               }}>
               <CardItem header>
-                <Left>
-                  <Body>
-                    <H3>Add Category</H3>
-                  </Body>
-                </Left>
+                <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
+                  Add Category
+                </Text>
               </CardItem>
+
               <CardItem>
                 <Item rounded>
                   <Input
@@ -171,20 +171,28 @@ class StoreItemsTab extends Component {
                   />
                 </Item>
               </CardItem>
+
               <CardItem footer>
-                <Left />
-                <Right style={{flexDirection: 'row'}}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    justifyContent: 'flex-end',
+                  }}>
                   <Button
-                    transparent
-                    onPress={() => this.closeAddCategoryModal()}>
-                    <Text>Cancel</Text>
-                  </Button>
+                    title="Cancel"
+                    type="clear"
+                    onPress={() => this.closeAddCategoryModal()}
+                    containerStyle={{marginRight: 10}}
+                  />
+
                   <Button
-                    transparent
-                    onPress={this.handleAddCategory.bind(this)}>
-                    <Text>Add</Text>
-                  </Button>
-                </Right>
+                    title="Add"
+                    type="clear"
+                    onPress={this.handleAddCategory.bind(this)}
+                  />
+                </View>
               </CardItem>
             </Card>
           </Modal>
@@ -194,19 +202,19 @@ class StoreItemsTab extends Component {
           <Modal
             isVisible={this.deleteCategoryModal}
             transparent={true}
+            onBackdropPress={() => (this.deleteCategoryModal = false)}
             style={{alignItems: 'center'}}>
             <Card
               style={{
-                borderRadius: 16,
+                borderRadius: 10,
                 overflow: 'hidden',
               }}>
               <CardItem header>
-                <Left>
-                  <Body>
-                    <H3>Delete Category</H3>
-                  </Body>
-                </Left>
+                <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
+                  Delete Category
+                </Text>
               </CardItem>
+
               <CardItem>
                 <Item
                   rounded
@@ -221,7 +229,7 @@ class StoreItemsTab extends Component {
                     mode="dropdown"
                     selectedValue={this.selectedCategory}
                     iosIcon={<Icon name="arrow-down" />}
-                    onValueChange={this.onValueChange.bind(this)}>
+                    onValueChange={(value) => this.onValueChange(value)}>
                     {itemCategories.map((cat, index) => {
                       return (
                         <Picker.Item key={index} label={cat} value={cat} />
@@ -230,20 +238,28 @@ class StoreItemsTab extends Component {
                   </Picker>
                 </Item>
               </CardItem>
+
               <CardItem footer>
-                <Left />
-                <Right style={{flexDirection: 'row', marginRight: 45}}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    justifyContent: 'flex-end',
+                  }}>
                   <Button
-                    transparent
-                    onPress={() => this.closeDeleteCategoryModal()}>
-                    <Text>Cancel</Text>
-                  </Button>
+                    title="Cancel"
+                    type="clear"
+                    onPress={() => this.closeDeleteCategoryModal()}
+                    containerStyle={{marginRight: 10}}
+                  />
+
                   <Button
-                    transparent
-                    onPress={this.handleDeleteCategory.bind(this)}>
-                    <Text>Delete</Text>
-                  </Button>
-                </Right>
+                    title="Delete"
+                    type="clear"
+                    onPress={this.handleDeleteCategory.bind(this)}
+                  />
+                </View>
               </CardItem>
             </Card>
           </Modal>
@@ -264,18 +280,19 @@ class StoreItemsTab extends Component {
               category: 'All',
             }}
           />
-          {itemCategories.map((category, index) => {
-            return (
-              <TabBase.Screen
-                name={`${category}`}
-                component={ItemsList}
-                key={index}
-                initialParams={{
-                  category,
-                }}
-              />
-            );
-          })}
+          {itemCategories.length > 0 &&
+            itemCategories.map((category, index) => {
+              return (
+                <TabBase.Screen
+                  name={`${category}`}
+                  component={ItemsList}
+                  key={index}
+                  initialParams={{
+                    category,
+                  }}
+                />
+              );
+            })}
         </TabBase.Navigator>
       </Container>
     );

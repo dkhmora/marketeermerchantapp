@@ -1,9 +1,11 @@
 import React, {setState} from 'react';
-import {StyleSheet} from 'react-native';
-import AnimatedLoader from 'react-native-animated-loader';
+import {StyleSheet, ActivityIndicator} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {inject, observer} from 'mobx-react';
+import {View} from 'native-base';
+import {colors} from '../../assets/colors';
+import Toast from './Toast';
 
 @inject('authStore')
 @inject('ordersStore')
@@ -17,43 +19,34 @@ class AuthLoader extends React.Component {
   }
 
   onAuthStateChanged(user) {
-    const merchantAdminsCollection = firestore().collection('merchant_admins');
     const {visible} = this.state;
 
+    this.props.authStore.appReady = false;
+
     if (auth().currentUser != null) {
-      console.log('auth', auth().currentUser);
-      const currentUserId = auth().currentUser.uid;
+      !this.props.detailsStore.unsubscribeSetStoreDetails &&
+        this.props.detailsStore.setStoreDetails();
 
-      merchantAdminsCollection
-        .where(`${currentUserId}`, '==', true)
-        .get()
-        .then((snapshot) => {
-          if (snapshot.empty) {
-            this.props.authStore.signOut();
+      this.setState({user});
 
-            console.log('Error: The user does not match with any merchants');
-          } else {
-            snapshot.forEach((doc) => {
-              const merchantId = doc.id.trim();
+      this.props.authStore.appReady = true;
+    } else {
+      this.props.detailsStore.unsubscribeSetStoreDetails &&
+        this.props.detailsStore.unsubscribeSetStoreDetails();
 
-              this.props.authStore.setMerchantId(merchantId);
-              this.props.detailsStore.setStoreDetails(merchantId);
+      this.props.itemsStore.unsubscribeSetStoreItems &&
+        this.props.itemsStore.unsubscribeSetStoreItems();
 
-              console.log(
-                `Current user is assigned to Merchant with doc id "${merchantId}"`,
-              );
-            });
+      this.props.ordersStore.pendingOrders = [];
+      this.props.ordersStore.paidOrders = [];
+      this.props.ordersStore.unpaidOrders = [];
+      this.props.ordersStore.shippedOrders = [];
+      this.props.ordersStore.completedOrders = [];
+      this.props.ordersStore.cancelledOrders = [];
 
-            this.setState({user});
+      this.props.navigation.navigate('Login');
 
-            if (visible) {
-              this.setState({visible: false});
-            }
-          }
-        })
-        .catch((err) => {
-          console.log(`Error: Cannot read documents - ${err}`);
-        });
+      this.props.authStore.appReady = true;
     }
 
     if (visible) {
@@ -71,11 +64,11 @@ class AuthLoader extends React.Component {
 
   componentDidUpdate() {
     const {navigation} = this.props;
-    const {merchantId} = this.props.authStore;
+    const {merchantId} = this.props.detailsStore.storeDetails;
     const {user} = this.state;
 
     if (!user) {
-      navigation.navigate('Auth');
+      navigation.navigate('Login');
     } else {
       navigation.navigate('Home', {
         merchantId,
@@ -84,25 +77,18 @@ class AuthLoader extends React.Component {
   }
 
   render() {
-    const {visible} = this.state;
-
     return (
-      <AnimatedLoader
-        visible={visible}
-        overlayColor="rgba(255,255,255,0.75)"
-        source={require('../../assets/loader.json')}
-        animationStyle={styles.lottie}
-        speed={1}
-      />
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+        }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  lottie: {
-    width: 100,
-    height: 100,
-  },
-});
 
 export default AuthLoader;

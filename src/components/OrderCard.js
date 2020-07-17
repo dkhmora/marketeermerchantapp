@@ -25,6 +25,10 @@ import {colors} from '../../assets/colors';
 class OrderCard extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      loading: false,
+    };
   }
 
   @observable confirmationModal = false;
@@ -39,76 +43,65 @@ class OrderCard extends Component {
   }
 
   @computed get orderStatus() {
-    const {orderStatus} = this.props;
+    const {order} = this.props;
 
-    const statusLabel = Object.entries(orderStatus).map(([key, value]) => {
-      if (value.status) {
-        return key.toUpperCase();
-      }
+    const statusLabel = Object.entries(order.orderStatus).map(
+      ([key, value]) => {
+        if (value.status) {
+          return key.toUpperCase();
+        }
 
-      return;
-    });
+        return;
+      },
+    );
 
     return statusLabel.filter((item) => item != null);
   }
 
   handleChangeOrderStatus() {
-    const {orderId, merchantOrderNumber} = this.props;
-    this.props.ordersStore.setOrderStatus(orderId).then(() => {
-      Toast.show({
-        text: `Successfully changed Order # ${merchantOrderNumber} status!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 3500,
-        style: {margin: 20, borderRadius: 16},
+    const {order} = this.props;
+    const orderFetchLimit = 5;
+
+    this.setState({loading: true});
+
+    this.props.ordersStore
+      .setOrderStatus(order.orderId, order.merchantId, orderFetchLimit)
+      .then(() => {
+        Toast.show({
+          text: `Successfully changed Order # ${order.merchantOrderNumber} status!`,
+          buttonText: 'Okay',
+          type: 'success',
+          duration: 3500,
+          style: {margin: 20, borderRadius: 16},
+        });
+      })
+      .then(() => {
+        this.setState({loading: false});
       });
-    });
     this.closeConfirmationModal();
   }
 
   handleViewOrderItems() {
-    const {
-      navigation,
-      deliveryCoordinates,
-      orderId,
-      orderStatus,
-      userName,
-      merchantOrderNumber,
-      quantity,
-      shippingPrice,
-      totalAmount,
-      deliveryAddress,
-      createdAt,
-    } = this.props;
+    const {navigation, order} = this.props;
 
-    this.props.ordersStore.setOrderItems(orderId).then(() => {
-      navigation.dangerouslyGetParent().navigate('Order Details', {
-        orderId,
-        orderItems: this.props.ordersStore.orderItems,
-        deliveryCoordinates,
-        orderStatus,
-        userName,
-        merchantOrderNumber,
-        quantity,
-        shippingPrice,
-        totalAmount,
-        deliveryAddress,
-        createdAt,
-      });
+    navigation.dangerouslyGetParent().navigate('Order Details', {
+      order,
     });
   }
 
   handleCancelOrder() {
-    const {orderId, merchantOrderNumber} = this.props;
-    this.props.ordersStore.cancelOrder(orderId, this.cancelReason).then(() => {
-      Toast.show({
-        text: `Order # ${merchantOrderNumber} successfully cancelled!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 3500,
-        style: {margin: 20, borderRadius: 16},
+    const {order} = this.props;
+    this.props.ordersStore
+      .cancelOrder(order.orderId, this.cancelReason)
+      .then(() => {
+        Toast.show({
+          text: `Order # ${order.merchantOrderNumber} successfully cancelled!`,
+          buttonText: 'Okay',
+          type: 'success',
+          duration: 3500,
+          style: {margin: 20, borderRadius: 16},
+        });
       });
-    });
   }
 
   openOptions() {
@@ -129,21 +122,7 @@ class OrderCard extends Component {
   }
 
   render() {
-    const {
-      merchantOrderNumber,
-      userName,
-      quantity,
-      totalAmount,
-      orderId,
-      paymentMethod,
-      deliveryAddress,
-      deliveryCoordinates,
-      createdAt,
-      index,
-      tabName,
-      navigation,
-      ...otherProps
-    } = this.props;
+    const {order, tabName, navigation, ...otherProps} = this.props;
 
     const buttonText =
       (tabName === 'Paid' && 'Ship') ||
@@ -160,10 +139,7 @@ class OrderCard extends Component {
           button
           onPress={() =>
             navigation.navigate('Order Chat', {
-              userName,
-              deliveryAddress,
-              orderId,
-              merchantOrderNumber,
+              order,
               orderStatus: this.orderStatus,
             })
           }
@@ -187,13 +163,14 @@ class OrderCard extends Component {
                   fontFamily: 'ProductSans-Regular',
                   fontSize: 18,
                 }}>
-                {userName}
+                {order.userName}
               </Text>
 
-              <Text style={{color: '#eee'}}>Order # {merchantOrderNumber}</Text>
+              <Text style={{color: '#eee'}}>
+                Order # {order.merchantOrderNumber}
+              </Text>
 
               <View
-                key={index}
                 style={{
                   borderRadius: 20,
                   backgroundColor: colors.accent,
@@ -210,7 +187,7 @@ class OrderCard extends Component {
                     color: '#fff',
                     textAlign: 'center',
                   }}>
-                  {paymentMethod}
+                  {order.paymentMethod}
                 </Text>
               </View>
             </View>
@@ -237,7 +214,7 @@ class OrderCard extends Component {
                   fontSize: 16,
                   textAlign: 'center',
                 }}>
-                ₱{(totalAmount * 0.05).toPrecision(3)}
+                ₱{(order.totalAmount * 0.05).toPrecision(3)}
               </Text>
 
               <Text
@@ -268,7 +245,7 @@ class OrderCard extends Component {
     const CardFooter = () => {
       const footerStatus = `Order ${tabName}`;
 
-      const timeStamp = moment(createdAt, ISO_8601).fromNow();
+      const timeStamp = moment(new Date(order.createdAt)).fromNow();
 
       return (
         <CardItem footer bordered>
@@ -282,6 +259,7 @@ class OrderCard extends Component {
               <Button
                 title={buttonText}
                 titleStyle={{color: colors.icons}}
+                loading={this.state.loading}
                 buttonStyle={{backgroundColor: colors.accent}}
                 containerStyle={{
                   borderRadius: 24,
@@ -391,7 +369,7 @@ class OrderCard extends Component {
                   fontSize: 16,
                   textAlign: 'right',
                 }}>
-                {deliveryAddress}
+                {order.deliveryAddress}
               </Text>
             </Right>
           </CardItem>
@@ -408,9 +386,9 @@ class OrderCard extends Component {
                   fontFamily: 'ProductSans-Black',
                   fontSize: 16,
                 }}>
-                ₱{totalAmount}
+                ₱ {order.totalAmount}
               </Text>
-              <Text note>{quantity} items</Text>
+              <Text note>{order.quantity} items</Text>
             </Right>
           </CardItem>
           <CardItem>

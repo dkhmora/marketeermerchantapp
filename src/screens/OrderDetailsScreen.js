@@ -1,18 +1,36 @@
 import React, {Component} from 'react';
 import {Container, Card, CardItem, Left, Right, Body, Toast} from 'native-base';
 import {Text, Button, Icon} from 'react-native-elements';
-import {View, Platform, Linking} from 'react-native';
+import {
+  View,
+  Platform,
+  Linking,
+  ActivityIndicator,
+  SectionList,
+} from 'react-native';
 import BaseHeader from '../components/BaseHeader';
 import {FlatList, ScrollView} from 'react-native-gesture-handler';
-import OrderItemCard from '../components/OrderItemCard';
+import OrderItemListItem from '../components/OrderItemListItem';
 import {colors} from '../../assets/colors';
+import {inject, observer} from 'mobx-react';
+import MapView, {Marker} from 'react-native-maps';
 
+@inject('ordersStore')
+@inject('detailsStore')
+@observer
 class OrderDetailsScreen extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      orderItems: [],
+      loading: true,
+    };
   }
 
   componentDidMount() {
+    this.getOrderItems();
+
     this.props.navigation
       .dangerouslyGetParent()
       .setOptions({gestureEnabled: false});
@@ -24,13 +42,55 @@ class OrderDetailsScreen extends Component {
       .setOptions({gestureEnabled: true});
   }
 
+  onMapReady() {
+    this.fitMarkers();
+
+    this.customerMarker.showCallout();
+  }
+
+  fitMarkers() {
+    const {order} = this.props.route.params;
+    const {storeDetails} = this.props.detailsStore;
+
+    this.map.fitToCoordinates(
+      [
+        {
+          latitude: order.deliveryCoordinates.latitude,
+          longitude: order.deliveryCoordinates.longitude,
+        },
+        {
+          latitude: storeDetails.deliveryCoordinates.latitude,
+          longitude: storeDetails.deliveryCoordinates.longitude,
+        },
+      ],
+      {
+        edgePadding: {left: 40, right: 40, top: 150, bottom: 150},
+        animated: true,
+      },
+    );
+  }
+
+  async getOrderItems() {
+    const {order} = this.props.route.params;
+    const {getOrderItems} = this.props.ordersStore;
+
+    this.setState(
+      {
+        orderItems: await getOrderItems(order.orderId),
+      },
+      () => {
+        this.setState({loading: false});
+      },
+    );
+  }
+
   openInMaps() {
-    const {deliveryCoordinates, userName} = this.props.route.params;
+    const {order} = this.props.route.params;
 
-    if (deliveryCoordinates) {
-      const markerName = `Customer ${userName}'s Location`;
+    if (order.deliveryCoordinates) {
+      const markerName = `Customer ${order.userName}'s Location`;
 
-      const latLng = `${deliveryCoordinates.latitude},${deliveryCoordinates.longitude}`;
+      const latLng = `${order.deliveryCoordinates.latitude},${order.deliveryCoordinates.longitude}`;
       const url = Platform.select({
         ios: `http://maps.apple.com/?q=${markerName}&ll=${latLng}`,
         android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
@@ -48,25 +108,21 @@ class OrderDetailsScreen extends Component {
     }
   }
 
+  OrderItemsList(orderItems) {
+    return (
+      <View>
+        {orderItems.map((item, index) => {
+          return <OrderItemListItem item={item} key={index} />;
+        })}
+      </View>
+    );
+  }
+
   render() {
-    const {
-      deliveryCoordinates,
-      orderId,
-      orderItems,
-      userName,
-      merchantOrderNumber,
-      orderStatus,
-      quantity,
-      shippingPrice,
-      totalAmount,
-      deliveryAddress,
-      createdAt,
-    } = this.props.route.params;
+    const {order} = this.props.route.params;
     const {navigation} = this.props;
-
-    const mapButtonText =
-      Platform.OS === 'ios' ? 'Open in Apple Maps' : 'Open in Google Maps';
-
+    const {orderItems, loading} = this.state;
+    const {storeDetails} = this.props.detailsStore;
     const actions = [
       {
         name: 'Accept Order',
@@ -77,7 +133,7 @@ class OrderDetailsScreen extends Component {
     return (
       <Container>
         <BaseHeader
-          title={`Order #${merchantOrderNumber} Details`}
+          title={`Order #${order.merchantOrderNumber} Details`}
           backButton
           optionsButton
           actions={actions}
@@ -102,6 +158,7 @@ class OrderDetailsScreen extends Component {
                 Customer Details
               </Text>
             </CardItem>
+
             <CardItem bordered>
               <Left>
                 <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
@@ -117,7 +174,7 @@ class OrderDetailsScreen extends Component {
                     fontFamily: 'ProductSans-Bold',
                     textAlign: 'right',
                   }}>
-                  {userName}
+                  {order.userName}
                 </Text>
               </Right>
             </CardItem>
@@ -125,11 +182,31 @@ class OrderDetailsScreen extends Component {
             <CardItem bordered>
               <Left>
                 <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                  Customer Contact Number:
+                </Text>
+              </Left>
+
+              <Right>
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 16,
+                    fontFamily: 'ProductSans-Bold',
+                    textAlign: 'right',
+                  }}>
+                  {order.userPhoneNumber}
+                </Text>
+              </Right>
+            </CardItem>
+
+            <CardItem>
+              <Left>
+                <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
                   Delivery Address:
                 </Text>
               </Left>
               <Right>
-                {deliveryCoordinates ? (
+                {order.deliveryCoordinates ? (
                   <View style={{justifyContent: 'flex-end'}}>
                     <Text
                       style={{
@@ -138,23 +215,8 @@ class OrderDetailsScreen extends Component {
                         fontFamily: 'ProductSans-Bold',
                         textAlign: 'right',
                       }}>
-                      {deliveryAddress}
+                      {order.deliveryAddress}
                     </Text>
-
-                    <Button
-                      title={mapButtonText}
-                      titleStyle={{color: colors.icons, paddingRight: 5}}
-                      icon={<Icon name="map" color={colors.icons} />}
-                      iconRight
-                      full
-                      bordered
-                      onPress={() => this.openInMaps()}
-                      buttonStyle={{
-                        borderRadius: 24,
-                        paddingHorizontal: 20,
-                        backgroundColor: colors.accent,
-                      }}
-                    />
                   </View>
                 ) : (
                   <Text
@@ -169,6 +231,70 @@ class OrderDetailsScreen extends Component {
                 )}
               </Right>
             </CardItem>
+
+            <CardItem
+              style={{
+                paddingLeft: 0,
+                paddingRight: 0,
+                paddingTop: 0,
+                paddingBottom: 0,
+              }}>
+              <View style={{flex: 1, borderRadius: 10, overflow: 'hidden'}}>
+                <MapView
+                  provider="google"
+                  style={{
+                    height: 300,
+                    width: '100%',
+                  }}
+                  ref={(map) => {
+                    this.map = map;
+                  }}
+                  onMapReady={() => this.onMapReady()}
+                  showsUserLocation
+                  initialRegion={{
+                    latitude: order.deliveryCoordinates.latitude,
+                    longitude: order.deliveryCoordinates.longitude,
+                    latitudeDelta: 0.009,
+                    longitudeDelta: 0.009,
+                  }}>
+                  {order.deliveryCoordinates.latitude &&
+                    order.deliveryCoordinates.longitude && (
+                      <Marker
+                        ref={(marker) => {
+                          this.customerMarker = marker;
+                        }}
+                        title="Customer Delivery Location"
+                        tracksViewChanges={false}
+                        coordinate={{
+                          latitude: order.deliveryCoordinates.latitude,
+                          longitude: order.deliveryCoordinates.longitude,
+                        }}>
+                        <View>
+                          <Icon color={colors.accent} name="map-pin" />
+                        </View>
+                      </Marker>
+                    )}
+
+                  {storeDetails.deliveryCoordinates.latitude &&
+                    storeDetails.deliveryCoordinates.longitude && (
+                      <Marker
+                        ref={(marker) => {
+                          this.storeMarker = marker;
+                        }}
+                        title={`${storeDetails.storeName} Set Location`}
+                        tracksViewChanges={false}
+                        coordinate={{
+                          latitude: storeDetails.deliveryCoordinates.latitude,
+                          longitude: storeDetails.deliveryCoordinates.longitude,
+                        }}>
+                        <View>
+                          <Icon color={colors.primary} name="map-pin" />
+                        </View>
+                      </Marker>
+                    )}
+                </MapView>
+              </View>
+            </CardItem>
           </Card>
 
           <Card
@@ -182,18 +308,15 @@ class OrderDetailsScreen extends Component {
               </Text>
             </CardItem>
 
-            <FlatList
-              data={orderItems}
-              renderItem={({item, index}) => (
-                <OrderItemCard item={item} key={index} />
-              )}
-              keyExtractor={(item, index) => `${item.name}${index.toString()}`}
-              showsVerticalScrollIndicator={false}
-            />
+            {loading ? (
+              <ActivityIndicator color={colors.primary} size="large" />
+            ) : (
+              this.OrderItemsList(orderItems)
+            )}
 
             <CardItem bordered>
               <Left>
-                <Text note>{quantity} items</Text>
+                <Text note>{order.quantity} items</Text>
               </Left>
               <Right>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -211,7 +334,7 @@ class OrderDetailsScreen extends Component {
                       color: colors.primary,
                       fontFamily: 'ProductSans-Black',
                     }}>
-                    ₱{totalAmount}
+                    ₱ {order.totalAmount}
                   </Text>
                 </View>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -229,7 +352,7 @@ class OrderDetailsScreen extends Component {
                       color: colors.primary,
                       fontFamily: 'ProductSans-Black',
                     }}>
-                    ₱{shippingPrice}130-200
+                    ₱ {order.shippingPrice}130-200
                   </Text>
                 </View>
               </Right>
@@ -255,14 +378,14 @@ class OrderDetailsScreen extends Component {
                       color: colors.primary,
                       fontFamily: 'ProductSans-Black',
                     }}>
-                    ₱{totalAmount + 130} - ₱{totalAmount + 200}
+                    ₱ {order.totalAmount + 130} - ₱ {order.totalAmount + 200}
                   </Text>
                 </View>
               </Right>
             </CardItem>
           </Card>
 
-          {orderStatus.cancelled.status && (
+          {order.orderStatus.cancelled.status && (
             <Card
               style={{
                 borderRadius: 10,
@@ -279,7 +402,7 @@ class OrderDetailsScreen extends Component {
               <CardItem>
                 <Body>
                   <Text style={{width: '100%', textAlign: 'justify'}}>
-                    {orderStatus.cancelled.reason}
+                    {order.orderStatus.cancelled.reason}
                   </Text>
                 </Body>
               </CardItem>

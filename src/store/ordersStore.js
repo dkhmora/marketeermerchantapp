@@ -4,25 +4,15 @@ import storage from '@react-native-firebase/storage';
 import {GiftedChat} from 'react-native-gifted-chat';
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
+import {persist} from 'mobx-persist';
 
 const ordersCollection = firestore().collection('orders');
 class OrdersStore {
-  @observable orders = [];
-  @observable orderItems = [];
-  @observable pendingOrders = [];
-  @observable paidOrders = [];
-  @observable unpaidOrders = [];
-  @observable shippedOrders = [];
-  @observable completedOrders = [];
-  @observable cancelledOrders = [];
+  @persist('list') @observable orders = [];
+  @persist @observable maxOrderUpdatedAt = 0;
   @observable orderMessages = [];
   @observable unsubscribeGetMessages = null;
-  @observable unsubscribeSetCancelledOrders = null;
-  @observable unsubscribeSetCompletedOrders = null;
-  @observable unsubscribeSetPaidOrders = null;
-  @observable unsubscribeSetPendingOrders = null;
-  @observable unsubscribeSetShippedOrders = null;
-  @observable unsubscribeSetUnpaidOrders = null;
+  @observable unsubscribeSetOrders = null;
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
@@ -58,7 +48,7 @@ class OrdersStore {
     };
 
     await firestore()
-      .collection('order_chats')
+      .collection('orders')
       .doc(orderId)
       .update('messages', firestore.FieldValue.arrayUnion(message))
       .then(() => console.log('Successfully sent the message'))
@@ -70,7 +60,7 @@ class OrdersStore {
     message.createdAt = createdAt;
 
     await firestore()
-      .collection('order_chats')
+      .collection('orders')
       .doc(orderId)
       .update('messages', firestore.FieldValue.arrayUnion(message))
       .then(() => console.log('Successfully sent the message'))
@@ -82,7 +72,7 @@ class OrdersStore {
 
     if (orderId) {
       this.unsubscribeGetMessages = firestore()
-        .collection('order_chats')
+        .collection('orders')
         .doc(orderId)
         .onSnapshot((documentSnapshot) => {
           if (documentSnapshot) {
@@ -98,274 +88,83 @@ class OrdersStore {
               } else {
                 this.orderMessages = documentSnapshot.data().messages.reverse();
               }
-            } else {
-              firestore()
-                .collection('order_chats')
-                .doc(orderId)
-                .set({messages: []});
             }
           }
         });
     }
   }
 
-  @action async setOrderItems(orderId) {
-    await firestore()
+  @action async getOrderItems(orderId) {
+    console.log(orderId);
+    return await firestore()
       .collection('order_items')
       .doc(orderId)
       .get()
       .then((documentReference) => {
-        return (this.orderItems = documentReference.data().items);
+        if (documentReference.exists) {
+          return documentReference.data().items;
+        } else {
+          return null;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }
 
-  @action async setPendingOrders(merchantId, limit, lastVisible) {
-    if (lastVisible === undefined) {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.pending.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
+  @action async setOrders(merchantId) {
+    console.log(
+      'this.maxOrderUpdatedAt',
+      this.maxOrderUpdatedAt,
+      this.orderMessages,
+      merchantId,
+    );
 
+    console.log(this.maxOrderUpdatedAt < firestore.Timestamp.now().toMillis());
+    console.log(firestore.Timestamp.now().toMillis());
+
+    this.unsubscribeSetOrders = ordersCollection
+      .where('merchantId', '==', merchantId)
+      .where('updatedAt', '>', this.maxOrderUpdatedAt)
+      .orderBy('updatedAt', 'desc')
+      .onSnapshot((querySnapshot) => {
+        if (querySnapshot) {
           querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
+            const order = {...doc.data(), orderId: doc.id};
+
+            console.log(order);
+
+            if (order.updatedAt > this.maxOrderUpdatedAt) {
+              this.maxOrderUpdatedAt = order.updatedAt;
+            }
+
+            const existingOrderIndex = this.orders
+              .slice()
+              .findIndex((existingOrder) => existingOrder.orderId === doc.id);
+
+            if (this.orders.length > 0) {
+              console.log(
+                this.orders[0].orderId,
+                doc.id,
+                this.orders[0].orderId === doc.id,
+              );
+            }
+
+            console.log('existingOrderIndex', existingOrderIndex);
+
+            if (existingOrderIndex >= 0) {
+              this.orders[existingOrderIndex] = order;
+            } else {
+              this.orders.push(order);
+            }
           });
 
-          this.pendingOrders = data;
-        })
-        .catch((err) => console.log(err));
-    } else {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.pending.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .startAfter(lastVisible)
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.pendingOrders = [...this.pendingOrders, ...data];
-        })
-        .catch((err) => console.log(err));
-    }
+          console.log(this.orders);
+        }
+      });
   }
 
-  @action async setUnpaidOrders(merchantId, limit, lastVisible) {
-    if (lastVisible === undefined) {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.unpaid.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.unpaidOrders = data;
-        })
-        .catch((err) => console.log(err));
-    } else {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.unpaid.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .startAfter(lastVisible)
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.unpaidOrders = [...this.unpaidOrders, ...data];
-        })
-        .catch((err) => console.log(err));
-    }
-  }
-
-  @action async setPaidOrders(merchantId, limit, lastVisible) {
-    if (lastVisible === undefined) {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.paid.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.paidOrders = data;
-        })
-        .catch((err) => console.log(err));
-    } else {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.paid.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .startAfter(lastVisible)
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.paidOrders = [...this.paidOrders, ...data];
-        })
-        .catch((err) => console.log(err));
-    }
-  }
-
-  @action async setShippedOrders(merchantId, limit, lastVisible) {
-    if (lastVisible === undefined) {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.shipped.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.shippedOrders = data;
-        })
-        .catch((err) => console.log(err));
-    } else {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.shipped.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .startAfter(lastVisible)
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.shippedOrders = [...this.shippedOrders, ...data];
-        })
-        .catch((err) => console.log(err));
-    }
-  }
-
-  @action async setCompletedOrders(merchantId, limit, lastVisible) {
-    if (lastVisible === undefined) {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.completed.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.completedOrders = data;
-        })
-        .catch((err) => console.log(err));
-    } else {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.completed.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .startAfter(lastVisible)
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.completedOrders = [...this.completedOrders, ...data];
-        })
-        .catch((err) => console.log(err));
-    }
-  }
-
-  @action async setCancelledOrders(merchantId, limit, lastVisible) {
-    if (lastVisible === undefined) {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.cancelled.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.cancelledOrders = data;
-        })
-        .catch((err) => console.log(err));
-    } else {
-      return ordersCollection
-        .where('merchantId', '==', merchantId)
-        .where('orderStatus.cancelled.status', '==', true)
-        .orderBy('merchantOrderNumber', 'desc')
-        .startAfter(lastVisible)
-        .limit(limit)
-        .get()
-        .then((querySnapshot) => {
-          const data = [];
-
-          querySnapshot.forEach((doc, index) => {
-            data.push(doc.data());
-            data[index].orderId = doc.id;
-          });
-
-          this.cancelledOrders = [...this.cancelledOrders, ...data];
-        })
-        .catch((err) => console.log(err));
-    }
-  }
-
-  @action async setOrderStatus(orderId) {
+  @action async setOrderStatus(orderId, merchantId, limit) {
     const statusArray = [
       'pending',
       'unpaid',
@@ -375,11 +174,14 @@ class OrdersStore {
       'cancelled',
     ];
     const orderRef = firestore().collection('orders').doc(orderId);
+    console.log(orderId);
 
     await orderRef
       .get()
       .then((documentReference) => {
         const {orderStatus, paymentMethod} = documentReference.data();
+        console.log('what');
+        console.log(documentReference.data());
         let newOrderStatus = {};
         let currentStatus;
         Object.keys(orderStatus).map((item, index) => {
@@ -398,17 +200,28 @@ class OrdersStore {
 
         newOrderStatus = orderStatus;
 
-        newOrderStatus[`${currentStatus}`].status = false;
+        newOrderStatus[`${currentStatus}`] = {
+          status: false,
+          updatedAt: firestore.Timestamp.now().toMillis(),
+        };
 
         newOrderStatus[`${nextStatus}`] = {
           status: true,
-          updatedAt: new Date().toISOString(),
+          updatedAt: firestore.Timestamp.now().toMillis(),
         };
 
-        return newOrderStatus;
+        return {newOrderStatus};
       })
-      .then((newOrderStatus) => {
-        orderRef.update({orderStatus: newOrderStatus});
+      .then(({newOrderStatus}) => {
+        orderRef
+          .update({
+            orderStatus: newOrderStatus,
+            updatedAt: firestore.Timestamp.now().toMillis(),
+          })
+          .catch((err) => console.log(err));
+      })
+      .catch((err) => {
+        console.log(err);
       });
   }
 
@@ -434,7 +247,7 @@ class OrdersStore {
         newOrderStatus.cancelled = {
           status: true,
           reason: cancelReason,
-          updatedAt: new Date().toISOString(),
+          updatedAt: firestore.Timestamp.now().toMillis(),
         };
 
         return newOrderStatus;

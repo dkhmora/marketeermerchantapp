@@ -5,111 +5,55 @@ import {observer, inject} from 'mobx-react';
 // Custom Components
 import OrderCard from './OrderCard';
 import {colors} from '../../assets/colors';
-import * as Animatable from 'react-native-animatable';
+import {computed} from 'mobx';
 
-@inject('authStore')
 @inject('ordersStore')
+@inject('detailsStore')
 @observer
 class OrdersList extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      refreshing: true,
       loading: false,
-      lastVisible: null,
-      limit: 10,
-      onEndReachedCalledDuringMomentum: true,
+      listOrderStatus: this.props.route.name.toLowerCase(),
     };
   }
 
-  componentDidMount() {
-    this.retrieveInitial();
+  @computed get orders() {
+    if (this.state.listOrderStatus) {
+      const orderList = this.props.ordersStore.orders.filter((order) => {
+        return order.orderStatus[this.state.listOrderStatus].status === true;
+      });
+
+      return orderList;
+    }
+
+    return [];
   }
 
-  retrieveInitial = () => {
-    const {storeVarName} = this.props.route.params;
+  async retrieveOrders() {
+    const {merchantId} = this.props.detailsStore.storeDetails;
 
-    this.setState({loading: true});
+    this.props.ordersStore.unsubscribeSetStoreDetails &&
+      this.props.ordersStore.unsubscribeSetStoreDetails();
 
-    this.props.ordersStore[`${this.props.route.params.storeFunctionName}`](
-      this.props.authStore.merchantId,
-      this.state.limit,
-    ).then(() => {
-      this.setState({
-        loading: false,
-        lastVisible:
-          this.props.ordersStore[`${storeVarName}`].length > 0 &&
-          this.props.ordersStore[`${storeVarName}`][0].merchantOrderNumber -
-            this.state.limit +
-            1,
-      });
-    });
-  };
-
-  retrieveMore = () => {
-    if (
-      !this.state.onEndReachedCalledDuringMomentum &&
-      this.state.lastVisible >= 1
-    ) {
-      this.setState({refreshing: true, onEndReachedCalledDuringMomentum: true});
-
-      this.props.ordersStore[`${this.props.route.params.storeFunctionName}`](
-        this.props.authStore.merchantId,
-        this.state.limit,
-        this.state.lastVisible,
-      ).then(() => {
-        this.setState({
-          refreshing: false,
-          lastVisible: this.state.lastVisible - this.state.limit,
-          onEndReachedCalledDuringMomentum: false,
-        });
-      });
-    }
-  };
-
-  renderFooter = () => {
-    const {storeVarName} = this.props.route.params;
-
-    return (
-      <View style={{bottom: 50, width: '100%'}}>
-        {this.state.onEndReachedCalledDuringMomentum &&
-          this.props.ordersStore[`${storeVarName}`].length >=
-            this.state.limit && (
-            <Animatable.View
-              animation="slideInUp"
-              duration={400}
-              useNativeDriver
-              style={{
-                alignItems: 'center',
-                flex: 1,
-              }}>
-              <ActivityIndicator
-                size="large"
-                color={colors.primary}
-                style={{
-                  backgroundColor: colors.icons,
-                  borderRadius: 30,
-                  padding: 5,
-                  elevation: 5,
-                }}
-              />
-            </Animatable.View>
-          )}
-      </View>
-    );
-  };
+    return this.props.ordersStore.setOrders(merchantId);
+  }
 
   onRefresh() {
-    this.retrieveInitial();
+    this.setState({loading: true});
+
+    this.retrieveOrders().then(() => {
+      this.setState({loading: false});
+    });
   }
 
   render() {
     const {navigation} = this.props;
-    const {storeVarName} = this.props.route.params;
     const {name} = this.props.route;
-    const {merchantId} = this.props.authStore;
-    const dataSource = this.props.ordersStore[`${storeVarName}`].slice();
+    const {loading} = this.state;
+    const dataSource = this.orders.slice();
 
     return (
       <View style={{flex: 1}}>
@@ -118,18 +62,7 @@ class OrdersList extends Component {
           style={{flex: 1, paddingHorizontal: 10}}
           renderItem={({item, index}) => (
             <OrderCard
-              merchantId={merchantId}
-              merchantOrderNumber={item.merchantOrderNumber}
-              orderStatus={item.orderStatus}
-              deliveryCoordinates={item.deliveryCoordinates}
-              userName={`${item.userName}`}
-              quantity={item.quantity}
-              shippingPrice={item.shippingPrice}
-              paymentMethod={item.paymentMethod}
-              totalAmount={item.totalAmount}
-              orderId={item.orderId}
-              deliveryAddress={item.deliveryAddress}
-              createdAt={item.createdAt}
+              order={item}
               tabName={name}
               navigation={navigation}
               key={index}
@@ -137,20 +70,13 @@ class OrdersList extends Component {
           )}
           keyExtractor={(item) => item.orderId}
           showsVerticalScrollIndicator={false}
-          onEndReached={this.retrieveMore}
-          onEndReachedThreshold={0.01}
-          onMomentumScrollBegin={() => {
-            this.state.onEndReachedCalledDuringMomentum = false;
-          }}
           refreshControl={
             <RefreshControl
               colors={[colors.primary, colors.dark]}
-              refreshing={this.state.loading}
+              refreshing={loading}
               onRefresh={this.onRefresh.bind(this)}
             />
           }
-          refreshing={this.state.onEndReachedCalledDuringMomentum}
-          ListFooterComponent={this.renderFooter}
         />
       </View>
     );

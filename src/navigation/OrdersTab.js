@@ -6,61 +6,72 @@ import OrdersList from '../components/OrdersList';
 import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
+import {computed} from 'mobx';
 
 const TabOrders = createMaterialTopTabNavigator();
 
 @inject('authStore')
 @inject('ordersStore')
+@inject('detailsStore')
 @observer
 class OrdersTab extends Component {
   constructor(props) {
     super(props);
+  }
 
-    this.props.authStore.checkNotificationSubscriptionStatus();
+  @computed get notificationSubscriptionStatus() {
+    return this.props.detailsStore.subscribedToNotifications
+      ? 'Unsubscribed'
+      : 'Subscribed';
+  }
+
+  @computed get optionsLabel() {
+    return this.props.detailsStore.subscribedToNotifications
+      ? 'Unsubscribe to Order Notifications'
+      : 'Subscribe to Order Notifications';
   }
 
   handleNotificationSubscription = () => {
-    const status = this.props.authStore.subscribedToNotifications
-      ? 'Unsubscribed'
-      : 'Subscribed';
+    const {notificationSubscriptionStatus} = this;
 
-    (this.props.authStore.subscribedToNotifications
-      ? this.props.authStore.unsubscribeToNotifications()
-      : this.props.authStore.subscribeToNotifications()
-    ).then(() => {
-      Toast.show({
-        text: `Successfully ${status} to Order Notifications!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 3500,
-        style: {margin: 20, borderRadius: 16},
+    this.subscribeToNotificationsTimeout &&
+      clearTimeout(this.subscribeToNotificationsTimeout);
+
+    this.props.authStore.appReady = false;
+
+    this.subscribeToNotificationsTimeout = setTimeout(() => {
+      (this.props.detailsStore.subscribedToNotifications
+        ? this.props.detailsStore.unsubscribeToNotifications()
+        : this.props.detailsStore.subscribeToNotifications()
+      ).then(() => {
+        this.props.authStore.appReady = true;
+
+        Toast.show({
+          text: `Successfully ${notificationSubscriptionStatus} to Order Notifications!`,
+          buttonText: 'Okay',
+          type: 'success',
+          duration: 3500,
+          style: {margin: 20, borderRadius: 16},
+        });
       });
-    });
-
-    this.props.authStore.checkNotificationSubscriptionStatus();
+    }, 500);
   };
 
+  componentDidMount() {
+    const {merchantId} = this.props.detailsStore.storeDetails;
+
+    this.props.ordersStore.setOrders(merchantId);
+  }
+
   componentWillUnmount() {
-    this.props.ordersStore.unsubscribeSetCancelledOrders &&
-      this.props.ordersStore.unsubscribeSetCancelledOrders();
-    this.props.ordersStore.unsubscribeSetCompletedOrders &&
-      this.props.ordersStore.unsubscribeSetCompletedOrders();
-    this.props.ordersStore.unsubscribeSetPendingOrders &&
-      this.props.ordersStore.unsubscribeSetPendingOrders();
-    this.props.ordersStore.unsubscribeSetPaidOrders &&
-      this.props.ordersStore.unsubscribeSetPaidOrders();
-    this.props.ordersStore.unsubscribeSetUnpaidOrders &&
-      this.props.ordersStore.unsubscribeSetUnpaidOrders();
-    this.props.ordersStore.unsubscribeSetShippedOrders &&
-      this.props.ordersStore.unsubscribeSetShippedOrders();
+    this.props.ordersStore.unsubscribeSetOrders &&
+      this.props.ordersStore.unsubscribeSetOrders();
   }
 
   render() {
     const {name} = this.props.route;
     const {navigation} = this.props;
-    const optionsLabel = this.props.authStore.subscribedToNotifications
-      ? 'Unsubscribe to Order Notifications'
-      : 'Subscribe to Order Notifications';
+    const {optionsLabel} = this;
 
     return (
       <Container>
@@ -80,54 +91,12 @@ class OrdersTab extends Component {
             indicatorStyle: {backgroundColor: colors.primary},
           }}
           headerMode="none">
-          <TabOrders.Screen
-            name="Pending"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setPendingOrders',
-              storeVarName: 'pendingOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Unpaid"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setUnpaidOrders',
-              storeVarName: 'unpaidOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Paid"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setPaidOrders',
-              storeVarName: 'paidOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Shipped"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setShippedOrders',
-              storeVarName: 'shippedOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Completed"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setCompletedOrders',
-              storeVarName: 'completedOrders',
-            }}
-          />
-          <TabOrders.Screen
-            name="Cancelled"
-            component={OrdersList}
-            initialParams={{
-              storeFunctionName: 'setCancelledOrders',
-              storeVarName: 'cancelledOrders',
-            }}
-          />
+          <TabOrders.Screen name="Pending" component={OrdersList} />
+          <TabOrders.Screen name="Unpaid" component={OrdersList} />
+          <TabOrders.Screen name="Paid" component={OrdersList} />
+          <TabOrders.Screen name="Shipped" component={OrdersList} />
+          <TabOrders.Screen name="Completed" component={OrdersList} />
+          <TabOrders.Screen name="Cancelled" component={OrdersList} />
         </TabOrders.Navigator>
       </Container>
     );

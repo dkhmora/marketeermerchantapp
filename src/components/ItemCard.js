@@ -1,22 +1,16 @@
 import React, {Component} from 'react';
-import {
-  Card,
-  CardItem,
-  Left,
-  Body,
-  Text,
-  Button,
-  Right,
-  Icon,
-  View,
-} from 'native-base';
-import {Image, ActionSheetIOS, Platform} from 'react-native';
+import {Card, CardItem, Body} from 'native-base';
+import {View} from 'react-native';
+import {Text} from 'react-native-elements';
 import moment, {ISO_8601} from 'moment';
 import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
-import {observable} from 'mobx';
+import {observable, computed} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
 import BaseOptionsMenu from './BaseOptionsMenu';
+import {colors} from '../../assets/colors';
+import Toast from './Toast';
+import FastImage from 'react-native-fast-image';
 
 @inject('itemsStore')
 @inject('authStore')
@@ -24,82 +18,43 @@ import BaseOptionsMenu from './BaseOptionsMenu';
 class ItemCard extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {url: require('../../assets/placeholder.jpg')};
   }
 
-  @observable url = null;
-
   getImage = async () => {
-    const ref = storage().ref(this.props.image);
-    const link = await ref.getDownloadURL();
-    this.url = link;
+    const ref = storage().ref(this.props.item.image);
+    const link = await ref.getDownloadURL().catch((err) => console.log(err));
+
+    this.setState({url: {uri: link}});
   };
 
   handleDelete() {
-    const {merchantId} = this.props.authStore;
-    const {deleteStoreItem, deleteImage} = this.props.itemsStore;
-    const {
-      category,
-      name,
-      image,
-      description,
-      price,
-      stock,
-      sales,
-      unit,
-      createdAt,
-    } = this.props;
+    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {deleteStoreItem} = this.props.itemsStore;
+    const {item} = this.props;
 
-    deleteStoreItem(
-      merchantId,
-      category,
-      name,
-      description,
-      unit,
-      price,
-      stock,
-      sales,
-      image,
-      createdAt,
-    ).then(() => deleteImage(image));
-  }
-
-  openOptions() {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: ['Cancel', 'Delete'],
-        destructiveIndex: 1,
-        cancelButtonIndex: 0,
-      },
-      (buttonIndex) => {
-        if (buttonIndex === 0) {
-          // cancel action
-        } else {
-          this.handleDelete();
-        }
-      },
-    );
+    deleteStoreItem(merchantId, item).then(() => {
+      Toast({text: `${item.name} successfully deleted`});
+    });
   }
 
   componentDidMount() {
-    if (this.props.image) {
+    const {url} = this.state;
+
+    if (
+      url === require('../../assets/placeholder.jpg') &&
+      this.props.item.image
+    ) {
       this.getImage();
     }
   }
 
   render() {
-    const {
-      name,
-      image,
-      description,
-      price,
-      stock,
-      sales,
-      unit,
-      createdAt,
-      ...otherProps
-    } = this.props;
+    const {item, ...otherProps} = this.props;
+    const {url} = this.state;
 
-    const timeStamp = moment(createdAt, ISO_8601).fromNow();
+    const timeStamp = moment(new Date(item.createdAt)).fromNow();
 
     return (
       <View
@@ -112,60 +67,57 @@ class ItemCard extends Component {
         <Card
           {...otherProps}
           style={{
-            borderRadius: 16,
+            borderRadius: 10,
             overflow: 'hidden',
           }}>
-          <CardItem header bordered style={{backgroundColor: '#E91E63'}}>
-            <Left>
-              <Body>
-                <Text style={{color: '#fff'}}>{name}</Text>
-                <Text note style={{color: '#ddd'}}>
-                  Left Stock: {stock}
-                </Text>
-              </Body>
-            </Left>
-            <Right style={{marginLeft: '-50%'}}>
-              <BaseOptionsMenu
-                destructiveIndex={1}
-                iconStyle={{color: '#fff', fontSize: 24}}
-                options={['Delete Item']}
-                actions={[this.handleDelete.bind(this)]}
-              />
-            </Right>
+          <CardItem
+            header
+            bordered
+            style={{
+              backgroundColor: colors.primary,
+              justifyContent: 'space-between',
+            }}>
+            <View style={{flexDirection: 'column'}}>
+              <Text
+                style={{
+                  color: colors.icons,
+                  fontFamily: 'ProductSans-Regular',
+                }}>
+                {item.name}
+              </Text>
+
+              <Text
+                note
+                style={{fontFamily: 'ProductSans-Black', color: colors.icons}}>
+                Stock: {item.stock}
+              </Text>
+
+              <Text style={{color: '#ddd'}}>{item.sales} Sold</Text>
+            </View>
+
+            <BaseOptionsMenu
+              destructiveIndex={1}
+              iconStyle={{color: '#fff', fontSize: 24}}
+              options={['Delete Item']}
+              actions={[this.handleDelete.bind(this)]}
+            />
           </CardItem>
+
           <CardItem cardBody>
-            {this.url ? (
-              <Image
-                loadingIndicatorSource={
-                  (require('../../assets/placeholder.jpg'), 2)
-                }
-                source={{uri: this.url}}
-                style={{
-                  height: 150,
-                  width: null,
-                  flex: 1,
-                  backgroundColor: '#e1e4e8',
-                }}
-              />
-            ) : (
-              <Image
-                source={require('../../assets/placeholder.jpg')}
-                style={{
-                  height: 150,
-                  width: null,
-                  flex: 1,
-                  backgroundColor: '#e1e4e8',
-                }}
-              />
-            )}
+            <FastImage
+              source={url}
+              style={{
+                height: 150,
+                aspectRatio: 1,
+                flex: 1,
+              }}
+            />
           </CardItem>
+
           <CardItem
             bordered
             style={{
-              borderTopLeftRadius: 8,
-              borderTopRightRadius: 8,
               position: 'relative',
-              bottom: 20,
               elevation: 5,
             }}>
             <Body
@@ -177,27 +129,46 @@ class ItemCard extends Component {
                 flexShrink: 1,
               }}>
               <ScrollView style={{flex: 1}}>
-                <Text>{description ? description : 'No description'}</Text>
+                <Text>
+                  {item.description ? item.description : 'No description'}
+                </Text>
               </ScrollView>
             </Body>
           </CardItem>
-          <CardItem bordered style={{bottom: 20, elevation: 5}}>
-            <Body
+
+          <CardItem
+            bordered
+            style={{
+              bottom: 20,
+              elevation: 5,
+              justifyContent: 'center',
+              flexDirection: 'column',
+            }}>
+            <View
               style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
+                borderRadius: 10,
+                padding: 8,
+                backgroundColor: colors.primary,
+                elevation: 3,
               }}>
-              <Text>
-                ₱{price}/{unit}
+              <Text
+                style={{
+                  fontFamily: 'ProductSans-Black',
+                  color: colors.icons,
+                }}>
+                ₱ {item.price}/{item.unit}
               </Text>
-            </Body>
+            </View>
           </CardItem>
+
           <CardItem
             footer
             bordered
             style={{bottom: 20, marginBottom: -20, elevation: 5}}>
             <Body>
-              <Text note>Added {timeStamp}</Text>
+              <Text style={{color: colors.text_secondary}}>
+                Added {timeStamp}
+              </Text>
             </Body>
           </CardItem>
         </Card>

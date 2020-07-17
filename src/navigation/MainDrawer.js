@@ -2,20 +2,21 @@ import React, {Component} from 'react';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
-  DrawerItem,
   DrawerItemList,
 } from '@react-navigation/drawer';
 import StoreItemsScreen from '../screens/StoreItemsScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
-import {Button, Icon, Text} from 'react-native-elements';
+import {Button, Icon} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import {View, Platform} from 'react-native';
-import {SafeAreaConsumer, SafeAreaView} from 'react-native-safe-area-context';
+import {View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import ReviewsScreen from '../screens/ReviewsScreen';
 
 @inject('authStore')
+@inject('detailsStore')
 @observer
 class MainDrawer extends Component {
   constructor(props) {
@@ -23,14 +24,11 @@ class MainDrawer extends Component {
   }
 
   handleSignOut() {
-    this.props.authStore.signOut().then(() => {
-      this.props.detailsStore.unsubscribeSetStoreDetails &&
-        this.props.detailsStore.unsubscribeSetStoreDetails();
+    this.props.authStore.appReady = false;
 
-      this.props.itemsStore.unsubscribeSetItemCategories &&
-        this.props.itemsStore.unsubscribeSetItemCategories();
+    this.props.authStore.signOut().then(() => {
+      this.props.authStore.appReady = true;
     });
-    this.props.navigation.navigate('Auth');
   }
 
   render() {
@@ -53,8 +51,7 @@ class MainDrawer extends Component {
 
               <View style={{flex: 1}} />
 
-              <SafeAreaView
-                style={{paddingBottom: Platform.OS === 'android' ? 50 : 0}}>
+              <SafeAreaView>
                 <Button
                   title="Sign Out"
                   icon={<Icon name="log-out" color={colors.icons} />}
@@ -87,6 +84,12 @@ class MainDrawer extends Component {
         <Drawer.Screen
           name="Orders"
           component={OrdersScreen}
+          initialParams={{merchantId}}
+        />
+
+        <Drawer.Screen
+          name="Reviews"
+          component={ReviewsScreen}
           initialParams={{merchantId}}
         />
 

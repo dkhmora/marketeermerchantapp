@@ -1,13 +1,50 @@
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import firebase from '@react-native-firebase/app';
+import messaging from '@react-native-firebase/messaging';
+import auth from '@react-native-firebase/auth';
 import '@react-native-firebase/functions';
+import Toast from '../components/Toast';
+import {Platform} from 'react-native';
 
 const functions = firebase.app().functions('asia-northeast1');
+const merchantsCollection = firestore().collection('merchants');
 class DetailsStore {
   @observable storeDetails = {};
+  @observable subscribedToNotifications = false;
   @observable unsubscribeSetStoreDetails = null;
+
+  @computed get merchantRef() {
+    const {merchantId} = this.storeDetails;
+
+    return merchantsCollection.doc(merchantId);
+  }
+
+  @action async getStoreReviews() {
+    const {merchantId} = this.storeDetails;
+    const storeOrderReviewsRef = firestore()
+      .collection('merchants')
+      .doc(merchantId)
+      .collection('order_reviews');
+
+    return await storeOrderReviewsRef
+      .get()
+      .then((querySnapshot) => {
+        const data = [];
+
+        querySnapshot.forEach((doc, index) => {
+          if (doc.id !== 'reviewNumber') {
+            data.push(...doc.data().reviews);
+          }
+        });
+
+        return data;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   @action async getAddressFromCoordinates({latitude, longitude}) {
     return await functions
@@ -21,39 +58,99 @@ class DetailsStore {
   }
 
   @action updateCoordinates(
-    merchantId,
     lowerRange,
     upperRange,
     locationCoordinates,
     boundingBox,
     address,
   ) {
-    return firestore()
-      .collection('merchants')
-      .doc(merchantId)
-      .update({
-        deliveryCoordinates: {
-          lowerRange,
-          upperRange,
-          ...locationCoordinates,
-          boundingBox,
-          address,
-        },
+    return this.merchantRef.update({
+      deliveryCoordinates: {
+        lowerRange,
+        upperRange,
+        ...locationCoordinates,
+        boundingBox,
+        address,
+      },
+      updatedAt: firestore.Timestamp.now().toMillis(),
+    });
+  }
+
+  @action async setStoreDetails() {
+    const userId = auth().currentUser.uid;
+
+    this.unsubscribeSetStoreDetails = merchantsCollection
+      .where(`admins.${userId}`, '==', true)
+      .onSnapshot((querySnapshot) => {
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach(async (doc, index) => {
+            this.storeDetails = {
+              ...doc.data(),
+              merchantId: doc.id,
+            };
+
+            const token = await messaging().getToken();
+
+            if (doc.data().fcmTokens) {
+              if (doc.data().fcmTokens.includes(token)) {
+                this.subscribedToNotifications = true;
+              } else {
+                this.subscribedToNotifications = false;
+              }
+            } else {
+              this.subscribedToNotifications = false;
+            }
+          });
+        } else {
+          auth()
+            .signOut()
+            .then(() => {
+              Toast({
+                text:
+                  'Error, user account is not set as admin. Please contact Marketeer support.',
+                type: 'danger',
+                duration: 10000,
+              });
+            });
+        }
       });
   }
 
-  @action setStoreDetails(merchantId) {
-    if (merchantId) {
-      this.unsubscribeSetStoreDetails = firestore()
-        .collection('merchants')
-        .doc(merchantId)
-        .onSnapshot((documentSnapshot) => {
-          if (documentSnapshot) {
-            if (documentSnapshot.exists) {
-              this.storeDetails = documentSnapshot.data();
-            }
-          }
-        });
+  @action async subscribeToNotifications() {
+    let authorizationStatus = null;
+
+    if (Platform.OS === 'ios') {
+      authorizationStatus = await messaging().requestPermission();
+    } else {
+      authorizationStatus = true;
+    }
+
+    if (!this.subscribedToNotifications) {
+      if (authorizationStatus) {
+        await messaging()
+          .getToken()
+          .then((token) => {
+            this.merchantRef.update(
+              'fcmTokens',
+              firestore.FieldValue.arrayUnion(token),
+            );
+          })
+          .catch((err) => console.log(err));
+      }
+    }
+  }
+
+  @action async unsubscribeToNotifications() {
+    if (this.subscribedToNotifications) {
+      await messaging()
+        .getToken()
+        .then((token) =>
+          this.merchantRef.update(
+            'fcmTokens',
+            firestore.FieldValue.arrayRemove(token),
+          ),
+        )
+        .catch((err) => console.log(err));
     }
   }
 
@@ -66,11 +163,10 @@ class DetailsStore {
       });
   }
 
-  @action async uploadImage(merchantId, imagePath, type, currentImagePath) {
+  @action async uploadImage(imagePath, type, currentImagePath) {
+    const {merchantId} = this.storeDetails;
     const fileExtension = imagePath.split('.').pop();
     const imageRef = `/images/merchants/${merchantId}/${type}.${fileExtension}`;
-
-    const merchantRef = firestore().collection('merchants').doc(merchantId);
 
     await storage()
       .ref(imageRef)
@@ -82,7 +178,12 @@ class DetailsStore {
           )} image for ${merchantId} successfully uploaded!`,
         ),
       )
-      .then(() => merchantRef.update({[`${type}Image`]: imageRef}))
+      .then(() =>
+        this.merchantRef.update({
+          [`${type}Image`]: imageRef,
+          updatedAt: firestore.Timestamp.now().toMillis(),
+        }),
+      )
       .then(() =>
         console.log(
           `Merchant ${_.capitalize(type)} image path successfully set!`,
@@ -97,7 +198,6 @@ class DetailsStore {
   }
 
   @action async updateStoreDetails(
-    merchantId,
     storeName,
     storeDescription,
     freeDelivery,
@@ -106,9 +206,7 @@ class DetailsStore {
     shippingMethods,
     deliveryType,
   ) {
-    await firestore()
-      .collection('merchants')
-      .doc(merchantId)
+    await this.merchantRef
       .update({
         storeName,
         storeDescription,
@@ -117,6 +215,7 @@ class DetailsStore {
         paymentMethods,
         shippingMethods,
         deliveryType,
+        updatedAt: firestore.Timestamp.now().toMillis(),
       })
       .then(() => console.log('Merchant details successfully updated!'))
       .catch((err) => {

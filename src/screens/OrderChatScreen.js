@@ -26,7 +26,7 @@ class OrderChatScreen extends Component {
 
     this.state = {
       user: {
-        _id: this.props.authStore.merchantId,
+        _id: this.props.detailsStore.storeDetails.merchantId,
         name: this.props.detailsStore.storeDetails.storeName,
       },
     };
@@ -41,9 +41,9 @@ class OrderChatScreen extends Component {
       .dangerouslyGetParent()
       .setOptions({gestureEnabled: false});
 
-    const {orderId} = this.props.route.params;
+    const {order} = this.props.route.params;
 
-    this.props.ordersStore.getMessages(orderId);
+    this.props.ordersStore.getMessages(order.orderId);
   }
 
   componentWillUnmount() {
@@ -55,12 +55,12 @@ class OrderChatScreen extends Component {
   }
 
   onSend(messages = []) {
-    const {orderId} = this.props.route.params;
-    this.props.ordersStore.sendMessage(orderId, messages[0]);
+    const {order} = this.props.route.params;
+    this.props.ordersStore.sendMessage(order.orderId, messages[0]);
   }
 
   handleTakePhoto() {
-    const {orderId} = this.props.route.params;
+    const {order} = this.props.route.params;
 
     ImagePicker.openCamera({
       width: 1280,
@@ -73,7 +73,7 @@ class OrderChatScreen extends Component {
       })
       .then(() =>
         this.props.ordersStore.sendImage(
-          orderId,
+          order.orderId,
           this.state.user,
           this.imagePath,
         ),
@@ -82,7 +82,7 @@ class OrderChatScreen extends Component {
   }
 
   handleSelectImage() {
-    const {orderId} = this.props.route.params;
+    const {order} = this.props.route.params;
 
     ImagePicker.openPicker({
       width: 1280,
@@ -95,7 +95,7 @@ class OrderChatScreen extends Component {
       })
       .then(() =>
         this.props.ordersStore.sendImage(
-          orderId,
+          order.orderId,
           this.state.user,
           this.imagePath,
         ),
@@ -197,14 +197,9 @@ class OrderChatScreen extends Component {
 
   render() {
     const {navigation} = this.props;
-    const {
-      userName,
-      deliveryAddress,
-      merchantOrderNumber,
-      orderId,
-    } = this.props.route.params;
+    const {order} = this.props.route.params;
 
-    const headerTitle = `Order # ${merchantOrderNumber} | ${userName}`;
+    const headerTitle = `Order # ${order.merchantOrderNumber} | ${order.userName}`;
 
     const {orderMessages} = this.props.ordersStore;
 

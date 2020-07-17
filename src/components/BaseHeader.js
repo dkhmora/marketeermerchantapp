@@ -90,6 +90,8 @@ class BaseHeader extends Component {
   };
 
   render() {
+    const {...otherProps} = this.props;
+
     return (
       <Header
         placement={Platform.OS === 'ios' ? 'center' : 'left'}
@@ -105,6 +107,7 @@ class BaseHeader extends Component {
         centerContainerStyle={{
           flex: 3,
         }}
+        {...otherProps}
       />
     );
   }
