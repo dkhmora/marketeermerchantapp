@@ -54,7 +54,7 @@ class ItemCard extends Component {
     const {item, ...otherProps} = this.props;
     const {url} = this.state;
 
-    const timeStamp = moment(item.createdAt, ISO_8601).fromNow();
+    const timeStamp = moment(new Date(item.createdAt)).fromNow();
 
     return (
       <View
