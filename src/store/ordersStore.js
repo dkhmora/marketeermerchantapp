@@ -48,7 +48,7 @@ class OrdersStore {
     };
 
     await firestore()
-      .collection('order_chats')
+      .collection('orders')
       .doc(orderId)
       .update('messages', firestore.FieldValue.arrayUnion(message))
       .then(() => console.log('Successfully sent the message'))
@@ -60,7 +60,7 @@ class OrdersStore {
     message.createdAt = createdAt;
 
     await firestore()
-      .collection('order_chats')
+      .collection('orders')
       .doc(orderId)
       .update('messages', firestore.FieldValue.arrayUnion(message))
       .then(() => console.log('Successfully sent the message'))
@@ -200,7 +200,10 @@ class OrdersStore {
 
         newOrderStatus = orderStatus;
 
-        newOrderStatus[`${currentStatus}`].status = false;
+        newOrderStatus[`${currentStatus}`] = {
+          status: false,
+          updatedAt: firestore.Timestamp.now().toMillis(),
+        };
 
         newOrderStatus[`${nextStatus}`] = {
           status: true,

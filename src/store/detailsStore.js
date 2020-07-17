@@ -72,6 +72,7 @@ class DetailsStore {
         boundingBox,
         address,
       },
+      updatedAt: firestore.Timestamp.now().toMillis(),
     });
   }
 
@@ -177,7 +178,12 @@ class DetailsStore {
           )} image for ${merchantId} successfully uploaded!`,
         ),
       )
-      .then(() => this.merchantRef.update({[`${type}Image`]: imageRef}))
+      .then(() =>
+        this.merchantRef.update({
+          [`${type}Image`]: imageRef,
+          updatedAt: firestore.Timestamp.now().toMillis(),
+        }),
+      )
       .then(() =>
         console.log(
           `Merchant ${_.capitalize(type)} image path successfully set!`,
@@ -209,6 +215,7 @@ class DetailsStore {
         paymentMethods,
         shippingMethods,
         deliveryType,
+        updatedAt: firestore.Timestamp.now().toMillis(),
       })
       .then(() => console.log('Merchant details successfully updated!'))
       .catch((err) => {
