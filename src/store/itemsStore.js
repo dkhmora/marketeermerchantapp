@@ -1,4 +1,4 @@
-import {observable, action, computed} from 'mobx';
+import {observable, action, computed, transaction} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import Toast from '../components/Toast';
@@ -7,6 +7,49 @@ class ItemsStore {
   @observable itemCategories = [];
   @observable categoryItems = new Map();
   @observable unsubscribeSetStoreItems = null;
+
+  @action async changeStock(merchantId, item, newStock) {
+    const merchantItemsRef = firestore()
+      .collection('merchant_items')
+      .doc(merchantId);
+    const newItem = {...item};
+    newItem.stock = newStock;
+
+    return firestore().runTransaction(async (transaction) => {
+      console.log('sokpa');
+      const merchantItemsDocument = await transaction.get(merchantItemsRef);
+
+      if (merchantItemsDocument.exists) {
+        let dbItems = [...merchantItemsDocument.data().items];
+
+        const dbItemIndex = dbItems.findIndex(
+          (dbItem) => item.name === dbItem.name,
+        );
+
+        if (dbItemIndex >= 0) {
+          dbItems[dbItemIndex] = newItem;
+
+          await transaction.update(merchantItemsRef, {items: dbItems});
+
+          Toast({
+            text: `Successfully updated ${item.name}'s stock!`,
+          });
+        } else {
+          Toast({
+            text: 'Error: Item was not found.',
+            type: 'danger',
+            duration: 10000,
+          });
+        }
+      }
+    });
+
+    await merchantItemsRef
+      .update('items', firestore.FieldValue.arrayRemove(item))
+      // .then(() =>  this.deleteImage(item.image)) TODO: Create crontask to auto delete unused item images after a period of time
+      .then(() => console.log('Item deleted!'))
+      .catch((err) => console.error(err));
+  }
 
   @action setCategoryItems(category) {
     const items = this.storeItems.filter((item) => item.category === category);
