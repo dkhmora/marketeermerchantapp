@@ -11,15 +11,20 @@ import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import FastImage from 'react-native-fast-image';
+import ChangeStockModal from './ChangeStockModal';
 
 @inject('itemsStore')
 @inject('authStore')
+@inject('detailsStore')
 @observer
 class ItemCard extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {url: require('../../assets/placeholder.jpg')};
+    this.state = {
+      url: require('../../assets/placeholder.jpg'),
+      changeStockModal: false,
+    };
   }
 
   getImage = async () => {
@@ -37,6 +42,10 @@ class ItemCard extends Component {
     deleteStoreItem(merchantId, item).then(() => {
       Toast({text: `${item.name} successfully deleted`});
     });
+  }
+
+  handleChangeStock() {
+    this.setState({changeStockModal: true});
   }
 
   componentDidMount() {
@@ -64,6 +73,12 @@ class ItemCard extends Component {
           marginHorizontal: 6,
           marginVertical: 3,
         }}>
+        <ChangeStockModal
+          isVisible={this.state.changeStockModal}
+          closeModal={() => this.setState({changeStockModal: false})}
+          item={item}
+        />
+
         <Card
           {...otherProps}
           style={{
@@ -98,8 +113,11 @@ class ItemCard extends Component {
             <BaseOptionsMenu
               destructiveIndex={1}
               iconStyle={{color: '#fff', fontSize: 24}}
-              options={['Delete Item']}
-              actions={[this.handleDelete.bind(this)]}
+              options={['Change Stock', 'Delete Item']}
+              actions={[
+                this.handleChangeStock.bind(this),
+                this.handleDelete.bind(this),
+              ]}
             />
           </CardItem>
 
