@@ -108,8 +108,8 @@ class StoreDetailsScreen extends Component {
       this.newStoreName = storeName;
       this.newVacationMode = vacationMode;
       this.newDeliveryType = deliveryType;
-      this.newPaymentMethods = paymentMethods;
-      this.newShippingMethods = shippingMethods;
+      this.newPaymentMethods = [...paymentMethods];
+      this.newShippingMethods = [...shippingMethods];
 
       this.setState({
         oldDisplayImageUrl: this.state.displayImageUrl,
