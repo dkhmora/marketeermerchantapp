@@ -25,6 +25,7 @@ import {colors} from '../../assets/colors';
 const TabBase = createMaterialTopTabNavigator();
 @inject('itemsStore')
 @inject('authStore')
+@inject('detailsStore')
 @observer
 class StoreItemsTab extends Component {
   constructor(props) {
