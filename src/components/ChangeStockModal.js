@@ -16,6 +16,7 @@ class ChangeStockModal extends Component {
     this.state = {
       stockCheck: false,
       stock: '',
+      loading: false,
     };
   }
 
@@ -40,7 +41,11 @@ class ChangeStockModal extends Component {
     const {stock} = this.state;
     const {item, closeModal} = this.props;
 
+    this.setState({loading: true});
+
     this.props.itemsStore.changeStock(merchantId, item, stock).then(() => {
+      this.setState({loading: false});
+
       closeModal();
 
       this.setState({stockCheck: false, stock: ''});
@@ -62,8 +67,8 @@ class ChangeStockModal extends Component {
         overlayBackgroundColor="red"
         width="auto"
         height="auto"
-        overlayStyle={{borderRadius: 10, padding: 0}}>
-        <View style={{width: '80%', padding: 15}}>
+        overlayStyle={{borderRadius: 10, padding: 15, width: '80%'}}>
+        <View>
           <Text
             style={{
               fontSize: 24,
@@ -94,17 +99,37 @@ class ChangeStockModal extends Component {
             ) : null}
           </View>
 
-          <Button
-            title="Confirm"
-            type="clear"
-            disabled={!stockCheck}
-            containerStyle={{
-              alignSelf: 'flex-end',
-              paddingTop: 20,
-              borderRadius: 30,
-            }}
-            onPress={() => this.handleConfirm()}
-          />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'flex-end',
+              justifyContent: 'flex-end',
+              marginTop: 40,
+            }}>
+            {!this.state.loading && (
+              <Button
+                title="Cancel"
+                type="clear"
+                containerStyle={{
+                  alignSelf: 'flex-end',
+                  borderRadius: 30,
+                }}
+                onPress={() => closeModal()}
+              />
+            )}
+
+            <Button
+              title="Confirm"
+              type="clear"
+              disabled={!stockCheck}
+              loading={this.state.loading}
+              containerStyle={{
+                alignSelf: 'flex-end',
+                borderRadius: 30,
+              }}
+              onPress={() => this.handleConfirm()}
+            />
+          </View>
         </View>
       </Overlay>
     );
