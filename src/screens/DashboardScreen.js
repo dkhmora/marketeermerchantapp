@@ -959,7 +959,7 @@ class StoreDetailsScreen extends Component {
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
                       }}>
-                      Credits
+                      Markee Credits
                     </Text>
                   </View>
 
@@ -994,7 +994,7 @@ class StoreDetailsScreen extends Component {
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
                       }}>
-                      Credit Threshold
+                      Markee Credit Threshold
                     </Text>
                   </View>
 
