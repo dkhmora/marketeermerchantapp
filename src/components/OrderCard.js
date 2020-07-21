@@ -220,7 +220,7 @@ class OrderCard extends PureComponent {
     const CardFooter = () => {
       const footerStatus = `Order ${tabName}`;
 
-      const timeStamp = moment(order.createdAt, 'x').fromNow();
+      const timeStamp = moment(order.updatedAt, 'x').fromNow();
 
       return (
         <CardItem footer bordered>
