@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {
   Card,
   CardItem,
@@ -22,7 +22,7 @@ import {colors} from '../../assets/colors';
 
 @inject('ordersStore')
 @observer
-class OrderCard extends Component {
+class OrderCard extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -245,7 +245,7 @@ class OrderCard extends Component {
     const CardFooter = () => {
       const footerStatus = `Order ${tabName}`;
 
-      const timeStamp = moment(new Date(order.createdAt)).fromNow();
+      const timeStamp = moment(order.createdAt, 'x').fromNow();
 
       return (
         <CardItem footer bordered>

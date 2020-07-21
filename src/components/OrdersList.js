@@ -59,6 +59,7 @@ class OrdersList extends Component {
       <View style={{flex: 1}}>
         <FlatList
           data={dataSource}
+          initialNumToRender={5}
           style={{flex: 1, paddingHorizontal: 10}}
           renderItem={({item, index}) => (
             <OrderCard
