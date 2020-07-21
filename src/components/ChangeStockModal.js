@@ -21,11 +21,10 @@ class ChangeStockModal extends Component {
 
   handleStockChange = (stock) => {
     const numberRegexp = /^[0-9]+$/;
-    const emptyRegexp = /^$|\s+/;
 
     this.setState({stock});
 
-    if (!emptyRegexp.test(stock) && numberRegexp.test(Number(stock))) {
+    if (stock !== '' && numberRegexp.test(Number(stock))) {
       this.setState({
         stockCheck: true,
       });
