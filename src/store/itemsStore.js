@@ -25,7 +25,7 @@ class ItemsStore {
         let dbItems = [...merchantItemsDocument.data().items];
 
         const dbItemIndex = dbItems.findIndex(
-          (dbItem) => item.name === dbItem.name,
+          (dbItem) => item.itemId === dbItem.itemId,
         );
 
         if (dbItemIndex >= 0) {
