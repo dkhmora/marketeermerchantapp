@@ -21,6 +21,7 @@ import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
 import {observable, action, computed} from 'mobx';
 import {colors} from '../../assets/colors';
+import ChangeStockModal from '../components/ChangeStockModal';
 
 const TabBase = createMaterialTopTabNavigator();
 @inject('itemsStore')
@@ -265,6 +266,8 @@ class StoreItemsTab extends Component {
             </Card>
           </Modal>
         </View>
+
+        <ChangeStockModal />
 
         <TabBase.Navigator
           tabBarOptions={{

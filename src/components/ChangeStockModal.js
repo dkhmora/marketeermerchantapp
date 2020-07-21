@@ -5,6 +5,7 @@ import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
 import {inject, observer} from 'mobx-react';
+import Toast from './Toast';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -39,29 +40,42 @@ class ChangeStockModal extends Component {
   handleConfirm() {
     const {merchantId} = this.props.detailsStore.storeDetails;
     const {stock} = this.state;
-    const {item, closeModal} = this.props;
 
     this.setState({loading: true});
 
-    this.props.itemsStore.changeStock(merchantId, item, stock).then(() => {
-      this.setState({loading: false});
+    this.props.itemsStore
+      .changeStock(merchantId, this.props.itemsStore.selectedItem, stock)
+      .then(() => {
+        this.setState({loading: false});
 
-      closeModal();
+        this.closeModal();
 
-      this.setState({stockCheck: false, stock: ''});
-    });
+        Toast({
+          text: `Item ${this.props.itemsStore.selectedItem.name} successfully edited!`,
+          buttonText: 'Okay',
+          type: 'success',
+          duration: 3500,
+          style: {margin: 20, borderRadius: 16},
+        });
+
+        this.setState({stockCheck: false, stock: ''});
+      });
+  }
+
+  closeModal() {
+    if (!this.state.loading) {
+      this.props.itemsStore.changeStockModal = false;
+    }
   }
 
   render() {
-    const {item, isVisible, closeModal, ...otherProps} = this.props;
     const {stockCheck} = this.state;
 
     return (
       <Overlay
-        {...otherProps}
-        isVisible={isVisible}
+        isVisible={this.props.itemsStore.changeStockModal}
         onBackdropPress={() => {
-          closeModal();
+          this.closeModal();
         }}
         windowBackgroundColor="rgba(255, 255, 255, .5)"
         overlayBackgroundColor="red"
@@ -75,7 +89,10 @@ class ChangeStockModal extends Component {
               fontFamily: 'ProductSans-Regular',
               paddingBottom: 20,
             }}>
-            Change {item.name}'s Stock
+            Change{' '}
+            {this.props.itemsStore.selectedItem &&
+              this.props.itemsStore.selectedItem.name}
+            's Stock
           </Text>
 
           <View style={styles.action}>
@@ -84,7 +101,10 @@ class ChangeStockModal extends Component {
             </View>
 
             <TextInput
-              placeholder={`${item.name}'s Stock`}
+              placeholder={`${
+                this.props.itemsStore.selectedItem &&
+                this.props.itemsStore.selectedItem.name
+              }'s Stock`}
               maxLength={10}
               keyboardType="numeric"
               style={styles.textInput}
@@ -114,7 +134,7 @@ class ChangeStockModal extends Component {
                   alignSelf: 'flex-end',
                   borderRadius: 30,
                 }}
-                onPress={() => closeModal()}
+                onPress={() => this.closeModal()}
               />
             )}
 

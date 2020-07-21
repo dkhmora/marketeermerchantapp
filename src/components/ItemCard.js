@@ -23,7 +23,6 @@ class ItemCard extends Component {
 
     this.state = {
       url: require('../../assets/placeholder.jpg'),
-      changeStockModal: false,
     };
   }
 
@@ -45,7 +44,8 @@ class ItemCard extends Component {
   }
 
   handleChangeStock() {
-    this.setState({changeStockModal: true});
+    this.props.itemsStore.changeStockModal = true;
+    this.props.itemsStore.selectedItem = this.props.item;
   }
 
   componentDidMount() {
@@ -73,12 +73,6 @@ class ItemCard extends Component {
           marginHorizontal: 6,
           marginVertical: 3,
         }}>
-        <ChangeStockModal
-          isVisible={this.state.changeStockModal}
-          closeModal={() => this.setState({changeStockModal: false})}
-          item={item}
-        />
-
         <Card
           {...otherProps}
           style={{
