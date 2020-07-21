@@ -29,7 +29,6 @@ class OrderCard extends PureComponent {
 
     this.state = {
       loading: false,
-      cancelOrderModal: false,
     };
   }
 
@@ -77,23 +76,6 @@ class OrderCard extends PureComponent {
     navigation.dangerouslyGetParent().navigate('Order Details', {
       order,
     });
-  }
-
-  openOptions() {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: ['Cancel', 'Decline Order'],
-        destructiveIndex: 1,
-        cancelButtonIndex: 0,
-      },
-      (buttonIndex) => {
-        if (buttonIndex === 0) {
-          // cancel action
-        } else {
-          this.handleCancelOrder.bind(this);
-        }
-      },
-    );
   }
 
   render() {
@@ -209,7 +191,12 @@ class OrderCard extends PureComponent {
                 iconStyle={{color: '#fff', fontSize: 27}}
                 destructiveIndex={1}
                 options={['Cancel Order']}
-                actions={[() => this.setState({cancelOrderModal: true})]}
+                actions={[
+                  () => {
+                    this.props.ordersStore.cancelOrderModal = true;
+                    this.props.ordersStore.selectedOrder = order;
+                  },
+                ]}
               />
             </View>
           )}
@@ -252,12 +239,6 @@ class OrderCard extends PureComponent {
 
     return (
       <View>
-        <CancelOrderModal
-          isVisible={this.state.cancelOrderModal}
-          order={order}
-          closeModal={() => this.setState({cancelOrderModal: false})}
-        />
-
         <Card {...otherProps} style={{borderRadius: 10, overflow: 'hidden'}}>
           <CardHeader />
           <CardItem bordered>
