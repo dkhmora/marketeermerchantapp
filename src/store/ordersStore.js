@@ -142,7 +142,7 @@ class OrdersStore {
 
           this.orders = this.orders
             .slice()
-            .sort((a, b) => b.merchantOrderNumber - a.merchantOrderNumber);
+            .sort((a, b) => b.updatedAt - a.updatedAt);
         }
       });
   }
