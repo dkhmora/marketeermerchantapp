@@ -134,8 +134,6 @@ class DeliveryAreaScreen extends Component {
       ) / 2000,
     );
 
-    console.log(distance);
-
     const boundingBox = this.getBoundingBox(lower, upper);
 
     this.setState({
