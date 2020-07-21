@@ -63,7 +63,7 @@ class ItemCard extends Component {
     const {item, ...otherProps} = this.props;
     const {url} = this.state;
 
-    const timeStamp = moment(item.createdAt, 'x').fromNow();
+    const timeStamp = moment(item.updatedAt, 'x').fromNow();
 
     return (
       <View
@@ -179,7 +179,7 @@ class ItemCard extends Component {
             style={{bottom: 20, marginBottom: -20, elevation: 5}}>
             <Body>
               <Text style={{color: colors.text_secondary}}>
-                Added {timeStamp}
+                Updated {timeStamp}
               </Text>
             </Body>
           </CardItem>

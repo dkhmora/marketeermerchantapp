@@ -17,6 +17,7 @@ class ItemsStore {
       .doc(merchantId);
     const newItem = {...item};
     newItem.stock = newStock;
+    newItem.updatedAt = firestore.Timestamp.now().toMillis();
 
     return firestore().runTransaction(async (transaction) => {
       const merchantItemsDocument = await transaction.get(merchantItemsRef);
@@ -138,7 +139,7 @@ class ItemsStore {
     if (itemExists === -1) {
       return await this.uploadImage(imageRef, imagePath)
         .then(async () => {
-          const timestampNow = new Date().toISOString();
+          const timestampNow = firestore.Timestamp.now().toMillis();
           const itemId = uuidv4();
 
           await merchantItemsRef.update({
