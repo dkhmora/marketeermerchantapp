@@ -7,6 +7,8 @@ class ItemsStore {
   @observable itemCategories = [];
   @observable categoryItems = new Map();
   @observable unsubscribeSetStoreItems = null;
+  @observable changeStockModal = false;
+  @observable selectedItem = null;
 
   @action async changeStock(merchantId, item, newStock) {
     const merchantItemsRef = firestore()
