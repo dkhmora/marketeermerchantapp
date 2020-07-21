@@ -34,37 +34,45 @@ class CancelOrderModal extends Component {
   };
 
   handleConfirm() {
-    const {order, closeModal} = this.props;
-
     this.setState({loading: true});
 
     this.props.ordersStore
-      .cancelOrder(order.orderId, order.merchantId, this.state.cancelReason)
+      .cancelOrder(
+        this.props.ordersStore.selectedOrder.orderId,
+        this.props.ordersStore.selectedOrder.merchantId,
+        this.state.cancelReason,
+      )
       .then(() => {
-        this.setState({loading: false});
+        this.setState({loading: false, cancelReason: ''});
 
-        closeModal();
+        this.closeModal();
 
         Toast({
-          text: `Order # ${order.merchantOrderNumber} successfully cancelled!`,
+          text: `Order # ${this.props.ordersStore.selectedOrder.merchantOrderNumber} successfully cancelled!`,
           buttonText: 'Okay',
           type: 'success',
           duration: 3500,
           style: {margin: 20, borderRadius: 16},
         });
+
+        this.props.ordersStore.selectedOrder = null;
       });
   }
 
+  closeModal() {
+    if (!this.state.loading) {
+      this.props.ordersStore.cancelOrderModal = false;
+    }
+  }
+
   render() {
-    const {order, isVisible, closeModal, ...otherProps} = this.props;
     const {cancelReasonCheck} = this.state;
 
     return (
       <Overlay
-        {...otherProps}
-        isVisible={isVisible}
+        isVisible={this.props.ordersStore.cancelOrderModal}
         onBackdropPress={() => {
-          closeModal();
+          this.closeModal();
         }}
         windowBackgroundColor="rgba(255, 255, 255, .5)"
         overlayBackgroundColor="red"
@@ -78,7 +86,10 @@ class CancelOrderModal extends Component {
               fontFamily: 'ProductSans-Regular',
               paddingBottom: 20,
             }}>
-            Are you sure you want to cancel Order # {order.merchantOrderNumber}?
+            Are you sure you want to cancel Order #{' '}
+            {this.props.ordersStore.selectedOrder &&
+              this.props.ordersStore.selectedOrder.merchantOrderNumber}
+            ?
           </Text>
 
           <View style={[styles.action]}>
@@ -127,7 +138,7 @@ class CancelOrderModal extends Component {
                   alignSelf: 'flex-end',
                   borderRadius: 30,
                 }}
-                onPress={() => closeModal()}
+                onPress={() => this.closeModal()}
               />
             )}
 

@@ -17,6 +17,8 @@ class OrdersStore {
   @observable orderMessages = [];
   @observable unsubscribeGetMessages = null;
   @observable unsubscribeSetOrders = null;
+  @observable cancelOrderModal = false;
+  @observable selectedOrder = null;
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
