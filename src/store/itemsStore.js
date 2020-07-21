@@ -1,7 +1,8 @@
-import {observable, action, computed, transaction} from 'mobx';
+import {observable, action} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import Toast from '../components/Toast';
+import {v4 as uuidv4} from 'uuid';
 class ItemsStore {
   @observable storeItems = [];
   @observable itemCategories = [];
@@ -18,7 +19,6 @@ class ItemsStore {
     newItem.stock = newStock;
 
     return firestore().runTransaction(async (transaction) => {
-      console.log('sokpa');
       const merchantItemsDocument = await transaction.get(merchantItemsRef);
 
       if (merchantItemsDocument.exists) {
@@ -49,6 +49,7 @@ class ItemsStore {
 
   @action setCategoryItems(category) {
     const items = this.storeItems.filter((item) => item.category === category);
+
     this.categoryItems.set(category, items);
   }
 
@@ -65,6 +66,7 @@ class ItemsStore {
 
   @action async addItemCategory(merchantId, newCategory) {
     const formattedCategory = _.capitalize(newCategory);
+
     await firestore()
       .collection('merchant_items')
       .doc(merchantId)
@@ -91,7 +93,6 @@ class ItemsStore {
   }
 
   @action setStoreItems(merchantId) {
-    console.log('storeitems', merchantId);
     this.unsubscribeSetStoreItems = firestore()
       .collection('merchant_items')
       .doc(merchantId)
@@ -135,9 +136,11 @@ class ItemsStore {
       .findIndex((item) => item.name === name);
 
     if (itemExists === -1) {
-      console.log('yes');
       return await this.uploadImage(imageRef, imagePath)
         .then(async () => {
+          const timestampNow = new Date().toISOString();
+          const itemId = uuidv4();
+
           await merchantItemsRef.update({
             items: firestore.FieldValue.arrayUnion({
               category,
@@ -148,7 +151,9 @@ class ItemsStore {
               stock,
               sales: 0,
               image: imageRef,
-              createdAt: new Date().toISOString(),
+              itemId,
+              updatedAt: timestampNow,
+              createdAt: timestampNow,
             }),
           });
         })
