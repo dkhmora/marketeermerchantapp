@@ -972,7 +972,7 @@ class StoreDetailsScreen extends Component {
                           fontFamily: 'ProductSans-Bold',
                           textAlign: 'right',
                         }}>
-                        ₱ {creditData.credits}
+                        ₱ {creditData.credits.toFixed(2)}
                       </Text>
                     )}
                   </View>
