@@ -44,7 +44,11 @@ class ChangeStockModal extends Component {
     this.setState({loading: true});
 
     this.props.itemsStore
-      .changeStock(merchantId, this.props.itemsStore.selectedItem, stock)
+      .changeStock(
+        merchantId,
+        this.props.itemsStore.selectedItem,
+        Number(Math.trunc(stock)),
+      )
       .then(() => {
         this.setState({loading: false});
 
@@ -89,10 +93,9 @@ class ChangeStockModal extends Component {
               fontFamily: 'ProductSans-Regular',
               paddingBottom: 20,
             }}>
-            Change{' '}
+            Add Stock to{' '}
             {this.props.itemsStore.selectedItem &&
               this.props.itemsStore.selectedItem.name}
-            's Stock
           </Text>
 
           <View style={styles.action}>
@@ -101,10 +104,10 @@ class ChangeStockModal extends Component {
             </View>
 
             <TextInput
-              placeholder={`${
+              placeholder={`Additional ${
                 this.props.itemsStore.selectedItem &&
                 this.props.itemsStore.selectedItem.name
-              }'s Stock`}
+              } Stock`}
               maxLength={10}
               keyboardType="numeric"
               style={styles.textInput}

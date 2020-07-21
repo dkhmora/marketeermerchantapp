@@ -11,13 +11,10 @@ class ItemsStore {
   @observable changeStockModal = false;
   @observable selectedItem = null;
 
-  @action async changeStock(merchantId, item, newStock) {
+  @action async changeStock(merchantId, item, additionalStock) {
     const merchantItemsRef = firestore()
       .collection('merchant_items')
       .doc(merchantId);
-    const newItem = {...item};
-    newItem.stock = newStock;
-    newItem.updatedAt = firestore.Timestamp.now().toMillis();
 
     return firestore().runTransaction(async (transaction) => {
       const merchantItemsDocument = await transaction.get(merchantItemsRef);
@@ -30,7 +27,8 @@ class ItemsStore {
         );
 
         if (dbItemIndex >= 0) {
-          dbItems[dbItemIndex] = newItem;
+          dbItems[dbItemIndex].stock += additionalStock;
+          dbItems[dbItemIndex].updatedAt = firestore.Timestamp.now().toMillis();
 
           await transaction.update(merchantItemsRef, {items: dbItems});
 
