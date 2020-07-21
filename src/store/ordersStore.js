@@ -113,26 +113,14 @@ class OrdersStore {
   }
 
   @action async setOrders(merchantId) {
-    console.log(
-      'this.maxOrderUpdatedAt',
-      this.maxOrderUpdatedAt,
-      this.orderMessages,
-      merchantId,
-    );
-
-    console.log(this.maxOrderUpdatedAt < firestore.Timestamp.now().toMillis());
-    console.log(firestore.Timestamp.now().toMillis());
-
     this.unsubscribeSetOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('updatedAt', '>', this.maxOrderUpdatedAt)
       .orderBy('updatedAt', 'desc')
-      .onSnapshot((querySnapshot) => {
+      .onSnapshot(async (querySnapshot) => {
         if (querySnapshot) {
-          querySnapshot.forEach((doc, index) => {
+          await querySnapshot.forEach((doc, index) => {
             const order = {...doc.data(), orderId: doc.id};
-
-            console.log(order);
 
             if (order.updatedAt > this.maxOrderUpdatedAt) {
               this.maxOrderUpdatedAt = order.updatedAt;
@@ -142,16 +130,6 @@ class OrdersStore {
               .slice()
               .findIndex((existingOrder) => existingOrder.orderId === doc.id);
 
-            if (this.orders.length > 0) {
-              console.log(
-                this.orders[0].orderId,
-                doc.id,
-                this.orders[0].orderId === doc.id,
-              );
-            }
-
-            console.log('existingOrderIndex', existingOrderIndex);
-
             if (existingOrderIndex >= 0) {
               this.orders[existingOrderIndex] = order;
             } else {
@@ -159,7 +137,9 @@ class OrdersStore {
             }
           });
 
-          console.log(this.orders);
+          this.orders = this.orders
+            .slice()
+            .sort((a, b) => b.merchantOrderNumber - a.merchantOrderNumber);
         }
       });
   }

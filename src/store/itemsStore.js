@@ -43,12 +43,6 @@ class ItemsStore {
         }
       }
     });
-
-    await merchantItemsRef
-      .update('items', firestore.FieldValue.arrayRemove(item))
-      // .then(() =>  this.deleteImage(item.image)) TODO: Create crontask to auto delete unused item images after a period of time
-      .then(() => console.log('Item deleted!'))
-      .catch((err) => console.error(err));
   }
 
   @action setCategoryItems(category) {
