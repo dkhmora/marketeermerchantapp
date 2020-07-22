@@ -8,13 +8,23 @@ class ItemsStore {
   @observable itemCategories = [];
   @observable categoryItems = new Map();
   @observable unsubscribeSetStoreItems = null;
-  @observable changeStockModal = false;
+  @observable editItemModal = false;
   @observable selectedItem = null;
 
-  @action async changeStock(merchantId, item, additionalStock) {
+  @action async editItem(merchantId, newItem, additionalStock) {
+    const item = this.selectedItem;
     const merchantItemsRef = firestore()
       .collection('merchant_items')
       .doc(merchantId);
+
+    const fileExtension = newItem.image ? newItem.image.split('.').pop() : null;
+    const imageRef = newItem.image
+      ? `/images/merchants/${merchantId}/items/${item.itemId}.${fileExtension}`
+      : null;
+
+    if (newItem.image) {
+      await this.uploadImage(imageRef, newItem.image);
+    }
 
     return firestore().runTransaction(async (transaction) => {
       const merchantItemsDocument = await transaction.get(merchantItemsRef);
@@ -28,9 +38,18 @@ class ItemsStore {
 
         if (dbItemIndex >= 0) {
           dbItems[dbItemIndex].stock += additionalStock;
+          dbItems[dbItemIndex].name = newItem.name;
+          dbItems[dbItemIndex].description = newItem.description;
+          dbItems[dbItemIndex].price = newItem.price;
+          dbItems[dbItemIndex].category = newItem.category;
+          dbItems[dbItemIndex].unit = newItem.unit;
           dbItems[dbItemIndex].updatedAt = firestore.Timestamp.now().toMillis();
 
-          await transaction.update(merchantItemsRef, {items: dbItems});
+          if (newItem.image) {
+            dbItems[dbItemIndex].image = imageRef;
+          }
+
+          transaction.update(merchantItemsRef, {items: dbItems});
 
           Toast({
             text: `Successfully updated ${item.name}'s stock!`,
@@ -123,12 +142,13 @@ class ItemsStore {
     price,
     stock,
   ) {
+    const itemId = uuidv4();
     const merchantItemsRef = firestore()
       .collection('merchant_items')
       .doc(merchantId);
     const fileExtension = imagePath ? imagePath.split('.').pop() : null;
     const imageRef = imagePath
-      ? `/images/merchants/${merchantId}/items/${name}.${fileExtension}`
+      ? `/images/merchants/${merchantId}/items/${itemId}.${fileExtension}`
       : null;
     const itemExists = this.storeItems
       .slice()
@@ -138,7 +158,6 @@ class ItemsStore {
       return await this.uploadImage(imageRef, imagePath)
         .then(async () => {
           const timestampNow = firestore.Timestamp.now().toMillis();
-          const itemId = uuidv4();
 
           await merchantItemsRef.update({
             items: firestore.FieldValue.arrayUnion({
