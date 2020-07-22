@@ -205,6 +205,7 @@ class DetailsStore {
     paymentMethods,
     shippingMethods,
     deliveryType,
+    ownDeliveryServiceFee,
   ) {
     await this.merchantRef
       .update({
@@ -215,6 +216,7 @@ class DetailsStore {
         paymentMethods,
         shippingMethods,
         deliveryType,
+        ownDeliveryServiceFee,
         updatedAt: firestore.Timestamp.now().toMillis(),
       })
       .then(() => console.log('Merchant details successfully updated!'))
