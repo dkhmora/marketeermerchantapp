@@ -138,10 +138,10 @@ class StoreItemsTab extends Component {
       <Container style={{flex: 1}}>
         <BaseHeader
           title={name}
-          options={['Delete Category', 'Add Category']}
+          options={['Add Category', 'Delete Category']}
           actions={[
-            this.showDeleteCategoryModal.bind(this),
             this.showAddCategoryModal.bind(this),
+            this.showDeleteCategoryModal.bind(this),
           ]}
           destructiveIndex={1}
           navigation={navigation}
