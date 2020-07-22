@@ -22,7 +22,7 @@ class ChangeStockModal extends Component {
   }
 
   handleStockChange = (stock) => {
-    const numberRegexp = /^[0-9]+$/;
+    const numberRegexp = /^-?[0-9]+$/;
 
     this.setState({stock});
 
