@@ -42,6 +42,7 @@ class StoreDetailsScreen extends Component {
       mrSpeedyCheckbox: false,
       ownServiceCheckbox: false,
       sameDayDeliveryCheckbox: false,
+      newOwnDeliveryServiceFeeError: null,
       displayImageUrl: null,
       coverImageUrl: null,
       oldDisplayImageUrl: null,
@@ -57,6 +58,7 @@ class StoreDetailsScreen extends Component {
   @observable newPaymentMethods = [];
   @observable newShippingMethods = [];
   @observable newDeliveryType = '';
+  @observable newOwnDeliveryServiceFee = 0;
   @observable storeDetailsHeaderColor = colors.primary;
 
   componentDidUpdate() {
@@ -78,6 +80,7 @@ class StoreDetailsScreen extends Component {
     this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
     this.newPaymentMethods = [];
     this.newShippingMethods = [];
+    this.newOwnDeliveryServiceFee = '0';
     this.storeDetailsHeaderColor = colors.primary;
 
     this.setState({
@@ -97,6 +100,7 @@ class StoreDetailsScreen extends Component {
       deliveryType,
       paymentMethods,
       shippingMethods,
+      deliveryServiceFee,
     } = this.props.detailsStore.storeDetails;
 
     if (this.editMode) {
@@ -110,6 +114,9 @@ class StoreDetailsScreen extends Component {
       this.newDeliveryType = deliveryType;
       this.newPaymentMethods = [...paymentMethods];
       this.newShippingMethods = [...shippingMethods];
+      this.newOwnDeliveryServiceFee = deliveryServiceFee
+        ? deliveryServiceFee
+        : '0';
 
       this.setState({
         oldDisplayImageUrl: this.state.displayImageUrl,
@@ -203,6 +210,24 @@ class StoreDetailsScreen extends Component {
     }
   }
 
+  handleOwnDeliveryServiceFee(ownDeliveryServiceFee) {
+    const numberRegexp = /^[0-9]+$/;
+
+    this.newOwnDeliveryServiceFee = ownDeliveryServiceFee;
+
+    if (ownDeliveryServiceFee === '') {
+      this.setState({
+        newOwnDeliveryServiceFeeError: 'Price must not be empty',
+      });
+    } else if (!numberRegexp.test(Number(ownDeliveryServiceFee))) {
+      this.setState({
+        newOwnDeliveryServiceFeeError: 'Price can only consist of numbers',
+      });
+    } else {
+      this.setState({newOwnDeliveryServiceFeeError: null});
+    }
+  }
+
   async handleConfirmDetails() {
     const {
       displayImageUrl,
@@ -218,6 +243,7 @@ class StoreDetailsScreen extends Component {
       paymentMethods,
       shippingMethods,
       deliveryType,
+      ownDeliveryServiceFee,
     } = this.props.detailsStore.storeDetails;
 
     this.setState({loading: true});
@@ -250,7 +276,8 @@ class StoreDetailsScreen extends Component {
       vacationMode !== this.newVacationMode ||
       paymentMethods !== this.newPaymentMethods ||
       shippingMethods !== this.newShippingMethods ||
-      deliveryType !== this.newDeliveryType
+      deliveryType !== this.newDeliveryType ||
+      ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee
     ) {
       await this.props.detailsStore
         .updateStoreDetails(
@@ -261,6 +288,7 @@ class StoreDetailsScreen extends Component {
           this.newPaymentMethods,
           this.newShippingMethods,
           this.newDeliveryType,
+          Number(this.newOwnDeliveryServiceFee),
         )
         .then(() => {
           Toast.show({
@@ -327,9 +355,15 @@ class StoreDetailsScreen extends Component {
       creditData,
       orderNumber,
       storeCategory,
+      ownDeliveryServiceFee,
     } = this.props.detailsStore.storeDetails;
 
-    const {coverImageUrl, displayImageUrl, loading} = this.state;
+    const {
+      coverImageUrl,
+      displayImageUrl,
+      loading,
+      newOwnDeliveryServiceFeeError,
+    } = this.state;
 
     const {editMode, newPaymentMethods, newShippingMethods} = this;
 
@@ -930,15 +964,67 @@ class StoreDetailsScreen extends Component {
                           }
                         />
                         <CheckBox
-                          title="Own Service"
-                          checked={newShippingMethods.includes('Own Service')}
+                          title="Own Delivery"
+                          checked={newShippingMethods.includes('Own Delivery')}
                           onPress={() =>
-                            this.handleShippingMethods('Own Service')
+                            this.handleShippingMethods('Own Delivery')
                           }
                         />
                       </View>
                     ) : (
                       this.CategoryPills(shippingMethods)
+                    )}
+                  </View>
+                </View>
+              </CardItem>
+
+              <CardItem bordered>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 8,
+                  }}>
+                  <View style={{flex: 2, paddingright: 10}}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      Own Delivery Service Fee
+                    </Text>
+                  </View>
+
+                  <View style={{flex: 3, alignItems: 'flex-end'}}>
+                    {this.editMode ? (
+                      <Input
+                        multiline
+                        maxLength={200}
+                        value={this.newOwnDeliveryServiceFee}
+                        errorMessage={
+                          newOwnDeliveryServiceFeeError &&
+                          newOwnDeliveryServiceFeeError
+                        }
+                        onChangeText={(value) =>
+                          this.handleOwnDeliveryServiceFee(value)
+                        }
+                        inputStyle={{textAlign: 'right'}}
+                        containerStyle={{
+                          borderColor: this.storeDetailsHeaderColor,
+                        }}
+                      />
+                    ) : (
+                      <Text
+                        style={{
+                          color: colors.primary,
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                          textAlign: 'right',
+                        }}>
+                        {ownDeliveryServiceFee}
+                      </Text>
                     )}
                   </View>
                 </View>
