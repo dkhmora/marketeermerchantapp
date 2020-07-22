@@ -48,6 +48,10 @@ class OrderCard extends PureComponent {
     return statusLabel.filter((item) => item != null);
   }
 
+  @computed get timeStamp() {
+    return moment(this.props.order.updatedAt, 'x').fromNow();
+  }
+
   handleChangeOrderStatus() {
     const {order} = this.props;
     const orderFetchLimit = 5;
@@ -207,12 +211,10 @@ class OrderCard extends PureComponent {
     const CardFooter = () => {
       const footerStatus = `Order ${tabName}`;
 
-      const timeStamp = moment(order.updatedAt, 'x').fromNow();
-
       return (
         <CardItem footer bordered>
           <Left>
-            <Text note>{timeStamp}</Text>
+            <Text note>{this.timeStamp}</Text>
           </Left>
           <Right>
             {footerStatus && !buttonText ? (
