@@ -27,6 +27,10 @@ class ItemCard extends Component {
     };
   }
 
+  @computed get timeStamp() {
+    return moment(this.props.item.updatedAt, 'x').fromNow();
+  }
+
   getImage = async () => {
     const ref = storage().ref(this.props.item.image);
     const link = await ref.getDownloadURL().catch((err) => console.log(err));
@@ -74,8 +78,6 @@ class ItemCard extends Component {
   render() {
     const {item, ...otherProps} = this.props;
     const {url} = this.state;
-
-    const timeStamp = moment(item.updatedAt, 'x').fromNow();
 
     return (
       <View
@@ -191,7 +193,7 @@ class ItemCard extends Component {
             style={{bottom: 20, marginBottom: -20, elevation: 5}}>
             <Body>
               <Text style={{color: colors.text_secondary}}>
-                Updated {timeStamp}
+                Updated {this.timeStamp}
               </Text>
             </Body>
           </CardItem>
