@@ -1,23 +1,22 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {Card, CardItem, Body} from 'native-base';
 import {View} from 'react-native';
 import {Text} from 'react-native-elements';
-import moment, {ISO_8601} from 'moment';
+import moment from 'moment';
 import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
-import {observable, computed} from 'mobx';
+import {computed} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import FastImage from 'react-native-fast-image';
-import EditItemModal from './EditItemModal';
 
 @inject('itemsStore')
 @inject('authStore')
 @inject('detailsStore')
 @observer
-class ItemCard extends Component {
+class ItemCard extends PureComponent {
   constructor(props) {
     super(props);
 
