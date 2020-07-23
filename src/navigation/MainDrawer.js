@@ -49,9 +49,7 @@ class MainDrawer extends Component {
               }}>
               <DrawerItemList {...props} />
 
-              <View style={{flex: 1}} />
-
-              <SafeAreaView>
+              <SafeAreaView style={{flex: 1, justifyContent: 'flex-end'}}>
                 <Button
                   title="Sign Out"
                   icon={<Icon name="log-out" color={colors.icons} />}
