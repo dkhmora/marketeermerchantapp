@@ -16,10 +16,11 @@ class ItemsStore {
     const merchantItemsRef = firestore()
       .collection('merchant_items')
       .doc(merchantId);
+    const timeStamp = firestore.Timestamp.now().toMillis();
 
     const fileExtension = newItem.image ? newItem.image.split('.').pop() : null;
     const imageRef = newItem.image
-      ? `/images/merchants/${merchantId}/items/${item.itemId}.${fileExtension}`
+      ? `/images/merchants/${merchantId}/items/${item.itemId}_${timeStamp}.${fileExtension}`
       : null;
 
     if (newItem.image) {
@@ -43,7 +44,7 @@ class ItemsStore {
           dbItems[dbItemIndex].price = newItem.price;
           dbItems[dbItemIndex].category = newItem.category;
           dbItems[dbItemIndex].unit = newItem.unit;
-          dbItems[dbItemIndex].updatedAt = firestore.Timestamp.now().toMillis();
+          dbItems[dbItemIndex].updatedAt = timeStamp;
 
           if (newItem.image) {
             dbItems[dbItemIndex].image = imageRef;
@@ -146,9 +147,11 @@ class ItemsStore {
     const merchantItemsRef = firestore()
       .collection('merchant_items')
       .doc(merchantId);
+    const timeStamp = firestore.Timestamp.now().toMillis();
+
     const fileExtension = imagePath ? imagePath.split('.').pop() : null;
     const imageRef = imagePath
-      ? `/images/merchants/${merchantId}/items/${itemId}.${fileExtension}`
+      ? `/images/merchants/${merchantId}/items/${itemId}_${timeStamp}.${fileExtension}`
       : null;
     const itemExists = this.storeItems
       .slice()
@@ -157,8 +160,6 @@ class ItemsStore {
     if (itemExists === -1) {
       return await this.uploadImage(imageRef, imagePath)
         .then(async () => {
-          const timestampNow = firestore.Timestamp.now().toMillis();
-
           await merchantItemsRef.update({
             items: firestore.FieldValue.arrayUnion({
               category,
@@ -170,8 +171,8 @@ class ItemsStore {
               sales: 0,
               image: imageRef,
               itemId,
-              updatedAt: timestampNow,
-              createdAt: timestampNow,
+              updatedAt: timeStamp,
+              createdAt: timeStamp,
             }),
           });
         })
