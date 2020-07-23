@@ -27,13 +27,28 @@ class OrdersStore {
     return link;
   }
 
-  @action async sendImage(orderId, user, imagePath) {
+  @action async sendImage(
+    orderId,
+    customerUserId,
+    merchantId,
+    user,
+    imagePath,
+  ) {
     const messageId = uuidv4();
     const imageRef = `/images/orders/${orderId}/order_chat/${messageId}`;
+    const storageRef = storage().ref(imageRef);
+    console.log(imagePath);
 
-    await storage()
-      .ref(imageRef)
+    await storageRef
       .putFile(imagePath)
+      .then(() => {
+        storageRef.updateMetadata({
+          customMetadata: {
+            customerUserId,
+            merchantId,
+          },
+        });
+      })
       .then(() => {
         return this.getImageUrl(imageRef);
       })
