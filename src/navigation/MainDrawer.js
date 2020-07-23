@@ -47,23 +47,25 @@ class MainDrawer extends Component {
                 flex: 1,
                 flexDirection: 'column',
               }}>
-              <DrawerItemList {...props} />
+              <SafeAreaView style={{flex: 1}}>
+                <DrawerItemList {...props} />
 
-              <View style={{flex: 1}} />
+                <View style={{flex: 1}} />
 
-              <Button
-                title="Sign Out"
-                icon={<Icon name="log-out" color={colors.icons} />}
-                iconRight
-                onPress={() => this.handleSignOut()}
-                titleStyle={{color: colors.icons, paddingRight: 5}}
-                buttonStyle={{backgroundColor: colors.primary}}
-                containerStyle={{
-                  borderRadius: 24,
-                  marginHorizontal: 12,
-                  marginVertical: 10,
-                }}
-              />
+                <Button
+                  title="Sign Out"
+                  icon={<Icon name="log-out" color={colors.icons} />}
+                  iconRight
+                  onPress={() => this.handleSignOut()}
+                  titleStyle={{color: colors.icons, paddingRight: 5}}
+                  buttonStyle={{backgroundColor: colors.primary}}
+                  containerStyle={{
+                    borderRadius: 24,
+                    marginHorizontal: 12,
+                    marginVertical: 10,
+                  }}
+                />
+              </SafeAreaView>
             </DrawerContentScrollView>
           );
         }}>
