@@ -61,11 +61,22 @@ class StoreDetailsScreen extends Component {
   @observable newOwnDeliveryServiceFee = 0;
   @observable storeDetailsHeaderColor = colors.primary;
 
-  componentDidUpdate() {
+  componentDidMount() {
     const {displayImageUrl, coverImageUrl} = this.state;
-    const {merchantId} = this.props.detailsStore.storeDetails;
 
     if (!displayImageUrl || !coverImageUrl) {
+      this.getImage();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const {merchantId} = this.props.detailsStore.storeDetails;
+
+    if (
+      prevProps.detailsStore.storeDetails !==
+      this.props.detailsStore.storeDetails
+    ) {
+      console.log('yes');
       this.getImage();
     }
 
@@ -129,17 +140,19 @@ class StoreDetailsScreen extends Component {
   }
 
   getImage = async () => {
-    const {displayImage, coverImage} = this.props.detailsStore.storeDetails;
-
-    if (displayImage) {
-      const displayRef = storage().ref(displayImage);
+    if (this.props.detailsStore.storeDetails.displayImage) {
+      const displayRef = storage().ref(
+        this.props.detailsStore.storeDetails.displayImage,
+      );
       const displayLink = await displayRef.getDownloadURL();
 
       this.setState({displayImageUrl: {uri: displayLink}});
     }
 
-    if (coverImage) {
-      const coverRef = storage().ref(coverImage);
+    if (this.props.detailsStore.storeDetails.coverImage) {
+      const coverRef = storage().ref(
+        this.props.detailsStore.storeDetails.coverImage,
+      );
       const coverLink = await coverRef.getDownloadURL();
 
       this.setState({coverImageUrl: {uri: coverLink}});
