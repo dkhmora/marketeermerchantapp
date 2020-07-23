@@ -21,8 +21,6 @@ class AuthLoader extends React.Component {
   async onAuthStateChanged(user) {
     const {navigation} = this.props;
 
-    this.props.authStore.appReady = false;
-
     if (auth().currentUser != null) {
       await auth()
         .currentUser.getIdTokenResult(true)
