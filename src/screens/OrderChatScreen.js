@@ -74,6 +74,8 @@ class OrderChatScreen extends Component {
       .then(() =>
         this.props.ordersStore.sendImage(
           order.orderId,
+          order.userId,
+          order.merchantId,
           this.state.user,
           this.imagePath,
         ),
@@ -96,6 +98,8 @@ class OrderChatScreen extends Component {
       .then(() =>
         this.props.ordersStore.sendImage(
           order.orderId,
+          order.userId,
+          order.merchantId,
           this.state.user,
           this.imagePath,
         ),
