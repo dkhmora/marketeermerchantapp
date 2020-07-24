@@ -20,8 +20,10 @@ class ItemsStore {
   @action async editItem(merchantId, newItem, additionalStock) {
     const item = this.selectedItem;
     const merchantItemsRef = firestore()
-      .collection('merchant_items')
-      .doc(merchantId);
+      .collection('merchants')
+      .doc(merchantId)
+      .collection('items')
+      .doc(item.doc);
     const timeStamp = firestore.Timestamp.now().toMillis();
 
     const fileExtension = newItem.image ? newItem.image.split('.').pop() : null;
@@ -56,7 +58,10 @@ class ItemsStore {
             dbItems[dbItemIndex].image = imageRef;
           }
 
-          transaction.update(merchantItemsRef, {items: dbItems});
+          transaction.update(merchantItemsRef, {
+            items: dbItems,
+            updatedAt: timeStamp,
+          });
 
           Toast({
             text: `Successfully updated ${item.name}'s stock!`,
@@ -125,19 +130,21 @@ class ItemsStore {
       .where('updatedAt', '>', this.maxItemsUpdatedAt)
       .orderBy('updatedAt', 'desc')
       .onSnapshot(async (querySnapshot) => {
-        if (querySnapshot) {
-          await querySnapshot.forEach((doc, index) => {
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc, index) => {
             this.storeItems.push(...doc.data().items);
 
             if (doc.data().updatedAt > this.maxItemsUpdatedAt) {
               this.maxItemsUpdatedAt = doc.data().updatedAt;
             }
           });
-
-          itemCategories.map((category) => {
-            this.setCategoryItems(category);
-          });
         }
+
+        itemCategories.map((category) => {
+          this.setCategoryItems(category);
+        });
+
+        this.itemCategories = itemCategories;
       });
   }
 
