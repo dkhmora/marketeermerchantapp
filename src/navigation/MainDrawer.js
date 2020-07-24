@@ -51,7 +51,15 @@ class MainDrawer extends Component {
               <View style={{justifyContent: 'flex-start'}}>
                 <DrawerItemList
                   {...props}
-                  labelStyle={{fontFamily: 'ProductSans-Light'}}
+                  labelStyle={{
+                    fontFamily: 'ProductSans-Light',
+                    paddingVertical: 10,
+                  }}
+                  itemStyle={{
+                    marginHorizontal: 0,
+                    marginVertical: 0,
+                    borderRadius: 0,
+                  }}
                 />
               </View>
 
