@@ -80,15 +80,20 @@ class AddItemScreen extends Component {
   async onSubmit() {
     this.props.authStore.appReady = false;
 
+    const item = {
+      category: this.category,
+      name: this.name,
+      description: this.description,
+      unit: this.unit,
+      price: Math.ceil(this.price),
+      stock: Number(Math.trunc(this.stock)),
+      sales: 0,
+    };
+
     await this.props.itemsStore.addStoreItem(
       this.props.detailsStore.storeDetails.merchantId,
+      item,
       this.imagePath,
-      this.category,
-      this.name,
-      this.description,
-      this.unit,
-      Math.ceil(this.price),
-      Number(Math.trunc(this.stock)),
     );
 
     this.props.authStore.appReady = true;
