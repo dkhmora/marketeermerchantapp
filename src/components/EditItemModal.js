@@ -175,7 +175,7 @@ class EditItemModal extends Component {
   }
 
   handleConfirm() {
-    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
     const {
       newName,
       newDescription,
@@ -197,9 +197,17 @@ class EditItemModal extends Component {
       image: newImagePath,
     };
 
+    this.props.itemsStore.unsubscribeSetStoreItems &&
+      this.props.itemsStore.unsubscribeSetStoreItems();
+
     this.props.itemsStore
       .editItem(merchantId, newItem, Number(Math.trunc(newStock)))
       .then(() => {
+        this.props.itemsStore.maxItemsUpdatedAt = 0;
+        this.props.itemsStore.storeItems = [];
+
+        this.props.itemsStore.setStoreItems(merchantId, itemCategories);
+
         Toast({
           text: `Item ${this.props.itemsStore.selectedItem.name} successfully edited!`,
           buttonText: 'Okay',
