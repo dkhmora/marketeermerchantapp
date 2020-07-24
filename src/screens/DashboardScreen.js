@@ -111,7 +111,7 @@ class StoreDetailsScreen extends Component {
       deliveryType,
       paymentMethods,
       shippingMethods,
-      deliveryServiceFee,
+      ownDeliveryServiceFee,
     } = this.props.detailsStore.storeDetails;
 
     if (this.editMode) {
@@ -125,8 +125,8 @@ class StoreDetailsScreen extends Component {
       this.newDeliveryType = deliveryType;
       this.newPaymentMethods = [...paymentMethods];
       this.newShippingMethods = [...shippingMethods];
-      this.newOwnDeliveryServiceFee = deliveryServiceFee
-        ? deliveryServiceFee
+      this.newOwnDeliveryServiceFee = ownDeliveryServiceFee
+        ? String(ownDeliveryServiceFee)
         : '0';
 
       this.setState({
