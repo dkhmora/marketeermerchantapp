@@ -71,10 +71,13 @@ class StoreDetailsScreen extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
+    const {displayImageUrl, coverImageUrl} = this.state;
 
     if (
       prevProps.detailsStore.storeDetails !==
-      this.props.detailsStore.storeDetails
+        this.props.detailsStore.storeDetails ||
+      !displayImageUrl ||
+      !coverImageUrl
     ) {
       this.getImage();
     }
