@@ -11,7 +11,7 @@ import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
 import {Button, Icon} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import {View} from 'react-native';
+import {View, Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReviewsScreen from '../screens/ReviewsScreen';
 
@@ -46,12 +46,32 @@ class MainDrawer extends Component {
               contentContainerStyle={{
                 flex: 1,
                 flexDirection: 'column',
+                justifyContent: 'space-between',
               }}>
-              <SafeAreaView style={{flex: 1}}>
-                <DrawerItemList {...props} />
+              <View style={{justifyContent: 'flex-start'}}>
+                <DrawerItemList
+                  {...props}
+                  labelStyle={{fontFamily: 'ProductSans-Light'}}
+                />
+              </View>
 
-                <View style={{flex: 1}} />
-
+              {Platform.OS === 'ios' ? (
+                <SafeAreaView>
+                  <Button
+                    title="Sign Out"
+                    icon={<Icon name="log-out" color={colors.icons} />}
+                    iconRight
+                    onPress={() => this.handleSignOut()}
+                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    buttonStyle={{backgroundColor: colors.primary}}
+                    containerStyle={{
+                      borderRadius: 24,
+                      marginHorizontal: 12,
+                      marginVertical: 10,
+                    }}
+                  />
+                </SafeAreaView>
+              ) : (
                 <Button
                   title="Sign Out"
                   icon={<Icon name="log-out" color={colors.icons} />}
@@ -65,7 +85,7 @@ class MainDrawer extends Component {
                     marginVertical: 10,
                   }}
                 />
-              </SafeAreaView>
+              )}
             </DrawerContentScrollView>
           );
         }}>
