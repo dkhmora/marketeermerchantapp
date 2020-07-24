@@ -142,11 +142,13 @@ class ItemsStore {
   }
 
   @action async uploadImage(imageRef, imagePath) {
-    return await storage()
-      .ref(imageRef)
-      .putFile(imagePath)
-      .then(() => console.log('Image successfully uploaded!'))
-      .catch((err) => console.error(err));
+    if (imageRef && imagePath) {
+      return await storage()
+        .ref(imageRef)
+        .putFile(imagePath)
+        .then(() => console.log('Image successfully uploaded!'))
+        .catch((err) => console.error(err));
+    }
   }
 
   @action async addStoreItem(merchantId, item, imagePath) {
