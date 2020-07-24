@@ -70,18 +70,17 @@ class StoreDetailsScreen extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
 
     if (
       prevProps.detailsStore.storeDetails !==
       this.props.detailsStore.storeDetails
     ) {
-      console.log('yes');
       this.getImage();
     }
 
     !this.props.itemsStore.unsubscribeSetStoreItems &&
-      this.props.itemsStore.setStoreItems(merchantId);
+      this.props.itemsStore.setStoreItems(merchantId, itemCategories);
   }
 
   @action cancelEditing() {

@@ -1,10 +1,16 @@
 import {observable, action} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
+import firebase from '@react-native-firebase/app';
+import '@react-native-firebase/functions';
 import storage from '@react-native-firebase/storage';
 import Toast from '../components/Toast';
 import {v4 as uuidv4} from 'uuid';
+import {persist} from 'mobx-persist';
+
+const functions = firebase.app().functions('asia-northeast1');
 class ItemsStore {
-  @observable storeItems = [];
+  @persist('list') @observable storeItems = [];
+  @persist @observable maxItemsUpdatedAt = 0;
   @observable itemCategories = [];
   @observable categoryItems = new Map();
   @observable unsubscribeSetStoreItems = null;
@@ -111,17 +117,27 @@ class ItemsStore {
       .catch((err) => console.error(err));
   }
 
-  @action setStoreItems(merchantId) {
+  @action setStoreItems(merchantId, itemCategories) {
     this.unsubscribeSetStoreItems = firestore()
-      .collection('merchant_items')
+      .collection('merchants')
       .doc(merchantId)
-      .onSnapshot((documentSnapshot) => {
-        this.storeItems = documentSnapshot.data().items;
-        this.itemCategories = documentSnapshot.data().itemCategories;
+      .collection('items')
+      .where('updatedAt', '>', this.maxItemsUpdatedAt)
+      .orderBy('updatedAt', 'desc')
+      .onSnapshot(async (querySnapshot) => {
+        if (querySnapshot) {
+          await querySnapshot.forEach((doc, index) => {
+            this.storeItems.push(...doc.data().items);
 
-        documentSnapshot.data().itemCategories.map((category) => {
-          this.setCategoryItems(category);
-        });
+            if (doc.data().updatedAt > this.maxItemsUpdatedAt) {
+              this.maxItemsUpdatedAt = doc.data().updatedAt;
+            }
+          });
+
+          itemCategories.map((category) => {
+            this.setCategoryItems(category);
+          });
+        }
       });
   }
 
@@ -133,6 +149,61 @@ class ItemsStore {
       .catch((err) => console.error(err));
   }
 
+  @action async addStoreItem(merchantId, item, imagePath) {
+    const itemId = uuidv4();
+    const timeStamp = firestore.Timestamp.now().toMillis();
+
+    const fileExtension = imagePath ? imagePath.split('.').pop() : null;
+    const imageRef = imagePath
+      ? `/images/merchants/${merchantId}/items/${itemId}_${timeStamp}.${fileExtension}`
+      : null;
+    const itemExists = this.storeItems
+      .slice()
+      .findIndex((existingItem) => existingItem.name === item.name);
+
+    const newItem = {
+      ...item,
+      image: imageRef,
+      itemId,
+      createdAt: timeStamp,
+      updatedAt: timeStamp,
+    };
+
+    if (itemExists === -1) {
+      return await this.uploadImage(imageRef, imagePath).then(async () => {
+        return await functions
+          .httpsCallable('addStoreItem')({item: JSON.stringify(newItem)})
+          .then((response) => {
+            if (response.data.s === 200) {
+              Toast({
+                text: `"${newItem.name}" successfully added to Item List!`,
+                buttonText: 'Okay',
+              });
+            } else {
+              Toast({
+                text: `Error: ${response.data.m} (${response.data.s})!`,
+                type: 'danger',
+              });
+            }
+
+            return response.data;
+          })
+          .catch((err) => {
+            Toast({
+              text: `Error: ${err}!`,
+              type: 'danger',
+            });
+          });
+      });
+    } else {
+      return Toast({
+        text: `Error: You already have an item named "${newItem.name}"!`,
+        type: 'danger',
+      });
+    }
+  }
+
+  /*
   @action async addStoreItem(
     merchantId,
     imagePath,
@@ -190,6 +261,7 @@ class ItemsStore {
       });
     }
   }
+  */
 
   @action async deleteImage(image) {
     await storage()
