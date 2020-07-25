@@ -58,6 +58,8 @@ class ItemsStore {
             dbItems[dbItemIndex].image = imageRef;
           }
 
+          await dbItems.sort((a, b) => a.name > b.name);
+
           transaction.update(merchantItemsRef, {
             items: dbItems,
             updatedAt: timeStamp,
@@ -123,6 +125,8 @@ class ItemsStore {
   }
 
   @action setStoreItems(merchantId, itemCategories) {
+    //this.maxItemsUpdatedAt = 0;
+    //this.storeItems = [];
     this.unsubscribeSetStoreItems = firestore()
       .collection('merchants')
       .doc(merchantId)
@@ -131,14 +135,33 @@ class ItemsStore {
       .orderBy('updatedAt', 'desc')
       .onSnapshot(async (querySnapshot) => {
         if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc, index) => {
-            this.storeItems.push(...doc.data().items);
+          await querySnapshot.docChanges().forEach(async (change, index) => {
+            const newItems = change.doc.data().items;
 
-            if (doc.data().updatedAt > this.maxItemsUpdatedAt) {
-              this.maxItemsUpdatedAt = doc.data().updatedAt;
+            if (this.storeItems.length > 0) {
+              this.storeItems = await this.storeItems.filter(
+                (storeItem) => storeItem.doc !== change.doc.id,
+              );
+            }
+
+            await this.storeItems.push(...newItems);
+
+            if (change.doc.data().updatedAt > this.maxItemsUpdatedAt) {
+              this.maxItemsUpdatedAt = change.doc.data().updatedAt;
             }
           });
+
+          this.storeItems = await this.storeItems
+            .slice()
+            .sort((a, b) => a.name > b.name);
+
+          itemCategories.map((category) => {
+            this.setCategoryItems(category);
+          });
         }
+        this.storeItems = await this.storeItems
+          .slice()
+          .sort((a, b) => a.name > b.name);
 
         itemCategories.map((category) => {
           this.setCategoryItems(category);
@@ -283,14 +306,24 @@ class ItemsStore {
 
   @action async deleteStoreItem(merchantId, item) {
     const merchantItemsRef = firestore()
-      .collection('merchant_items')
-      .doc(merchantId);
+      .collection('merchants')
+      .doc(merchantId)
+      .collection('items')
+      .doc(item.doc);
 
-    await merchantItemsRef
-      .update('items', firestore.FieldValue.arrayRemove(item))
-      // .then(() =>  this.deleteImage(item.image)) TODO: Create crontask to auto delete unused item images after a period of time
-      .then(() => console.log('Item deleted!'))
-      .catch((err) => console.error(err));
+    return await firestore().runTransaction((transaction) => {
+      const timeStamp = firestore.Timestamp.now().toMillis();
+      const merchantItems = transaction.get(merchantItemsRef).data().items;
+
+      const itemSnapshot = merchantItems.find(
+        (merchantItem) => merchantItem.itemId === item.itemId,
+      );
+
+      transaction.update(merchantItemsRef, {
+        items: firestore.FieldValue.arrayRemove(itemSnapshot),
+        updatedAt: timeStamp,
+      });
+    });
   }
 }
 
