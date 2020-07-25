@@ -235,66 +235,6 @@ class ItemsStore {
     }
   }
 
-  /*
-  @action async addStoreItem(
-    merchantId,
-    imagePath,
-    category,
-    name,
-    description,
-    unit,
-    price,
-    stock,
-  ) {
-    const itemId = uuidv4();
-    const merchantItemsRef = firestore()
-      .collection('merchant_items')
-      .doc(merchantId);
-    const timeStamp = firestore.Timestamp.now().toMillis();
-
-    const fileExtension = imagePath ? imagePath.split('.').pop() : null;
-    const imageRef = imagePath
-      ? `/images/merchants/${merchantId}/items/${itemId}_${timeStamp}.${fileExtension}`
-      : null;
-    const itemExists = this.storeItems
-      .slice()
-      .findIndex((item) => item.name === name);
-
-    if (itemExists === -1) {
-      return await this.uploadImage(imageRef, imagePath)
-        .then(async () => {
-          await merchantItemsRef.update({
-            items: firestore.FieldValue.arrayUnion({
-              category,
-              name,
-              description,
-              unit,
-              price,
-              stock,
-              sales: 0,
-              image: imageRef,
-              itemId,
-              updatedAt: timeStamp,
-              createdAt: timeStamp,
-            }),
-          });
-        })
-        .then(() =>
-          Toast({
-            text: `"${name}" successfully added to Item List!`,
-            buttonText: 'Okay',
-          }),
-        )
-        .catch((err) => console.error(err));
-    } else {
-      return Toast({
-        text: `Error: You already have an item named "${name}"!`,
-        type: 'danger',
-      });
-    }
-  }
-  */
-
   @action async deleteImage(image) {
     await storage()
       .ref(image)
@@ -311,16 +251,18 @@ class ItemsStore {
       .collection('items')
       .doc(item.doc);
 
-    return await firestore().runTransaction((transaction) => {
+    return await firestore().runTransaction(async (transaction) => {
       const timeStamp = firestore.Timestamp.now().toMillis();
-      const merchantItems = transaction.get(merchantItemsRef).data().items;
+      const merchantItems = (await transaction.get(merchantItemsRef)).data()
+        .items;
 
-      const itemSnapshot = merchantItems.find(
+      const itemSnapshot = await merchantItems.find(
         (merchantItem) => merchantItem.itemId === item.itemId,
       );
 
       transaction.update(merchantItemsRef, {
         items: firestore.FieldValue.arrayRemove(itemSnapshot),
+        itemNumber: firestore.FieldValue.increment(-1),
         updatedAt: timeStamp,
       });
     });
