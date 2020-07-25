@@ -203,9 +203,6 @@ class EditItemModal extends Component {
     this.props.itemsStore
       .editItem(merchantId, newItem, Number(Math.trunc(newStock)))
       .then(() => {
-        this.props.itemsStore.maxItemsUpdatedAt = 0;
-        this.props.itemsStore.storeItems = [];
-
         this.props.itemsStore.setStoreItems(merchantId, itemCategories);
 
         Toast({
