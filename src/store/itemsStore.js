@@ -50,6 +50,7 @@ class ItemsStore {
           dbItems[dbItemIndex].name = newItem.name;
           dbItems[dbItemIndex].description = newItem.description;
           dbItems[dbItemIndex].price = newItem.price;
+          dbItems[dbItemIndex].discountedPrice = newItem.discountedPrice;
           dbItems[dbItemIndex].category = newItem.category;
           dbItems[dbItemIndex].unit = newItem.unit;
           dbItems[dbItemIndex].updatedAt = timeStamp;

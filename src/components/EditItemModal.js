@@ -30,10 +30,12 @@ class EditItemModal extends Component {
       newStock: '',
       newUnit: '',
       newPrice: '',
+      newDiscountedPrice: '',
       newStockError: null,
       newNameError: null,
       newDescriptionError: null,
       newPriceError: null,
+      newDiscountedPriceError: null,
     };
   }
 
@@ -50,6 +52,7 @@ class EditItemModal extends Component {
         category,
         unit,
         price,
+        discountedPrice,
       } = this.props.itemsStore.selectedItem;
 
       this.setState({
@@ -61,6 +64,7 @@ class EditItemModal extends Component {
             : this.categories[0],
         newUnit: String(unit),
         newPrice: String(price),
+        newDiscountedPrice: discountedPrice ? String(discountedPrice) : '',
       });
 
       if (this.props.itemsStore.selectedItem.image) {
@@ -135,8 +139,31 @@ class EditItemModal extends Component {
       this.setState({
         newPriceError: 'Price can only consist of numbers',
       });
+    } else if (Number(this.state.newDiscountedPrice) >= Number(price)) {
+      this.setState({
+        newPriceError: 'Normal Price must be more than Discounted Price',
+      });
     } else {
       this.setState({newPriceError: null});
+    }
+  }
+
+  handleDiscountedPrice(discountedPrice) {
+    const numberRegexp = /^[0-9]+$/;
+
+    this.setState({newDiscountedPrice: discountedPrice});
+
+    if (!numberRegexp.test(Number(discountedPrice))) {
+      this.setState({
+        newDiscountedPriceError: 'Price can only consist of numbers',
+      });
+    } else if (Number(discountedPrice) >= Number(this.state.newPrice)) {
+      this.setState({
+        newDiscountedPriceError:
+          'Discounted Price must be less than Normal Price',
+      });
+    } else {
+      this.setState({newDiscountedPriceError: null});
     }
   }
 
@@ -182,6 +209,7 @@ class EditItemModal extends Component {
       newUnit,
       newCategory,
       newPrice,
+      newDiscountedPrice,
       newStock,
       newImagePath,
     } = this.state;
@@ -194,6 +222,7 @@ class EditItemModal extends Component {
       unit: newUnit,
       category: newCategory,
       price: newPrice,
+      discountedPrice: newDiscountedPrice,
       image: newImagePath,
     };
 
@@ -234,10 +263,12 @@ class EditItemModal extends Component {
       newStock: '',
       newUnit: '',
       newPrice: '',
+      newDiscountedPrice: '',
       newStockError: null,
       newNameError: null,
       newDescriptionError: null,
       newPriceError: null,
+      newDiscountedPriceError: null,
     });
   }
 
@@ -251,9 +282,11 @@ class EditItemModal extends Component {
       newStock,
       newUnit,
       newPrice,
+      newDiscountedPrice,
       newNameError,
       newDescriptionError,
       newPriceError,
+      newDiscountedPriceError,
     } = this.state;
     const {isVisible} = this.props;
 
@@ -268,223 +301,267 @@ class EditItemModal extends Component {
         fullScreen
         width="auto"
         height="auto"
-        overlayStyle={{flex: 1, padding: 15}}>
-        <ScrollView>
-          <Text
-            style={{
-              fontSize: 24,
-              fontFamily: 'ProductSans-Regular',
-              paddingBottom: 20,
-            }}>
-            Edit{' '}
-            {this.props.itemsStore.selectedItem &&
-              this.props.itemsStore.selectedItem.name}
-          </Text>
-
+        overlayStyle={{flex: 1, padding: 0}}>
+        <View style={{flex: 1}}>
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              paddingBottom: 10,
+              borderBottomWidth: 2,
+              padding: 10,
+              borderColor: colors.divider,
+              alignItems: 'center',
             }}>
-            <FastImage
-              source={imageDisplay}
-              style={{
-                alignSelf: 'flex-start',
-                borderColor: '#BDBDBD',
-                borderRadius: 10,
-                borderWidth: 1,
-                height: 150,
-                width: 150,
-              }}
-            />
-
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'column',
-                justifyContent: 'center',
-                paddingHorizontal: 15,
-              }}>
-              <Button
-                title="Select Photo"
-                titleStyle={{color: colors.icons, marginLeft: 5}}
-                icon={<Icon name="image" color={colors.icons} />}
-                iconLeft
-                buttonStyle={{backgroundColor: colors.primary}}
-                onPress={() => this.handleSelectImage()}
-              />
-
-              <Text style={{textAlign: 'center', marginVertical: 12}}>or</Text>
-
-              <Button
-                title="Take Photo"
-                titleStyle={{color: colors.icons, marginLeft: 5}}
-                icon={<Icon name="camera" color={colors.icons} />}
-                iconLeft
-                buttonStyle={{backgroundColor: colors.primary}}
-                onPress={() => this.handleTakePhoto()}
-              />
-            </View>
-          </View>
-
-          <Card style={{borderRadius: 10, overflow: 'hidden'}}>
-            <CardItem>
-              <Text note style={{textAlign: 'left'}}>
-                Tip: Uploading a photo makes customers more likely to buy your
-                product!
-              </Text>
-            </CardItem>
-          </Card>
-
-          <View style={styles.action}>
-            <Item
-              style={{paddingHorizontal: 10, flex: 1, borderBottomWidth: 0}}>
-              <View style={styles.icon_container}>
-                <Icon name="folder" color={colors.primary} size={20} />
-              </View>
-
-              <Picker
-                note={false}
-                placeholder="Select Item Category"
-                mode="dropdown"
-                selectedValue={newCategory}
-                iosIcon={<Icon name="arrow-down" />}
-                onValueChange={this.handleCategory.bind(this)}>
-                {this.categories.map((cat, index) => {
-                  return <Picker.Item key={index} label={cat} value={cat} />;
-                })}
-              </Picker>
-            </Item>
-          </View>
-
-          <Input
-            leftIcon={<Icon name="type" color={colors.primary} size={20} />}
-            placeholder={`${
-              this.props.itemsStore.selectedItem &&
-              this.props.itemsStore.selectedItem.name
-            }'s New Name`}
-            errorMessage={newNameError && newNameError}
-            style={styles.textInput}
-            autoCapitalize="words"
-            value={newName}
-            onChangeText={(value) => this.handleName(value)}
-          />
-
-          <Input
-            leftIcon={
-              <Icon name="align-justify" color={colors.primary} size={20} />
-            }
-            placeholder={`${
-              this.props.itemsStore.selectedItem &&
-              this.props.itemsStore.selectedItem.name
-            }'s New Description`}
-            maxLength={150}
-            numberOfLines={3}
-            multiline
-            style={styles.textInput}
-            inputStyle={{textAlignVertical: 'top'}}
-            autoCapitalize="words"
-            value={newDescription}
-            onChangeText={(value) => this.handleDescription(value)}
-          />
-
-          <View style={{flexDirection: 'row'}}>
-            <Input
-              placeholder={`${
-                this.props.itemsStore.selectedItem &&
-                this.props.itemsStore.selectedItem.name
-              }'s New Price`}
-              leftIcon={
-                <Text style={{color: colors.primary, fontSize: 25}}>₱</Text>
-              }
-              errorMessage={newPriceError && newPriceError}
-              containerStyle={{flex: 1}}
-              maxLength={10}
-              keyboardType="numeric"
-              style={styles.textInput}
-              autoCapitalize="none"
-              value={newPrice}
-              onChangeText={(value) => this.handlePrice(value)}
-            />
-
             <Text
               style={{
-                fontSize: 34,
-                textAlignVertical: 'center',
-                marginBottom: 15,
+                fontSize: 24,
+                fontFamily: 'ProductSans-Regular',
               }}>
-              /
+              Edit{' '}
+              {this.props.itemsStore.selectedItem &&
+                this.props.itemsStore.selectedItem.name}
             </Text>
 
-            <Input
-              placeholder={`${
-                this.props.itemsStore.selectedItem &&
-                this.props.itemsStore.selectedItem.name
-              }'s New Unit`}
-              maxLength={10}
-              containerStyle={{flex: 1}}
-              style={styles.textInput}
-              autoCapitalize="none"
-              value={newUnit}
-              onChangeText={(value) => this.setState({newUnit: value})}
-            />
-          </View>
-
-          <Input
-            placeholder={`Additional ${
-              this.props.itemsStore.selectedItem &&
-              this.props.itemsStore.selectedItem.name
-            } Stock`}
-            leftIcon={<Icon name="hash" color={colors.primary} size={20} />}
-            maxLength={10}
-            errorMessage={newDescriptionError && newDescriptionError}
-            keyboardType="numeric"
-            style={styles.textInput}
-            autoCapitalize="none"
-            value={newStock}
-            onChangeText={(value) => this.handleStock(value)}
-          />
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              justifyContent: 'flex-end',
-              marginTop: 40,
-            }}>
             {!this.state.loading && (
               <Button
-                title="Cancel"
                 type="clear"
+                icon={<Icon name="x" color={colors.primary} />}
+                titleStyle={{color: colors.primary}}
                 containerStyle={{
-                  alignSelf: 'flex-end',
                   borderRadius: 30,
                 }}
                 onPress={() => this.closeModal()}
               />
             )}
-
-            <Button
-              title="Confirm"
-              type="clear"
-              disabled={
-                !(
-                  !newStockError &&
-                  !newNameError &&
-                  !newDescriptionError &&
-                  !newPriceError
-                )
-              }
-              loading={this.state.loading}
-              containerStyle={{
-                alignSelf: 'flex-end',
-                borderRadius: 30,
-              }}
-              onPress={() => this.handleConfirm()}
-            />
           </View>
-        </ScrollView>
+
+          <ScrollView style={{paddingHorizontal: 15, paddingTop: 15}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                paddingBottom: 10,
+              }}>
+              <FastImage
+                source={imageDisplay}
+                style={{
+                  alignSelf: 'flex-start',
+                  borderColor: '#BDBDBD',
+                  borderRadius: 10,
+                  borderWidth: 1,
+                  height: 150,
+                  width: 150,
+                }}
+              />
+
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  paddingHorizontal: 15,
+                }}>
+                <Button
+                  title="Select Photo"
+                  titleStyle={{color: colors.icons, marginLeft: 5}}
+                  icon={<Icon name="image" color={colors.icons} />}
+                  iconLeft
+                  buttonStyle={{backgroundColor: colors.primary}}
+                  onPress={() => this.handleSelectImage()}
+                />
+
+                <Text style={{textAlign: 'center', marginVertical: 12}}>
+                  or
+                </Text>
+
+                <Button
+                  title="Take Photo"
+                  titleStyle={{color: colors.icons, marginLeft: 5}}
+                  icon={<Icon name="camera" color={colors.icons} />}
+                  iconLeft
+                  buttonStyle={{backgroundColor: colors.primary}}
+                  onPress={() => this.handleTakePhoto()}
+                />
+              </View>
+            </View>
+
+            <Card style={{borderRadius: 10, overflow: 'hidden'}}>
+              <CardItem>
+                <Text note style={{textAlign: 'left'}}>
+                  Tip: Uploading a photo makes customers more likely to buy your
+                  product!
+                </Text>
+              </CardItem>
+            </Card>
+
+            <View style={styles.action}>
+              <Item
+                style={{paddingHorizontal: 10, flex: 1, borderBottomWidth: 0}}>
+                <View style={styles.icon_container}>
+                  <Icon name="folder" color={colors.primary} size={20} />
+                </View>
+
+                <Picker
+                  note={false}
+                  placeholder="Select Item Category"
+                  mode="dropdown"
+                  selectedValue={newCategory}
+                  iosIcon={<Icon name="arrow-down" />}
+                  onValueChange={this.handleCategory.bind(this)}>
+                  {this.categories.map((cat, index) => {
+                    return <Picker.Item key={index} label={cat} value={cat} />;
+                  })}
+                </Picker>
+              </Item>
+            </View>
+
+            <Input
+              leftIcon={<Icon name="type" color={colors.primary} size={20} />}
+              placeholder={`${
+                this.props.itemsStore.selectedItem &&
+                this.props.itemsStore.selectedItem.name
+              }'s New Name`}
+              errorMessage={newNameError && newNameError}
+              style={styles.textInput}
+              autoCapitalize="words"
+              value={newName}
+              onChangeText={(value) => this.handleName(value)}
+            />
+
+            <Input
+              leftIcon={
+                <Icon name="align-justify" color={colors.primary} size={20} />
+              }
+              placeholder={`${
+                this.props.itemsStore.selectedItem &&
+                this.props.itemsStore.selectedItem.name
+              }'s New Description`}
+              maxLength={150}
+              numberOfLines={3}
+              multiline
+              style={styles.textInput}
+              inputStyle={{textAlignVertical: 'top'}}
+              autoCapitalize="sentences"
+              value={newDescription}
+              onChangeText={(value) => this.handleDescription(value)}
+            />
+
+            <View style={{flexDirection: 'row'}}>
+              <Input
+                placeholder={`${
+                  this.props.itemsStore.selectedItem &&
+                  this.props.itemsStore.selectedItem.name
+                }'s New Price`}
+                leftIcon={
+                  <Text style={{color: colors.primary, fontSize: 25}}>₱</Text>
+                }
+                errorMessage={newPriceError && newPriceError}
+                containerStyle={{flex: 1}}
+                maxLength={10}
+                keyboardType="numeric"
+                style={styles.textInput}
+                autoCapitalize="none"
+                value={newPrice}
+                onChangeText={(value) => this.handlePrice(value)}
+              />
+
+              <Text
+                style={{
+                  fontSize: 34,
+                  textAlignVertical: 'center',
+                  marginBottom: 15,
+                }}>
+                /
+              </Text>
+
+              <Input
+                placeholder={`${
+                  this.props.itemsStore.selectedItem &&
+                  this.props.itemsStore.selectedItem.name
+                }'s New Unit`}
+                maxLength={10}
+                containerStyle={{flex: 1}}
+                style={styles.textInput}
+                autoCapitalize="none"
+                value={newUnit}
+                onChangeText={(value) => this.setState({newUnit: value})}
+              />
+            </View>
+
+            <Input
+              placeholder={`${
+                this.props.itemsStore.selectedItem &&
+                this.props.itemsStore.selectedItem.name
+              }'s New Discounted Price`}
+              leftIcon={
+                <Text style={{color: colors.primary, fontSize: 25}}>₱</Text>
+              }
+              errorMessage={newDiscountedPriceError}
+              containerStyle={{flex: 1}}
+              maxLength={10}
+              keyboardType="numeric"
+              style={styles.textInput}
+              autoCapitalize="none"
+              value={newDiscountedPrice}
+              onChangeText={(value) => this.handleDiscountedPrice(value)}
+            />
+
+            <Input
+              placeholder={`Additional ${
+                this.props.itemsStore.selectedItem &&
+                this.props.itemsStore.selectedItem.name
+              } Stock`}
+              leftIcon={<Icon name="hash" color={colors.primary} size={20} />}
+              maxLength={10}
+              errorMessage={newDescriptionError && newDescriptionError}
+              keyboardType="numeric"
+              style={styles.textInput}
+              autoCapitalize="none"
+              value={newStock}
+              onChangeText={(value) => this.handleStock(value)}
+            />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                justifyContent: 'flex-end',
+                marginVertical: 30,
+              }}>
+              {!this.state.loading && (
+                <Button
+                  title="Cancel"
+                  type="clear"
+                  containerStyle={{
+                    alignSelf: 'flex-end',
+                    borderRadius: 30,
+                  }}
+                  onPress={() => this.closeModal()}
+                />
+              )}
+
+              <Button
+                title="Confirm"
+                type="clear"
+                disabled={
+                  !(
+                    !newStockError &&
+                    !newNameError &&
+                    !newDescriptionError &&
+                    !newPriceError &&
+                    !newDiscountedPriceError
+                  )
+                }
+                loading={this.state.loading}
+                containerStyle={{
+                  alignSelf: 'flex-end',
+                  borderRadius: 30,
+                }}
+                onPress={() => this.handleConfirm()}
+              />
+            </View>
+          </ScrollView>
+        </View>
       </Overlay>
     );
   }

@@ -66,7 +66,7 @@ class OrdersList extends Component {
               order={item}
               tabName={name}
               navigation={navigation}
-              key={index}
+              key={item.orderId}
             />
           )}
           keyExtractor={(item) => item.orderId}

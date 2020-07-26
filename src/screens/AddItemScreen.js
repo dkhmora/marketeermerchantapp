@@ -33,10 +33,11 @@ class AddItemScreen extends Component {
     this.state = {
       pageCategory: this.props.pageCategory,
       imageDisplay: require('../../assets/placeholder.jpg'),
-      nameError: '',
-      descriptionError: '',
-      priceError: '',
-      stockError: '',
+      nameError: null,
+      descriptionError: null,
+      priceError: null,
+      stockError: null,
+      discountedPriceError: null,
     };
   }
 
@@ -47,17 +48,33 @@ class AddItemScreen extends Component {
   @observable description = '';
   @observable unit = '';
   @observable price = '';
+  @observable discountedPrice = '';
   @observable stock = '';
   @observable categories = this.props.itemsStore.itemCategories;
 
   @computed get formValid() {
-    const {nameError, priceError, stockError} = this.state;
+    const {
+      nameError,
+      priceError,
+      stockError,
+      descriptionError,
+      discountedPriceError,
+    } = this.state;
 
-    if (nameError !== null || priceError !== null || stockError !== null) {
-      return true;
+    if (
+      nameError === null ||
+      priceError === null ||
+      stockError === null ||
+      nameError !== '' ||
+      priceError !== '' ||
+      stockError !== '' ||
+      descriptionError ||
+      discountedPriceError
+    ) {
+      return false;
     }
 
-    return false;
+    return true;
   }
 
   componentDidMount() {
@@ -86,6 +103,7 @@ class AddItemScreen extends Component {
       description: this.description,
       unit: this.unit,
       price: Math.ceil(this.price),
+      discountedPrice: Math.ceil(this.discountedPrice),
       stock: Number(Math.trunc(this.stock)),
       sales: 0,
     };
@@ -113,7 +131,7 @@ class AddItemScreen extends Component {
     } else if (regexp.test(this.name)) {
       this.setState({nameError: 'Item Name cannot include Emojis'});
     } else {
-      this.setState({nameError: null});
+      this.setState({nameError: ''});
     }
   }
 
@@ -143,8 +161,29 @@ class AddItemScreen extends Component {
       this.setState({
         priceError: 'Price can only consist of numbers',
       });
+    } else if (Number(this.discountedPrice) >= Number(price)) {
+      this.setState({
+        discountedPriceError: 'Normal Price must be more than Discounted Price',
+      });
     } else {
-      this.setState({priceError: null});
+      this.setState({priceError: ''});
+    }
+  }
+
+  handleDiscountedPrice(discountedPrice) {
+    const numberRegexp = /^[0-9]+$/;
+    this.discountedPrice = discountedPrice;
+
+    if (!numberRegexp.test(Number(discountedPrice))) {
+      this.setState({
+        discountedPriceError: 'Discounted Price can only consist of numbers',
+      });
+    } else if (Number(discountedPrice) >= Number(this.price)) {
+      this.setState({
+        discountedPriceError: 'Discounted Price must be less than Normal Price',
+      });
+    } else {
+      this.setState({discountedPriceError: null});
     }
   }
 
@@ -162,7 +201,7 @@ class AddItemScreen extends Component {
         stockError: 'Initial Stock can only consist of numbers',
       });
     } else {
-      this.setState({stockError: null});
+      this.setState({stockError: ''});
     }
   }
 
@@ -204,6 +243,7 @@ class AddItemScreen extends Component {
       nameError,
       stockError,
       priceError,
+      discountedPriceError,
       descriptionError,
     } = this.state;
 
@@ -324,6 +364,7 @@ class AddItemScreen extends Component {
                   maxLength={150}
                   placeholder="Item Description"
                   value={this.description}
+                  autoCapitalize="sentences"
                   onChangeText={(value) => this.handleDescription(value)}
                 />
                 <Text
@@ -385,13 +426,22 @@ class AddItemScreen extends Component {
                 </View>
               </View>
 
+              <Input
+                placeholder="Discounted Price"
+                keyboardType="number-pad"
+                errorMessage={discountedPriceError}
+                value={this.discountedPrice}
+                onChangeText={(value) => this.handleDiscountedPrice(value)}
+                leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
+              />
+
               <Button
                 title="Submit"
                 titleStyle={{color: colors.icons}}
                 buttonStyle={{backgroundColor: colors.primary, height: 50}}
                 containerStyle={{marginTop: 20}}
                 onPress={() => this.onSubmit()}
-                disabled={this.formValid}
+                disabled={!this.formValid}
               />
             </View>
           </Grid>
