@@ -16,6 +16,8 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import ReviewsScreen from '../screens/ReviewsScreen';
 
 @inject('authStore')
+@inject('itemsStore')
+@inject('ordersStore')
 @inject('detailsStore')
 @observer
 class MainDrawer extends Component {
@@ -27,6 +29,11 @@ class MainDrawer extends Component {
     this.props.authStore.appReady = false;
 
     this.props.authStore.signOut().then(() => {
+      this.props.ordersStore.orders = [];
+      this.props.ordersStore.maxOrderUpdatedAt = 0;
+      this.props.itemsStore.storeItems = [];
+      this.props.itemsStore.maxItemsUpdatedAt = 0;
+
       this.props.authStore.appReady = true;
     });
   }
