@@ -34,12 +34,13 @@ class StoreItemsTab extends Component {
   }
 
   @observable newCategory = '';
-  @observable selectedCategory = this.props.itemsStore.itemCategories.slice[0];
+  @observable selectedCategory = this.props.detailsStore.storeDetails
+    .itemCategories.slice[0];
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
 
   @computed get scrollEnabled() {
-    return this.props.itemsStore.itemCategories.length > 1;
+    return this.props.detailsStore.storeDetails.itemCategories.length > 1;
   }
 
   @action closeAddCategoryModal() {
@@ -52,9 +53,9 @@ class StoreItemsTab extends Component {
   }
 
   @action showDeleteCategoryModal() {
-    if (this.props.itemsStore.itemCategories.length > 0) {
+    if (this.props.detailsStore.storeDetails.itemCategories.length > 0) {
       this.deleteCategoryModal = true;
-      this.selectedCategory = this.props.itemsStore.itemCategories[0];
+      this.selectedCategory = this.props.detailsStore.storeDetails.itemCategories[0];
     } else {
       Toast.show({
         text: `There are no categories to be deleted.`,
@@ -74,12 +75,14 @@ class StoreItemsTab extends Component {
   }
 
   handleAddCategory() {
-    const {addItemCategory, itemCategories} = this.props.itemsStore;
-    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
 
     if (!itemCategories.includes(this.newCategory)) {
-      addItemCategory(merchantId, this.newCategory)
+      this.props.itemsStore
+        .addItemCategory(merchantId, this.newCategory)
         .then(() => {
+          this.props.itemsStore.setStoreItems(merchantId, itemCategories);
+
           Toast.show({
             text: `Category "${this.newCategory}" successfully added!`,
             buttonText: 'Okay',
@@ -104,19 +107,23 @@ class StoreItemsTab extends Component {
   }
 
   handleDeleteCategory() {
-    const {deleteItemCategory, itemCategories} = this.props.itemsStore;
-    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
 
     if (itemCategories.includes(this.selectedCategory)) {
-      deleteItemCategory(merchantId, this.selectedCategory);
-      this.closeDeleteCategoryModal();
-      Toast.show({
-        text: `Category "${this.selectedCategory}" successfully deleted!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 5000,
-        style: {margin: 20, borderRadius: 16},
-      });
+      this.props.itemsStore
+        .deleteItemCategory(merchantId, this.selectedCategory)
+        .then(() => {
+          this.props.itemsStore.setStoreItems(merchantId, itemCategories);
+
+          this.closeDeleteCategoryModal();
+          Toast.show({
+            text: `Category "${this.selectedCategory}" successfully deleted!`,
+            buttonText: 'Okay',
+            type: 'success',
+            duration: 5000,
+            style: {margin: 20, borderRadius: 16},
+          });
+        });
     } else {
       Toast.show({
         text: `Category "${this.selectedCategory}" does not exist!`,
@@ -130,7 +137,7 @@ class StoreItemsTab extends Component {
   }
 
   render() {
-    const {itemCategories} = this.props.itemsStore;
+    const {itemCategories} = this.props.detailsStore.storeDetails;
     const {name} = this.props.route;
     const {navigation} = this.props;
 

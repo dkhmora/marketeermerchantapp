@@ -39,7 +39,7 @@ class EditItemModal extends Component {
     };
   }
 
-  @observable categories = this.props.itemsStore.itemCategories;
+  @observable categories = this.props.detailsStore.storeDetails.itemCategories;
 
   componentDidUpdate(prevProps, prevState) {
     if (
@@ -145,6 +145,16 @@ class EditItemModal extends Component {
       });
     } else {
       this.setState({newPriceError: null});
+
+      if (
+        Number(this.state.newDiscountedPrice) <= Number(price) &&
+        this.state.newDiscountedPriceError ===
+          'Discounted Price must be less than Normal Price'
+      ) {
+        this.setState({
+          newDiscountedPriceError: null,
+        });
+      }
     }
   }
 
@@ -164,6 +174,14 @@ class EditItemModal extends Component {
       });
     } else {
       this.setState({newDiscountedPriceError: null});
+
+      if (
+        Number(discountedPrice) <= Number(this.state.newPrice) &&
+        this.state.newPriceError ===
+          'Normal Price must be more than Discounted Price'
+      ) {
+        this.setState({newPriceError: null});
+      }
     }
   }
 
@@ -221,8 +239,10 @@ class EditItemModal extends Component {
       description: newDescription,
       unit: newUnit,
       category: newCategory,
-      price: newPrice,
-      discountedPrice: newDiscountedPrice,
+      price: Number(Math.ceil(newPrice)),
+      discountedPrice: newDiscountedPrice
+        ? Number(Math.ceil(newDiscountedPrice))
+        : null,
       image: newImagePath,
     };
 

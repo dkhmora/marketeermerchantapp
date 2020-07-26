@@ -4,11 +4,12 @@ import {
   ActivityIndicator,
   TouchableHighlightBase,
 } from 'react-native';
-import {Container, View, Fab, Icon, Button} from 'native-base';
+import {Container, View, Fab, Button} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components
 import ItemCard from './ItemCard';
 import {colors} from '../../assets/colors';
+import {Text, Icon} from 'react-native-elements';
 
 @inject('itemsStore')
 @observer
@@ -38,7 +39,9 @@ class ItemsList extends Component {
     let dataSource = [];
 
     if (category !== 'All' && this.props.itemsStore.categoryItems.size > 0) {
-      dataSource = this.props.itemsStore.categoryItems.get(category).slice();
+      dataSource = this.props.itemsStore.categoryItems.get(category)
+        ? this.props.itemsStore.categoryItems.get(category).slice()
+        : [];
     } else if (this.props.itemsStore.storeItems.length > 0) {
       dataSource = this.props.itemsStore.storeItems.slice();
     }
@@ -48,11 +51,11 @@ class ItemsList extends Component {
     return (
       <Container style={{flex: 1}}>
         <View style={{paddingHorizontal: 10, flex: 1}}>
-          {dataSource.length > 0 &&
-          this.props.itemsStore.categoryItems.size > 0 ? (
+          {this.props.itemsStore.loaded ? (
             <FlatList
               data={this.formatData(dataSource, numColumns)}
               numColumns={numColumns}
+              contentContainerStyle={{flexGrow: 1}}
               initialNumToRender={4}
               renderItem={({item, index}) =>
                 item.empty ? (
@@ -63,6 +66,36 @@ class ItemsList extends Component {
                 ) : (
                   <ItemCard item={item} key={`${item.name}${category}`} />
                 )
+              }
+              ListEmptyComponent={
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      textAlign: 'center',
+                      paddingHorizontal: 15,
+                    }}>
+                    You haven't placed added an item to this category yet. Add
+                    an item by pressing
+                  </Text>
+                  <Icon
+                    name="plus"
+                    size={20}
+                    color={colors.icons}
+                    containerStyle={{
+                      marginTop: 10,
+                      borderRadius: 30,
+                      padding: 10,
+                      backgroundColor: colors.accent,
+                    }}
+                  />
+                </View>
               }
               keyExtractor={(item, index) => `${item.name}${category}`}
               showsVerticalScrollIndicator={false}
@@ -79,14 +112,14 @@ class ItemsList extends Component {
             </View>
           )}
         </View>
+
         <Fab
-          containerStyle={{}}
           position="bottomRight"
           style={{backgroundColor: colors.accent}}
           onPress={() =>
             navigation.navigate('Add Item', {pageCategory: category})
           }>
-          <Icon name="add" />
+          <Icon name="plus" color={colors.icons} />
         </Fab>
       </Container>
     );

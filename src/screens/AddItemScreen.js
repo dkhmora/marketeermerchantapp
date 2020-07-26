@@ -50,7 +50,7 @@ class AddItemScreen extends Component {
   @observable price = '';
   @observable discountedPrice = '';
   @observable stock = '';
-  @observable categories = this.props.itemsStore.itemCategories;
+  @observable categories = this.props.detailsStore.storeDetails.itemCategories;
 
   @computed get formValid() {
     const {
@@ -79,10 +79,10 @@ class AddItemScreen extends Component {
 
   componentDidMount() {
     const {pageCategory} = this.props.route.params;
-    const {itemCategories} = this.props.itemsStore;
+    const {itemCategories} = this.props.detailsStore.storeDetails;
     this.category = pageCategory !== 'All' ? pageCategory : itemCategories[0];
 
-    if (this.props.itemsStore.itemCategories.length <= 0) {
+    if (this.props.detailsStore.storeDetails.itemCategories.length <= 0) {
       this.props.navigation.goBack();
       Toast.show({
         text: `Please add a category before adding an item.`,
@@ -102,8 +102,10 @@ class AddItemScreen extends Component {
       name: this.name,
       description: this.description,
       unit: this.unit,
-      price: Math.ceil(this.price),
-      discountedPrice: Math.ceil(this.discountedPrice),
+      price: Number(Math.ceil(this.price)),
+      discountedPrice: this.discountedPrice
+        ? Number(Math.ceil(this.discountedPrice))
+        : null,
       stock: Number(Math.trunc(this.stock)),
       sales: 0,
     };
@@ -167,6 +169,16 @@ class AddItemScreen extends Component {
       });
     } else {
       this.setState({priceError: ''});
+
+      if (
+        Number(this.discountedPrice) <= Number(price) &&
+        this.state.priceError ===
+          'Discounted Price must be less than Normal Price'
+      ) {
+        this.setState({
+          discountedPriceError: null,
+        });
+      }
     }
   }
 
@@ -184,6 +196,14 @@ class AddItemScreen extends Component {
       });
     } else {
       this.setState({discountedPriceError: null});
+
+      if (
+        Number(discountedPrice) <= Number(this.price) &&
+        this.state.priceError ===
+          'Normal Price must be more than Discounted Price'
+      ) {
+        this.setState({priceError: ''});
+      }
     }
   }
 
@@ -344,6 +364,7 @@ class AddItemScreen extends Component {
                 <Input
                   errorMessage={nameError}
                   maxLength={80}
+                  autoCapitalize="words"
                   placeholder="Item Name"
                   value={this.name}
                   onChangeText={(value) => this.handleName(value)}
