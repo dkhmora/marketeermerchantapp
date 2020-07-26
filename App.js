@@ -30,6 +30,7 @@ const authStore = (window.store = new AuthStore());
 const detailsStore = (window.store = new DetailsStore());
 const itemsStore = (window.store = new ItemsStore());
 hydrate('list', ordersStore);
+hydrate('list', itemsStore);
 
 YellowBox.ignoreWarnings([
   'Animated: `useNativeDriver` was not specified. This is a required option and must be explicitly set to `true` or `false`',

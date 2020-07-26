@@ -76,23 +76,21 @@ class DetailsStore {
     });
   }
 
-  @action async setStoreDetails() {
-    const userId = auth().currentUser.uid;
-
-    this.unsubscribeSetStoreDetails = merchantsCollection
-      .where(`admins.${userId}`, '==', true)
-      .onSnapshot((querySnapshot) => {
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach(async (doc, index) => {
+  @action async setStoreDetails(merchantId) {
+    if (merchantId && !this.unsubscribeSetStoreDetails) {
+      this.unsubscribeSetStoreDetails = merchantsCollection
+        .doc(merchantId)
+        .onSnapshot(async (documentSnapshot) => {
+          if (!documentSnapshot.empty) {
             this.storeDetails = {
-              ...doc.data(),
-              merchantId: doc.id,
+              ...documentSnapshot.data(),
+              merchantId,
             };
 
             const token = await messaging().getToken();
 
-            if (doc.data().fcmTokens) {
-              if (doc.data().fcmTokens.includes(token)) {
+            if (documentSnapshot.data().fcmTokens) {
+              if (documentSnapshot.data().fcmTokens.includes(token)) {
                 this.subscribedToNotifications = true;
               } else {
                 this.subscribedToNotifications = false;
@@ -100,20 +98,15 @@ class DetailsStore {
             } else {
               this.subscribedToNotifications = false;
             }
-          });
-        } else {
-          auth()
-            .signOut()
-            .then(() => {
-              Toast({
-                text:
-                  'Error, user account is not set as admin. Please contact Marketeer support.',
-                type: 'danger',
-                duration: 10000,
-              });
+          } else {
+            Toast({
+              text: 'Store Details are still empty.',
+              type: 'warning',
+              duration: 5000,
             });
-        }
-      });
+          }
+        });
+    }
   }
 
   @action async subscribeToNotifications() {
@@ -205,6 +198,7 @@ class DetailsStore {
     paymentMethods,
     shippingMethods,
     deliveryType,
+    ownDeliveryServiceFee,
   ) {
     await this.merchantRef
       .update({
@@ -215,6 +209,7 @@ class DetailsStore {
         paymentMethods,
         shippingMethods,
         deliveryType,
+        ownDeliveryServiceFee,
         updatedAt: firestore.Timestamp.now().toMillis(),
       })
       .then(() => console.log('Merchant details successfully updated!'))

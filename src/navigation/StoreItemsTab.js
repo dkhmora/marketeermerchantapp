@@ -21,10 +21,12 @@ import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
 import {observable, action, computed} from 'mobx';
 import {colors} from '../../assets/colors';
+import EditItemModal from '../components/EditItemModal';
 
 const TabBase = createMaterialTopTabNavigator();
 @inject('itemsStore')
 @inject('authStore')
+@inject('detailsStore')
 @observer
 class StoreItemsTab extends Component {
   constructor(props) {
@@ -136,10 +138,10 @@ class StoreItemsTab extends Component {
       <Container style={{flex: 1}}>
         <BaseHeader
           title={name}
-          options={['Delete Category', 'Add Category']}
+          options={['Add Category', 'Delete Category']}
           actions={[
-            this.showDeleteCategoryModal.bind(this),
             this.showAddCategoryModal.bind(this),
+            this.showDeleteCategoryModal.bind(this),
           ]}
           destructiveIndex={1}
           navigation={navigation}
@@ -264,6 +266,8 @@ class StoreItemsTab extends Component {
             </Card>
           </Modal>
         </View>
+
+        <EditItemModal isVisible={this.props.itemsStore.editItemModal} />
 
         <TabBase.Navigator
           tabBarOptions={{

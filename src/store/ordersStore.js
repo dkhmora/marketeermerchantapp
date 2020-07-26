@@ -1,11 +1,15 @@
 import {observable, action} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
+import firebase from '@react-native-firebase/app';
+import '@react-native-firebase/functions';
 import storage from '@react-native-firebase/storage';
 import {GiftedChat} from 'react-native-gifted-chat';
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
 import {persist} from 'mobx-persist';
+import Toast from '../components/Toast';
 
+const functions = firebase.app().functions('asia-northeast1');
 const ordersCollection = firestore().collection('orders');
 class OrdersStore {
   @persist('list') @observable orders = [];
@@ -13,6 +17,8 @@ class OrdersStore {
   @observable orderMessages = [];
   @observable unsubscribeGetMessages = null;
   @observable unsubscribeSetOrders = null;
+  @observable cancelOrderModal = false;
+  @observable selectedOrder = null;
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
@@ -21,13 +27,28 @@ class OrdersStore {
     return link;
   }
 
-  @action async sendImage(orderId, user, imagePath) {
+  @action async sendImage(
+    orderId,
+    customerUserId,
+    merchantId,
+    user,
+    imagePath,
+  ) {
     const messageId = uuidv4();
     const imageRef = `/images/orders/${orderId}/order_chat/${messageId}`;
+    const storageRef = storage().ref(imageRef);
+    console.log(imagePath);
 
-    await storage()
-      .ref(imageRef)
+    await storageRef
       .putFile(imagePath)
+      .then(() => {
+        storageRef.updateMetadata({
+          customMetadata: {
+            customerUserId,
+            merchantId,
+          },
+        });
+      })
       .then(() => {
         return this.getImageUrl(imageRef);
       })
@@ -95,7 +116,6 @@ class OrdersStore {
   }
 
   @action async getOrderItems(orderId) {
-    console.log(orderId);
     return await firestore()
       .collection('order_items')
       .doc(orderId)
@@ -113,26 +133,14 @@ class OrdersStore {
   }
 
   @action async setOrders(merchantId) {
-    console.log(
-      'this.maxOrderUpdatedAt',
-      this.maxOrderUpdatedAt,
-      this.orderMessages,
-      merchantId,
-    );
-
-    console.log(this.maxOrderUpdatedAt < firestore.Timestamp.now().toMillis());
-    console.log(firestore.Timestamp.now().toMillis());
-
     this.unsubscribeSetOrders = ordersCollection
       .where('merchantId', '==', merchantId)
       .where('updatedAt', '>', this.maxOrderUpdatedAt)
       .orderBy('updatedAt', 'desc')
-      .onSnapshot((querySnapshot) => {
+      .onSnapshot(async (querySnapshot) => {
         if (querySnapshot) {
-          querySnapshot.forEach((doc, index) => {
+          await querySnapshot.forEach((doc, index) => {
             const order = {...doc.data(), orderId: doc.id};
-
-            console.log(order);
 
             if (order.updatedAt > this.maxOrderUpdatedAt) {
               this.maxOrderUpdatedAt = order.updatedAt;
@@ -142,16 +150,6 @@ class OrdersStore {
               .slice()
               .findIndex((existingOrder) => existingOrder.orderId === doc.id);
 
-            if (this.orders.length > 0) {
-              console.log(
-                this.orders[0].orderId,
-                doc.id,
-                this.orders[0].orderId === doc.id,
-              );
-            }
-
-            console.log('existingOrderIndex', existingOrderIndex);
-
             if (existingOrderIndex >= 0) {
               this.orders[existingOrderIndex] = order;
             } else {
@@ -159,101 +157,34 @@ class OrdersStore {
             }
           });
 
-          console.log(this.orders);
+          this.orders = this.orders
+            .slice()
+            .sort((a, b) => b.updatedAt - a.updatedAt);
         }
       });
   }
 
-  @action async setOrderStatus(orderId, merchantId, limit) {
-    const statusArray = [
-      'pending',
-      'unpaid',
-      'paid',
-      'shipped',
-      'completed',
-      'cancelled',
-    ];
-    const orderRef = firestore().collection('orders').doc(orderId);
-    console.log(orderId);
-
-    await orderRef
-      .get()
-      .then((documentReference) => {
-        const {orderStatus, paymentMethod} = documentReference.data();
-        console.log('what');
-        console.log(documentReference.data());
-        let newOrderStatus = {};
-        let currentStatus;
-        Object.keys(orderStatus).map((item, index) => {
-          if (orderStatus[`${item}`].status) {
-            currentStatus = item;
-          }
-        });
-
-        let nextStatusIndex = statusArray.indexOf(currentStatus) + 1;
-
-        if (paymentMethod === 'COD' && currentStatus === 'pending') {
-          nextStatusIndex = 2;
-        }
-
-        const nextStatus = statusArray[nextStatusIndex];
-
-        newOrderStatus = orderStatus;
-
-        newOrderStatus[`${currentStatus}`] = {
-          status: false,
-          updatedAt: firestore.Timestamp.now().toMillis(),
-        };
-
-        newOrderStatus[`${nextStatus}`] = {
-          status: true,
-          updatedAt: firestore.Timestamp.now().toMillis(),
-        };
-
-        return {newOrderStatus};
-      })
-      .then(({newOrderStatus}) => {
-        orderRef
-          .update({
-            orderStatus: newOrderStatus,
-            updatedAt: firestore.Timestamp.now().toMillis(),
-          })
-          .catch((err) => console.log(err));
+  @action async setOrderStatus(orderId, merchantId) {
+    return await functions
+      .httpsCallable('changeOrderStatus')({orderId, merchantId})
+      .then((response) => {
+        return response.data;
       })
       .catch((err) => {
         console.log(err);
       });
   }
 
-  @action async cancelOrder(orderId, cancelReason) {
-    const orderRef = firestore().collection('orders').doc(orderId);
+  @action async cancelOrder(orderId, merchantId, cancelReason) {
+    return await functions
+      .httpsCallable('cancelOrder')({orderId, merchantId, cancelReason})
+      .then((response) => {
+        console.log(response.data);
 
-    await orderRef
-      .get()
-      .then((documentReference) => {
-        const {orderStatus} = documentReference.data();
-        let newOrderStatus = {};
-        let currentStatus;
-        Object.keys(orderStatus).map((item, index) => {
-          if (orderStatus[`${item}`].status) {
-            currentStatus = item;
-          }
-        });
-
-        newOrderStatus = orderStatus;
-
-        newOrderStatus[`${currentStatus}`].status = false;
-
-        newOrderStatus.cancelled = {
-          status: true,
-          reason: cancelReason,
-          updatedAt: firestore.Timestamp.now().toMillis(),
-        };
-
-        return newOrderStatus;
+        return response.data;
       })
-      .then((newOrderStatus) => {
-        orderRef.update({orderStatus: newOrderStatus});
+      .catch((err) => {
+        console.log(err);
       });
   }
 }

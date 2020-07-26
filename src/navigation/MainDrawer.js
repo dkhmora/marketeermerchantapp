@@ -11,11 +11,13 @@ import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
 import {Button, Icon} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import {View} from 'react-native';
+import {View, Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReviewsScreen from '../screens/ReviewsScreen';
 
 @inject('authStore')
+@inject('itemsStore')
+@inject('ordersStore')
 @inject('detailsStore')
 @observer
 class MainDrawer extends Component {
@@ -27,6 +29,11 @@ class MainDrawer extends Component {
     this.props.authStore.appReady = false;
 
     this.props.authStore.signOut().then(() => {
+      this.props.ordersStore.orders = [];
+      this.props.ordersStore.maxOrderUpdatedAt = 0;
+      this.props.itemsStore.storeItems = [];
+      this.props.itemsStore.maxItemsUpdatedAt = 0;
+
       this.props.authStore.appReady = true;
     });
   }
@@ -46,12 +53,40 @@ class MainDrawer extends Component {
               contentContainerStyle={{
                 flex: 1,
                 flexDirection: 'column',
+                justifyContent: 'space-between',
               }}>
-              <DrawerItemList {...props} />
+              <View style={{justifyContent: 'flex-start'}}>
+                <DrawerItemList
+                  {...props}
+                  labelStyle={{
+                    fontFamily: 'ProductSans-Light',
+                    paddingVertical: 10,
+                  }}
+                  itemStyle={{
+                    marginHorizontal: 0,
+                    marginVertical: 0,
+                    borderRadius: 0,
+                  }}
+                />
+              </View>
 
-              <View style={{flex: 1}} />
-
-              <SafeAreaView>
+              {Platform.OS === 'ios' ? (
+                <SafeAreaView>
+                  <Button
+                    title="Sign Out"
+                    icon={<Icon name="log-out" color={colors.icons} />}
+                    iconRight
+                    onPress={() => this.handleSignOut()}
+                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    buttonStyle={{backgroundColor: colors.primary}}
+                    containerStyle={{
+                      borderRadius: 24,
+                      marginHorizontal: 12,
+                      marginVertical: 10,
+                    }}
+                  />
+                </SafeAreaView>
+              ) : (
                 <Button
                   title="Sign Out"
                   icon={<Icon name="log-out" color={colors.icons} />}
@@ -65,7 +100,7 @@ class MainDrawer extends Component {
                     marginVertical: 10,
                   }}
                 />
-              </SafeAreaView>
+              )}
             </DrawerContentScrollView>
           );
         }}>

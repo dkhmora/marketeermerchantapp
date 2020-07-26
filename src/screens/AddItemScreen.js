@@ -80,15 +80,20 @@ class AddItemScreen extends Component {
   async onSubmit() {
     this.props.authStore.appReady = false;
 
+    const item = {
+      category: this.category,
+      name: this.name,
+      description: this.description,
+      unit: this.unit,
+      price: Math.ceil(this.price),
+      stock: Number(Math.trunc(this.stock)),
+      sales: 0,
+    };
+
     await this.props.itemsStore.addStoreItem(
       this.props.detailsStore.storeDetails.merchantId,
+      item,
       this.imagePath,
-      this.category,
-      this.name,
-      this.description,
-      this.unit,
-      Math.ceil(this.price),
-      Number(Math.trunc(this.stock)),
     );
 
     this.props.authStore.appReady = true;
@@ -101,10 +106,9 @@ class AddItemScreen extends Component {
 
   handleName(name) {
     const regexp = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
-    const emptyRegexp = /^$|\s+/;
     this.name = name;
 
-    if (emptyRegexp.test(this.name)) {
+    if (this.name === '') {
       this.setState({nameError: 'Item Name must not be empty'});
     } else if (regexp.test(this.name)) {
       this.setState({nameError: 'Item Name cannot include Emojis'});
@@ -129,11 +133,9 @@ class AddItemScreen extends Component {
 
   handlePrice(price) {
     const numberRegexp = /^[0-9]+$/;
-    const emptyRegexp = /^$|\s+/;
-
     this.price = price;
 
-    if (emptyRegexp.test(this.price)) {
+    if (this.price === '') {
       this.setState({
         priceError: 'Price must not be empty',
       });
@@ -148,11 +150,10 @@ class AddItemScreen extends Component {
 
   handleStock(stock) {
     const numberRegexp = /^[0-9]+$/;
-    const emptyRegexp = /^$|\s+/;
 
     this.stock = stock;
 
-    if (emptyRegexp.test(this.stock)) {
+    if (this.stock === '') {
       this.setState({
         stockError: 'Initial Stock must not be empty',
       });

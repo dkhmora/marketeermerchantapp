@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {
   Card,
   CardItem,
@@ -19,27 +19,17 @@ import {Icon, Button, Text} from 'react-native-elements';
 import {observable, action, computed} from 'mobx';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
+import CancelOrderModal from './CancelOrderModal';
 
 @inject('ordersStore')
 @observer
-class OrderCard extends Component {
+class OrderCard extends PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
       loading: false,
     };
-  }
-
-  @observable confirmationModal = false;
-  @observable cancelReason = '';
-
-  @action openConfirmationModal() {
-    this.confirmationModal = true;
-  }
-
-  @action closeConfirmationModal() {
-    this.confirmationModal = false;
   }
 
   @computed get orderStatus() {
@@ -56,6 +46,10 @@ class OrderCard extends Component {
     );
 
     return statusLabel.filter((item) => item != null);
+  }
+
+  @computed get timeStamp() {
+    return moment(this.props.order.updatedAt, 'x').fromNow();
   }
 
   handleChangeOrderStatus() {
@@ -78,7 +72,6 @@ class OrderCard extends Component {
       .then(() => {
         this.setState({loading: false});
       });
-    this.closeConfirmationModal();
   }
 
   handleViewOrderItems() {
@@ -87,38 +80,6 @@ class OrderCard extends Component {
     navigation.dangerouslyGetParent().navigate('Order Details', {
       order,
     });
-  }
-
-  handleCancelOrder() {
-    const {order} = this.props;
-    this.props.ordersStore
-      .cancelOrder(order.orderId, this.cancelReason)
-      .then(() => {
-        Toast.show({
-          text: `Order # ${order.merchantOrderNumber} successfully cancelled!`,
-          buttonText: 'Okay',
-          type: 'success',
-          duration: 3500,
-          style: {margin: 20, borderRadius: 16},
-        });
-      });
-  }
-
-  openOptions() {
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        options: ['Cancel', 'Decline Order'],
-        destructiveIndex: 1,
-        cancelButtonIndex: 0,
-      },
-      (buttonIndex) => {
-        if (buttonIndex === 0) {
-          // cancel action
-        } else {
-          this.handleCancelOrder.bind(this);
-        }
-      },
-    );
   }
 
   render() {
@@ -234,7 +195,12 @@ class OrderCard extends Component {
                 iconStyle={{color: '#fff', fontSize: 27}}
                 destructiveIndex={1}
                 options={['Cancel Order']}
-                actions={[this.openConfirmationModal.bind(this)]}
+                actions={[
+                  () => {
+                    this.props.ordersStore.cancelOrderModal = true;
+                    this.props.ordersStore.selectedOrder = order;
+                  },
+                ]}
               />
             </View>
           )}
@@ -245,12 +211,10 @@ class OrderCard extends Component {
     const CardFooter = () => {
       const footerStatus = `Order ${tabName}`;
 
-      const timeStamp = moment(new Date(order.createdAt)).fromNow();
-
       return (
         <CardItem footer bordered>
           <Left>
-            <Text note>{timeStamp}</Text>
+            <Text note>{this.timeStamp}</Text>
           </Left>
           <Right>
             {footerStatus && !buttonText ? (
@@ -277,82 +241,6 @@ class OrderCard extends Component {
 
     return (
       <View>
-        <View style={{flex: 1}}>
-          <Modal
-            isVisible={this.confirmationModal}
-            transparent={true}
-            style={{alignItems: 'center'}}>
-            <Card
-              style={{
-                borderRadius: 10,
-                overflow: 'hidden',
-                width: '100%',
-              }}>
-              <CardItem header>
-                <Left>
-                  <Body>
-                    <H3>Are you sure?</H3>
-                  </Body>
-                </Left>
-              </CardItem>
-              <CardItem>
-                <Body>
-                  <Textarea
-                    rowSpan={6}
-                    maxLength={600}
-                    bordered
-                    placeholder="Reason for Cancellation"
-                    value={this.cancelReason}
-                    onChangeText={(value) => (this.cancelReason = value)}
-                    style={{borderRadius: 24, width: '100%'}}
-                  />
-                  <Text note style={{alignSelf: 'flex-end', marginRight: 16}}>
-                    Character Limit: {this.cancelReason.length}/600
-                  </Text>
-                </Body>
-              </CardItem>
-              <CardItem>
-                <Body>
-                  <Text note style={{textAlign: 'justify', width: '100%'}}>
-                    You can no longer bring back an order after it has been
-                    cancelled.
-                  </Text>
-                </Body>
-              </CardItem>
-              <CardItem footer>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    justifyContent: 'flex-end',
-                  }}>
-                  <Button
-                    title="Cancel"
-                    titleStyle={{color: colors.accent}}
-                    buttonStyle={{backgroundColor: colors.icons}}
-                    containerStyle={{
-                      borderRadius: 24,
-                      borderWidth: 1,
-                      borderColor: colors.accent,
-                      marginRight: 10,
-                    }}
-                    onPress={this.closeConfirmationModal.bind(this)}
-                  />
-                  <Button
-                    title="Confirm"
-                    titleStyle={{color: colors.icons}}
-                    buttonStyle={{backgroundColor: colors.dark_accent}}
-                    containerStyle={{
-                      borderRadius: 24,
-                    }}
-                    onPress={this.handleCancelOrder.bind(this)}
-                  />
-                </View>
-              </CardItem>
-            </Card>
-          </Modal>
-        </View>
-
         <Card {...otherProps} style={{borderRadius: 10, overflow: 'hidden'}}>
           <CardHeader />
           <CardItem bordered>

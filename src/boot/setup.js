@@ -50,6 +50,10 @@ const theme = {
 @inject('authStore')
 @observer
 class Setup extends Component {
+  componentDidMount() {
+
+  }
+  
   render() {
     const {appReady} = this.props.authStore;
 

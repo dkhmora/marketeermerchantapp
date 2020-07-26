@@ -38,7 +38,6 @@ class ItemsList extends Component {
     let dataSource = [];
 
     if (category !== 'All' && this.props.itemsStore.categoryItems.size > 0) {
-      console.log('size', this.props.itemsStore.categoryItems.size, category);
       dataSource = this.props.itemsStore.categoryItems.get(category).slice();
     } else if (this.props.itemsStore.storeItems.length > 0) {
       dataSource = this.props.itemsStore.storeItems.slice();

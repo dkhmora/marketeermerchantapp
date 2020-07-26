@@ -7,6 +7,7 @@ import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
 import {computed} from 'mobx';
+import CancelOrderModal from '../components/CancelOrderModal';
 
 const TabOrders = createMaterialTopTabNavigator();
 
@@ -82,6 +83,8 @@ class OrdersTab extends Component {
           destructiveIndex={1}
           navigation={navigation}
         />
+        <CancelOrderModal />
+
         <TabOrders.Navigator
           tabBarOptions={{
             scrollEnabled: true,

@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React, {PureComponent} from 'react';
 import {Card, CardItem, Body} from 'native-base';
 import {View} from 'react-native';
 import {Text} from 'react-native-elements';
-import moment, {ISO_8601} from 'moment';
+import moment from 'moment';
 import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
-import {observable, computed} from 'mobx';
+import {computed} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
@@ -14,29 +14,52 @@ import FastImage from 'react-native-fast-image';
 
 @inject('itemsStore')
 @inject('authStore')
+@inject('detailsStore')
 @observer
-class ItemCard extends Component {
+class ItemCard extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = {url: require('../../assets/placeholder.jpg')};
+    this.state = {
+      url: require('../../assets/placeholder.jpg'),
+      loaded: false,
+    };
+  }
+
+  @computed get timeStamp() {
+    return moment(this.props.item.updatedAt, 'x').fromNow();
   }
 
   getImage = async () => {
     const ref = storage().ref(this.props.item.image);
     const link = await ref.getDownloadURL().catch((err) => console.log(err));
 
-    this.setState({url: {uri: link}});
+    this.setState({url: {uri: link}, loaded: true});
   };
 
   handleDelete() {
     const {merchantId} = this.props.detailsStore.storeDetails;
-    const {deleteStoreItem} = this.props.itemsStore;
     const {item} = this.props;
 
-    deleteStoreItem(merchantId, item).then(() => {
+    this.props.itemsStore.deleteStoreItem(merchantId, item).then(() => {
       Toast({text: `${item.name} successfully deleted`});
     });
+  }
+
+  handleEditItem() {
+    this.props.itemsStore.selectedItem = this.props.item;
+
+    this.props.itemsStore.editItemModal = true;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.item !== this.props.item) {
+      this.setState({loaded: false});
+    }
+
+    if (!this.state.loaded) {
+      this.getImage();
+    }
   }
 
   componentDidMount() {
@@ -53,8 +76,6 @@ class ItemCard extends Component {
   render() {
     const {item, ...otherProps} = this.props;
     const {url} = this.state;
-
-    const timeStamp = moment(new Date(item.createdAt)).fromNow();
 
     return (
       <View
@@ -98,8 +119,11 @@ class ItemCard extends Component {
             <BaseOptionsMenu
               destructiveIndex={1}
               iconStyle={{color: '#fff', fontSize: 24}}
-              options={['Delete Item']}
-              actions={[this.handleDelete.bind(this)]}
+              options={['Edit Item', 'Delete Item']}
+              actions={[
+                this.handleEditItem.bind(this),
+                this.handleDelete.bind(this),
+              ]}
             />
           </CardItem>
 
@@ -167,7 +191,7 @@ class ItemCard extends Component {
             style={{bottom: 20, marginBottom: -20, elevation: 5}}>
             <Body>
               <Text style={{color: colors.text_secondary}}>
-                Added {timeStamp}
+                Updated {this.timeStamp}
               </Text>
             </Body>
           </CardItem>
