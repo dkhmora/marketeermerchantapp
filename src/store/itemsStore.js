@@ -156,9 +156,10 @@ class ItemsStore {
             .slice()
             .sort((a, b) => a.name > b.name);
 
-          itemCategories.map((category) => {
-            this.setCategoryItems(category);
-          });
+          itemCategories &&
+            itemCategories.map((category) => {
+              this.setCategoryItems(category);
+            });
         }
 
         this.loaded = true;
@@ -167,9 +168,10 @@ class ItemsStore {
           .slice()
           .sort((a, b) => a.name > b.name);
 
-        itemCategories.map((category) => {
-          this.setCategoryItems(category);
-        });
+        itemCategories &&
+          itemCategories.map((category) => {
+            this.setCategoryItems(category);
+          });
       });
   }
 

@@ -64,7 +64,7 @@ class OrderDetailsScreen extends Component {
         },
       ],
       {
-        edgePadding: {left: 40, right: 40, top: 150, bottom: 150},
+        edgePadding: {left: 40, right: 40, top: 100, bottom: 100},
         animated: true,
       },
     );

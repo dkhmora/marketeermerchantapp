@@ -35,12 +35,18 @@ class StoreItemsTab extends Component {
 
   @observable newCategory = '';
   @observable selectedCategory = this.props.detailsStore.storeDetails
-    .itemCategories.slice[0];
+    .itemCategories
+    ? this.props.detailsStore.storeDetails.itemCategories.slice[0]
+    : null;
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
 
   @computed get scrollEnabled() {
-    return this.props.detailsStore.storeDetails.itemCategories.length > 1;
+    if (this.props.detailsStore.storeDetails.itemCategories) {
+      return this.props.detailsStore.storeDetails.itemCategories.length > 1;
+    }
+
+    return false;
   }
 
   @action closeAddCategoryModal() {
@@ -239,11 +245,12 @@ class StoreItemsTab extends Component {
                     selectedValue={this.selectedCategory}
                     iosIcon={<Icon name="arrow-down" />}
                     onValueChange={(value) => this.onValueChange(value)}>
-                    {itemCategories.map((cat, index) => {
-                      return (
-                        <Picker.Item key={index} label={cat} value={cat} />
-                      );
-                    })}
+                    {itemCategories &&
+                      itemCategories.map((cat, index) => {
+                        return (
+                          <Picker.Item key={index} label={cat} value={cat} />
+                        );
+                      })}
                   </Picker>
                 </Item>
               </CardItem>
@@ -291,7 +298,7 @@ class StoreItemsTab extends Component {
               category: 'All',
             }}
           />
-          {itemCategories.length > 0 &&
+          {itemCategories &&
             itemCategories.map((category, index) => {
               return (
                 <TabBase.Screen

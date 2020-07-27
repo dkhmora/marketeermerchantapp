@@ -6,6 +6,7 @@ import {
   Platform,
   ActivityIndicator,
   View,
+  SafeAreaView,
 } from 'react-native';
 import {Card, Body, CardItem, Left, Toast} from 'native-base';
 // Custom Components
@@ -1149,30 +1150,32 @@ class StoreDetailsScreen extends Component {
               </CardItem>
             </Card>
 
-            <Card
-              style={{
-                borderRadius: 10,
-                overflow: 'hidden',
-              }}>
-              <CardItem
-                header
-                bordered
-                style={{backgroundColor: colors.primary}}>
-                <Left>
-                  <Body>
-                    <Text style={{color: colors.icons, fontSize: 20}}>
-                      Sales
-                    </Text>
-                  </Body>
-                </Left>
-              </CardItem>
+            <SafeAreaView>
+              <Card
+                style={{
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                }}>
+                <CardItem
+                  header
+                  bordered
+                  style={{backgroundColor: colors.primary}}>
+                  <Left>
+                    <Body>
+                      <Text style={{color: colors.icons, fontSize: 20}}>
+                        Sales
+                      </Text>
+                    </Body>
+                  </Left>
+                </CardItem>
 
-              <CardItem bordered>
-                <Text style={{textAlign: 'center', width: '100%'}}>
-                  Coming Soon! View your sales summary here in the future.
-                </Text>
-              </CardItem>
-            </Card>
+                <CardItem bordered>
+                  <Text style={{textAlign: 'center', width: '100%'}}>
+                    Coming Soon! View your sales summary here in the future.
+                  </Text>
+                </CardItem>
+              </Card>
+            </SafeAreaView>
           </ScrollView>
         </View>
       );

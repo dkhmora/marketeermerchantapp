@@ -428,9 +428,12 @@ class EditItemModal extends Component {
                   selectedValue={newCategory}
                   iosIcon={<Icon name="arrow-down" />}
                   onValueChange={this.handleCategory.bind(this)}>
-                  {this.categories.map((cat, index) => {
-                    return <Picker.Item key={index} label={cat} value={cat} />;
-                  })}
+                  {this.categories &&
+                    this.categories.map((cat, index) => {
+                      return (
+                        <Picker.Item key={index} label={cat} value={cat} />
+                      );
+                    })}
                 </Picker>
               </Item>
             </View>
