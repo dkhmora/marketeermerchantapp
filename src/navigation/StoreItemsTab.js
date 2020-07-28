@@ -43,7 +43,7 @@ class StoreItemsTab extends Component {
 
   @computed get scrollEnabled() {
     if (this.props.detailsStore.storeDetails.itemCategories) {
-      return this.props.detailsStore.storeDetails.itemCategories.length > 1;
+      return this.props.detailsStore.storeDetails.itemCategories.length > 4;
     }
 
     return false;
@@ -289,7 +289,12 @@ class StoreItemsTab extends Component {
             style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
-            indicatorStyle: {backgroundColor: colors.primary},
+            tabStyle: {width: 100},
+            indicatorStyle: {
+              backgroundColor: colors.primary,
+              width: 50,
+              left: 25,
+            },
           }}>
           <TabBase.Screen
             name="All"
