@@ -42,6 +42,10 @@ class AuthLoader extends React.Component {
           } else {
             !this.props.detailsStore.unsubscribeSetStoreDetails &&
               this.props.detailsStore.setStoreDetails(merchantId);
+
+            navigation.replace('Home', {
+              merchantId,
+            });
           }
         });
 
@@ -54,6 +58,8 @@ class AuthLoader extends React.Component {
 
       this.props.itemsStore.unsubscribeSetStoreItems &&
         this.props.itemsStore.unsubscribeSetStoreItems();
+
+      navigation.replace('Login');
 
       this.props.authStore.appReady = true;
     }
