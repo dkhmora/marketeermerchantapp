@@ -413,7 +413,7 @@ class StoreDetailsScreen extends Component {
                   }}>
                   <Button
                     type="clear"
-                    title="Confirm"
+                    title="Save"
                     titleStyle={{color: colors.icons}}
                     loading={loading}
                     loadingProps={{color: colors.icons}}
@@ -438,7 +438,7 @@ class StoreDetailsScreen extends Component {
                     fontSize: 25,
                     marginRight: 10,
                   }}
-                  options={['Toggle Editing']}
+                  options={['Edit Details']}
                   actions={[this.toggleEditing.bind(this)]}
                 />
               )
