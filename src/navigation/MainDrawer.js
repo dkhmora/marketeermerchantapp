@@ -14,6 +14,7 @@ import {colors} from '../../assets/colors';
 import {View, Platform} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReviewsScreen from '../screens/ReviewsScreen';
+import AccountScreen from '../screens/AccountScreen';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -131,6 +132,12 @@ class MainDrawer extends Component {
         <Drawer.Screen
           name="Delivery Area"
           component={DeliveryAreaScreen}
+          initialParams={{ merchantId }}
+        />
+
+        <Drawer.Screen
+          name="Account Settings"
+          component={AccountScreen}
           initialParams={{merchantId}}
         />
       </Drawer.Navigator>
