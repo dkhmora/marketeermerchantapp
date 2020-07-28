@@ -52,7 +52,6 @@ class StoreDetailsScreen extends Component {
   }
 
   @observable editMode = false;
-  @observable newStoreName = '';
   @observable newStoreDescription = '';
   @observable newFreeDelivery = '';
   @observable newVacationMode = null;
@@ -90,7 +89,6 @@ class StoreDetailsScreen extends Component {
   @action cancelEditing() {
     this.newFreeDelivery = '';
     this.newStoreDescription = '';
-    this.newStoreName = '';
     this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
     this.newPaymentMethods = [];
     this.newShippingMethods = [];
@@ -123,7 +121,6 @@ class StoreDetailsScreen extends Component {
       this.storeDetailsHeaderColor = colors.accent;
       this.newFreeDelivery = freeDelivery;
       this.newStoreDescription = storeDescription;
-      this.newStoreName = storeName;
       this.newVacationMode = vacationMode;
       this.newDeliveryType = deliveryType;
       this.newPaymentMethods = [...paymentMethods];
@@ -280,15 +277,9 @@ class StoreDetailsScreen extends Component {
         });
     }
 
-    const validStoreName = this.newStoreName.replace(
-      /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
-      '',
-    );
-
     if (
       freeDelivery !== this.newFreeDelivery ||
       storeDescription !== this.newStoreDescription ||
-      storeName !== validStoreName ||
       vacationMode !== this.newVacationMode ||
       paymentMethods !== this.newPaymentMethods ||
       shippingMethods !== this.newShippingMethods ||
@@ -297,7 +288,6 @@ class StoreDetailsScreen extends Component {
     ) {
       await this.props.detailsStore
         .updateStoreDetails(
-          validStoreName,
           this.newStoreDescription,
           this.newFreeDelivery,
           this.newVacationMode,
@@ -631,34 +621,20 @@ class StoreDetailsScreen extends Component {
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
                       }}>
-                      Display Name
+                      Store Name
                     </Text>
                   </View>
 
                   <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <Input
-                        maxLength={50}
-                        value={this.newStoreName}
-                        onChangeText={(value) => (this.newStoreName = value)}
-                        inputStyle={{
-                          textAlign: 'right',
-                        }}
-                        containerStyle={{
-                          borderColor: this.storeDetailsHeaderColor,
-                        }}
-                      />
-                    ) : (
-                      <Text
-                        style={{
-                          color: colors.primary,
-                          fontSize: 16,
-                          fontFamily: 'ProductSans-Bold',
-                          textAlign: 'right',
-                        }}>
-                        {storeName}
-                      </Text>
-                    )}
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
+                      }}>
+                      {storeName}
+                    </Text>
                   </View>
                 </View>
               </CardItem>

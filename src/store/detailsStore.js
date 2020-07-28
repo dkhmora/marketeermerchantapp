@@ -191,7 +191,6 @@ class DetailsStore {
   }
 
   @action async updateStoreDetails(
-    storeName,
     storeDescription,
     freeDelivery,
     vacationMode,
@@ -202,7 +201,6 @@ class DetailsStore {
   ) {
     await this.merchantRef
       .update({
-        storeName,
         storeDescription,
         freeDelivery,
         vacationMode,
