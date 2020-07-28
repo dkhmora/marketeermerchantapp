@@ -380,11 +380,12 @@ class StoreDetailsScreen extends Component {
             title={this.props.route.name}
             navigation={this.props.navigation}
             rightComponent={
-              editMode && (
+              editMode ? (
                 <View
                   style={{
                     flexDirection: 'row',
-                    marginLeft: -10,
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
                   }}>
                   <Button
                     type="clear"
@@ -394,12 +395,122 @@ class StoreDetailsScreen extends Component {
                     loadingProps={{color: colors.icons}}
                     onPress={() => this.handleConfirmDetails()}
                   />
+
+                  <Button
+                    type="clear"
+                    color={colors.icons}
+                    icon={<Icon name="x" color={colors.icons} />}
+                    onPress={() => this.cancelEditing()}
+                    titleStyle={{color: colors.icons}}
+                    containerStyle={{
+                      borderRadius: 24,
+                    }}
+                  />
                 </View>
+              ) : (
+                <BaseOptionsMenu
+                  iconStyle={{
+                    color: colors.icons,
+                    fontSize: 25,
+                    marginRight: 10,
+                  }}
+                  options={['Toggle Editing']}
+                  actions={[this.toggleEditing.bind(this)]}
+                />
               )
             }
           />
 
           <ScrollView style={{paddingHorizontal: 10}}>
+            <Card
+              style={{
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}>
+              <CardItem
+                header
+                bordered
+                style={{backgroundColor: colors.primary}}>
+                <Left>
+                  <Body>
+                    <Text style={{color: colors.icons, fontSize: 20}}>
+                      Markee Credits
+                    </Text>
+                  </Body>
+                </Left>
+              </CardItem>
+
+              <CardItem bordered>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 8,
+                  }}>
+                  <View style={{flex: 2, paddingright: 10}}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      Markee Credits
+                    </Text>
+                  </View>
+
+                  <View style={{flex: 3, alignItems: 'flex-end'}}>
+                    {creditData && (
+                      <Text
+                        style={{
+                          color: colors.primary,
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                          textAlign: 'right',
+                        }}>
+                        ₱ {creditData.credits.toFixed(2)}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              </CardItem>
+
+              <CardItem bordered>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 8,
+                  }}>
+                  <View style={{flex: 2, paddingright: 10}}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      Markee Credit Threshold
+                    </Text>
+                  </View>
+
+                  <View style={{flex: 3, alignItems: 'flex-end'}}>
+                    {creditData && (
+                      <Text
+                        style={{
+                          color: colors.primary,
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                          textAlign: 'right',
+                        }}>
+                        ₱ {creditData.creditThreshold}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              </CardItem>
+            </Card>
+
             <Card style={{borderRadius: 10, overflow: 'hidden'}}>
               <CardItem
                 header
@@ -444,34 +555,6 @@ class StoreDetailsScreen extends Component {
                   }}>
                   Store Details
                 </Text>
-
-                <View>
-                  {this.editMode ? (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'flex-end',
-                        justifyContent: 'space-between',
-                      }}>
-                      <Button
-                        type="clear"
-                        color={colors.icons}
-                        icon={<Icon name="x" color={colors.icons} />}
-                        onPress={() => this.cancelEditing()}
-                        titleStyle={{color: colors.icons}}
-                        containerStyle={{
-                          borderRadius: 24,
-                        }}
-                      />
-                    </View>
-                  ) : (
-                    <BaseOptionsMenu
-                      iconStyle={{color: colors.icons, fontSize: 25}}
-                      options={['Toggle Editing']}
-                      actions={[this.toggleEditing.bind(this)]}
-                    />
-                  )}
-                </View>
               </CardItem>
 
               <CardItem bordered>
@@ -654,7 +737,7 @@ class StoreDetailsScreen extends Component {
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
                       }}>
-                      Description
+                      Store Description
                     </Text>
                   </View>
 
@@ -735,151 +818,6 @@ class StoreDetailsScreen extends Component {
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
                       }}>
-                      Free Delivery
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    <Switch
-                      trackColor={{
-                        false: '#767577',
-                        true: this.editMode ? colors.accent : colors.primary,
-                      }}
-                      thumbColor={'#f4f3f4'}
-                      ios_backgroundColor="#3e3e3e"
-                      onValueChange={() =>
-                        (this.newFreeDelivery = !this.newFreeDelivery)
-                      }
-                      value={
-                        this.editMode ? this.newFreeDelivery : freeDelivery
-                      }
-                      disabled={!this.editMode}
-                    />
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Delivery Type
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <View>
-                        <CheckBox
-                          title="Same Day Delivery"
-                          checked={this.newDeliveryType === 'Same Day Delivery'}
-                          checkedIcon="dot-circle-o"
-                          uncheckedIcon="circle-o"
-                          onPress={() =>
-                            (this.newDeliveryType = 'Same Day Delivery')
-                          }
-                        />
-                        <CheckBox
-                          title="Next Day Delivery"
-                          checked={this.newDeliveryType === 'Next Day Delivery'}
-                          checkedIcon="dot-circle-o"
-                          uncheckedIcon="circle-o"
-                          onPress={() =>
-                            (this.newDeliveryType = 'Next Day Delivery')
-                          }
-                        />
-                        <CheckBox
-                          title="Scheduled Delivery"
-                          checked={
-                            this.newDeliveryType === 'Scheduled Delivery'
-                          }
-                          checkedIcon="dot-circle-o"
-                          uncheckedIcon="circle-o"
-                          onPress={() =>
-                            (this.newDeliveryType = 'Scheduled Delivery')
-                          }
-                        />
-                      </View>
-                    ) : (
-                      <Text
-                        style={{
-                          color: colors.primary,
-                          fontSize: 16,
-                          fontFamily: 'ProductSans-Bold',
-                          textAlign: 'right',
-                        }}>
-                        {deliveryType}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Vacation Mode
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    <Switch
-                      trackColor={{
-                        false: '#767577',
-                        true: this.editMode ? colors.accent : colors.primary,
-                      }}
-                      thumbColor={'#f4f3f4'}
-                      ios_backgroundColor="#3e3e3e"
-                      onValueChange={() =>
-                        (this.newVacationMode = !this.newVacationMode)
-                      }
-                      value={
-                        this.editMode ? this.newVacationMode : vacationMode
-                      }
-                      disabled={!this.editMode}
-                    />
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
                       Payment Methods
                     </Text>
                   </View>
@@ -922,7 +860,98 @@ class StoreDetailsScreen extends Component {
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
                       }}>
-                      Shipping Methods
+                      Number of Orders
+                    </Text>
+                  </View>
+
+                  <View style={{flex: 3, alignItems: 'flex-end'}}>
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                        textAlign: 'right',
+                      }}>
+                      {orderNumber ? orderNumber : 0}
+                    </Text>
+                  </View>
+                </View>
+              </CardItem>
+
+              <CardItem bordered>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 8,
+                  }}>
+                  <View style={{flex: 2, paddingright: 10}}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      Vacation Mode
+                    </Text>
+                  </View>
+
+                  <View style={{flex: 3, alignItems: 'flex-end'}}>
+                    <Switch
+                      trackColor={{
+                        false: '#767577',
+                        true: this.editMode ? colors.accent : colors.primary,
+                      }}
+                      thumbColor={'#f4f3f4'}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={() =>
+                        (this.newVacationMode = !this.newVacationMode)
+                      }
+                      value={
+                        this.editMode ? this.newVacationMode : vacationMode
+                      }
+                      disabled={!this.editMode}
+                    />
+                  </View>
+                </View>
+              </CardItem>
+            </Card>
+
+            <Card
+              style={{
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}>
+              <CardItem
+                header
+                bordered
+                style={{backgroundColor: colors.primary}}>
+                <Left>
+                  <Body>
+                    <Text style={{color: colors.icons, fontSize: 20}}>
+                      Delivery Settings
+                    </Text>
+                  </Body>
+                </Left>
+              </CardItem>
+
+              <CardItem bordered>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 8,
+                  }}>
+                  <View style={{flex: 2, paddingright: 10}}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      Delivery Methods
                     </Text>
                   </View>
 
@@ -1015,7 +1044,7 @@ class StoreDetailsScreen extends Component {
                           fontFamily: 'ProductSans-Bold',
                           textAlign: 'right',
                         }}>
-                        {ownDeliveryServiceFee}
+                        ₱{ownDeliveryServiceFee}
                       </Text>
                     )}
                   </View>
@@ -1037,12 +1066,44 @@ class StoreDetailsScreen extends Component {
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
                       }}>
-                      Markee Credits
+                      Delivery Type
                     </Text>
                   </View>
 
                   <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {creditData && (
+                    {this.editMode ? (
+                      <View>
+                        <CheckBox
+                          title="Same Day Delivery"
+                          checked={this.newDeliveryType === 'Same Day Delivery'}
+                          checkedIcon="dot-circle-o"
+                          uncheckedIcon="circle-o"
+                          onPress={() =>
+                            (this.newDeliveryType = 'Same Day Delivery')
+                          }
+                        />
+                        <CheckBox
+                          title="Next Day Delivery"
+                          checked={this.newDeliveryType === 'Next Day Delivery'}
+                          checkedIcon="dot-circle-o"
+                          uncheckedIcon="circle-o"
+                          onPress={() =>
+                            (this.newDeliveryType = 'Next Day Delivery')
+                          }
+                        />
+                        <CheckBox
+                          title="Scheduled Delivery"
+                          checked={
+                            this.newDeliveryType === 'Scheduled Delivery'
+                          }
+                          checkedIcon="dot-circle-o"
+                          uncheckedIcon="circle-o"
+                          onPress={() =>
+                            (this.newDeliveryType = 'Scheduled Delivery')
+                          }
+                        />
+                      </View>
+                    ) : (
                       <Text
                         style={{
                           color: colors.primary,
@@ -1050,7 +1111,7 @@ class StoreDetailsScreen extends Component {
                           fontFamily: 'ProductSans-Bold',
                           textAlign: 'right',
                         }}>
-                        ₱ {creditData.credits.toFixed(2)}
+                        {deliveryType}
                       </Text>
                     )}
                   </View>
@@ -1072,55 +1133,26 @@ class StoreDetailsScreen extends Component {
                         fontSize: 16,
                         fontFamily: 'ProductSans-Bold',
                       }}>
-                      Markee Credit Threshold
+                      Free Delivery
                     </Text>
                   </View>
 
                   <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {creditData && (
-                      <Text
-                        style={{
-                          color: colors.primary,
-                          fontSize: 16,
-                          fontFamily: 'ProductSans-Bold',
-                          textAlign: 'right',
-                        }}>
-                        ₱ {creditData.creditThreshold}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Number of Orders
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    <Text
-                      style={{
-                        color: colors.primary,
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                        textAlign: 'right',
-                      }}>
-                      {orderNumber ? orderNumber : 0}
-                    </Text>
+                    <Switch
+                      trackColor={{
+                        false: '#767577',
+                        true: this.editMode ? colors.accent : colors.primary,
+                      }}
+                      thumbColor={'#f4f3f4'}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={() =>
+                        (this.newFreeDelivery = !this.newFreeDelivery)
+                      }
+                      value={
+                        this.editMode ? this.newFreeDelivery : freeDelivery
+                      }
+                      disabled={!this.editMode}
+                    />
                   </View>
                 </View>
               </CardItem>
