@@ -46,6 +46,16 @@ class OrdersList extends Component {
     return true;
   }
 
+  componentDidMount() {
+    const unsubscribe = this.props.navigation.addListener('tabPress', (e) => {
+      e.preventDefault();
+
+      this.flatList.scrollToOffset({animated: true, offset: 0});
+    });
+
+    return unsubscribe;
+  }
+
   async retrieveOrders() {
     const {merchantId} = this.props.detailsStore.storeDetails;
 
@@ -79,6 +89,7 @@ class OrdersList extends Component {
     return (
       <View style={{flex: 1}}>
         <FlatList
+          ref={(flatList) => (this.flatList = flatList)}
           data={dataSource}
           contentContainerStyle={{flexGrow: 1}}
           initialNumToRender={5}
