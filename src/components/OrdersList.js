@@ -47,13 +47,16 @@ class OrdersList extends Component {
   }
 
   componentDidMount() {
-    const unsubscribe = this.props.navigation.addListener('tabPress', (e) => {
-      e.preventDefault();
+    this.unsubscribeTabPress = this.props.navigation.addListener(
+      'tabPress',
+      (e) => {
+        this.flatList.scrollToOffset({animated: true, offset: 0});
+      },
+    );
+  }
 
-      this.flatList.scrollToOffset({animated: true, offset: 0});
-    });
-
-    return unsubscribe;
+  componentWillUnmount() {
+    this.unsubscribeTabPress && this.unsubscribeTabPress();
   }
 
   async retrieveOrders() {

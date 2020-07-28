@@ -93,7 +93,8 @@ class OrdersTab extends Component {
             inactiveTintcolor: '#eee',
             indicatorStyle: {backgroundColor: colors.primary},
           }}
-          headerMode="none">
+          headerMode="none"
+          backBehavior="initialRoute">
           <TabOrders.Screen name="Pending" component={OrdersList} />
           <TabOrders.Screen name="Unpaid" component={OrdersList} />
           <TabOrders.Screen name="Paid" component={OrdersList} />
