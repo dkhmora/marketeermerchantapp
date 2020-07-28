@@ -61,7 +61,7 @@ class StoreDetailsScreen extends Component {
   @observable newDeliveryType = '';
   @observable newOwnDeliveryServiceFee = '0';
   @observable newFreeDeliveryMinimum = '0';
-  @observable storeDetailsHeaderColor = colors.primary;
+  @observable editModeHeaderColor = colors.primary;
 
   componentDidMount() {
     const {displayImageUrl, coverImageUrl} = this.state;
@@ -96,7 +96,7 @@ class StoreDetailsScreen extends Component {
     this.newShippingMethods = [];
     this.newOwnDeliveryServiceFee = '0';
     this.newFreeDeliveryMinimum = '0';
-    this.storeDetailsHeaderColor = colors.primary;
+    this.editModeHeaderColor = colors.primary;
 
     this.setState({
       displayImageUrl: this.state.oldDisplayImageUrl,
@@ -121,7 +121,7 @@ class StoreDetailsScreen extends Component {
     if (this.editMode) {
       this.cancelEditing();
     } else {
-      this.storeDetailsHeaderColor = colors.accent;
+      this.editModeHeaderColor = colors.accent;
       this.newFreeDelivery = freeDelivery;
       this.newStoreDescription = storeDescription;
       this.newVacationMode = vacationMode;
@@ -492,7 +492,7 @@ class StoreDetailsScreen extends Component {
                           fontFamily: 'ProductSans-Bold',
                           textAlign: 'right',
                         }}>
-                        ₱ {creditData.credits.toFixed(2)}
+                        ₱{creditData.credits.toFixed(2)}
                       </Text>
                     )}
                   </View>
@@ -527,7 +527,7 @@ class StoreDetailsScreen extends Component {
                           fontFamily: 'ProductSans-Bold',
                           textAlign: 'right',
                         }}>
-                        ₱ {creditData.creditThreshold}
+                        ₱{creditData.creditThreshold}
                       </Text>
                     )}
                   </View>
@@ -566,7 +566,7 @@ class StoreDetailsScreen extends Component {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  backgroundColor: this.storeDetailsHeaderColor,
+                  backgroundColor: this.editModeHeaderColor,
                   paddingLeft: 25,
                   paddingBottom: 0,
                   paddingTop: 0,
@@ -640,7 +640,7 @@ class StoreDetailsScreen extends Component {
                         borderRadius: 10,
                         borderWidth: 1,
                         borderColor: this.editMode
-                          ? this.storeDetailsHeaderColor
+                          ? this.editModeHeaderColor
                           : colors.primary,
                       }}
                     />
@@ -704,7 +704,7 @@ class StoreDetailsScreen extends Component {
                         borderRadius: 10,
                         borderWidth: 1,
                         borderColor: this.editMode
-                          ? this.storeDetailsHeaderColor
+                          ? this.editModeHeaderColor
                           : colors.primary,
                         resizeMode: 'cover',
                       }}
@@ -776,7 +776,7 @@ class StoreDetailsScreen extends Component {
                         }
                         inputStyle={{textAlign: 'right'}}
                         containerStyle={{
-                          borderColor: this.storeDetailsHeaderColor,
+                          borderColor: this.editModeHeaderColor,
                         }}
                       />
                     ) : (
@@ -950,7 +950,7 @@ class StoreDetailsScreen extends Component {
               <CardItem
                 header
                 bordered
-                style={{backgroundColor: colors.primary}}>
+                style={{backgroundColor: this.editModeHeaderColor}}>
                 <Left>
                   <Body>
                     <Text style={{color: colors.icons, fontSize: 20}}>
@@ -1046,6 +1046,7 @@ class StoreDetailsScreen extends Component {
                     {this.editMode ? (
                       <Input
                         value={this.newOwnDeliveryServiceFee}
+                        leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
                         errorMessage={
                           newOwnDeliveryServiceFeeError &&
                           newOwnDeliveryServiceFeeError
@@ -1055,7 +1056,7 @@ class StoreDetailsScreen extends Component {
                         }
                         inputStyle={{textAlign: 'right'}}
                         containerStyle={{
-                          borderColor: this.storeDetailsHeaderColor,
+                          borderColor: this.editModeHeaderColor,
                         }}
                       />
                     ) : (
@@ -1202,6 +1203,7 @@ class StoreDetailsScreen extends Component {
                     {this.editMode ? (
                       <Input
                         value={this.newFreeDeliveryMinimum}
+                        leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
                         errorMessage={
                           newFreeDeliveryMinimumError &&
                           newFreeDeliveryMinimumError
@@ -1211,7 +1213,7 @@ class StoreDetailsScreen extends Component {
                         }
                         inputStyle={{textAlign: 'right'}}
                         containerStyle={{
-                          borderColor: this.storeDetailsHeaderColor,
+                          borderColor: this.editModeHeaderColor,
                         }}
                       />
                     ) : (
