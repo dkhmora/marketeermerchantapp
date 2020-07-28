@@ -1,4 +1,4 @@
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/functions';
@@ -135,7 +135,7 @@ class ItemsStore {
       .where('updatedAt', '>', this.maxItemsUpdatedAt)
       .orderBy('updatedAt', 'desc')
       .onSnapshot(async (querySnapshot) => {
-        if (!querySnapshot.empty) {
+        if (querySnapshot && !querySnapshot.empty) {
           await querySnapshot.docChanges().forEach(async (change, index) => {
             const newItems = change.doc.data().items;
 

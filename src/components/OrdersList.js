@@ -28,8 +28,19 @@ class OrdersList extends Component {
 
       return orderList;
     }
-
     return [];
+  }
+
+  @computed get orderLoading() {
+    if (
+      this.props.detailsStore.storeDetails.orderNumber &&
+      this.props.ordersStore.orders.length ===
+        this.props.detailsStore.storeDetails.orderNumber
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
   async retrieveOrders() {
@@ -74,7 +85,7 @@ class OrdersList extends Component {
           refreshControl={
             <RefreshControl
               colors={[colors.primary, colors.dark]}
-              refreshing={loading}
+              refreshing={loading || this.orderLoading}
               onRefresh={this.onRefresh.bind(this)}
             />
           }
