@@ -45,15 +45,29 @@ const theme = {
       fontFamily: 'ProductSans-Light',
     },
   },
+  CheckBox: {
+    checkedColor: colors.accent,
+    containerStyle: {
+      borderRadius: 30,
+      backgroundColor: colors.icons,
+      borderColor: colors.icons,
+      elevation: 2,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: 0.2,
+      shadowRadius: 1.41,
+    },
+  },
 };
 
 @inject('authStore')
 @observer
 class Setup extends Component {
-  componentDidMount() {
+  componentDidMount() {}
 
-  }
-  
   render() {
     const {appReady} = this.props.authStore;
 
