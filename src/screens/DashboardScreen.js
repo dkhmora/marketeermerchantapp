@@ -44,6 +44,7 @@ class StoreDetailsScreen extends Component {
       ownServiceCheckbox: false,
       sameDayDeliveryCheckbox: false,
       newOwnDeliveryServiceFeeError: null,
+      newFreeDeliveryMinimumError: null,
       displayImageUrl: null,
       coverImageUrl: null,
       oldDisplayImageUrl: null,
@@ -58,7 +59,8 @@ class StoreDetailsScreen extends Component {
   @observable newPaymentMethods = [];
   @observable newShippingMethods = [];
   @observable newDeliveryType = '';
-  @observable newOwnDeliveryServiceFee = 0;
+  @observable newOwnDeliveryServiceFee = '0';
+  @observable newFreeDeliveryMinimum = '0';
   @observable storeDetailsHeaderColor = colors.primary;
 
   componentDidMount() {
@@ -93,6 +95,7 @@ class StoreDetailsScreen extends Component {
     this.newPaymentMethods = [];
     this.newShippingMethods = [];
     this.newOwnDeliveryServiceFee = '0';
+    this.newFreeDeliveryMinimum = '0';
     this.storeDetailsHeaderColor = colors.primary;
 
     this.setState({
@@ -107,12 +110,12 @@ class StoreDetailsScreen extends Component {
     const {
       freeDelivery,
       storeDescription,
-      storeName,
       vacationMode,
       deliveryType,
       paymentMethods,
       shippingMethods,
       ownDeliveryServiceFee,
+      freeDeliveryMinimum,
     } = this.props.detailsStore.storeDetails;
 
     if (this.editMode) {
@@ -127,6 +130,9 @@ class StoreDetailsScreen extends Component {
       this.newShippingMethods = [...shippingMethods];
       this.newOwnDeliveryServiceFee = ownDeliveryServiceFee
         ? String(ownDeliveryServiceFee)
+        : '0';
+      this.newFreeDeliveryMinimum = freeDeliveryMinimum
+        ? String(freeDeliveryMinimum)
         : '0';
 
       this.setState({
@@ -241,6 +247,20 @@ class StoreDetailsScreen extends Component {
     }
   }
 
+  handleFreeDeliveryMinimum(freeDeliveryMinimum) {
+    const numberRegexp = /^[0-9]+$/;
+
+    this.newFreeDeliveryMinimum = freeDeliveryMinimum;
+
+    if (!numberRegexp.test(Number(freeDeliveryMinimum))) {
+      this.setState({
+        newFreeDeliveryMinimumError: 'Price can only consist of numbers',
+      });
+    } else {
+      this.setState({newFreeDeliveryMinimumError: null});
+    }
+  }
+
   async handleConfirmDetails() {
     const {
       displayImageUrl,
@@ -251,12 +271,12 @@ class StoreDetailsScreen extends Component {
     const {
       freeDelivery,
       storeDescription,
-      storeName,
       vacationMode,
       paymentMethods,
       shippingMethods,
       deliveryType,
       ownDeliveryServiceFee,
+      freeDeliveryMinimum,
     } = this.props.detailsStore.storeDetails;
 
     this.setState({loading: true});
@@ -284,7 +304,8 @@ class StoreDetailsScreen extends Component {
       paymentMethods !== this.newPaymentMethods ||
       shippingMethods !== this.newShippingMethods ||
       deliveryType !== this.newDeliveryType ||
-      ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee
+      ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee ||
+      freeDeliveryMinimum !== this.newFreeDeliveryMinimum
     ) {
       await this.props.detailsStore
         .updateStoreDetails(
@@ -295,6 +316,7 @@ class StoreDetailsScreen extends Component {
           this.newShippingMethods,
           this.newDeliveryType,
           Number(this.newOwnDeliveryServiceFee),
+          Number(this.newFreeDeliveryMinimum),
         )
         .then(() => {
           Toast.show({
@@ -362,6 +384,7 @@ class StoreDetailsScreen extends Component {
       orderNumber,
       storeCategory,
       ownDeliveryServiceFee,
+      freeDeliveryMinimum,
     } = this.props.detailsStore.storeDetails;
 
     const {
@@ -369,6 +392,7 @@ class StoreDetailsScreen extends Component {
       displayImageUrl,
       loading,
       newOwnDeliveryServiceFeeError,
+      newFreeDeliveryMinimumError,
     } = this.state;
 
     const {editMode, newPaymentMethods, newShippingMethods} = this;
@@ -1021,8 +1045,6 @@ class StoreDetailsScreen extends Component {
                   <View style={{flex: 3, alignItems: 'flex-end'}}>
                     {this.editMode ? (
                       <Input
-                        multiline
-                        maxLength={200}
                         value={this.newOwnDeliveryServiceFee}
                         errorMessage={
                           newOwnDeliveryServiceFeeError &&
@@ -1153,6 +1175,56 @@ class StoreDetailsScreen extends Component {
                       }
                       disabled={!this.editMode}
                     />
+                  </View>
+                </View>
+              </CardItem>
+
+              <CardItem bordered>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 8,
+                  }}>
+                  <View style={{flex: 2, paddingright: 10}}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>
+                      Free Delivery Minimum Order Amount
+                    </Text>
+                  </View>
+
+                  <View style={{flex: 3, alignItems: 'flex-end'}}>
+                    {this.editMode ? (
+                      <Input
+                        value={this.newFreeDeliveryMinimum}
+                        errorMessage={
+                          newFreeDeliveryMinimumError &&
+                          newFreeDeliveryMinimumError
+                        }
+                        onChangeText={(value) =>
+                          this.handleFreeDeliveryMinimum(value)
+                        }
+                        inputStyle={{textAlign: 'right'}}
+                        containerStyle={{
+                          borderColor: this.storeDetailsHeaderColor,
+                        }}
+                      />
+                    ) : (
+                      <Text
+                        style={{
+                          color: colors.primary,
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                          textAlign: 'right',
+                        }}>
+                        ₱{freeDeliveryMinimum ? freeDeliveryMinimum : 0}
+                      </Text>
+                    )}
                   </View>
                 </View>
               </CardItem>

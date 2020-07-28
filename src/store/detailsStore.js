@@ -198,16 +198,20 @@ class DetailsStore {
     shippingMethods,
     deliveryType,
     ownDeliveryServiceFee,
+    freeDeliveryMinimum,
   ) {
     await this.merchantRef
       .update({
         storeDescription,
         freeDelivery,
+        freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
         vacationMode,
         paymentMethods,
         shippingMethods,
         deliveryType,
-        ownDeliveryServiceFee,
+        ownDeliveryServiceFee: ownDeliveryServiceFee
+          ? ownDeliveryServiceFee
+          : 0,
         updatedAt: firestore.Timestamp.now().toMillis(),
       })
       .then(() => console.log('Merchant details successfully updated!'))
