@@ -339,25 +339,25 @@ class AddItemScreen extends Component {
                   alignItems: 'center',
                   paddingHorizontal: 10,
                 }}>
-                <Text style={{fontSize: 16, fontFamily: 'ProductSans-Regular'}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: 'ProductSans-Regular',
+                  }}>
                   Category:
                 </Text>
 
-                <Item style={{paddingHorizontal: 10, flex: 1}}>
-                  <Picker
-                    note={false}
-                    placeholder="Select Item Category"
-                    mode="dropdown"
-                    selectedValue={this.category}
-                    iosIcon={<Icon name="arrow-down" />}
-                    onValueChange={this.handleCategory.bind(this)}>
-                    {this.categories.map((cat, index) => {
-                      return (
-                        <Picker.Item key={index} label={cat} value={cat} />
-                      );
-                    })}
-                  </Picker>
-                </Item>
+                <Picker
+                  note={false}
+                  placeholder="Select Item Category"
+                  mode="dropdown"
+                  selectedValue={this.category}
+                  iosIcon={<Icon name="chevron-down" />}
+                  onValueChange={this.handleCategory.bind(this)}>
+                  {this.categories.map((cat, index) => {
+                    return <Picker.Item key={index} label={cat} value={cat} />;
+                  })}
+                </Picker>
               </View>
 
               <View style={{marginTop: 18}}>
@@ -366,6 +366,7 @@ class AddItemScreen extends Component {
                   maxLength={80}
                   autoCapitalize="words"
                   placeholder="Item Name"
+                  placeholderTextColor={colors.text_secondary}
                   value={this.name}
                   onChangeText={(value) => this.handleName(value)}
                 />
@@ -384,6 +385,7 @@ class AddItemScreen extends Component {
                   multiline
                   maxLength={150}
                   placeholder="Item Description"
+                  placeholderTextColor={colors.text_secondary}
                   value={this.description}
                   autoCapitalize="sentences"
                   onChangeText={(value) => this.handleDescription(value)}
@@ -408,6 +410,7 @@ class AddItemScreen extends Component {
                   <View style={{flex: 1}}>
                     <Input
                       placeholder="Price"
+                      placeholderTextColor={colors.text_secondary}
                       keyboardType="number-pad"
                       errorMessage={priceError}
                       value={this.price}
@@ -429,6 +432,7 @@ class AddItemScreen extends Component {
                   <View style={{flex: 1}}>
                     <Input
                       placeholder="Unit"
+                      placeholderTextColor={colors.text_secondary}
                       autoCapitalize="none"
                       value={this.unit}
                       onChangeText={(value) => (this.unit = value)}
@@ -440,6 +444,7 @@ class AddItemScreen extends Component {
                       errorMessage={stockError}
                       keyboardType="number-pad"
                       placeholder="Initial Stock"
+                      placeholderTextColor={colors.text_secondary}
                       value={this.stock}
                       onChangeText={(value) => this.handleStock(value)}
                     />
@@ -449,6 +454,7 @@ class AddItemScreen extends Component {
 
               <Input
                 placeholder="Discounted Price"
+                placeholderTextColor={colors.text_secondary}
                 keyboardType="number-pad"
                 errorMessage={discountedPriceError}
                 value={this.discountedPrice}

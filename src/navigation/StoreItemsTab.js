@@ -41,14 +41,6 @@ class StoreItemsTab extends Component {
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
 
-  @computed get scrollEnabled() {
-    if (this.props.detailsStore.storeDetails.itemCategories) {
-      return this.props.detailsStore.storeDetails.itemCategories.length > 4;
-    }
-
-    return false;
-  }
-
   @action closeAddCategoryModal() {
     this.addCategoryModal = false;
     this.newCategory = '';
@@ -285,15 +277,15 @@ class StoreItemsTab extends Component {
 
         <TabBase.Navigator
           tabBarOptions={{
-            scrollEnabled: this.scrollEnabled,
+            scrollEnabled: true,
             style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
-            tabStyle: {width: 100},
+            tabStyle: {width: 120},
             indicatorStyle: {
               backgroundColor: colors.primary,
-              width: 50,
-              left: 25,
+              width: 70,
+              left: (120 - 70) / 2,
             },
           }}>
           <TabBase.Screen

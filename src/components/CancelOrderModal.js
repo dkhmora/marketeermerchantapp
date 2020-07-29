@@ -5,6 +5,7 @@ import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
 import {inject, observer} from 'mobx-react';
 import Toast from './Toast';
+import {colors} from '../../assets/colors';
 
 @inject('ordersStore')
 @observer
@@ -92,19 +93,18 @@ class CancelOrderModal extends Component {
             ?
           </Text>
 
-          <View style={[styles.action]}>
-            <Input
-              numberOfLines={8}
-              maxLength={600}
-              placeholder="Reason for Cancellation"
-              value={this.state.cancelReason}
-              onChangeText={(value) => this.handleCancelReasonChange(value)}
-              style={{
-                borderRadius: 24,
-              }}
-              inputStyle={{textAlignVertical: 'top'}}
-            />
-          </View>
+          <Input
+            numberOfLines={8}
+            maxLength={600}
+            placeholder="Reason for Cancellation"
+            placeholderTextColor={colors.text_secondary}
+            value={this.state.cancelReason}
+            onChangeText={(value) => this.handleCancelReasonChange(value)}
+            style={{
+              borderRadius: 24,
+            }}
+            inputStyle={{textAlignVertical: 'top'}}
+          />
 
           {cancelReasonCheck ? (
             <Animatable.View

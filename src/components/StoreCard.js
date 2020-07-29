@@ -130,7 +130,7 @@ class StoreCard extends Component {
                         color: colors.text_primary,
                         fontFamily: 'ProductSans-Black',
                       }}>
-                      Free Delivery
+                      Free Delivery (₱{store.freeDeliveryMinimum} Min.)
                     </Text>
                   )}
                 </View>

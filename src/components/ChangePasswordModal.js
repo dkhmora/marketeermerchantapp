@@ -3,6 +3,7 @@ import {Overlay, Text, Button, Icon, Input} from 'react-native-elements';
 import {View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {inject, observer} from 'mobx-react';
+import { colors } from '../../assets/colors';
 
 @inject('authStore')
 @observer
@@ -127,6 +128,7 @@ class ChangePasswordModal extends Component {
             secureTextEntry
             errorMessage={currentPasswordError && currentPasswordError}
             placeholder="Current Password"
+            placeholderTextColor={colors.text_secondary}
             value={this.state.currentPassword}
             onChangeText={(value) => this.handleCurrentPasswordChange(value)}
           />
@@ -136,6 +138,7 @@ class ChangePasswordModal extends Component {
               maxLength={32}
               secureTextEntry
               placeholder="New Password"
+              placeholderTextColor={colors.text_secondary}
               errorMessage={
                 this.state.newPasswordError && this.state.newPasswordError
               }
@@ -163,6 +166,7 @@ class ChangePasswordModal extends Component {
             maxLength={32}
             secureTextEntry
             placeholder="Confirm New Password"
+            placeholderTextColor={colors.text_secondary}
             errorMessage={
               this.state.confirmNewPasswordError &&
               this.state.confirmNewPasswordError

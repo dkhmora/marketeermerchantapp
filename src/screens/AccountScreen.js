@@ -68,7 +68,16 @@ class AccountScreen extends Component {
                   fontSize: 16,
                   textAlignVertical: 'center',
                 }}>
-                Email address: {userEmail}
+                Email address:{' '}
+              </Text>
+
+              <Text
+                style={{
+                  flex: 1,
+                  fontSize: 16,
+                  textAlignVertical: 'center',
+                }}>
+                {userEmail}
               </Text>
             </CardItem>
 

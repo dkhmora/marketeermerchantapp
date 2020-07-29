@@ -54,7 +54,7 @@ class StoreDetailsScreen extends Component {
 
   @observable editMode = false;
   @observable newStoreDescription = '';
-  @observable newFreeDelivery = '';
+  @observable newFreeDelivery = null;
   @observable newVacationMode = null;
   @observable newPaymentMethods = [];
   @observable newShippingMethods = [];
@@ -89,7 +89,7 @@ class StoreDetailsScreen extends Component {
   }
 
   @action cancelEditing() {
-    this.newFreeDelivery = '';
+    this.newFreeDelivery = null;
     this.newStoreDescription = '';
     this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
     this.newPaymentMethods = [];
