@@ -7,6 +7,7 @@ import {
   Linking,
   ActivityIndicator,
   SectionList,
+  SafeAreaView,
 } from 'react-native';
 import BaseHeader from '../components/BaseHeader';
 import {FlatList, ScrollView} from 'react-native-gesture-handler';
@@ -131,7 +132,7 @@ class OrderDetailsScreen extends Component {
     ];
 
     return (
-      <Container>
+      <View style={{flex: 1}}>
         <BaseHeader
           title={`Order #${order.merchantOrderNumber} Details`}
           backButton
@@ -145,8 +146,7 @@ class OrderDetailsScreen extends Component {
           style={{
             flex: 1,
             flexDirection: 'column',
-            marginHorizontal: 6,
-            marginVertical: 3,
+            paddingHorizontal: 10,
           }}>
           <Card
             style={{
@@ -297,95 +297,7 @@ class OrderDetailsScreen extends Component {
             </CardItem>
           </Card>
 
-          <Card
-            style={{
-              borderRadius: 10,
-              overflow: 'hidden',
-            }}>
-            <CardItem header bordered style={{backgroundColor: colors.primary}}>
-              <Text style={{color: colors.icons, fontSize: 20}}>
-                Order Items
-              </Text>
-            </CardItem>
-
-            {loading ? (
-              <ActivityIndicator color={colors.primary} size="large" />
-            ) : (
-              this.OrderItemsList(orderItems)
-            )}
-
-            <CardItem bordered>
-              <Left>
-                <Text note>{order.quantity} items</Text>
-              </Left>
-              <Right>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: colors.text_primary,
-                      fontFamily: 'ProductSans-Light',
-                    }}>
-                    Subtotal:{' '}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      color: colors.primary,
-                      fontFamily: 'ProductSans-Black',
-                    }}>
-                    ₱ {order.totalAmount}
-                  </Text>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: colors.text_primary,
-                      fontFamily: 'ProductSans-Light',
-                    }}>
-                    Estimated Shipping Price:{' '}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      color: colors.primary,
-                      fontFamily: 'ProductSans-Black',
-                    }}>
-                    ₱ {order.shippingPrice}130-200
-                  </Text>
-                </View>
-              </Right>
-            </CardItem>
-
-            <CardItem footer bordered>
-              <Left />
-
-              <Right>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: colors.text_primary,
-                      fontFamily: 'ProductSans-Light',
-                    }}>
-                    Order Total:{' '}
-                  </Text>
-
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      color: colors.primary,
-                      fontFamily: 'ProductSans-Black',
-                    }}>
-                    ₱ {order.totalAmount + 130} - ₱ {order.totalAmount + 200}
-                  </Text>
-                </View>
-              </Right>
-            </CardItem>
-          </Card>
-
-          {order.orderStatus.cancelled.status && (
+          <SafeAreaView>
             <Card
               style={{
                 borderRadius: 10,
@@ -396,20 +308,113 @@ class OrderDetailsScreen extends Component {
                 bordered
                 style={{backgroundColor: colors.primary}}>
                 <Text style={{color: colors.icons, fontSize: 20}}>
-                  Reason for Cancellation
+                  Order Items
                 </Text>
               </CardItem>
-              <CardItem>
-                <Body>
-                  <Text style={{width: '100%', textAlign: 'justify'}}>
-                    {order.orderStatus.cancelled.reason}
-                  </Text>
-                </Body>
+
+              {loading ? (
+                <ActivityIndicator color={colors.primary} size="large" />
+              ) : (
+                this.OrderItemsList(orderItems)
+              )}
+
+              <CardItem bordered>
+                <Left>
+                  <Text note>{order.quantity} items</Text>
+                </Left>
+                <Right>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: colors.text_primary,
+                        fontFamily: 'ProductSans-Light',
+                      }}>
+                      Subtotal:{' '}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        color: colors.primary,
+                        fontFamily: 'ProductSans-Black',
+                      }}>
+                      ₱ {order.totalAmount}
+                    </Text>
+                  </View>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: colors.text_primary,
+                        fontFamily: 'ProductSans-Light',
+                      }}>
+                      Estimated Shipping Price:{' '}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        color: colors.primary,
+                        fontFamily: 'ProductSans-Black',
+                      }}>
+                      ₱ {order.shippingPrice}130-200
+                    </Text>
+                  </View>
+                </Right>
+              </CardItem>
+
+              <CardItem footer bordered>
+                <Left />
+
+                <Right>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: colors.text_primary,
+                        fontFamily: 'ProductSans-Light',
+                      }}>
+                      Order Total:{' '}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        color: colors.primary,
+                        fontFamily: 'ProductSans-Black',
+                      }}>
+                      ₱ {order.totalAmount + 130} - ₱ {order.totalAmount + 200}
+                    </Text>
+                  </View>
+                </Right>
               </CardItem>
             </Card>
-          )}
+
+            {order.orderStatus.cancelled.status && (
+              <Card
+                style={{
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                }}>
+                <CardItem
+                  header
+                  bordered
+                  style={{backgroundColor: colors.primary}}>
+                  <Text style={{color: colors.icons, fontSize: 20}}>
+                    Reason for Cancellation
+                  </Text>
+                </CardItem>
+                <CardItem>
+                  <Body>
+                    <Text style={{width: '100%', textAlign: 'justify'}}>
+                      {order.orderStatus.cancelled.reason}
+                    </Text>
+                  </Body>
+                </CardItem>
+              </Card>
+            )}
+          </SafeAreaView>
         </ScrollView>
-      </Container>
+      </View>
     );
   }
 }
