@@ -475,7 +475,11 @@ class DeliveryAreaScreen extends Component {
                   }}>
                   <Button
                     title="Cancel Changes"
-                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    titleStyle={{
+                      color: colors.icons,
+                      paddingRight: 5,
+                      fontSize: 15,
+                    }}
                     icon={<Icon name="x" color={colors.icons} />}
                     iconRight
                     onPress={() => this.handleCancelChanges()}
@@ -484,7 +488,11 @@ class DeliveryAreaScreen extends Component {
                   />
                   <Button
                     title="Save Changes"
-                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    titleStyle={{
+                      color: colors.icons,
+                      paddingRight: 5,
+                      fontSize: 15,
+                    }}
                     icon={<Icon name="save" color={colors.icons} />}
                     iconRight
                     buttonStyle={{backgroundColor: colors.accent}}
