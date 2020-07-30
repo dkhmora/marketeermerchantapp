@@ -39,7 +39,9 @@ class EditItemModal extends Component {
     };
   }
 
-  @observable categories = this.props.detailsStore.storeDetails.itemCategories;
+  @computed get categories() {
+    return this.props.detailsStore.storeDetails.itemCategories;
+  }
 
   componentDidUpdate(prevProps, prevState) {
     if (
