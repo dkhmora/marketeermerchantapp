@@ -33,6 +33,12 @@ class MainDrawer extends Component {
     Linking.openURL(url);
   }
 
+  openPrivacyPolicy() {
+    const url = 'https://marketeer.ph/components/pages/privacypolicy';
+
+    Linking.openURL(url);
+  }
+
   handleSignOut() {
     this.props.authStore.appReady = false;
 
@@ -80,6 +86,20 @@ class MainDrawer extends Component {
                 <DrawerItem
                   onPress={() => this.openTermsAndConditions()}
                   label="Terms and Conditions"
+                  labelStyle={{
+                    fontFamily: 'ProductSans-Light',
+                    padding: 10,
+                  }}
+                  style={{
+                    marginHorizontal: 0,
+                    marginVertical: 0,
+                    borderRadius: 0,
+                  }}
+                />
+
+                <DrawerItem
+                  onPress={() => this.openPrivacyPolicy()}
+                  label="Privacy Policy"
                   labelStyle={{
                     fontFamily: 'ProductSans-Light',
                     padding: 10,

@@ -47,7 +47,6 @@ export const styles = StyleSheet.create({
   touchable_text: {
     fontFamily: 'ProductSans-Bold',
     color: colors.primary,
-    marginTop: 1,
   },
   action: {
     flexDirection: 'row',

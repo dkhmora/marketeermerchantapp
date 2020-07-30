@@ -93,6 +93,12 @@ class LoginScreen extends Component {
     Linking.openURL(url);
   }
 
+  openPrivacyPolicy() {
+    const url = 'https://marketeer.ph/components/pages/privacypolicy';
+
+    Linking.openURL(url);
+  }
+
   render() {
     const {navigation} = this.props;
     const {emailCheck} = this.state;
@@ -194,7 +200,19 @@ class LoginScreen extends Component {
               <TouchableOpacity onPress={() => this.openTermsAndConditions()}>
                 <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
                   {' '}
-                  Terms and Conditions
+                  Terms and Conditions{' '}
+                </Text>
+              </TouchableOpacity>
+
+              <Text
+                style={([styles.color_textPrivate], {textAlign: 'justify'})}>
+                and
+              </Text>
+
+              <TouchableOpacity onPress={() => this.openPrivacyPolicy()}>
+                <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
+                  {' '}
+                  Privacy Policy
                 </Text>
               </TouchableOpacity>
             </View>
