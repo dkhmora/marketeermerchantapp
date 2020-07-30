@@ -14,6 +14,7 @@ import {observer, inject} from 'mobx-react';
 import {Icon, SocialIcon, Button} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 @inject('authStore')
 @observer
@@ -119,7 +120,7 @@ class LoginScreen extends Component {
           useNativeDriver
           animation="fadeInUpBig"
           style={styles.footer}>
-          <ScrollView>
+          <KeyboardAwareScrollView>
             <Text style={styles.text_header}>Login</Text>
 
             <Text style={styles.text_footer}>Email Address</Text>
@@ -226,7 +227,7 @@ class LoginScreen extends Component {
                 <Text style={styles.touchable_text}>Come and join us!</Text>
               </TouchableOpacity>
             </View>
-          </ScrollView>
+          </KeyboardAwareScrollView>
         </Animatable.View>
       </View>
     );

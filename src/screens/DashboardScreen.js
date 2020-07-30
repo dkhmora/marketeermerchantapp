@@ -22,6 +22,7 @@ import {colors} from '../../assets/colors';
 import {Switch} from 'react-native-gesture-handler';
 import StoreCard from '../components/StoreCard';
 import FastImage from 'react-native-fast-image';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -445,7 +446,7 @@ class StoreDetailsScreen extends Component {
             }
           />
 
-          <ScrollView style={{paddingHorizontal: 10}}>
+          <KeyboardAwareScrollView style={{paddingHorizontal: 10}}>
             <Card
               style={{
                 borderRadius: 10,
@@ -1258,7 +1259,7 @@ class StoreDetailsScreen extends Component {
                 </CardItem>
               </Card>
             </SafeAreaView>
-          </ScrollView>
+          </KeyboardAwareScrollView>
         </View>
       );
     }
