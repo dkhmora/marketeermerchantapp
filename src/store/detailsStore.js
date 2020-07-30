@@ -156,7 +156,7 @@ class DetailsStore {
       });
   }
 
-  @action async uploadImage(imagePath, type, currentImagePath) {
+  @action async uploadImage(imagePath, type) {
     const {merchantId} = this.storeDetails;
     const fileExtension = imagePath.split('.').pop();
     const imageRef = `/images/merchants/${merchantId}/${type}.${fileExtension}`;
@@ -182,11 +182,6 @@ class DetailsStore {
           `Merchant ${_.capitalize(type)} image path successfully set!`,
         ),
       )
-      .then(() => {
-        if (!(imageRef === currentImagePath)) {
-          this.deleteImage(currentImagePath);
-        }
-      })
       .catch((err) => console.log(err));
   }
 

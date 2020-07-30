@@ -284,7 +284,7 @@ class StoreDetailsScreen extends Component {
 
     if (coverImageUrl !== oldCoverImageUrl) {
       await this.props.detailsStore
-        .uploadImage(coverImageUrl.uri, 'cover', oldCoverImageUrl)
+        .uploadImage(coverImageUrl.uri, 'cover')
         .then(() => {
           this.setState({oldCoverImageUrl: coverImageUrl});
         });
@@ -292,7 +292,7 @@ class StoreDetailsScreen extends Component {
 
     if (displayImageUrl !== oldDisplayImageUrl) {
       await this.props.detailsStore
-        .uploadImage(displayImageUrl.uri, 'display', oldDisplayImageUrl)
+        .uploadImage(displayImageUrl.uri, 'display')
         .then(() => {
           this.setState({oldDisplayImageUrl: displayImageUrl});
         });
