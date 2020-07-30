@@ -3,6 +3,7 @@ import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItemList,
+  DrawerItem,
 } from '@react-navigation/drawer';
 import StoreItemsScreen from '../screens/StoreItemsScreen';
 import DashboardScreen from '../screens/DashboardScreen';
@@ -11,7 +12,7 @@ import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
 import {Button, Icon} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import {View, Platform} from 'react-native';
+import {View, Platform, Linking} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReviewsScreen from '../screens/ReviewsScreen';
 import AccountScreen from '../screens/AccountScreen';
@@ -24,6 +25,12 @@ import AccountScreen from '../screens/AccountScreen';
 class MainDrawer extends Component {
   constructor(props) {
     super(props);
+  }
+
+  openTermsAndConditions() {
+    const url = 'https://marketeer.ph/components/pages/termsofservice';
+
+    Linking.openURL(url);
   }
 
   handleSignOut() {
@@ -61,9 +68,23 @@ class MainDrawer extends Component {
                   {...props}
                   labelStyle={{
                     fontFamily: 'ProductSans-Light',
-                    paddingVertical: 10,
+                    padding: 10,
                   }}
                   itemStyle={{
+                    marginHorizontal: 0,
+                    marginVertical: 0,
+                    borderRadius: 0,
+                  }}
+                />
+
+                <DrawerItem
+                  onPress={() => this.openTermsAndConditions()}
+                  label="Terms and Conditions"
+                  labelStyle={{
+                    fontFamily: 'ProductSans-Light',
+                    padding: 10,
+                  }}
+                  style={{
                     marginHorizontal: 0,
                     marginVertical: 0,
                     borderRadius: 0,
@@ -132,7 +153,7 @@ class MainDrawer extends Component {
         <Drawer.Screen
           name="Delivery Area"
           component={DeliveryAreaScreen}
-          initialParams={{ merchantId }}
+          initialParams={{merchantId}}
         />
 
         <Drawer.Screen
