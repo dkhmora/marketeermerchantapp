@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Overlay, Text, Button, Icon, Image, Input} from 'react-native-elements';
-import {View, TextInput} from 'react-native';
+import {View, TextInput, SafeAreaView} from 'react-native';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
@@ -322,7 +322,7 @@ class EditItemModal extends Component {
         width="auto"
         height="auto"
         overlayStyle={{flex: 1, padding: 0}}>
-        <View style={{flex: 1}}>
+        <SafeAreaView style={{flex: 1}}>
           <View
             style={{
               flexDirection: 'row',
@@ -584,7 +584,7 @@ class EditItemModal extends Component {
               />
             </View>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Overlay>
     );
   }
