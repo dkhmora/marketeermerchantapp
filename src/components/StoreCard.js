@@ -60,28 +60,29 @@ class StoreCard extends Component {
     const {paymentMethods} = this.props.store;
     const pills = [];
 
-    paymentMethods.map((method, index) => {
-      pills.push(
-        <View
-          key={index}
-          style={{
-            borderRadius: 20,
-            backgroundColor: colors.accent,
-            padding: 3,
-            paddingHorizontal: 10,
-            marginRight: 2,
-          }}>
-          <Text
+    paymentMethods &&
+      paymentMethods.map((method, index) => {
+        pills.push(
+          <View
+            key={index}
             style={{
-              fontSize: 13,
-              fontFamily: 'ProductSans-Regular',
-              color: colors.icons,
+              borderRadius: 20,
+              backgroundColor: colors.accent,
+              padding: 3,
+              paddingHorizontal: 10,
+              marginRight: 2,
             }}>
-            {method}
-          </Text>
-        </View>,
-      );
-    });
+            <Text
+              style={{
+                fontSize: 13,
+                fontFamily: 'ProductSans-Regular',
+                color: colors.icons,
+              }}>
+              {method}
+            </Text>
+          </View>,
+        );
+      });
 
     return pills;
   };

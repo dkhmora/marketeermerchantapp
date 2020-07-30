@@ -28,7 +28,7 @@ class MainDrawer extends Component {
   }
 
   openTermsAndConditions() {
-    const url = 'https://marketeer.ph/components/pages/termsofservice';
+    const url = 'https://marketeer.ph/components/pages/termsandconditions';
 
     Linking.openURL(url);
   }

@@ -127,8 +127,8 @@ class StoreDetailsScreen extends Component {
       this.newStoreDescription = storeDescription;
       this.newVacationMode = vacationMode;
       this.newDeliveryType = deliveryType;
-      this.newPaymentMethods = [...paymentMethods];
-      this.newShippingMethods = [...shippingMethods];
+      this.newPaymentMethods = paymentMethods ? [...paymentMethods] : [];
+      this.newShippingMethods = shippingMethods ? [...shippingMethods] : [];
       this.newOwnDeliveryServiceFee = ownDeliveryServiceFee
         ? String(ownDeliveryServiceFee)
         : '0';

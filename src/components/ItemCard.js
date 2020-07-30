@@ -57,7 +57,7 @@ class ItemCard extends PureComponent {
       this.setState({loaded: false});
     }
 
-    if (!this.state.loaded) {
+    if (!this.state.loaded && this.props.item.image) {
       this.getImage();
     }
   }

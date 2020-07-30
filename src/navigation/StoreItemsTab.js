@@ -75,7 +75,10 @@ class StoreItemsTab extends Component {
   handleAddCategory() {
     const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
 
-    if (!itemCategories.includes(this.newCategory)) {
+    if (
+      (itemCategories && !itemCategories.includes(this.newCategory)) ||
+      !itemCategories
+    ) {
       this.props.itemsStore
         .addItemCategory(merchantId, this.newCategory)
         .then(() => {
@@ -108,6 +111,7 @@ class StoreItemsTab extends Component {
     const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
 
     if (itemCategories.includes(this.selectedCategory)) {
+      const category = this.selectedCategory;
       this.props.itemsStore
         .deleteItemCategory(merchantId, this.selectedCategory)
         .then(() => {
@@ -115,7 +119,7 @@ class StoreItemsTab extends Component {
 
           this.closeDeleteCategoryModal();
           Toast.show({
-            text: `Category "${this.selectedCategory}" successfully deleted!`,
+            text: `Category "${category}" successfully deleted!`,
             buttonText: 'Okay',
             type: 'success',
             duration: 5000,

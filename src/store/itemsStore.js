@@ -106,7 +106,11 @@ class ItemsStore {
       .get()
       .then((documentSnapshot) => {
         if (
-          !documentSnapshot.data().itemCategories.includes(formattedCategory)
+          (documentSnapshot.data().itemCategories &&
+            !documentSnapshot
+              .data()
+              .itemCategories.includes(formattedCategory)) ||
+          !documentSnapshot.data().itemCategories
         ) {
           documentSnapshot.ref
             .update(

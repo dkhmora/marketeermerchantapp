@@ -10,8 +10,10 @@ import {observer, inject} from 'mobx-react';
 import ItemCard from './ItemCard';
 import {colors} from '../../assets/colors';
 import {Text, Icon} from 'react-native-elements';
+import Toast from './Toast';
 
 @inject('itemsStore')
+@inject('detailsStore')
 @observer
 class ItemsList extends Component {
   constructor(props) {
@@ -116,9 +118,21 @@ class ItemsList extends Component {
         <Fab
           position="bottomRight"
           style={{backgroundColor: colors.accent}}
-          onPress={() =>
-            navigation.navigate('Add Item', {pageCategory: category})
-          }>
+          onPress={() => {
+            if (
+              this.props.detailsStore.storeDetails.itemCategories &&
+              this.props.detailsStore.storeDetails.itemCategories.length > 0
+            ) {
+              navigation.navigate('Add Item', {pageCategory: category});
+            } else {
+              Toast({
+                text: 'Please add a category before adding an item.',
+                type: 'danger',
+                buttonText: 'Okay',
+                duration: 6000,
+              });
+            }
+          }}>
           <Icon name="plus" color={colors.icons} />
         </Fab>
       </Container>
