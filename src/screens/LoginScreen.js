@@ -75,7 +75,7 @@ class LoginScreen extends Component {
 
   openMerchantSignUpForm() {
     const merchantFormUrl =
-      'https://docs.google.com/forms/d/e/1FAIpQLSfH5koRomOIcJgDrluuEOQ7GpB7q77lThZuFivSYfz7Ec8tag/viewform?usp=sf_link';
+      'https://marketeer.ph/components/pages/partnermerchantsignup';
 
     Linking.canOpenURL(merchantFormUrl).then((supported) => {
       if (supported) {
@@ -84,6 +84,12 @@ class LoginScreen extends Component {
         console.log("Don't know how to open URI: " + merchantFormUrl);
       }
     });
+  }
+
+  openTermsAndConditions() {
+    const url = 'https://marketeer.ph/components/pages/termsofservice';
+
+    Linking.openURL(url);
   }
 
   render() {
@@ -171,6 +177,27 @@ class LoginScreen extends Component {
               </TouchableOpacity>
             </View>
 
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                paddingTop: 10,
+                flexWrap: 'wrap',
+              }}>
+              <Text
+                style={([styles.color_textPrivate], {textAlign: 'justify'})}>
+                By using our service, you agree to our
+              </Text>
+
+              <TouchableOpacity onPress={() => this.openTermsAndConditions()}>
+                <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
+                  {' '}
+                  Terms and Conditions
+                </Text>
+              </TouchableOpacity>
+            </View>
+
             <Button
               onPress={() => this.handleSignIn()}
               title="Login"
@@ -191,13 +218,12 @@ class LoginScreen extends Component {
                 flexDirection: 'row',
                 justifyContent: 'center',
                 paddingTop: 10,
+                flexWrap: 'wrap',
               }}>
-              <Text style={styles.color_textPrivate}>
-                Are you a merchant? Come and join us! Register
-              </Text>
+              <Text style={styles.color_textPrivate}>Are you a merchant? </Text>
 
               <TouchableOpacity onPress={() => this.openMerchantSignUpForm()}>
-                <Text style={styles.touchable_text}> here</Text>
+                <Text style={styles.touchable_text}>Come and join us!</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
