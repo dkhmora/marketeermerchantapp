@@ -43,8 +43,13 @@ class MainDrawer extends Component {
     this.props.authStore.appReady = false;
 
     this.props.authStore.signOut().then(() => {
+      this.props.detailsStore.storeDetails = {};
+      this.props.detailsStore.subscribedToNotifications = false;
+      this.props.detailsStore.unsubscribeSetStoreDetails();
+      this.props.detailsStore.unsubscribeSetStoreDetails = null;
       this.props.ordersStore.orders = [];
       this.props.ordersStore.maxOrderUpdatedAt = 0;
+      this.props.itemsStore.categoryItems = new Map();
       this.props.itemsStore.storeItems = [];
       this.props.itemsStore.maxItemsUpdatedAt = 0;
 
