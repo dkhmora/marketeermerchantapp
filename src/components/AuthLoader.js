@@ -75,7 +75,7 @@ class AuthLoader extends React.Component {
     return subscriber;
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     const {navigation} = this.props;
     const {merchantId} = this.props.detailsStore.storeDetails;
     const {user} = this.state;

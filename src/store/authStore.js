@@ -14,7 +14,9 @@ class AuthStore {
     return await auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => console.log('signed in succesfully'))
-      .catch((err) => console.log(err));
+      .catch((err) =>
+        Toast({text: err, type: 'danger', duration: 5000, buttonText: 'Okay'}),
+      );
   }
 
   @action async signOut() {

@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1549607298:android:64efe0b99dd1b52409af9b",
+        "mobilesdk_app_id": "1:1549607298:android:d63bbbc9245fb10e09af9b",
         "android_client_info": {
-          "package_name": "com.marketeerph.marketeermerchantapp"
+          "package_name": "com.marketeerph.marketeerclientapp.android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1549607298-6c2jet8dr53fqgeu5nf0ggv5bh9idbq4.apps.googleusercontent.com",
+          "client_id": "1549607298-l9ecpmg0o7mo7pcftmqp2vomt9to2e2m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.marketeerph.marketeermerchantapp",
+            "package_name": "com.marketeerph.marketeerclientapp.android",
             "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
@@ -40,10 +40,62 @@
               "client_type": 3
             },
             {
-              "client_id": "1549607298-iks0jrkpfh1qebul8nsj28h8u1uq8dmd.apps.googleusercontent.com",
+              "client_id": "1549607298-q1290th7j81hiiemr00bftuoo3k62mnh.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "org.reactjs.native.example.marketeermerchantapp"
+                "bundle_id": "com.marketeerph.marketeerclientapp.ios"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1549607298:android:64efe0b99dd1b52409af9b",
+        "android_client_info": {
+          "package_name": "com.marketeerph.marketeermerchantapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1549607298-qtk09go80g1p9e8j1cre0gf6lga875hm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marketeerph.marketeermerchantapp",
+            "certificate_hash": "7e5a86756b8d982aed0066a716c4e064722ab5cf"
+          }
+        },
+        {
+          "client_id": "1549607298-d55iv52402ijdo9mpa3j0hhcvbegjpq8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marketeerph.marketeermerchantapp",
+            "certificate_hash": "9b3a7020802581a55d7d888880235be320cba2a8"
+          }
+        },
+        {
+          "client_id": "1549607298-928kle9cvet18h9s0jv87pb8inokrrbd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgo8Ds4N80HWTdjal9AW1jQyLcXxaQAgg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1549607298-928kle9cvet18h9s0jv87pb8inokrrbd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1549607298-q1290th7j81hiiemr00bftuoo3k62mnh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.marketeerph.marketeerclientapp.ios"
               }
             }
           ]
