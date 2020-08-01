@@ -117,7 +117,7 @@ class LoginScreen extends Component {
             style={{
               height: 150,
               width: 200,
-              resizeMode: 'center',
+              resizeMode: 'contain',
             }}
           />
         </Animatable.View>
