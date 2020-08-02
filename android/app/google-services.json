@@ -30,6 +30,9 @@
       "api_key": [
         {
           "current_key": "AIzaSyAgo8Ds4N80HWTdjal9AW1jQyLcXxaQAgg"
+        },
+        {
+          "current_key": "AIzaSyBa9vUzayrrx44R1KPpZxtEO-2BQXAlkGA"
         }
       ],
       "services": {
@@ -82,6 +85,64 @@
       "api_key": [
         {
           "current_key": "AIzaSyAgo8Ds4N80HWTdjal9AW1jQyLcXxaQAgg"
+        },
+        {
+          "current_key": "AIzaSyBa9vUzayrrx44R1KPpZxtEO-2BQXAlkGA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1549607298-928kle9cvet18h9s0jv87pb8inokrrbd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1549607298-q1290th7j81hiiemr00bftuoo3k62mnh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.marketeerph.marketeerclientapp.ios"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1549607298:android:af63de4dc47e34db09af9b",
+        "android_client_info": {
+          "package_name": "com.marketeerph.marketeermerchantapp.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1549607298-ah62onrnt7vkcoqr8khpg7k2a2mhte1p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marketeerph.marketeermerchantapp.android",
+            "certificate_hash": "9b3a7020802581a55d7d888880235be320cba2a8"
+          }
+        },
+        {
+          "client_id": "1549607298-u25idokn4fh6a7kb1cntqdp451j4ss6a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marketeerph.marketeermerchantapp.android",
+            "certificate_hash": "e5e53ea2194a8c3cccc14bc261cd257e3134aceb"
+          }
+        },
+        {
+          "client_id": "1549607298-928kle9cvet18h9s0jv87pb8inokrrbd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgo8Ds4N80HWTdjal9AW1jQyLcXxaQAgg"
+        },
+        {
+          "current_key": "AIzaSyBa9vUzayrrx44R1KPpZxtEO-2BQXAlkGA"
         }
       ],
       "services": {
