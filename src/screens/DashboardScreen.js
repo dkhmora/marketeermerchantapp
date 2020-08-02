@@ -6,6 +6,7 @@ import {
   Platform,
   ActivityIndicator,
   View,
+  SafeAreaView,
 } from 'react-native';
 import {Card, Body, CardItem, Left, Toast} from 'native-base';
 // Custom Components
@@ -21,6 +22,7 @@ import {colors} from '../../assets/colors';
 import {Switch} from 'react-native-gesture-handler';
 import StoreCard from '../components/StoreCard';
 import FastImage from 'react-native-fast-image';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -43,6 +45,7 @@ class StoreDetailsScreen extends Component {
       ownServiceCheckbox: false,
       sameDayDeliveryCheckbox: false,
       newOwnDeliveryServiceFeeError: null,
+      newFreeDeliveryMinimumError: null,
       displayImageUrl: null,
       coverImageUrl: null,
       oldDisplayImageUrl: null,
@@ -51,15 +54,15 @@ class StoreDetailsScreen extends Component {
   }
 
   @observable editMode = false;
-  @observable newStoreName = '';
   @observable newStoreDescription = '';
-  @observable newFreeDelivery = '';
+  @observable newFreeDelivery = null;
   @observable newVacationMode = null;
   @observable newPaymentMethods = [];
   @observable newShippingMethods = [];
   @observable newDeliveryType = '';
-  @observable newOwnDeliveryServiceFee = 0;
-  @observable storeDetailsHeaderColor = colors.primary;
+  @observable newOwnDeliveryServiceFee = '0';
+  @observable newFreeDeliveryMinimum = '0';
+  @observable editModeHeaderColor = colors.primary;
 
   componentDidMount() {
     const {displayImageUrl, coverImageUrl} = this.state;
@@ -87,14 +90,14 @@ class StoreDetailsScreen extends Component {
   }
 
   @action cancelEditing() {
-    this.newFreeDelivery = '';
+    this.newFreeDelivery = null;
     this.newStoreDescription = '';
-    this.newStoreName = '';
     this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
     this.newPaymentMethods = [];
     this.newShippingMethods = [];
     this.newOwnDeliveryServiceFee = '0';
-    this.storeDetailsHeaderColor = colors.primary;
+    this.newFreeDeliveryMinimum = '0';
+    this.editModeHeaderColor = colors.primary;
 
     this.setState({
       displayImageUrl: this.state.oldDisplayImageUrl,
@@ -108,27 +111,29 @@ class StoreDetailsScreen extends Component {
     const {
       freeDelivery,
       storeDescription,
-      storeName,
       vacationMode,
       deliveryType,
       paymentMethods,
       shippingMethods,
       ownDeliveryServiceFee,
+      freeDeliveryMinimum,
     } = this.props.detailsStore.storeDetails;
 
     if (this.editMode) {
       this.cancelEditing();
     } else {
-      this.storeDetailsHeaderColor = colors.accent;
+      this.editModeHeaderColor = colors.accent;
       this.newFreeDelivery = freeDelivery;
       this.newStoreDescription = storeDescription;
-      this.newStoreName = storeName;
       this.newVacationMode = vacationMode;
       this.newDeliveryType = deliveryType;
-      this.newPaymentMethods = [...paymentMethods];
-      this.newShippingMethods = [...shippingMethods];
+      this.newPaymentMethods = paymentMethods ? [...paymentMethods] : [];
+      this.newShippingMethods = shippingMethods ? [...shippingMethods] : [];
       this.newOwnDeliveryServiceFee = ownDeliveryServiceFee
         ? String(ownDeliveryServiceFee)
+        : '0';
+      this.newFreeDeliveryMinimum = freeDeliveryMinimum
+        ? String(freeDeliveryMinimum)
         : '0';
 
       this.setState({
@@ -243,6 +248,20 @@ class StoreDetailsScreen extends Component {
     }
   }
 
+  handleFreeDeliveryMinimum(freeDeliveryMinimum) {
+    const numberRegexp = /^[0-9]+$/;
+
+    this.newFreeDeliveryMinimum = freeDeliveryMinimum;
+
+    if (!numberRegexp.test(Number(freeDeliveryMinimum))) {
+      this.setState({
+        newFreeDeliveryMinimumError: 'Price can only consist of numbers',
+      });
+    } else {
+      this.setState({newFreeDeliveryMinimumError: null});
+    }
+  }
+
   async handleConfirmDetails() {
     const {
       displayImageUrl,
@@ -253,19 +272,19 @@ class StoreDetailsScreen extends Component {
     const {
       freeDelivery,
       storeDescription,
-      storeName,
       vacationMode,
       paymentMethods,
       shippingMethods,
       deliveryType,
       ownDeliveryServiceFee,
+      freeDeliveryMinimum,
     } = this.props.detailsStore.storeDetails;
 
     this.setState({loading: true});
 
     if (coverImageUrl !== oldCoverImageUrl) {
       await this.props.detailsStore
-        .uploadImage(coverImageUrl.uri, 'cover', oldCoverImageUrl)
+        .uploadImage(coverImageUrl.uri, 'cover')
         .then(() => {
           this.setState({oldCoverImageUrl: coverImageUrl});
         });
@@ -273,30 +292,24 @@ class StoreDetailsScreen extends Component {
 
     if (displayImageUrl !== oldDisplayImageUrl) {
       await this.props.detailsStore
-        .uploadImage(displayImageUrl.uri, 'display', oldDisplayImageUrl)
+        .uploadImage(displayImageUrl.uri, 'display')
         .then(() => {
           this.setState({oldDisplayImageUrl: displayImageUrl});
         });
     }
 
-    const validStoreName = this.newStoreName.replace(
-      /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
-      '',
-    );
-
     if (
       freeDelivery !== this.newFreeDelivery ||
       storeDescription !== this.newStoreDescription ||
-      storeName !== validStoreName ||
       vacationMode !== this.newVacationMode ||
       paymentMethods !== this.newPaymentMethods ||
       shippingMethods !== this.newShippingMethods ||
       deliveryType !== this.newDeliveryType ||
-      ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee
+      ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee ||
+      freeDeliveryMinimum !== this.newFreeDeliveryMinimum
     ) {
       await this.props.detailsStore
         .updateStoreDetails(
-          validStoreName,
           this.newStoreDescription,
           this.newFreeDelivery,
           this.newVacationMode,
@@ -304,6 +317,7 @@ class StoreDetailsScreen extends Component {
           this.newShippingMethods,
           this.newDeliveryType,
           Number(this.newOwnDeliveryServiceFee),
+          Number(this.newFreeDeliveryMinimum),
         )
         .then(() => {
           Toast.show({
@@ -371,6 +385,7 @@ class StoreDetailsScreen extends Component {
       orderNumber,
       storeCategory,
       ownDeliveryServiceFee,
+      freeDeliveryMinimum,
     } = this.props.detailsStore.storeDetails;
 
     const {
@@ -378,6 +393,7 @@ class StoreDetailsScreen extends Component {
       displayImageUrl,
       loading,
       newOwnDeliveryServiceFeeError,
+      newFreeDeliveryMinimumError,
     } = this.state;
 
     const {editMode, newPaymentMethods, newShippingMethods} = this;
@@ -389,265 +405,336 @@ class StoreDetailsScreen extends Component {
             title={this.props.route.name}
             navigation={this.props.navigation}
             rightComponent={
-              editMode && (
+              editMode ? (
                 <View
                   style={{
                     flexDirection: 'row',
-                    marginLeft: -10,
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
                   }}>
                   <Button
                     type="clear"
-                    title="Confirm"
+                    title="Save"
                     titleStyle={{color: colors.icons}}
                     loading={loading}
                     loadingProps={{color: colors.icons}}
                     onPress={() => this.handleConfirmDetails()}
                   />
+
+                  <Button
+                    type="clear"
+                    color={colors.icons}
+                    icon={<Icon name="x" color={colors.icons} />}
+                    onPress={() => this.cancelEditing()}
+                    titleStyle={{color: colors.icons}}
+                    containerStyle={{
+                      borderRadius: 24,
+                    }}
+                  />
                 </View>
+              ) : (
+                <BaseOptionsMenu
+                  iconStyle={{
+                    color: colors.icons,
+                    fontSize: 25,
+                    marginRight: 10,
+                  }}
+                  options={['Edit Details']}
+                  actions={[this.toggleEditing.bind(this)]}
+                />
               )
             }
           />
 
-          <ScrollView style={{paddingHorizontal: 10}}>
-            <Card style={{borderRadius: 10, overflow: 'hidden'}}>
-              <CardItem
-                header
-                bordered
-                style={{backgroundColor: colors.primary}}>
-                <Left>
-                  <Body>
-                    <Text style={{color: colors.icons, fontSize: 20}}>
-                      Store Card Preview
-                    </Text>
-                  </Body>
-                </Left>
-              </CardItem>
-              <CardItem bordered style={{flex: 1}}>
-                <StoreCard store={this.props.detailsStore.storeDetails} />
-              </CardItem>
-            </Card>
-
-            <Card
-              style={{
-                borderRadius: 10,
-                overflow: 'hidden',
-              }}>
-              <CardItem
-                header
-                bordered
+          <KeyboardAwareScrollView style={{paddingHorizontal: 10}}>
+            <SafeAreaView>
+              <Card
                 style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  backgroundColor: this.storeDetailsHeaderColor,
-                  paddingLeft: 25,
-                  paddingBottom: 0,
-                  paddingTop: 0,
+                  borderRadius: 10,
+                  overflow: 'hidden',
                 }}>
-                <Text
-                  style={{
-                    color: colors.icons,
-                    fontSize: 20,
-                    paddingVertical: 16,
-                  }}>
-                  Store Details
-                </Text>
+                <CardItem
+                  header
+                  bordered
+                  style={{backgroundColor: colors.primary}}>
+                  <Left>
+                    <Body>
+                      <Text style={{color: colors.icons, fontSize: 20}}>
+                        Markee Credits
+                      </Text>
+                    </Body>
+                  </Left>
+                </CardItem>
 
-                <View>
-                  {this.editMode ? (
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Markee Credits
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      {creditData && (
+                        <Text
+                          style={{
+                            color: colors.primary,
+                            fontSize: 16,
+                            fontFamily: 'ProductSans-Bold',
+                            textAlign: 'right',
+                          }}>
+                          ₱{creditData.credits.toFixed(2)}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                </CardItem>
+
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Markee Credit Threshold
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      {creditData && (
+                        <Text
+                          style={{
+                            color: colors.primary,
+                            fontSize: 16,
+                            fontFamily: 'ProductSans-Bold',
+                            textAlign: 'right',
+                          }}>
+                          ₱{creditData.creditThreshold}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                </CardItem>
+              </Card>
+
+              <Card style={{borderRadius: 10, overflow: 'hidden'}}>
+                <CardItem
+                  header
+                  bordered
+                  style={{backgroundColor: colors.primary}}>
+                  <Left>
+                    <Body>
+                      <Text style={{color: colors.icons, fontSize: 20}}>
+                        Store Card Preview
+                      </Text>
+                    </Body>
+                  </Left>
+                </CardItem>
+                <CardItem bordered style={{flex: 1}}>
+                  <StoreCard store={this.props.detailsStore.storeDetails} />
+                </CardItem>
+              </Card>
+
+              <Card
+                style={{
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                }}>
+                <CardItem
+                  header
+                  bordered
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    backgroundColor: this.editModeHeaderColor,
+                    paddingLeft: 25,
+                    paddingBottom: 0,
+                    paddingTop: 0,
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.icons,
+                      fontSize: 20,
+                      paddingVertical: 16,
+                    }}>
+                    Store Details
+                  </Text>
+                </CardItem>
+
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{paddingRight: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Display Image
+                      </Text>
+
+                      {this.editMode && (
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                          }}>
+                          <Button
+                            type="clear"
+                            titleStyle={{color: colors.accent}}
+                            color={colors.icons}
+                            onPress={() => this.handleTakePhoto('display')}
+                            icon={<Icon name="camera" color={colors.accent} />}
+                            containerStyle={{borderRadius: 24}}
+                          />
+
+                          <Button
+                            type="clear"
+                            titleStyle={{color: colors.accent}}
+                            color={colors.icons}
+                            onPress={() => this.handleSelectImage('display')}
+                            icon={<Icon name="image" color={colors.accent} />}
+                            containerStyle={{borderRadius: 24}}
+                          />
+                        </View>
+                      )}
+                    </View>
+
                     <View
                       style={{
-                        flexDirection: 'row',
+                        flex: 1,
+                        alignSelf: 'flex-start',
                         alignItems: 'flex-end',
-                        justifyContent: 'space-between',
                       }}>
-                      <Button
-                        type="clear"
-                        color={colors.icons}
-                        icon={<Icon name="x" color={colors.icons} />}
-                        onPress={() => this.cancelEditing()}
-                        titleStyle={{color: colors.icons}}
-                        containerStyle={{
-                          borderRadius: 24,
+                      <FastImage
+                        source={displayImageUrl}
+                        style={{
+                          width: '70%',
+                          aspectRatio: 1,
+                          backgroundColor: '#e1e4e8',
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: this.editMode
+                            ? this.editModeHeaderColor
+                            : colors.primary,
                         }}
                       />
                     </View>
-                  ) : (
-                    <BaseOptionsMenu
-                      iconStyle={{color: colors.icons, fontSize: 25}}
-                      options={['Toggle Editing']}
-                      actions={[this.toggleEditing.bind(this)]}
-                    />
-                  )}
-                </View>
-              </CardItem>
+                  </View>
+                </CardItem>
 
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{paddingRight: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Display Image
-                    </Text>
-
-                    {this.editMode && (
-                      <View
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{paddingRight: 10}}>
+                      <Text
                         style={{
-                          flexDirection: 'row',
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
                         }}>
-                        <Button
-                          type="clear"
-                          titleStyle={{color: colors.accent}}
-                          color={colors.icons}
-                          onPress={() => this.handleTakePhoto('display')}
-                          icon={<Icon name="camera" color={colors.accent} />}
-                          containerStyle={{borderRadius: 24}}
-                        />
+                        Cover Image
+                      </Text>
 
-                        <Button
-                          type="clear"
-                          titleStyle={{color: colors.accent}}
-                          color={colors.icons}
-                          onPress={() => this.handleSelectImage('display')}
-                          icon={<Icon name="image" color={colors.accent} />}
-                          containerStyle={{borderRadius: 24}}
-                        />
-                      </View>
-                    )}
-                  </View>
+                      {this.editMode && (
+                        <View style={{flexDirection: 'row'}}>
+                          <Button
+                            type="clear"
+                            color={colors.icons}
+                            titleStyle={{color: colors.accent}}
+                            icon={<Icon name="camera" color={colors.accent} />}
+                            onPress={() => this.handleTakePhoto('cover')}
+                            containerStyle={{borderRadius: 24}}
+                          />
+                          <Button
+                            type="clear"
+                            color={colors.icons}
+                            titleStyle={{color: colors.accent}}
+                            icon={<Icon name="image" color={colors.accent} />}
+                            onPress={() => this.handleSelectImage('cover')}
+                            containerStyle={{borderRadius: 24}}
+                          />
+                        </View>
+                      )}
+                    </View>
 
-                  <View
-                    style={{
-                      flex: 1,
-                      alignSelf: 'flex-start',
-                      alignItems: 'flex-end',
-                    }}>
-                    <FastImage
-                      source={displayImageUrl}
+                    <View
                       style={{
-                        width: '70%',
-                        aspectRatio: 1,
-                        backgroundColor: '#e1e4e8',
-                        borderRadius: 10,
-                        borderWidth: 1,
-                        borderColor: this.editMode
-                          ? this.storeDetailsHeaderColor
-                          : colors.primary,
-                      }}
-                    />
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{paddingRight: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
+                        flex: 1,
+                        alignSelf: 'flex-start',
+                        alignItems: 'flex-end',
                       }}>
-                      Cover Image
-                    </Text>
-
-                    {this.editMode && (
-                      <View style={{flexDirection: 'row'}}>
-                        <Button
-                          type="clear"
-                          color={colors.icons}
-                          titleStyle={{color: colors.accent}}
-                          icon={<Icon name="camera" color={colors.accent} />}
-                          onPress={() => this.handleTakePhoto('cover')}
-                          containerStyle={{borderRadius: 24}}
-                        />
-                        <Button
-                          type="clear"
-                          color={colors.icons}
-                          titleStyle={{color: colors.accent}}
-                          icon={<Icon name="image" color={colors.accent} />}
-                          onPress={() => this.handleSelectImage('cover')}
-                          containerStyle={{borderRadius: 24}}
-                        />
-                      </View>
-                    )}
-                  </View>
-
-                  <View
-                    style={{
-                      flex: 1,
-                      alignSelf: 'flex-start',
-                      alignItems: 'flex-end',
-                    }}>
-                    <FastImage
-                      source={coverImageUrl}
-                      style={{
-                        width: '100%',
-                        aspectRatio: 1620 / 1080,
-                        backgroundColor: '#e1e4e8',
-                        alignSelf: 'center',
-                        borderRadius: 10,
-                        borderWidth: 1,
-                        borderColor: this.editMode
-                          ? this.storeDetailsHeaderColor
-                          : colors.primary,
-                        resizeMode: 'cover',
-                      }}
-                    />
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Display Name
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <Input
-                        maxLength={50}
-                        value={this.newStoreName}
-                        onChangeText={(value) => (this.newStoreName = value)}
-                        inputStyle={{
-                          textAlign: 'right',
-                        }}
-                        containerStyle={{
-                          borderColor: this.storeDetailsHeaderColor,
+                      <FastImage
+                        source={coverImageUrl}
+                        style={{
+                          width: '100%',
+                          aspectRatio: 1620 / 1080,
+                          backgroundColor: '#e1e4e8',
+                          alignSelf: 'center',
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: this.editMode
+                            ? this.editModeHeaderColor
+                            : colors.primary,
+                          resizeMode: 'cover',
                         }}
                       />
-                    ) : (
+                    </View>
+                  </View>
+                </CardItem>
+
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Store Name
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
                       <Text
                         style={{
                           color: colors.primary,
@@ -657,523 +744,536 @@ class StoreDetailsScreen extends Component {
                         }}>
                         {storeName}
                       </Text>
-                    )}
+                    </View>
                   </View>
-                </View>
-              </CardItem>
+                </CardItem>
 
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Description
-                    </Text>
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Store Description
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      {this.editMode ? (
+                        <Input
+                          multiline
+                          maxLength={200}
+                          value={this.newStoreDescription}
+                          onChangeText={(value) =>
+                            (this.newStoreDescription = value)
+                          }
+                          inputStyle={{textAlign: 'right'}}
+                          containerStyle={{
+                            borderColor: this.editModeHeaderColor,
+                          }}
+                        />
+                      ) : (
+                        <Text
+                          style={{
+                            color: colors.primary,
+                            fontSize: 16,
+                            fontFamily: 'ProductSans-Bold',
+                            textAlign: 'right',
+                          }}>
+                          {storeDescription}
+                        </Text>
+                      )}
+                    </View>
                   </View>
+                </CardItem>
 
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <Input
-                        multiline
-                        maxLength={200}
-                        value={this.newStoreDescription}
-                        onChangeText={(value) =>
-                          (this.newStoreDescription = value)
-                        }
-                        inputStyle={{textAlign: 'right'}}
-                        containerStyle={{
-                          borderColor: this.storeDetailsHeaderColor,
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Store Category
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      <Text
+                        style={{
+                          color: colors.primary,
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                          textAlign: 'right',
+                        }}>
+                        {storeCategory}
+                      </Text>
+                    </View>
+                  </View>
+                </CardItem>
+
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Payment Methods
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      {this.editMode ? (
+                        <View>
+                          <CheckBox
+                            title="COD"
+                            checked={newPaymentMethods.includes('COD')}
+                            onPress={() => this.handlePaymentMethods('COD')}
+                          />
+                          <CheckBox
+                            title="Online Banking"
+                            checked={newPaymentMethods.includes(
+                              'Online Banking',
+                            )}
+                            onPress={() =>
+                              this.handlePaymentMethods('Online Banking')
+                            }
+                          />
+                        </View>
+                      ) : (
+                        this.CategoryPills(paymentMethods)
+                      )}
+                    </View>
+                  </View>
+                </CardItem>
+
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Number of Orders
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      <Text
+                        style={{
+                          color: colors.primary,
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                          textAlign: 'right',
+                        }}>
+                        {orderNumber ? orderNumber : 0}
+                      </Text>
+                    </View>
+                  </View>
+                </CardItem>
+
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Vacation Mode
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      <Switch
+                        trackColor={{
+                          false: '#767577',
+                          true: this.editMode ? colors.accent : colors.primary,
                         }}
+                        thumbColor={'#f4f3f4'}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={() =>
+                          (this.newVacationMode = !this.newVacationMode)
+                        }
+                        value={
+                          this.editMode ? this.newVacationMode : vacationMode
+                        }
+                        disabled={!this.editMode}
                       />
-                    ) : (
+                    </View>
+                  </View>
+                </CardItem>
+              </Card>
+
+              <Card
+                style={{
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                }}>
+                <CardItem
+                  header
+                  bordered
+                  style={{backgroundColor: this.editModeHeaderColor}}>
+                  <Left>
+                    <Body>
+                      <Text style={{color: colors.icons, fontSize: 20}}>
+                        Delivery Settings
+                      </Text>
+                    </Body>
+                  </Left>
+                </CardItem>
+
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
                       <Text
                         style={{
-                          color: colors.primary,
                           fontSize: 16,
                           fontFamily: 'ProductSans-Bold',
-                          textAlign: 'right',
                         }}>
-                        {storeDescription}
+                        Delivery Methods
                       </Text>
-                    )}
-                  </View>
-                </View>
-              </CardItem>
+                    </View>
 
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Store Category
-                    </Text>
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      {this.editMode ? (
+                        <View>
+                          <CheckBox
+                            title="Grab Express"
+                            checked={newShippingMethods.includes(
+                              'Grab Express',
+                            )}
+                            onPress={() =>
+                              this.handleShippingMethods('Grab Express')
+                            }
+                          />
+                          <CheckBox
+                            title="Lalamove"
+                            checked={newShippingMethods.includes('Lalamove')}
+                            onPress={() =>
+                              this.handleShippingMethods('Lalamove')
+                            }
+                          />
+                          <CheckBox
+                            title="Mr. Speedy"
+                            checked={newShippingMethods.includes('Mr. Speedy')}
+                            onPress={() =>
+                              this.handleShippingMethods('Mr. Speedy')
+                            }
+                          />
+                          <CheckBox
+                            title="Angkas Padala"
+                            checked={newShippingMethods.includes(
+                              'Angkas Padala',
+                            )}
+                            onPress={() =>
+                              this.handleShippingMethods('Angkas Padala')
+                            }
+                          />
+                          <CheckBox
+                            title="Own Delivery"
+                            checked={newShippingMethods.includes(
+                              'Own Delivery',
+                            )}
+                            onPress={() =>
+                              this.handleShippingMethods('Own Delivery')
+                            }
+                          />
+                        </View>
+                      ) : (
+                        this.CategoryPills(shippingMethods)
+                      )}
+                    </View>
                   </View>
+                </CardItem>
 
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    <Text
-                      style={{
-                        color: colors.primary,
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                        textAlign: 'right',
-                      }}>
-                      {storeCategory}
-                    </Text>
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Free Delivery
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    <Switch
-                      trackColor={{
-                        false: '#767577',
-                        true: this.editMode ? colors.accent : colors.primary,
-                      }}
-                      thumbColor={'#f4f3f4'}
-                      ios_backgroundColor="#3e3e3e"
-                      onValueChange={() =>
-                        (this.newFreeDelivery = !this.newFreeDelivery)
-                      }
-                      value={
-                        this.editMode ? this.newFreeDelivery : freeDelivery
-                      }
-                      disabled={!this.editMode}
-                    />
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Delivery Type
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <View>
-                        <CheckBox
-                          title="Same Day Delivery"
-                          checked={this.newDeliveryType === 'Same Day Delivery'}
-                          checkedIcon="dot-circle-o"
-                          uncheckedIcon="circle-o"
-                          onPress={() =>
-                            (this.newDeliveryType = 'Same Day Delivery')
-                          }
-                        />
-                        <CheckBox
-                          title="Next Day Delivery"
-                          checked={this.newDeliveryType === 'Next Day Delivery'}
-                          checkedIcon="dot-circle-o"
-                          uncheckedIcon="circle-o"
-                          onPress={() =>
-                            (this.newDeliveryType = 'Next Day Delivery')
-                          }
-                        />
-                        <CheckBox
-                          title="Scheduled Delivery"
-                          checked={
-                            this.newDeliveryType === 'Scheduled Delivery'
-                          }
-                          checkedIcon="dot-circle-o"
-                          uncheckedIcon="circle-o"
-                          onPress={() =>
-                            (this.newDeliveryType = 'Scheduled Delivery')
-                          }
-                        />
-                      </View>
-                    ) : (
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
                       <Text
                         style={{
-                          color: colors.primary,
                           fontSize: 16,
                           fontFamily: 'ProductSans-Bold',
-                          textAlign: 'right',
                         }}>
-                        {deliveryType}
+                        Own Delivery Service Fee
                       </Text>
-                    )}
-                  </View>
-                </View>
-              </CardItem>
+                    </View>
 
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Vacation Mode
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    <Switch
-                      trackColor={{
-                        false: '#767577',
-                        true: this.editMode ? colors.accent : colors.primary,
-                      }}
-                      thumbColor={'#f4f3f4'}
-                      ios_backgroundColor="#3e3e3e"
-                      onValueChange={() =>
-                        (this.newVacationMode = !this.newVacationMode)
-                      }
-                      value={
-                        this.editMode ? this.newVacationMode : vacationMode
-                      }
-                      disabled={!this.editMode}
-                    />
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Payment Methods
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <View>
-                        <CheckBox
-                          title="COD"
-                          checked={newPaymentMethods.includes('COD')}
-                          onPress={() => this.handlePaymentMethods('COD')}
-                        />
-                        <CheckBox
-                          title="Online Banking"
-                          checked={newPaymentMethods.includes('Online Banking')}
-                          onPress={() =>
-                            this.handlePaymentMethods('Online Banking')
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      {this.editMode ? (
+                        <Input
+                          value={this.newOwnDeliveryServiceFee}
+                          leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
+                          errorMessage={
+                            newOwnDeliveryServiceFeeError &&
+                            newOwnDeliveryServiceFeeError
                           }
-                        />
-                      </View>
-                    ) : (
-                      this.CategoryPills(paymentMethods)
-                    )}
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Shipping Methods
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <View>
-                        <CheckBox
-                          title="Grab Express"
-                          checked={newShippingMethods.includes('Grab Express')}
-                          onPress={() =>
-                            this.handleShippingMethods('Grab Express')
+                          onChangeText={(value) =>
+                            this.handleOwnDeliveryServiceFee(value)
                           }
+                          inputStyle={{textAlign: 'right'}}
+                          containerStyle={{
+                            borderColor: this.editModeHeaderColor,
+                          }}
                         />
-                        <CheckBox
-                          title="Lalamove"
-                          checked={newShippingMethods.includes('Lalamove')}
-                          onPress={() => this.handleShippingMethods('Lalamove')}
-                        />
-                        <CheckBox
-                          title="Mr. Speedy"
-                          checked={newShippingMethods.includes('Mr. Speedy')}
-                          onPress={() =>
-                            this.handleShippingMethods('Mr. Speedy')
-                          }
-                        />
-                        <CheckBox
-                          title="Angkas Padala"
-                          checked={newShippingMethods.includes('Angkas Padala')}
-                          onPress={() =>
-                            this.handleShippingMethods('Angkas Padala')
-                          }
-                        />
-                        <CheckBox
-                          title="Own Delivery"
-                          checked={newShippingMethods.includes('Own Delivery')}
-                          onPress={() =>
-                            this.handleShippingMethods('Own Delivery')
-                          }
-                        />
-                      </View>
-                    ) : (
-                      this.CategoryPills(shippingMethods)
-                    )}
+                      ) : (
+                        <Text
+                          style={{
+                            color: colors.primary,
+                            fontSize: 16,
+                            fontFamily: 'ProductSans-Bold',
+                            textAlign: 'right',
+                          }}>
+                          ₱{ownDeliveryServiceFee}
+                        </Text>
+                      )}
+                    </View>
                   </View>
-                </View>
-              </CardItem>
+                </CardItem>
 
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Own Delivery Service Fee
-                    </Text>
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Delivery Type
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      {this.editMode ? (
+                        <View>
+                          <CheckBox
+                            title="Same Day Delivery"
+                            checked={
+                              this.newDeliveryType === 'Same Day Delivery'
+                            }
+                            checkedIcon="dot-circle-o"
+                            uncheckedIcon="circle-o"
+                            onPress={() =>
+                              (this.newDeliveryType = 'Same Day Delivery')
+                            }
+                          />
+                          <CheckBox
+                            title="Next Day Delivery"
+                            checked={
+                              this.newDeliveryType === 'Next Day Delivery'
+                            }
+                            checkedIcon="dot-circle-o"
+                            uncheckedIcon="circle-o"
+                            onPress={() =>
+                              (this.newDeliveryType = 'Next Day Delivery')
+                            }
+                          />
+                          <CheckBox
+                            title="Scheduled Delivery"
+                            checked={
+                              this.newDeliveryType === 'Scheduled Delivery'
+                            }
+                            checkedIcon="dot-circle-o"
+                            uncheckedIcon="circle-o"
+                            onPress={() =>
+                              (this.newDeliveryType = 'Scheduled Delivery')
+                            }
+                          />
+                        </View>
+                      ) : (
+                        <Text
+                          style={{
+                            color: colors.primary,
+                            fontSize: 16,
+                            fontFamily: 'ProductSans-Bold',
+                            textAlign: 'right',
+                          }}>
+                          {deliveryType}
+                        </Text>
+                      )}
+                    </View>
                   </View>
+                </CardItem>
 
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {this.editMode ? (
-                      <Input
-                        multiline
-                        maxLength={200}
-                        value={this.newOwnDeliveryServiceFee}
-                        errorMessage={
-                          newOwnDeliveryServiceFeeError &&
-                          newOwnDeliveryServiceFeeError
-                        }
-                        onChangeText={(value) =>
-                          this.handleOwnDeliveryServiceFee(value)
-                        }
-                        inputStyle={{textAlign: 'right'}}
-                        containerStyle={{
-                          borderColor: this.storeDetailsHeaderColor,
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
+                        Free Delivery
+                      </Text>
+                    </View>
+
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      <Switch
+                        trackColor={{
+                          false: '#767577',
+                          true: this.editMode ? colors.accent : colors.primary,
                         }}
+                        thumbColor={'#f4f3f4'}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={() =>
+                          (this.newFreeDelivery = !this.newFreeDelivery)
+                        }
+                        value={
+                          this.editMode ? this.newFreeDelivery : freeDelivery
+                        }
+                        disabled={!this.editMode}
                       />
-                    ) : (
+                    </View>
+                  </View>
+                </CardItem>
+
+                <CardItem bordered>
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingHorizontal: 8,
+                    }}>
+                    <View style={{flex: 2, paddingright: 10}}>
                       <Text
                         style={{
-                          color: colors.primary,
                           fontSize: 16,
                           fontFamily: 'ProductSans-Bold',
-                          textAlign: 'right',
                         }}>
-                        {ownDeliveryServiceFee}
+                        Free Delivery Minimum Order Amount
                       </Text>
-                    )}
-                  </View>
-                </View>
-              </CardItem>
+                    </View>
 
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Markee Credits
-                    </Text>
+                    <View style={{flex: 3, alignItems: 'flex-end'}}>
+                      {this.editMode ? (
+                        <Input
+                          value={this.newFreeDeliveryMinimum}
+                          leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
+                          errorMessage={
+                            newFreeDeliveryMinimumError &&
+                            newFreeDeliveryMinimumError
+                          }
+                          onChangeText={(value) =>
+                            this.handleFreeDeliveryMinimum(value)
+                          }
+                          inputStyle={{textAlign: 'right'}}
+                          containerStyle={{
+                            borderColor: this.editModeHeaderColor,
+                          }}
+                        />
+                      ) : (
+                        <Text
+                          style={{
+                            color: colors.primary,
+                            fontSize: 16,
+                            fontFamily: 'ProductSans-Bold',
+                            textAlign: 'right',
+                          }}>
+                          ₱{freeDeliveryMinimum ? freeDeliveryMinimum : 0}
+                        </Text>
+                      )}
+                    </View>
                   </View>
+                </CardItem>
+              </Card>
 
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {creditData && (
-                      <Text
-                        style={{
-                          color: colors.primary,
-                          fontSize: 16,
-                          fontFamily: 'ProductSans-Bold',
-                          textAlign: 'right',
-                        }}>
-                        ₱ {creditData.credits.toFixed(2)}
+              <Card
+                style={{
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                }}>
+                <CardItem
+                  header
+                  bordered
+                  style={{backgroundColor: colors.primary}}>
+                  <Left>
+                    <Body>
+                      <Text style={{color: colors.icons, fontSize: 20}}>
+                        Sales
                       </Text>
-                    )}
-                  </View>
-                </View>
-              </CardItem>
+                    </Body>
+                  </Left>
+                </CardItem>
 
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Markee Credit Threshold
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    {creditData && (
-                      <Text
-                        style={{
-                          color: colors.primary,
-                          fontSize: 16,
-                          fontFamily: 'ProductSans-Bold',
-                          textAlign: 'right',
-                        }}>
-                        ₱ {creditData.creditThreshold}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-              </CardItem>
-
-              <CardItem bordered>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 8,
-                  }}>
-                  <View style={{flex: 2, paddingright: 10}}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>
-                      Number of Orders
-                    </Text>
-                  </View>
-
-                  <View style={{flex: 3, alignItems: 'flex-end'}}>
-                    <Text
-                      style={{
-                        color: colors.primary,
-                        fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
-                        textAlign: 'right',
-                      }}>
-                      {orderNumber ? orderNumber : 0}
-                    </Text>
-                  </View>
-                </View>
-              </CardItem>
-            </Card>
-
-            <Card
-              style={{
-                borderRadius: 10,
-                overflow: 'hidden',
-              }}>
-              <CardItem
-                header
-                bordered
-                style={{backgroundColor: colors.primary}}>
-                <Left>
-                  <Body>
-                    <Text style={{color: colors.icons, fontSize: 20}}>
-                      Sales
-                    </Text>
-                  </Body>
-                </Left>
-              </CardItem>
-
-              <CardItem bordered>
-                <Text style={{textAlign: 'center', width: '100%'}}>
-                  Coming Soon! View your sales summary here in the future.
-                </Text>
-              </CardItem>
-            </Card>
-          </ScrollView>
+                <CardItem bordered>
+                  <Text style={{textAlign: 'center', width: '100%'}}>
+                    Coming Soon! View your sales summary here in the future.
+                  </Text>
+                </CardItem>
+              </Card>
+            </SafeAreaView>
+          </KeyboardAwareScrollView>
         </View>
       );
     }

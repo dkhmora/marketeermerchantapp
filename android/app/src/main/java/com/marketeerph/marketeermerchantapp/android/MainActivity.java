@@ -1,4 +1,4 @@
-package com.marketeerph.marketeermerchantapp;
+package com.marketeerph.marketeermerchantapp.android;
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity;

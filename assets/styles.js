@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     paddingTop: StatusBar.currentHeight,
   },
   header: {
-    flex: 2,
+    flex: 2.5,
     alignItems: 'center',
     justifyContent: 'flex-end',
     paddingHorizontal: 20,
@@ -47,7 +47,6 @@ export const styles = StyleSheet.create({
   touchable_text: {
     fontFamily: 'ProductSans-Bold',
     color: colors.primary,
-    marginTop: 1,
   },
   action: {
     flexDirection: 'row',

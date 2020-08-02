@@ -34,13 +34,12 @@ class StoreItemsTab extends Component {
   }
 
   @observable newCategory = '';
-  @observable selectedCategory = this.props.itemsStore.itemCategories.slice[0];
+  @observable selectedCategory = this.props.detailsStore.storeDetails
+    .itemCategories
+    ? this.props.detailsStore.storeDetails.itemCategories.slice[0]
+    : null;
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
-
-  @computed get scrollEnabled() {
-    return this.props.itemsStore.itemCategories.length > 1;
-  }
 
   @action closeAddCategoryModal() {
     this.addCategoryModal = false;
@@ -52,9 +51,9 @@ class StoreItemsTab extends Component {
   }
 
   @action showDeleteCategoryModal() {
-    if (this.props.itemsStore.itemCategories.length > 0) {
+    if (this.props.detailsStore.storeDetails.itemCategories.length > 0) {
       this.deleteCategoryModal = true;
-      this.selectedCategory = this.props.itemsStore.itemCategories[0];
+      this.selectedCategory = this.props.detailsStore.storeDetails.itemCategories[0];
     } else {
       Toast.show({
         text: `There are no categories to be deleted.`,
@@ -74,12 +73,17 @@ class StoreItemsTab extends Component {
   }
 
   handleAddCategory() {
-    const {addItemCategory, itemCategories} = this.props.itemsStore;
-    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
 
-    if (!itemCategories.includes(this.newCategory)) {
-      addItemCategory(merchantId, this.newCategory)
+    if (
+      (itemCategories && !itemCategories.includes(this.newCategory)) ||
+      !itemCategories
+    ) {
+      this.props.itemsStore
+        .addItemCategory(merchantId, this.newCategory)
         .then(() => {
+          this.props.itemsStore.setStoreItems(merchantId, itemCategories);
+
           Toast.show({
             text: `Category "${this.newCategory}" successfully added!`,
             buttonText: 'Okay',
@@ -104,19 +108,24 @@ class StoreItemsTab extends Component {
   }
 
   handleDeleteCategory() {
-    const {deleteItemCategory, itemCategories} = this.props.itemsStore;
-    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
 
     if (itemCategories.includes(this.selectedCategory)) {
-      deleteItemCategory(merchantId, this.selectedCategory);
-      this.closeDeleteCategoryModal();
-      Toast.show({
-        text: `Category "${this.selectedCategory}" successfully deleted!`,
-        buttonText: 'Okay',
-        type: 'success',
-        duration: 5000,
-        style: {margin: 20, borderRadius: 16},
-      });
+      const category = this.selectedCategory;
+      this.props.itemsStore
+        .deleteItemCategory(merchantId, this.selectedCategory)
+        .then(() => {
+          this.props.itemsStore.setStoreItems(merchantId, itemCategories);
+
+          this.closeDeleteCategoryModal();
+          Toast.show({
+            text: `Category "${category}" successfully deleted!`,
+            buttonText: 'Okay',
+            type: 'success',
+            duration: 5000,
+            style: {margin: 20, borderRadius: 16},
+          });
+        });
     } else {
       Toast.show({
         text: `Category "${this.selectedCategory}" does not exist!`,
@@ -130,7 +139,7 @@ class StoreItemsTab extends Component {
   }
 
   render() {
-    const {itemCategories} = this.props.itemsStore;
+    const {itemCategories} = this.props.detailsStore.storeDetails;
     const {name} = this.props.route;
     const {navigation} = this.props;
 
@@ -232,11 +241,12 @@ class StoreItemsTab extends Component {
                     selectedValue={this.selectedCategory}
                     iosIcon={<Icon name="arrow-down" />}
                     onValueChange={(value) => this.onValueChange(value)}>
-                    {itemCategories.map((cat, index) => {
-                      return (
-                        <Picker.Item key={index} label={cat} value={cat} />
-                      );
-                    })}
+                    {itemCategories &&
+                      itemCategories.map((cat, index) => {
+                        return (
+                          <Picker.Item key={index} label={cat} value={cat} />
+                        );
+                      })}
                   </Picker>
                 </Item>
               </CardItem>
@@ -271,11 +281,16 @@ class StoreItemsTab extends Component {
 
         <TabBase.Navigator
           tabBarOptions={{
-            scrollEnabled: this.scrollEnabled,
+            scrollEnabled: true,
             style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
-            indicatorStyle: {backgroundColor: colors.primary},
+            tabStyle: {width: 120},
+            indicatorStyle: {
+              backgroundColor: colors.primary,
+              width: 70,
+              left: (120 - 70) / 2,
+            },
           }}>
           <TabBase.Screen
             name="All"
@@ -284,7 +299,7 @@ class StoreItemsTab extends Component {
               category: 'All',
             }}
           />
-          {itemCategories.length > 0 &&
+          {itemCategories &&
             itemCategories.map((category, index) => {
               return (
                 <TabBase.Screen

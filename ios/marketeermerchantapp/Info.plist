@@ -21,9 +21,9 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>3</string>
 	<key>LSApplicationCategoryType</key>
-	<string/>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -31,18 +31,14 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 		<key>NSExceptionDomains</key>
-		<dict>
-			<key>localhost</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
+		<dict/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera needs to be accesed in order to upload captured item and store images</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Location needs to be obtained in order for User to set delivery bounds for their store in Google Maps.</string>
+	<string>Location needs to be obtained in order for User to set delivery bounds for their store in Maps.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location needs to be obtained in order for User to set delivery bounds for their store in Maps.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>User Photos needs to be accessed in order to upload item and store images</string>
 	<key>UIAppFonts</key>
@@ -90,6 +86,8 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>UIRequiresFullScreen</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

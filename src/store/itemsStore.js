@@ -1,4 +1,4 @@
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/functions';
@@ -11,11 +11,11 @@ const functions = firebase.app().functions('asia-northeast1');
 class ItemsStore {
   @persist('list') @observable storeItems = [];
   @persist @observable maxItemsUpdatedAt = 0;
-  @observable itemCategories = [];
   @observable categoryItems = new Map();
   @observable unsubscribeSetStoreItems = null;
   @observable editItemModal = false;
   @observable selectedItem = null;
+  @observable loaded = false;
 
   @action async editItem(merchantId, newItem, additionalStock) {
     const item = this.selectedItem;
@@ -50,6 +50,7 @@ class ItemsStore {
           dbItems[dbItemIndex].name = newItem.name;
           dbItems[dbItemIndex].description = newItem.description;
           dbItems[dbItemIndex].price = newItem.price;
+          dbItems[dbItemIndex].discountedPrice = newItem.discountedPrice;
           dbItems[dbItemIndex].category = newItem.category;
           dbItems[dbItemIndex].unit = newItem.unit;
           dbItems[dbItemIndex].updatedAt = timeStamp;
@@ -87,7 +88,7 @@ class ItemsStore {
 
   @action async deleteItemCategory(merchantId, category) {
     const merchantItemsRef = firestore()
-      .collection('merchant_items')
+      .collection('merchants')
       .doc(merchantId);
 
     await merchantItemsRef
@@ -100,12 +101,16 @@ class ItemsStore {
     const formattedCategory = _.capitalize(newCategory);
 
     await firestore()
-      .collection('merchant_items')
+      .collection('merchants')
       .doc(merchantId)
       .get()
       .then((documentSnapshot) => {
         if (
-          !documentSnapshot.data().itemCategories.includes(formattedCategory)
+          (documentSnapshot.data().itemCategories &&
+            !documentSnapshot
+              .data()
+              .itemCategories.includes(formattedCategory)) ||
+          !documentSnapshot.data().itemCategories
         ) {
           documentSnapshot.ref
             .update(
@@ -134,7 +139,7 @@ class ItemsStore {
       .where('updatedAt', '>', this.maxItemsUpdatedAt)
       .orderBy('updatedAt', 'desc')
       .onSnapshot(async (querySnapshot) => {
-        if (!querySnapshot.empty) {
+        if (querySnapshot && !querySnapshot.empty) {
           await querySnapshot.docChanges().forEach(async (change, index) => {
             const newItems = change.doc.data().items;
 
@@ -155,19 +160,22 @@ class ItemsStore {
             .slice()
             .sort((a, b) => a.name > b.name);
 
-          itemCategories.map((category) => {
-            this.setCategoryItems(category);
-          });
+          itemCategories &&
+            itemCategories.map((category) => {
+              this.setCategoryItems(category);
+            });
         }
+
+        this.loaded = true;
+
         this.storeItems = await this.storeItems
           .slice()
           .sort((a, b) => a.name > b.name);
 
-        itemCategories.map((category) => {
-          this.setCategoryItems(category);
-        });
-
-        this.itemCategories = itemCategories;
+        itemCategories &&
+          itemCategories.map((category) => {
+            this.setCategoryItems(category);
+          });
       });
   }
 

@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import {Overlay, Text, Button, Icon, Input} from 'react-native-elements';
-import {View} from 'react-native';
+import {View, KeyboardAvoidingView} from 'react-native';
 import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
 import {inject, observer} from 'mobx-react';
 import Toast from './Toast';
+import {colors} from '../../assets/colors';
 
 @inject('ordersStore')
 @observer
@@ -71,9 +72,6 @@ class CancelOrderModal extends Component {
     return (
       <Overlay
         isVisible={this.props.ordersStore.cancelOrderModal}
-        onBackdropPress={() => {
-          this.closeModal();
-        }}
         windowBackgroundColor="rgba(255, 255, 255, .5)"
         overlayBackgroundColor="red"
         width="80%"
@@ -92,19 +90,19 @@ class CancelOrderModal extends Component {
             ?
           </Text>
 
-          <View style={[styles.action]}>
-            <Input
-              numberOfLines={8}
-              maxLength={600}
-              placeholder="Reason for Cancellation"
-              value={this.state.cancelReason}
-              onChangeText={(value) => this.handleCancelReasonChange(value)}
-              style={{
-                borderRadius: 24,
-              }}
-              inputStyle={{textAlignVertical: 'top'}}
-            />
-          </View>
+          <Input
+            numberOfLines={8}
+            multiline
+            maxLength={600}
+            placeholder="Reason for Cancellation"
+            placeholderTextColor={colors.text_secondary}
+            value={this.state.cancelReason}
+            onChangeText={(value) => this.handleCancelReasonChange(value)}
+            style={{
+              borderRadius: 24,
+            }}
+            inputStyle={{textAlignVertical: 'top'}}
+          />
 
           {cancelReasonCheck ? (
             <Animatable.View

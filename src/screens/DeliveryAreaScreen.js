@@ -33,7 +33,7 @@ class DeliveryAreaScreen extends Component {
       mapReady: false,
       editMode: false,
       updating: false,
-      boundingBox: null,
+      boundingBox: [],
       address: null,
       distance: 0,
       newDistance: 0,
@@ -284,11 +284,11 @@ class DeliveryAreaScreen extends Component {
   handleEditDeliveryArea() {
     this.setState({
       mapData: {
-        ...this.state.markerPosition,
+        ...this.state.newMarkerPosition,
         latitudeDelta: 0.04,
         longitudeDelta: 0.05,
       },
-      newMarkerPosition: this.state.markerPosition,
+      newMarkerPosition: this.state.newMarkerPosition,
       newDistance: this.state.distance,
       editMode: true,
     });
@@ -297,11 +297,15 @@ class DeliveryAreaScreen extends Component {
   }
 
   handleCancelChanges() {
-    const {markerPosition, distance} = this.state;
+    const {newMarkerPosition, markerPosition, mapData, distance} = this.state;
 
     this.setState({
-      mapData: {...markerPosition, latitudeDelta: 0.04, longitudeDelta: 0.05},
-      newMarkerPosition: {...markerPosition},
+      mapData: markerPosition
+        ? {...markerPosition, latitudeDelta: 0.04, longitudeDelta: 0.05}
+        : mapData,
+      newMarkerPosition: markerPosition
+        ? {...markerPosition}
+        : newMarkerPosition,
       newDistance: distance,
       editMode: false,
     });
@@ -475,7 +479,11 @@ class DeliveryAreaScreen extends Component {
                   }}>
                   <Button
                     title="Cancel Changes"
-                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    titleStyle={{
+                      color: colors.icons,
+                      paddingRight: 5,
+                      fontSize: 15,
+                    }}
                     icon={<Icon name="x" color={colors.icons} />}
                     iconRight
                     onPress={() => this.handleCancelChanges()}
@@ -484,7 +492,11 @@ class DeliveryAreaScreen extends Component {
                   />
                   <Button
                     title="Save Changes"
-                    titleStyle={{color: colors.icons, paddingRight: 5}}
+                    titleStyle={{
+                      color: colors.icons,
+                      paddingRight: 5,
+                      fontSize: 15,
+                    }}
                     icon={<Icon name="save" color={colors.icons} />}
                     iconRight
                     buttonStyle={{backgroundColor: colors.accent}}

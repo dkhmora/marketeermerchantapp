@@ -3,6 +3,7 @@ import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItemList,
+  DrawerItem,
 } from '@react-navigation/drawer';
 import StoreItemsScreen from '../screens/StoreItemsScreen';
 import DashboardScreen from '../screens/DashboardScreen';
@@ -11,9 +12,10 @@ import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
 import {Button, Icon} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import {View, Platform} from 'react-native';
+import {View, Platform, Linking} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReviewsScreen from '../screens/ReviewsScreen';
+import AccountScreen from '../screens/AccountScreen';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -25,12 +27,29 @@ class MainDrawer extends Component {
     super(props);
   }
 
+  openTermsAndConditions() {
+    const url = 'https://marketeer.ph/components/pages/termsandconditions';
+
+    Linking.openURL(url);
+  }
+
+  openPrivacyPolicy() {
+    const url = 'https://marketeer.ph/components/pages/privacypolicy';
+
+    Linking.openURL(url);
+  }
+
   handleSignOut() {
     this.props.authStore.appReady = false;
 
     this.props.authStore.signOut().then(() => {
+      this.props.detailsStore.storeDetails = {};
+      this.props.detailsStore.subscribedToNotifications = false;
+      this.props.detailsStore.unsubscribeSetStoreDetails();
+      this.props.detailsStore.unsubscribeSetStoreDetails = null;
       this.props.ordersStore.orders = [];
       this.props.ordersStore.maxOrderUpdatedAt = 0;
+      this.props.itemsStore.categoryItems = new Map();
       this.props.itemsStore.storeItems = [];
       this.props.itemsStore.maxItemsUpdatedAt = 0;
 
@@ -60,9 +79,37 @@ class MainDrawer extends Component {
                   {...props}
                   labelStyle={{
                     fontFamily: 'ProductSans-Light',
-                    paddingVertical: 10,
+                    padding: 10,
                   }}
                   itemStyle={{
+                    marginHorizontal: 0,
+                    marginVertical: 0,
+                    borderRadius: 0,
+                  }}
+                />
+
+                <DrawerItem
+                  onPress={() => this.openTermsAndConditions()}
+                  label="Terms and Conditions"
+                  labelStyle={{
+                    fontFamily: 'ProductSans-Light',
+                    padding: 10,
+                  }}
+                  style={{
+                    marginHorizontal: 0,
+                    marginVertical: 0,
+                    borderRadius: 0,
+                  }}
+                />
+
+                <DrawerItem
+                  onPress={() => this.openPrivacyPolicy()}
+                  label="Privacy Policy"
+                  labelStyle={{
+                    fontFamily: 'ProductSans-Light',
+                    padding: 10,
+                  }}
+                  style={{
                     marginHorizontal: 0,
                     marginVertical: 0,
                     borderRadius: 0,
@@ -131,6 +178,12 @@ class MainDrawer extends Component {
         <Drawer.Screen
           name="Delivery Area"
           component={DeliveryAreaScreen}
+          initialParams={{merchantId}}
+        />
+
+        <Drawer.Screen
+          name="Account Settings"
+          component={AccountScreen}
           initialParams={{merchantId}}
         />
       </Drawer.Navigator>

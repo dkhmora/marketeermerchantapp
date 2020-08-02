@@ -33,10 +33,11 @@ class AddItemScreen extends Component {
     this.state = {
       pageCategory: this.props.pageCategory,
       imageDisplay: require('../../assets/placeholder.jpg'),
-      nameError: '',
-      descriptionError: '',
-      priceError: '',
-      stockError: '',
+      nameError: null,
+      descriptionError: null,
+      priceError: null,
+      stockError: null,
+      discountedPriceError: null,
     };
   }
 
@@ -47,25 +48,41 @@ class AddItemScreen extends Component {
   @observable description = '';
   @observable unit = '';
   @observable price = '';
+  @observable discountedPrice = '';
   @observable stock = '';
-  @observable categories = this.props.itemsStore.itemCategories;
+  @observable categories = this.props.detailsStore.storeDetails.itemCategories;
 
   @computed get formValid() {
-    const {nameError, priceError, stockError} = this.state;
+    const {
+      nameError,
+      priceError,
+      stockError,
+      descriptionError,
+      discountedPriceError,
+    } = this.state;
 
-    if (nameError !== null || priceError !== null || stockError !== null) {
-      return true;
+    if (
+      nameError === null ||
+      priceError === null ||
+      stockError === null ||
+      nameError !== '' ||
+      priceError !== '' ||
+      stockError !== '' ||
+      descriptionError ||
+      discountedPriceError
+    ) {
+      return false;
     }
 
-    return false;
+    return true;
   }
 
   componentDidMount() {
     const {pageCategory} = this.props.route.params;
-    const {itemCategories} = this.props.itemsStore;
+    const {itemCategories} = this.props.detailsStore.storeDetails;
     this.category = pageCategory !== 'All' ? pageCategory : itemCategories[0];
 
-    if (this.props.itemsStore.itemCategories.length <= 0) {
+    if (this.props.detailsStore.storeDetails.itemCategories.length <= 0) {
       this.props.navigation.goBack();
       Toast.show({
         text: `Please add a category before adding an item.`,
@@ -85,7 +102,10 @@ class AddItemScreen extends Component {
       name: this.name,
       description: this.description,
       unit: this.unit,
-      price: Math.ceil(this.price),
+      price: Number(Math.ceil(this.price)),
+      discountedPrice: this.discountedPrice
+        ? Number(Math.ceil(this.discountedPrice))
+        : null,
       stock: Number(Math.trunc(this.stock)),
       sales: 0,
     };
@@ -113,7 +133,7 @@ class AddItemScreen extends Component {
     } else if (regexp.test(this.name)) {
       this.setState({nameError: 'Item Name cannot include Emojis'});
     } else {
-      this.setState({nameError: null});
+      this.setState({nameError: ''});
     }
   }
 
@@ -143,8 +163,47 @@ class AddItemScreen extends Component {
       this.setState({
         priceError: 'Price can only consist of numbers',
       });
+    } else if (Number(this.discountedPrice) >= Number(price)) {
+      this.setState({
+        discountedPriceError: 'Normal Price must be more than Discounted Price',
+      });
     } else {
-      this.setState({priceError: null});
+      this.setState({priceError: ''});
+
+      if (
+        Number(this.discountedPrice) <= Number(price) &&
+        this.state.priceError ===
+          'Discounted Price must be less than Normal Price'
+      ) {
+        this.setState({
+          discountedPriceError: null,
+        });
+      }
+    }
+  }
+
+  handleDiscountedPrice(discountedPrice) {
+    const numberRegexp = /^[0-9]+$/;
+    this.discountedPrice = discountedPrice;
+
+    if (!numberRegexp.test(Number(discountedPrice))) {
+      this.setState({
+        discountedPriceError: 'Discounted Price can only consist of numbers',
+      });
+    } else if (Number(discountedPrice) >= Number(this.price)) {
+      this.setState({
+        discountedPriceError: 'Discounted Price must be less than Normal Price',
+      });
+    } else {
+      this.setState({discountedPriceError: null});
+
+      if (
+        Number(discountedPrice) <= Number(this.price) &&
+        this.state.priceError ===
+          'Normal Price must be more than Discounted Price'
+      ) {
+        this.setState({priceError: ''});
+      }
     }
   }
 
@@ -162,7 +221,7 @@ class AddItemScreen extends Component {
         stockError: 'Initial Stock can only consist of numbers',
       });
     } else {
-      this.setState({stockError: null});
+      this.setState({stockError: ''});
     }
   }
 
@@ -204,6 +263,7 @@ class AddItemScreen extends Component {
       nameError,
       stockError,
       priceError,
+      discountedPriceError,
       descriptionError,
     } = this.state;
 
@@ -279,32 +339,34 @@ class AddItemScreen extends Component {
                   alignItems: 'center',
                   paddingHorizontal: 10,
                 }}>
-                <Text style={{fontSize: 16, fontFamily: 'ProductSans-Regular'}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: 'ProductSans-Regular',
+                  }}>
                   Category:
                 </Text>
 
-                <Item style={{paddingHorizontal: 10, flex: 1}}>
-                  <Picker
-                    note={false}
-                    placeholder="Select Item Category"
-                    mode="dropdown"
-                    selectedValue={this.category}
-                    iosIcon={<Icon name="arrow-down" />}
-                    onValueChange={this.handleCategory.bind(this)}>
-                    {this.categories.map((cat, index) => {
-                      return (
-                        <Picker.Item key={index} label={cat} value={cat} />
-                      );
-                    })}
-                  </Picker>
-                </Item>
+                <Picker
+                  note={false}
+                  placeholder="Select Item Category"
+                  mode="dropdown"
+                  selectedValue={this.category}
+                  iosIcon={<Icon name="chevron-down" />}
+                  onValueChange={this.handleCategory.bind(this)}>
+                  {this.categories.map((cat, index) => {
+                    return <Picker.Item key={index} label={cat} value={cat} />;
+                  })}
+                </Picker>
               </View>
 
               <View style={{marginTop: 18}}>
                 <Input
                   errorMessage={nameError}
                   maxLength={80}
+                  autoCapitalize="words"
                   placeholder="Item Name"
+                  placeholderTextColor={colors.text_secondary}
                   value={this.name}
                   onChangeText={(value) => this.handleName(value)}
                 />
@@ -323,7 +385,9 @@ class AddItemScreen extends Component {
                   multiline
                   maxLength={150}
                   placeholder="Item Description"
+                  placeholderTextColor={colors.text_secondary}
                   value={this.description}
+                  autoCapitalize="sentences"
                   onChangeText={(value) => this.handleDescription(value)}
                 />
                 <Text
@@ -346,6 +410,7 @@ class AddItemScreen extends Component {
                   <View style={{flex: 1}}>
                     <Input
                       placeholder="Price"
+                      placeholderTextColor={colors.text_secondary}
                       keyboardType="number-pad"
                       errorMessage={priceError}
                       value={this.price}
@@ -367,6 +432,7 @@ class AddItemScreen extends Component {
                   <View style={{flex: 1}}>
                     <Input
                       placeholder="Unit"
+                      placeholderTextColor={colors.text_secondary}
                       autoCapitalize="none"
                       value={this.unit}
                       onChangeText={(value) => (this.unit = value)}
@@ -378,6 +444,7 @@ class AddItemScreen extends Component {
                       errorMessage={stockError}
                       keyboardType="number-pad"
                       placeholder="Initial Stock"
+                      placeholderTextColor={colors.text_secondary}
                       value={this.stock}
                       onChangeText={(value) => this.handleStock(value)}
                     />
@@ -385,13 +452,23 @@ class AddItemScreen extends Component {
                 </View>
               </View>
 
+              <Input
+                placeholder="Discounted Price"
+                placeholderTextColor={colors.text_secondary}
+                keyboardType="number-pad"
+                errorMessage={discountedPriceError}
+                value={this.discountedPrice}
+                onChangeText={(value) => this.handleDiscountedPrice(value)}
+                leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
+              />
+
               <Button
                 title="Submit"
                 titleStyle={{color: colors.icons}}
                 buttonStyle={{backgroundColor: colors.primary, height: 50}}
                 containerStyle={{marginTop: 20}}
                 onPress={() => this.onSubmit()}
-                disabled={this.formValid}
+                disabled={!this.formValid}
               />
             </View>
           </Grid>

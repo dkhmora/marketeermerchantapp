@@ -57,7 +57,7 @@ class ItemCard extends PureComponent {
       this.setState({loaded: false});
     }
 
-    if (!this.state.loaded) {
+    if (!this.state.loaded && this.props.item.image) {
       this.getImage();
     }
   }
@@ -174,13 +174,27 @@ class ItemCard extends PureComponent {
                 padding: 8,
                 backgroundColor: colors.primary,
                 elevation: 3,
+                flexDirection: 'row',
               }}>
+              {item.discountedPrice && (
+                <Text
+                  style={{
+                    textDecorationLine: 'line-through',
+                    textDecorationStyle: 'solid',
+                    color: colors.icons,
+                    marginRight: 5,
+                  }}>
+                  ₱ {item.price}
+                </Text>
+              )}
+
               <Text
                 style={{
                   fontFamily: 'ProductSans-Black',
                   color: colors.icons,
                 }}>
-                ₱ {item.price}/{item.unit}
+                ₱ {item.discountedPrice ? item.discountedPrice : item.price}/
+                {item.unit}
               </Text>
             </View>
           </CardItem>

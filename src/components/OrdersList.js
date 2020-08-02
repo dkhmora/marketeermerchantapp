@@ -6,6 +6,7 @@ import {observer, inject} from 'mobx-react';
 import OrderCard from './OrderCard';
 import {colors} from '../../assets/colors';
 import {computed} from 'mobx';
+import {Text} from 'react-native-elements';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -26,10 +27,36 @@ class OrdersList extends Component {
         return order.orderStatus[this.state.listOrderStatus].status === true;
       });
 
-      return orderList;
+      return orderList.length > 0 ? orderList : [];
     }
 
-    return [];
+    return null;
+  }
+
+  @computed get orderLoading() {
+    if (
+      this.props.detailsStore.storeDetails.orderNumber &&
+      this.props.ordersStore.orders.length ===
+        this.props.detailsStore.storeDetails.orderNumber &&
+      this.orders
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  componentDidMount() {
+    this.unsubscribeTabPress = this.props.navigation.addListener(
+      'tabPress',
+      (e) => {
+        this.flatList.scrollToOffset({animated: true, offset: 0});
+      },
+    );
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeTabPress && this.unsubscribeTabPress();
   }
 
   async retrieveOrders() {
@@ -49,32 +76,55 @@ class OrdersList extends Component {
     });
   }
 
+  renderItem = ({item, index}) => (
+    <OrderCard
+      order={item}
+      tabName={this.props.route.name}
+      navigation={this.props.navigation}
+      key={item.orderId}
+    />
+  );
+
   render() {
-    const {navigation} = this.props;
-    const {name} = this.props.route;
     const {loading} = this.state;
-    const dataSource = this.orders.slice();
+    const dataSource = this.orders ? this.orders.slice() : [];
 
     return (
       <View style={{flex: 1}}>
         <FlatList
+          ref={(flatList) => (this.flatList = flatList)}
           data={dataSource}
+          contentContainerStyle={{flexGrow: 1}}
           initialNumToRender={5}
+          windowSize={11}
           style={{flex: 1, paddingHorizontal: 10}}
-          renderItem={({item, index}) => (
-            <OrderCard
-              order={item}
-              tabName={name}
-              navigation={navigation}
-              key={index}
-            />
-          )}
+          renderItem={this.renderItem}
           keyExtractor={(item) => item.orderId}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            !this.orderLoading && (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    textAlign: 'center',
+                    paddingHorizontal: 15,
+                  }}>
+                  No {this.props.route.name} Orders as of the moment.
+                </Text>
+              </View>
+            )
+          }
           refreshControl={
             <RefreshControl
               colors={[colors.primary, colors.dark]}
-              refreshing={loading}
+              refreshing={loading || this.orderLoading}
               onRefresh={this.onRefresh.bind(this)}
             />
           }

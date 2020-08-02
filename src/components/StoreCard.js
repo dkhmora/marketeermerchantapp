@@ -31,44 +31,58 @@ class StoreCard extends Component {
   getImage = async () => {
     const {displayImage, coverImage} = this.props.store;
 
-    const displayImageRef = storage().ref(displayImage);
-    const coverImageRef = storage().ref(coverImage);
-    const coverImageUrl = await coverImageRef.getDownloadURL();
-    const displayImageUrl = await displayImageRef.getDownloadURL();
+    if (displayImage) {
+      const displayImageRef = storage().ref(displayImage);
+      const displayImageUrl = await displayImageRef.getDownloadURL();
 
-    this.setState({displayImageUrl, coverImageUrl, ready: true});
+      this.setState({displayImageUrl, ready: true});
+    }
+
+    if (coverImage) {
+      const coverImageRef = storage().ref(coverImage);
+      const coverImageUrl = await coverImageRef.getDownloadURL();
+
+      this.setState({coverImageUrl, ready: true});
+    }
   };
 
   componentDidMount() {
     this.getImage();
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.store !== this.props.store) {
+      this.getImage();
+    }
+  }
+
   PaymentMethods = () => {
     const {paymentMethods} = this.props.store;
     const pills = [];
 
-    paymentMethods.map((method, index) => {
-      pills.push(
-        <View
-          key={index}
-          style={{
-            borderRadius: 20,
-            backgroundColor: colors.accent,
-            padding: 3,
-            paddingHorizontal: 10,
-            marginRight: 2,
-          }}>
-          <Text
+    paymentMethods &&
+      paymentMethods.map((method, index) => {
+        pills.push(
+          <View
+            key={index}
             style={{
-              fontSize: 13,
-              fontFamily: 'ProductSans-Regular',
-              color: colors.icons,
+              borderRadius: 20,
+              backgroundColor: colors.accent,
+              padding: 3,
+              paddingHorizontal: 10,
+              marginRight: 2,
             }}>
-            {method}
-          </Text>
-        </View>,
-      );
-    });
+            <Text
+              style={{
+                fontSize: 13,
+                fontFamily: 'ProductSans-Regular',
+                color: colors.icons,
+              }}>
+              {method}
+            </Text>
+          </View>,
+        );
+      });
 
     return pills;
   };
@@ -130,7 +144,7 @@ class StoreCard extends Component {
                         color: colors.text_primary,
                         fontFamily: 'ProductSans-Black',
                       }}>
-                      Free Delivery
+                      Free Delivery (₱{store.freeDeliveryMinimum} Min.)
                     </Text>
                   )}
                 </View>

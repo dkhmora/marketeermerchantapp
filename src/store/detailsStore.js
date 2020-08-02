@@ -156,7 +156,7 @@ class DetailsStore {
       });
   }
 
-  @action async uploadImage(imagePath, type, currentImagePath) {
+  @action async uploadImage(imagePath, type) {
     const {merchantId} = this.storeDetails;
     const fileExtension = imagePath.split('.').pop();
     const imageRef = `/images/merchants/${merchantId}/${type}.${fileExtension}`;
@@ -182,16 +182,10 @@ class DetailsStore {
           `Merchant ${_.capitalize(type)} image path successfully set!`,
         ),
       )
-      .then(() => {
-        if (!(imageRef === currentImagePath)) {
-          this.deleteImage(currentImagePath);
-        }
-      })
       .catch((err) => console.log(err));
   }
 
   @action async updateStoreDetails(
-    storeName,
     storeDescription,
     freeDelivery,
     vacationMode,
@@ -199,17 +193,20 @@ class DetailsStore {
     shippingMethods,
     deliveryType,
     ownDeliveryServiceFee,
+    freeDeliveryMinimum,
   ) {
     await this.merchantRef
       .update({
-        storeName,
         storeDescription,
         freeDelivery,
+        freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
         vacationMode,
         paymentMethods,
         shippingMethods,
         deliveryType,
-        ownDeliveryServiceFee,
+        ownDeliveryServiceFee: ownDeliveryServiceFee
+          ? ownDeliveryServiceFee
+          : 0,
         updatedAt: firestore.Timestamp.now().toMillis(),
       })
       .then(() => console.log('Merchant details successfully updated!'))

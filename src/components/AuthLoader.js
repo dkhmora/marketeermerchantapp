@@ -42,12 +42,16 @@ class AuthLoader extends React.Component {
           } else {
             !this.props.detailsStore.unsubscribeSetStoreDetails &&
               this.props.detailsStore.setStoreDetails(merchantId);
+
+            navigation.replace('Home', {
+              merchantId,
+            });
+
+            this.setState({user}, () => {
+              this.props.authStore.appReady = true;
+            });
           }
         });
-
-      this.setState({user});
-
-      this.props.authStore.appReady = true;
     } else {
       this.props.detailsStore.unsubscribeSetStoreDetails &&
         this.props.detailsStore.unsubscribeSetStoreDetails();
@@ -55,7 +59,11 @@ class AuthLoader extends React.Component {
       this.props.itemsStore.unsubscribeSetStoreItems &&
         this.props.itemsStore.unsubscribeSetStoreItems();
 
-      this.props.authStore.appReady = true;
+      navigation.replace('Login');
+
+      this.setState({user}, () => {
+        this.props.authStore.appReady = true;
+      });
     }
   }
 
@@ -67,7 +75,7 @@ class AuthLoader extends React.Component {
     return subscriber;
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     const {navigation} = this.props;
     const {merchantId} = this.props.detailsStore.storeDetails;
     const {user} = this.state;
