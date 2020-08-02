@@ -57,20 +57,12 @@ class DetailsStore {
       });
   }
 
-  @action updateCoordinates(
-    lowerRange,
-    upperRange,
-    locationCoordinates,
-    boundingBox,
-    address,
-  ) {
+  @action updateCoordinates(lowerRange, upperRange, boundingBox) {
     return this.merchantRef.update({
       deliveryCoordinates: {
         lowerRange,
         upperRange,
-        ...locationCoordinates,
         boundingBox,
-        address,
       },
       updatedAt: firestore.Timestamp.now().toMillis(),
     });

@@ -5,6 +5,7 @@ const Toast = (props) => {
     text: '',
     type: 'success',
     duration: 3000,
+    position: 'bottom',
     style: {margin: 20, borderRadius: 16},
     ...props,
   });
