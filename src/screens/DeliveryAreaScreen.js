@@ -213,8 +213,6 @@ class DeliveryAreaScreen extends Component {
             ref={(map) => {
               this.map = map;
             }}
-            showsUserLocation
-            followsUserLocation
             initialRegion={{
               latitude: storeLocation.latitude,
               longitude: storeLocation.longitude,
