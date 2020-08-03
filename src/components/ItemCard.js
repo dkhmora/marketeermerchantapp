@@ -32,7 +32,9 @@ class ItemCard extends PureComponent {
 
   getImage = async () => {
     const ref = storage().ref(this.props.item.image);
-    const link = await ref.getDownloadURL().catch((err) => console.log(err));
+    const link = await ref
+      .getDownloadURL()
+      .catch((err) => Toast({text: err, type: 'danger'}));
 
     this.setState({url: {uri: link}, loaded: true});
   };

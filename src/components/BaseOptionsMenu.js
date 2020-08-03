@@ -25,8 +25,6 @@ class BaseOptionsMenu extends PureComponent {
           return {optionActions};
         });
       });
-    } else {
-      console.log('Please put an equal number of options and actions');
     }
   }
 

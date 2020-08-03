@@ -4,14 +4,13 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
-  ScrollView,
   StatusBar,
   Image,
   Linking,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {observer, inject} from 'mobx-react';
-import {Icon, SocialIcon, Button} from 'react-native-elements';
+import {Icon, Button} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -78,13 +77,7 @@ class LoginScreen extends Component {
     const merchantFormUrl =
       'https://marketeer.ph/components/pages/partnermerchantsignup';
 
-    Linking.canOpenURL(merchantFormUrl).then((supported) => {
-      if (supported) {
-        Linking.openURL(merchantFormUrl);
-      } else {
-        console.log("Don't know how to open URI: " + merchantFormUrl);
-      }
-    });
+    Linking.openURL(merchantFormUrl);
   }
 
   openTermsAndConditions() {

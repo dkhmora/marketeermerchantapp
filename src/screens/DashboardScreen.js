@@ -183,8 +183,7 @@ class StoreDetailsScreen extends Component {
           this.setState({coverImageUrl: {uri: image.path}});
         }
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   handleSelectImage(type) {
@@ -203,8 +202,7 @@ class StoreDetailsScreen extends Component {
           this.setState({coverImageUrl: {uri: image.path}});
         }
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   handlePaymentMethods(paymentMethod) {

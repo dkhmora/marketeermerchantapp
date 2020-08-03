@@ -93,8 +93,7 @@ class ItemsStore {
 
     await merchantItemsRef
       .update('itemCategories', firestore.FieldValue.arrayRemove(category))
-      .then(() => console.log('Item deleted!'))
-      .catch((err) => console.error(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   @action async addItemCategory(merchantId, newCategory) {
@@ -112,21 +111,15 @@ class ItemsStore {
               .itemCategories.includes(formattedCategory)) ||
           !documentSnapshot.data().itemCategories
         ) {
-          documentSnapshot.ref
-            .update(
-              'itemCategories',
-              firestore.FieldValue.arrayUnion(formattedCategory),
-            )
-            .then(() =>
-              console.log(
-                `Successfully added new category "${formattedCategory}"`,
-              ),
-            );
+          documentSnapshot.ref.update(
+            'itemCategories',
+            firestore.FieldValue.arrayUnion(formattedCategory),
+          );
         } else {
-          console.error(`${formattedCategory} already exists`);
+          Toast({text: `${formattedCategory} already exists`, type: 'danger'});
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   @action setStoreItems(merchantId, itemCategories) {
@@ -184,8 +177,7 @@ class ItemsStore {
       return await storage()
         .ref(imageRef)
         .putFile(imagePath)
-        .then(() => console.log('Image successfully uploaded!'))
-        .catch((err) => console.error(err));
+        .catch((err) => Toast({text: err, type: 'danger'}));
     }
   }
 
@@ -243,12 +235,7 @@ class ItemsStore {
   }
 
   @action async deleteImage(image) {
-    await storage()
-      .ref(image)
-      .delete()
-      .then(() => {
-        console.log(`Image at ${image} successfully deleted!`);
-      });
+    await storage().ref(image).delete();
   }
 
   @action async deleteStoreItem(merchantId, item) {

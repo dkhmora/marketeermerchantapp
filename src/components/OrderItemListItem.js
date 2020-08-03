@@ -4,6 +4,7 @@ import {observer} from 'mobx-react';
 import storage from '@react-native-firebase/storage';
 import {colors} from '../../assets/colors';
 import FastImage from 'react-native-fast-image';
+import Toast from './Toast';
 
 @observer
 class OrderItemCard extends PureComponent {
@@ -17,7 +18,9 @@ class OrderItemCard extends PureComponent {
 
   getImage = async () => {
     const ref = storage().ref(this.props.item.image);
-    const link = await ref.getDownloadURL().catch((err) => console.log(err));
+    const link = await ref
+      .getDownloadURL()
+      .catch((err) => Toast({text: err, type: 'danger'}));
 
     if (link) {
       this.setState({url: {uri: link}});

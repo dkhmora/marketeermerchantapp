@@ -86,29 +86,6 @@ class OrderDetailsScreen extends Component {
     );
   }
 
-  openInMaps() {
-    const {order} = this.props.route.params;
-
-    if (order.deliveryCoordinates) {
-      const markerName = `Customer ${order.userName}'s Location`;
-
-      const latLng = `${order.deliveryCoordinates.latitude},${order.deliveryCoordinates.longitude}`;
-      const url = Platform.select({
-        ios: `http://maps.apple.com/?q=${markerName}&ll=${latLng}`,
-        android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
-      });
-
-      Linking.openURL(url);
-    } else {
-      Toast({
-        text: 'Error, no user deliveryCoordinates found!',
-        type: 'danger',
-        duration: 7000,
-        style: {margin: 20, borderRadius: 16},
-      });
-    }
-  }
-
   OrderItemsList(orderItems) {
     return (
       <View>

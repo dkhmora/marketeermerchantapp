@@ -77,7 +77,9 @@ class EditItemModal extends Component {
 
   getImage = async () => {
     const ref = storage().ref(this.props.itemsStore.selectedItem.image);
-    const link = await ref.getDownloadURL().catch((err) => console.log(err));
+    const link = await ref
+      .getDownloadURL()
+      .catch((err) => Toast({text: err, type: 'danger'}));
 
     this.setState({imageDisplay: {uri: link}, imageLoading: false});
   };
@@ -200,8 +202,7 @@ class EditItemModal extends Component {
           imageDisplay: {uri: image.path},
         });
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   handleSelectImage() {
@@ -217,8 +218,7 @@ class EditItemModal extends Component {
           imageDisplay: {uri: image.path},
         });
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   handleConfirm() {

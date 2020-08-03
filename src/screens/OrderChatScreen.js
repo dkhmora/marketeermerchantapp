@@ -15,6 +15,7 @@ import {Avatar, Icon, Button, Text} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
 import {observable} from 'mobx';
 import {colors} from '../../assets/colors';
+import Toast from '../components/Toast';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -80,7 +81,7 @@ class OrderChatScreen extends Component {
           this.imagePath,
         ),
       )
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   handleSelectImage() {
@@ -104,7 +105,7 @@ class OrderChatScreen extends Component {
           this.imagePath,
         ),
       )
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   renderBubble(props) {
@@ -193,7 +194,6 @@ class OrderChatScreen extends Component {
         overlayContainerStyle={{backgroundColor: colors.primary}}
         titleStyle={{color: colors.icons}}
         title={userInitial}
-        onPress={() => console.log('Works!')}
         activeOpacity={0.7}
       />
     );

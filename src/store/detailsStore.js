@@ -42,7 +42,7 @@ class DetailsStore {
         return data;
       })
       .catch((err) => {
-        console.log(err);
+        Toast({text: err, type: 'danger'});
       });
   }
 
@@ -53,7 +53,7 @@ class DetailsStore {
         return response.data.locationDetails;
       })
       .catch((err) => {
-        console.log(err);
+        Toast({text: err, type: 'danger'});
       });
   }
 
@@ -120,7 +120,7 @@ class DetailsStore {
               firestore.FieldValue.arrayUnion(token),
             );
           })
-          .catch((err) => console.log(err));
+          .catch((err) => Toast({text: err, type: 'danger'}));
       }
     }
   }
@@ -135,7 +135,7 @@ class DetailsStore {
             firestore.FieldValue.arrayRemove(token),
           ),
         )
-        .catch((err) => console.log(err));
+        .catch((err) => Toast({text: err, type: 'danger'}));
     }
   }
 
@@ -143,8 +143,8 @@ class DetailsStore {
     await storage()
       .ref(image)
       .delete()
-      .then(() => {
-        console.log(`Image at ${image} successfully deleted!`);
+      .catch((err) => {
+        Toast({text: err, type: 'danger'});
       });
   }
 
@@ -157,24 +157,12 @@ class DetailsStore {
       .ref(imageRef)
       .putFile(imagePath)
       .then(() =>
-        console.log(
-          `${_.capitalize(
-            type,
-          )} image for ${merchantId} successfully uploaded!`,
-        ),
-      )
-      .then(() =>
         this.merchantRef.update({
           [`${type}Image`]: imageRef,
           updatedAt: firestore.Timestamp.now().toMillis(),
         }),
       )
-      .then(() =>
-        console.log(
-          `Merchant ${_.capitalize(type)} image path successfully set!`,
-        ),
-      )
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   @action async updateStoreDetails(
@@ -201,9 +189,8 @@ class DetailsStore {
           : 0,
         updatedAt: firestore.Timestamp.now().toMillis(),
       })
-      .then(() => console.log('Merchant details successfully updated!'))
       .catch((err) => {
-        console.log(`Something went wrong. Error: ${err}`);
+        Toast({text: `Something went wrong. Error: ${err}`, type: 'danger'});
       });
   }
 }

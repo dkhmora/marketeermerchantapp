@@ -235,8 +235,7 @@ class AddItemScreen extends Component {
         this.imagePath = image.path;
         this.setState({imageDisplay: {uri: image.path}});
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   handleSelectImage() {
@@ -250,8 +249,7 @@ class AddItemScreen extends Component {
         this.imagePath = image.path;
         this.setState({imageDisplay: {uri: image.path}});
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err, type: 'danger'}));
   }
 
   render() {
