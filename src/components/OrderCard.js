@@ -10,7 +10,7 @@ import {
   H3,
   Textarea,
 } from 'native-base';
-import {ActionSheetIOS, Platform} from 'react-native';
+import {ActionSheetIOS, Platform, ActivityIndicator} from 'react-native';
 import moment, {ISO_8601} from 'moment';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
@@ -189,17 +189,21 @@ class OrderCard extends PureComponent {
 
           {optionsButton && (
             <View>
-              <BaseOptionsMenu
-                iconStyle={{color: '#fff', fontSize: 27}}
-                destructiveIndex={1}
-                options={['Cancel Order']}
-                actions={[
-                  () => {
-                    this.props.ordersStore.cancelOrderModal = true;
-                    this.props.ordersStore.selectedOrder = order;
-                  },
-                ]}
-              />
+              {this.state.loading ? (
+                <ActivityIndicator size="small" color={colors.icons} />
+              ) : (
+                <BaseOptionsMenu
+                  iconStyle={{color: '#fff', fontSize: 27}}
+                  destructiveIndex={1}
+                  options={['Cancel Order']}
+                  actions={[
+                    () => {
+                      this.props.ordersStore.cancelOrderModal = true;
+                      this.props.ordersStore.selectedOrder = order;
+                    },
+                  ]}
+                />
+              )}
             </View>
           )}
         </CardItem>
@@ -222,6 +226,7 @@ class OrderCard extends PureComponent {
                 title={buttonText}
                 titleStyle={{color: colors.icons}}
                 loading={this.state.loading}
+                loadingProps={{size: 'small', color: colors.accent}}
                 buttonStyle={{backgroundColor: colors.accent}}
                 containerStyle={{
                   borderRadius: 24,
