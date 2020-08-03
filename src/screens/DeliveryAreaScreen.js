@@ -258,6 +258,8 @@ class DeliveryAreaScreen extends Component {
               alignSelf: 'center',
               justifyContent: 'center',
               bottom: 20,
+              left: 0,
+              right: 0,
             }}>
             <Card
               style={{
@@ -285,23 +287,6 @@ class DeliveryAreaScreen extends Component {
                   />
                   <Text style={{alignSelf: 'center'}}>{newDistance} KM</Text>
                 </View>
-              </CardItem>
-              <CardItem style={{alignSelf: 'center'}}>
-                <Card
-                  style={{
-                    borderRadius: 10,
-                    overflow: 'hidden',
-                    backgroundColor: '#eee',
-                  }}>
-                  <CardItem
-                    style={{
-                      backgroundColor: '#eef',
-                    }}>
-                    <Text note style={{margin: 6, width: '100%'}}>
-                      Tip: Pan around the map to move your store's location!
-                    </Text>
-                  </CardItem>
-                </Card>
               </CardItem>
               <CardItem>
                 <View
