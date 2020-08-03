@@ -61,8 +61,8 @@ class OrderDetailsScreen extends Component {
           longitude: order.deliveryCoordinates.longitude,
         },
         {
-          latitude: storeDetails.deliveryCoordinates.latitude,
-          longitude: storeDetails.deliveryCoordinates.longitude,
+          latitude: storeDetails.storeLocation.latitude,
+          longitude: storeDetails.storeLocation.longitude,
         },
       ],
       {
@@ -227,7 +227,6 @@ class OrderDetailsScreen extends Component {
                     this.map = map;
                   }}
                   onMapReady={() => this.onMapReady()}
-                  showsUserLocation
                   initialRegion={{
                     latitude: order.deliveryCoordinates.latitude,
                     longitude: order.deliveryCoordinates.longitude,
@@ -252,8 +251,8 @@ class OrderDetailsScreen extends Component {
                       </Marker>
                     )}
 
-                  {storeDetails.deliveryCoordinates.latitude &&
-                    storeDetails.deliveryCoordinates.longitude && (
+                  {storeDetails.storeLocation.latitude &&
+                    storeDetails.storeLocation.longitude && (
                       <Marker
                         ref={(marker) => {
                           this.storeMarker = marker;
@@ -261,8 +260,8 @@ class OrderDetailsScreen extends Component {
                         title={`${storeDetails.storeName} Set Location`}
                         tracksViewChanges={false}
                         coordinate={{
-                          latitude: storeDetails.deliveryCoordinates.latitude,
-                          longitude: storeDetails.deliveryCoordinates.longitude,
+                          latitude: storeDetails.storeLocation.latitude,
+                          longitude: storeDetails.storeLocation.longitude,
                         }}>
                         <View>
                           <Icon color={colors.primary} name="map-pin" />

@@ -2,16 +2,13 @@ import React, {Component} from 'react';
 import {Image} from 'react-native';
 import {
   Container,
-  Item,
   Grid,
   Content,
   Row,
   Col,
-  Textarea,
   Picker,
   Card,
   CardItem,
-  H3,
   View,
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';

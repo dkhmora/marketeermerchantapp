@@ -65,10 +65,6 @@ class ItemsStore {
             items: dbItems,
             updatedAt: timeStamp,
           });
-
-          Toast({
-            text: `Successfully updated ${item.name}'s stock!`,
-          });
         } else {
           Toast({
             text: 'Error: Item was not found.',
