@@ -1,21 +1,13 @@
 import React, {Component} from 'react';
 import MapView, {Marker, Polygon} from 'react-native-maps';
-import {
-  View,
-  StatusBar,
-  StyleSheet,
-  PermissionsAndroid,
-  Platform,
-} from 'react-native';
+import {View, StatusBar, StyleSheet} from 'react-native';
 import {Card, CardItem} from 'native-base';
 import {Slider, Button, Icon, Text} from 'react-native-elements';
 import {observer, inject} from 'mobx-react';
-import Geolocation from '@react-native-community/geolocation';
 import {colors} from '../../assets/colors';
 import geohash from 'ngeohash';
 import * as geolib from 'geolib';
 import BaseHeader from '../components/BaseHeader';
-import RNGooglePlaces from 'react-native-google-places';
 import * as turf from '@turf/turf';
 import {computed, toJS} from 'mobx';
 import Toast from '../components/Toast';
