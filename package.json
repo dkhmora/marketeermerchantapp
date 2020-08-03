@@ -17,7 +17,7 @@
     "lint": "eslint .",
     "postinstall": "patch-package && npx jetify",
     "createdebugapk": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && cd android && gradlew assembleDebug",
-    "release": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res && gradlew clean && gradlew assembleRelease"
+    "release": "cd android && gradlew clean && gradlew bundleRelease"
   },
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.10.5",
