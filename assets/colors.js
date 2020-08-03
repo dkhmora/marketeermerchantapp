@@ -9,4 +9,8 @@ export const colors = {
   icons: '#FFFFFF',
   divider: '#BDBDBD',
   statusBar: 'rgba(0,0,0,0.1)',
+  success: '#00C851',
+  danger: '#ff4444',
+  warning: '#ffbb33',
+  info: '#33b5e5',
 };

@@ -13,7 +13,6 @@ import {
   CardItem,
   H3,
   View,
-  Toast,
 } from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import {Button, Text, Icon, Input} from 'react-native-elements';
@@ -21,6 +20,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {inject, observer} from 'mobx-react';
 import {observable, computed} from 'mobx';
 import {colors} from '../../assets/colors';
+import Toast from '../components/Toast';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -84,9 +84,8 @@ class AddItemScreen extends Component {
 
     if (this.props.detailsStore.storeDetails.itemCategories.length <= 0) {
       this.props.navigation.goBack();
-      Toast.show({
+      Toast({
         text: `Please add a category before adding an item.`,
-        buttonText: 'Okay',
         type: 'danger',
         style: {margin: 20, borderRadius: 16},
         duration: 0,

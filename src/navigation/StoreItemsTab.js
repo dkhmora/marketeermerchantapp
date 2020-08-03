@@ -10,7 +10,6 @@ import {
   Left,
   Body,
   H3,
-  Toast,
   Picker,
 } from 'native-base';
 import {Text, Button, Icon} from 'react-native-elements';
@@ -22,6 +21,7 @@ import Modal from 'react-native-modal';
 import {observable, action, computed} from 'mobx';
 import {colors} from '../../assets/colors';
 import EditItemModal from '../components/EditItemModal';
+import Toast from '../components/Toast';
 
 const TabBase = createMaterialTopTabNavigator();
 @inject('itemsStore')
@@ -55,7 +55,7 @@ class StoreItemsTab extends Component {
       this.deleteCategoryModal = true;
       this.selectedCategory = this.props.detailsStore.storeDetails.itemCategories[0];
     } else {
-      Toast.show({
+      Toast({
         text: `There are no categories to be deleted.`,
         type: 'warning',
         style: {margin: 20, borderRadius: 16},
@@ -84,9 +84,8 @@ class StoreItemsTab extends Component {
         .then(() => {
           this.props.itemsStore.setStoreItems(merchantId, itemCategories);
 
-          Toast.show({
+          Toast({
             text: `Category "${this.newCategory}" successfully added!`,
-            buttonText: 'Okay',
             type: 'success',
             duration: 5000,
             style: {margin: 20, borderRadius: 16},
@@ -96,9 +95,8 @@ class StoreItemsTab extends Component {
           this.closeAddCategoryModal();
         });
     } else {
-      Toast.show({
+      Toast({
         text: `Category "${this.newCategory}" already exists!`,
-        buttonText: 'Okay',
         type: 'danger',
         duration: 5000,
         style: {margin: 20, borderRadius: 16},
@@ -118,18 +116,16 @@ class StoreItemsTab extends Component {
           this.props.itemsStore.setStoreItems(merchantId, itemCategories);
 
           this.closeDeleteCategoryModal();
-          Toast.show({
+          Toast({
             text: `Category "${category}" successfully deleted!`,
-            buttonText: 'Okay',
             type: 'success',
             duration: 5000,
             style: {margin: 20, borderRadius: 16},
           });
         });
     } else {
-      Toast.show({
+      Toast({
         text: `Category "${this.selectedCategory}" does not exist!`,
-        buttonText: 'Okay',
         type: 'danger',
         duration: 5000,
         style: {margin: 20, borderRadius: 16},

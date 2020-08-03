@@ -15,7 +15,7 @@ class AuthStore {
       .signInWithEmailAndPassword(email, password)
       .then(() => console.log('signed in succesfully'))
       .catch((err) =>
-        Toast({text: err, type: 'danger', duration: 5000, buttonText: 'Okay'}),
+        Toast({text: err, type: 'danger', duration: 5000,}),
       );
   }
 

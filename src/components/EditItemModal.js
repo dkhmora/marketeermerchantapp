@@ -258,7 +258,6 @@ class EditItemModal extends Component {
 
         Toast({
           text: `Item ${this.props.itemsStore.selectedItem.name} successfully edited!`,
-          buttonText: 'Okay',
           type: 'success',
           duration: 3500,
           style: {margin: 20, borderRadius: 16},

@@ -5,7 +5,6 @@ import {
   Left,
   Body,
   Right,
-  Toast,
   View,
   Item,
   H3,
@@ -20,6 +19,7 @@ import {observable, action, computed} from 'mobx';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import CancelOrderModal from './CancelOrderModal';
+import Toast from './Toast';
 
 @inject('ordersStore')
 @observer
@@ -61,12 +61,10 @@ class OrderCard extends PureComponent {
     this.props.ordersStore
       .setOrderStatus(order.orderId, order.merchantId, orderFetchLimit)
       .then(() => {
-        Toast.show({
+        Toast({
           text: `Successfully changed Order # ${order.merchantOrderNumber} status!`,
-          buttonText: 'Okay',
           type: 'success',
           duration: 3500,
-          style: {margin: 20, borderRadius: 16},
         });
       })
       .then(() => {

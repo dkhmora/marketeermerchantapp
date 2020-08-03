@@ -128,7 +128,6 @@ class ItemsList extends Component {
               Toast({
                 text: 'Please add a category before adding an item.',
                 type: 'danger',
-                buttonText: 'Okay',
                 duration: 6000,
               });
             }

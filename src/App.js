@@ -5,6 +5,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import MainDrawer from './navigation/MainDrawer';
 import AuthLoader from './components/AuthLoader';
 import LoginScreen from './screens/LoginScreen';
+import {RootSiblingParent} from 'react-native-root-siblings';
 
 const StackMain = createStackNavigator();
 
@@ -20,7 +21,7 @@ const NavigationTheme = {
 };
 
 export default () => (
-  <Root>
+  <RootSiblingParent>
     <NavigationContainer theme={NavigationTheme}>
       <StackMain.Navigator initialRouteName="Loader" headerMode="none">
         <StackMain.Screen name="Loader" component={AuthLoader} />
@@ -28,5 +29,5 @@ export default () => (
         <StackMain.Screen name="Home" component={MainDrawer} />
       </StackMain.Navigator>
     </NavigationContainer>
-  </Root>
+  </RootSiblingParent>
 );

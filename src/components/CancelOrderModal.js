@@ -50,7 +50,6 @@ class CancelOrderModal extends Component {
 
         Toast({
           text: `Order # ${this.props.ordersStore.selectedOrder.merchantOrderNumber} successfully cancelled!`,
-          buttonText: 'Okay',
           type: 'success',
           duration: 3500,
           style: {margin: 20, borderRadius: 16},

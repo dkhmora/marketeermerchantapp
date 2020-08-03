@@ -217,7 +217,6 @@ class ItemsStore {
             if (response.data.s === 200) {
               Toast({
                 text: `"${newItem.name}" successfully added to Item List!`,
-                buttonText: 'Okay',
               });
             } else {
               Toast({

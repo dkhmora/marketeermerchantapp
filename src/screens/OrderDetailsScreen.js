@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Container, Card, CardItem, Left, Right, Body, Toast} from 'native-base';
+import {Container, Card, CardItem, Left, Right, Body} from 'native-base';
 import {Text, Button, Icon} from 'react-native-elements';
 import {
   View,
@@ -15,6 +15,7 @@ import OrderItemListItem from '../components/OrderItemListItem';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
 import MapView, {Marker} from 'react-native-maps';
+import Toast from '../components/Toast';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -99,9 +100,8 @@ class OrderDetailsScreen extends Component {
 
       Linking.openURL(url);
     } else {
-      Toast.show({
+      Toast({
         text: 'Error, no user deliveryCoordinates found!',
-        buttonText: 'Okay',
         type: 'danger',
         duration: 7000,
         style: {margin: 20, borderRadius: 16},

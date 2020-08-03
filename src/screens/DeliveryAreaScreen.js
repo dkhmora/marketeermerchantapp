@@ -155,9 +155,7 @@ class DeliveryAreaScreen extends Component {
     this.props.detailsStore
       .updateCoordinates(range.lower, range.upper, boundingBox)
       .then(() => {
-        Toast({
-          text: 'Delivery Area successfully set!',
-        });
+        Toast({text: 'Delivery Area successfully set!'});
 
         this.props.authStore.appReady = true;
 

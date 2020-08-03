@@ -8,7 +8,7 @@ import {
   View,
   SafeAreaView,
 } from 'react-native';
-import {Card, Body, CardItem, Left, Toast} from 'native-base';
+import {Card, Body, CardItem, Left} from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
 // Mobx
@@ -23,6 +23,7 @@ import {Switch} from 'react-native-gesture-handler';
 import StoreCard from '../components/StoreCard';
 import FastImage from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import Toast from '../components/Toast';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -320,18 +321,16 @@ class StoreDetailsScreen extends Component {
           Number(this.newFreeDeliveryMinimum),
         )
         .then(() => {
-          Toast.show({
+          Toast({
             text: 'Store details successfully updated!',
             type: 'success',
-            style: {margin: 20, borderRadius: 16},
             duration: 3000,
           });
         });
     } else {
-      Toast.show({
+      Toast({
         text: 'Store details successfully updated!',
         type: 'success',
-        style: {margin: 20, borderRadius: 16},
         duration: 3000,
       });
     }

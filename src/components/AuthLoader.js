@@ -35,8 +35,6 @@ class AuthLoader extends React.Component {
                   text:
                     'Error, user account is not set as admin. Please contact Marketeer business support at business@marketeer.ph if you are supposed to be an admin.',
                   type: 'danger',
-                  duration: 0,
-                  buttonText: 'Okay',
                 });
               });
           } else {
