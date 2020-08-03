@@ -119,7 +119,7 @@ class LoginScreen extends Component {
           useNativeDriver
           animation="fadeInUpBig"
           style={styles.footer}>
-          <KeyboardAwareScrollView>
+          <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
             <Text style={styles.text_header}>Login</Text>
 
             <Text style={styles.text_footer}>Email Address</Text>
