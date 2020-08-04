@@ -64,6 +64,9 @@
          identifier = "../simulateScoutLozano.gpx"
          referenceType = "0">
       </LocationScenarioReference>
+      <RoutingCoverageFileReference
+         identifier = "../map.geojson">
+      </RoutingCoverageFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

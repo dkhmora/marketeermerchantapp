@@ -12,6 +12,7 @@ import {Card, CardItem, Picker, Item} from 'native-base';
 import storage from '@react-native-firebase/storage';
 import FastImage from 'react-native-fast-image';
 import {ScrollView} from 'react-native-gesture-handler';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -356,7 +357,10 @@ class EditItemModal extends Component {
             )}
           </View>
 
-          <ScrollView style={{paddingHorizontal: 15, paddingTop: 15}}>
+          <KeyboardAwareScrollView
+            showsVerticalScrollIndicator={false}
+            contentInsetAdjustmentBehavior="automatic"
+            style={{paddingHorizontal: 15, paddingTop: 15}}>
             <View
               style={{
                 flexDirection: 'row',
@@ -545,7 +549,7 @@ class EditItemModal extends Component {
               onChangeText={(value) => this.handleStock(value)}
             />
 
-            <View
+            <SafeAreaView
               style={{
                 flexDirection: 'row',
                 alignItems: 'flex-end',
@@ -583,8 +587,8 @@ class EditItemModal extends Component {
                 }}
                 onPress={() => this.handleConfirm()}
               />
-            </View>
-          </ScrollView>
+            </SafeAreaView>
+          </KeyboardAwareScrollView>
         </SafeAreaView>
       </Overlay>
     );
