@@ -35,6 +35,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera needs to be accesed in order to upload captured item and store images</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Marketeer Merchant needs user location data</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Marketeer Merchant needs user location data</string>
 	<key>NSPhotoLibraryUsageDescription</key>
