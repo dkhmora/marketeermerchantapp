@@ -80,27 +80,6 @@ class AuthLoader extends React.Component {
     }
   }
 
-  /*
-  componentDidUpdate(prevProps, prevState) {
-    const {navigation} = this.props;
-    const {merchantId} = this.props.detailsStore.storeDetails;
-
-    if (prevState.user !== this.state.user) {
-      console.log(prevState.user, this.state.user);
-      console.log(prevState.user !== this.state.user);
-      if (!this.state.user) {
-        console.log(1);
-        navigation.replace('Login');
-      } else {
-        console.log(2);
-        navigation.replace('Home', {
-          merchantId,
-        });
-      }
-    }
-  }
-  */
-
   render() {
     return (
       <View

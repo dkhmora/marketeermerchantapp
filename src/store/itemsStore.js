@@ -119,9 +119,6 @@ class ItemsStore {
   }
 
   @action setStoreItems(merchantId, itemCategories) {
-    console.log('max', this.maxItemsUpdatedAt);
-    //this.maxItemsUpdatedAt = 0;
-    //this.storeItems = [];
     this.unsubscribeSetStoreItems = firestore()
       .collection('merchants')
       .doc(merchantId)
