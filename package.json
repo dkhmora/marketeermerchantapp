@@ -66,6 +66,7 @@
     "react-native-screens": "^2.9.0",
     "react-native-splash-screen": "^3.2.0",
     "react-native-tab-view": "^2.15.0",
+    "react-native-webview": "^10.3.3",
     "rn-placeholder": "^3.0.1",
     "rn-sliding-up-panel": "^2.4.3",
     "uuid": "^8.3.0"

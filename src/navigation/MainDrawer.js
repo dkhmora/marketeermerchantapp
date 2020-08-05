@@ -28,15 +28,25 @@ class MainDrawer extends Component {
   }
 
   openTermsAndConditions() {
-    const url = 'https://marketeer.ph/components/pages/termsandconditions';
+    const {navigation} = this.props;
 
-    Linking.openURL(url);
+    const uri = 'https://marketeer.ph/components/pages/termsandconditions';
+
+    navigation.navigate('Browser', {
+      uri,
+      title: 'Marketeer Terms and Conditions',
+    });
   }
 
   openPrivacyPolicy() {
-    const url = 'https://marketeer.ph/components/pages/privacypolicy';
+    const {navigation} = this.props;
 
-    Linking.openURL(url);
+    const uri = 'https://marketeer.ph/components/pages/privacypolicy';
+
+    navigation.navigate('Browser', {
+      uri,
+      title: 'Marketeer Privacy Policy',
+    });
   }
 
   handleSignOut() {

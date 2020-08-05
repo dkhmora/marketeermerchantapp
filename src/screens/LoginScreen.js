@@ -74,26 +74,39 @@ class LoginScreen extends Component {
   }
 
   openMerchantSignUpForm() {
-    const merchantFormUrl =
-      'https://marketeer.ph/components/pages/partnermerchantsignup';
+    const {navigation} = this.props;
 
-    Linking.openURL(merchantFormUrl);
+    const uri = 'https://marketeer.ph/components/pages/partnermerchantsignup';
+
+    navigation.navigate('Browser', {
+      uri,
+      title: 'Marketeer Partner Merchant Sign Up',
+    });
   }
 
   openTermsAndConditions() {
-    const url = 'https://marketeer.ph/components/pages/termsandconditions';
+    const {navigation} = this.props;
 
-    Linking.openURL(url);
+    const uri = 'https://marketeer.ph/components/pages/termsandconditions';
+
+    navigation.navigate('Browser', {
+      uri,
+      title: 'Marketeer Terms and Conditions',
+    });
   }
 
   openPrivacyPolicy() {
-    const url = 'https://marketeer.ph/components/pages/privacypolicy';
+    const {navigation} = this.props;
 
-    Linking.openURL(url);
+    const uri = 'https://marketeer.ph/components/pages/privacypolicy';
+
+    navigation.navigate('Browser', {
+      uri,
+      title: 'Marketeer Privacy Policy',
+    });
   }
 
   render() {
-    const {navigation} = this.props;
     const {emailCheck} = this.state;
 
     return (
