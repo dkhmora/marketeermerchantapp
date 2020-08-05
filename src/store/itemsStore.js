@@ -119,6 +119,7 @@ class ItemsStore {
   }
 
   @action setStoreItems(merchantId, itemCategories) {
+    console.log('max', this.maxItemsUpdatedAt);
     //this.maxItemsUpdatedAt = 0;
     //this.storeItems = [];
     this.unsubscribeSetStoreItems = firestore()
@@ -132,17 +133,19 @@ class ItemsStore {
           await querySnapshot.docChanges().forEach(async (change, index) => {
             const newItems = change.doc.data().items;
 
-            if (this.storeItems.length > 0) {
-              this.storeItems = await this.storeItems.filter(
+            await new Promise((resolve, reject) => {
+              this.storeItems = this.storeItems.filter(
                 (storeItem) => storeItem.doc !== change.doc.id,
               );
-            }
 
-            await this.storeItems.push(...newItems);
+              resolve();
+            }).then(() => {
+              this.storeItems.push(...newItems);
 
-            if (change.doc.data().updatedAt > this.maxItemsUpdatedAt) {
-              this.maxItemsUpdatedAt = change.doc.data().updatedAt;
-            }
+              if (change.doc.data().updatedAt > this.maxItemsUpdatedAt) {
+                this.maxItemsUpdatedAt = change.doc.data().updatedAt;
+              }
+            });
           });
 
           this.storeItems = await this.storeItems
@@ -154,17 +157,7 @@ class ItemsStore {
               this.setCategoryItems(category);
             });
         }
-
         this.loaded = true;
-
-        this.storeItems = await this.storeItems
-          .slice()
-          .sort((a, b) => a.name > b.name);
-
-        itemCategories &&
-          itemCategories.map((category) => {
-            this.setCategoryItems(category);
-          });
       });
   }
 

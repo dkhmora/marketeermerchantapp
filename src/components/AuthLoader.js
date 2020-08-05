@@ -21,7 +21,7 @@ class AuthLoader extends React.Component {
   async onAuthStateChanged(user) {
     const {navigation} = this.props;
 
-    if (auth().currentUser != null) {
+    if (user) {
       await auth()
         .currentUser.getIdTokenResult(true)
         .then(async (idToken) => {
@@ -45,9 +45,7 @@ class AuthLoader extends React.Component {
               merchantId,
             });
 
-            this.setState({user}, () => {
-              this.props.authStore.appReady = true;
-            });
+            this.authStateSubscriber && this.authStateSubscriber();
           }
         });
     } else {
@@ -58,27 +56,22 @@ class AuthLoader extends React.Component {
         this.props.itemsStore.unsubscribeSetStoreItems();
 
       navigation.replace('Login');
-
-      this.setState({user}, () => {
-        this.props.authStore.appReady = true;
-      });
     }
+
+    this.setState({user}, () => {
+      this.props.authStore.appReady = true;
+    });
   }
 
   componentDidMount() {
-    const subscriber = auth().onAuthStateChanged(
+    const {navigation} = this.props;
+    const {merchantId} = this.props.detailsStore.storeDetails;
+
+    this.authStateSubscriber = auth().onAuthStateChanged(
       this.onAuthStateChanged.bind(this),
     );
 
-    return subscriber;
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const {navigation} = this.props;
-    const {merchantId} = this.props.detailsStore.storeDetails;
-    const {user} = this.state;
-
-    if (!user) {
+    if (!this.state.user) {
       navigation.replace('Login');
     } else {
       navigation.replace('Home', {
@@ -86,6 +79,27 @@ class AuthLoader extends React.Component {
       });
     }
   }
+
+  /*
+  componentDidUpdate(prevProps, prevState) {
+    const {navigation} = this.props;
+    const {merchantId} = this.props.detailsStore.storeDetails;
+
+    if (prevState.user !== this.state.user) {
+      console.log(prevState.user, this.state.user);
+      console.log(prevState.user !== this.state.user);
+      if (!this.state.user) {
+        console.log(1);
+        navigation.replace('Login');
+      } else {
+        console.log(2);
+        navigation.replace('Home', {
+          merchantId,
+        });
+      }
+    }
+  }
+  */
 
   render() {
     return (

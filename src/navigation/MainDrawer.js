@@ -63,6 +63,8 @@ class MainDrawer extends Component {
       this.props.itemsStore.storeItems = [];
       this.props.itemsStore.maxItemsUpdatedAt = 0;
 
+      this.props.navigation.navigate('Loader');
+
       this.props.authStore.appReady = true;
     });
   }
