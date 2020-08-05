@@ -49,7 +49,7 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
-      allowLocationSimulation = "YES">
+      allowLocationSimulation = "NO">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
@@ -64,9 +64,6 @@
          identifier = "../simulateScoutLozano.gpx"
          referenceType = "0">
       </LocationScenarioReference>
-      <RoutingCoverageFileReference
-         identifier = "../map.geojson">
-      </RoutingCoverageFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
