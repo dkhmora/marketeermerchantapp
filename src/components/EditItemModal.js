@@ -1,18 +1,17 @@
 import React, {Component} from 'react';
-import {Overlay, Text, Button, Icon, Image, Input} from 'react-native-elements';
-import {View, TextInput, SafeAreaView, StatusBar} from 'react-native';
+import {Overlay, Text, Button, Icon, Input} from 'react-native-elements';
+import {View, SafeAreaView, StatusBar, Platform} from 'react-native';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
-import * as Animatable from 'react-native-animatable';
 import {inject, observer} from 'mobx-react';
 import Toast from './Toast';
-import {observable, computed} from 'mobx';
+import {computed} from 'mobx';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Card, CardItem, Picker, Item, Label} from 'native-base';
 import storage from '@react-native-firebase/storage';
 import FastImage from 'react-native-fast-image';
-import {ScrollView} from 'react-native-gesture-handler';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import ConfirmationModal from './ConfirmationModal';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -37,6 +36,7 @@ class EditItemModal extends Component {
       newDescriptionError: null,
       newPriceError: null,
       newDiscountedPriceError: null,
+      editItemConfirmModal: false,
     };
   }
 
@@ -222,7 +222,7 @@ class EditItemModal extends Component {
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
-  handleConfirm() {
+  handleEditItem() {
     const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
     const {
       newName,
@@ -325,7 +325,30 @@ class EditItemModal extends Component {
         height="auto"
         overlayStyle={{flex: 1, padding: 0}}>
         <SafeAreaView style={{flex: 1}}>
-          <StatusBar barStyle="dark-content" />
+          <StatusBar
+            barStyle={
+              Platform.OS === 'android' ? 'light-content' : 'dark-content'
+            }
+          />
+
+          <ConfirmationModal
+            isVisible={this.state.editItemConfirmModal}
+            title={`Edit Item "${
+              this.props.itemsStore.selectedItem &&
+              this.props.itemsStore.selectedItem.name
+            }"`}
+            body={`Are you sure you want to edit "${
+              this.props.itemsStore.selectedItem &&
+              this.props.itemsStore.selectedItem.name
+            }"? Buyers will immediately see changes.`}
+            onConfirm={() => {
+              this.setState({editItemConfirmModal: false}, () => {
+                this.handleEditItem();
+              });
+            }}
+            closeModal={() => this.setState({editItemConfirmModal: false})}
+          />
+
           <View
             style={{
               flexDirection: 'row',
@@ -590,11 +613,12 @@ class EditItemModal extends Component {
                   )
                 }
                 loading={this.state.loading}
+                loadingProps={{size: 'small', color: colors.primary}}
                 containerStyle={{
                   alignSelf: 'flex-end',
                   borderRadius: 30,
                 }}
-                onPress={() => this.handleConfirm()}
+                onPress={() => this.setState({editItemConfirmModal: true})}
               />
             </SafeAreaView>
           </KeyboardAwareScrollView>

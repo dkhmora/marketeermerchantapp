@@ -19,6 +19,7 @@ import {colors} from '../../assets/colors';
 import Toast from '../components/Toast';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -36,6 +37,7 @@ class AddItemScreen extends Component {
       priceError: null,
       stockError: null,
       discountedPriceError: null,
+      addItemModal: false,
     };
   }
 
@@ -91,7 +93,7 @@ class AddItemScreen extends Component {
     }
   }
 
-  async onSubmit() {
+  async handleAddItem() {
     this.props.authStore.appReady = false;
 
     const item = {
@@ -265,6 +267,19 @@ class AddItemScreen extends Component {
     return (
       <Container style={{flex: 1}}>
         <BaseHeader title={name} backButton navigation={navigation} />
+
+        <ConfirmationModal
+          isVisible={this.state.addItemModal}
+          title={`${this.name}`}
+          body={`Are you sure you want to add ${this.name} to your Store Items? Buyers can immediately order it from your store.`}
+          onConfirm={() => {
+            this.setState({addItemModal: false}, () => {
+              this.handleAddItem();
+            });
+          }}
+          closeModal={() => this.setState({addItemModal: false})}
+        />
+
         <KeyboardAwareScrollView
           showsVerticalScrollIndicator={false}
           contentInsetAdjustmentBehavior="automatic"
@@ -469,7 +484,7 @@ class AddItemScreen extends Component {
                   titleStyle={{color: colors.icons}}
                   buttonStyle={{backgroundColor: colors.primary, height: 50}}
                   containerStyle={{marginTop: 20}}
-                  onPress={() => this.onSubmit()}
+                  onPress={() => this.setState({addItemModal: false})}
                   disabled={!this.formValid}
                 />
               </View>
