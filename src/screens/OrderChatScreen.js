@@ -1,15 +1,8 @@
 import React, {Component} from 'react';
-import {View, Image} from 'react-native';
-import {Container, Input, Item} from 'native-base';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {View} from 'react-native';
+import {Container} from 'native-base';
 import BaseHeader from '../components/BaseHeader';
-import {
-  GiftedChat,
-  Bubble,
-  Send,
-  Composer,
-  MessageImage,
-} from 'react-native-gifted-chat';
+import {GiftedChat, Bubble, Send, Composer} from 'react-native-gifted-chat';
 import {inject, observer} from 'mobx-react';
 import {Avatar, Icon, Button, Text} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';

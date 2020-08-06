@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Overlay, Text, Button, Icon, Input} from 'react-native-elements';
-import {View, KeyboardAvoidingView} from 'react-native';
-import {styles} from '../../assets/styles';
+import {View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {inject, observer} from 'mobx-react';
 import Toast from './Toast';

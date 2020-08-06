@@ -12,7 +12,7 @@ import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
 import {Button, Icon} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import {View, Platform, Linking, Alert} from 'react-native';
+import {View, Platform, Linking} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReviewsScreen from '../screens/ReviewsScreen';
 import AccountScreen from '../screens/AccountScreen';

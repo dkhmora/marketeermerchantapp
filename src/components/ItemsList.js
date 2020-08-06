@@ -1,10 +1,6 @@
 import React, {Component} from 'react';
-import {
-  FlatList,
-  ActivityIndicator,
-  TouchableHighlightBase,
-} from 'react-native';
-import {Container, View, Fab, Button} from 'native-base';
+import {FlatList, ActivityIndicator} from 'react-native';
+import {Container, View, Fab} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components
 import ItemCard from './ItemCard';

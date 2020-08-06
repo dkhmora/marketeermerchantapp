@@ -1,24 +1,12 @@
 import React, {PureComponent} from 'react';
-import {
-  Card,
-  CardItem,
-  Left,
-  Body,
-  Right,
-  View,
-  Item,
-  H3,
-  Textarea,
-} from 'native-base';
-import {ActionSheetIOS, Platform, ActivityIndicator} from 'react-native';
-import moment, {ISO_8601} from 'moment';
+import {Card, CardItem, Left, Body, Right} from 'native-base';
+import {ActivityIndicator, View} from 'react-native';
+import moment from 'moment';
 import {observer, inject} from 'mobx-react';
-import Modal from 'react-native-modal';
 import {Icon, Button, Text} from 'react-native-elements';
-import {observable, action, computed} from 'mobx';
+import {computed} from 'mobx';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
-import CancelOrderModal from './CancelOrderModal';
 import Toast from './Toast';
 
 @inject('ordersStore')

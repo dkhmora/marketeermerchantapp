@@ -1,21 +1,13 @@
 import React, {Component} from 'react';
-import {Container, Card, CardItem, Left, Right, Body} from 'native-base';
-import {Text, Button, Icon} from 'react-native-elements';
-import {
-  View,
-  Platform,
-  Linking,
-  ActivityIndicator,
-  SectionList,
-  SafeAreaView,
-} from 'react-native';
+import {Card, CardItem, Left, Right, Body} from 'native-base';
+import {Text, Icon} from 'react-native-elements';
+import {View, ActivityIndicator, SafeAreaView} from 'react-native';
 import BaseHeader from '../components/BaseHeader';
-import {FlatList, ScrollView} from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native-gesture-handler';
 import OrderItemListItem from '../components/OrderItemListItem';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
 import MapView, {Marker} from 'react-native-maps';
-import Toast from '../components/Toast';
 
 @inject('ordersStore')
 @inject('detailsStore')

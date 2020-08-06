@@ -1,7 +1,6 @@
-import React, {setState} from 'react';
-import {StyleSheet, ActivityIndicator} from 'react-native';
+import React from 'react';
+import {ActivityIndicator} from 'react-native';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 import {inject, observer} from 'mobx-react';
 import {View} from 'native-base';
 import {colors} from '../../assets/colors';

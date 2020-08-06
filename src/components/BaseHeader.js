@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import OptionsMenu from 'react-native-options-menu';
 import {Header, Button, Icon, Text} from 'react-native-elements';
-import {Platform, ActionSheetIOS, StyleSheet} from 'react-native';
+import {Platform, StyleSheet} from 'react-native';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 

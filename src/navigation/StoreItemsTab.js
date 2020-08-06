@@ -6,10 +6,6 @@ import {
   CardItem,
   Input,
   Item,
-  Right,
-  Left,
-  Body,
-  H3,
   Picker,
 } from 'native-base';
 import {Text, Button, Icon} from 'react-native-elements';
@@ -18,7 +14,7 @@ import ItemsList from '../components/ItemsList';
 import BaseHeader from '../components/BaseHeader';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
-import {observable, action, computed} from 'mobx';
+import {observable, action} from 'mobx';
 import {colors} from '../../assets/colors';
 import EditItemModal from '../components/EditItemModal';
 import Toast from '../components/Toast';

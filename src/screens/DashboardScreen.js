@@ -1,13 +1,5 @@
-import React, {Component, setState} from 'react';
-import {
-  StyleSheet,
-  Image,
-  ScrollView,
-  Platform,
-  ActivityIndicator,
-  View,
-  SafeAreaView,
-} from 'react-native';
+import React, {Component} from 'react';
+import {ActivityIndicator, View, SafeAreaView} from 'react-native';
 import {Card, Body, CardItem, Left} from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';

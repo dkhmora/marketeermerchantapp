@@ -3,7 +3,6 @@ import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import firebase from '@react-native-firebase/app';
 import messaging from '@react-native-firebase/messaging';
-import auth from '@react-native-firebase/auth';
 import '@react-native-firebase/functions';
 import Toast from '../components/Toast';
 import {Platform} from 'react-native';

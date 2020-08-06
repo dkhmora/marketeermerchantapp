@@ -3,7 +3,6 @@ import {Image} from 'react-native';
 import {
   Container,
   Grid,
-  Content,
   Row,
   Col,
   Picker,
