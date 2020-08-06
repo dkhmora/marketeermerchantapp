@@ -311,12 +311,13 @@ class OrderDetailsScreen extends Component {
                     <Text
                       style={{
                         fontSize: 18,
-                        color: colors.primary,
+                        color: colors.text_primary,
                         fontFamily: 'ProductSans-Black',
                       }}>
-                      ₱ {order.totalAmount}
+                      ₱ {order.subTotal}
                     </Text>
                   </View>
+
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <Text
                       style={{
@@ -324,15 +325,19 @@ class OrderDetailsScreen extends Component {
                         color: colors.text_primary,
                         fontFamily: 'ProductSans-Light',
                       }}>
-                      Estimated Shipping Price:{' '}
+                      Delivery Price:{' '}
                     </Text>
                     <Text
                       style={{
                         fontSize: 18,
-                        color: colors.primary,
+                        color: colors.text_primary,
                         fontFamily: 'ProductSans-Black',
                       }}>
-                      ₱ {order.shippingPrice}130-200
+                      {order.deliveryPrice && order.deliveryPrice > 0
+                        ? `₱${order.deliveryPrice}`
+                        : order.deliveryPrice === null
+                        ? '(Contact Merchant)'
+                        : '₱0 (Free Delivery)'}
                     </Text>
                   </View>
                 </Right>
@@ -355,10 +360,12 @@ class OrderDetailsScreen extends Component {
                     <Text
                       style={{
                         fontSize: 18,
-                        color: colors.primary,
+                        color: colors.text_primary,
                         fontFamily: 'ProductSans-Black',
                       }}>
-                      ₱ {order.totalAmount + 130} - ₱ {order.totalAmount + 200}
+                      ₱
+                      {order.subTotal +
+                        (order.deliveryPrice ? order.deliveryPrice : 0)}
                     </Text>
                   </View>
                 </Right>

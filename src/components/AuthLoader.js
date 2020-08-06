@@ -58,9 +58,7 @@ class AuthLoader extends React.Component {
       navigation.replace('Login');
     }
 
-    this.setState({user}, () => {
-      this.props.authStore.appReady = true;
-    });
+    this.setState({user});
   }
 
   componentDidMount() {

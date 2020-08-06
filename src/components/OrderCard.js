@@ -173,7 +173,7 @@ class OrderCard extends PureComponent {
                   fontSize: 16,
                   textAlign: 'center',
                 }}>
-                ₱{(order.totalAmount * 0.05).toPrecision(3)}
+                ₱{(order.subTotal * 0.05).toPrecision(3)}
               </Text>
 
               <Text
@@ -277,7 +277,7 @@ class OrderCard extends PureComponent {
                   fontFamily: 'ProductSans-Black',
                   fontSize: 16,
                 }}>
-                ₱ {order.totalAmount}
+                ₱ {order.subTotal}
               </Text>
               <Text note>{order.quantity} items</Text>
             </Right>

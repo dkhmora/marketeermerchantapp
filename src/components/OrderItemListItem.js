@@ -103,7 +103,7 @@ class OrderItemCard extends PureComponent {
               style={{
                 fontFamily: 'ProductSans-Black',
                 fontSize: 18,
-                color: colors.primary,
+                color: colors.text_primary,
               }}>
               ₱ {item.price * item.quantity}
             </Text>

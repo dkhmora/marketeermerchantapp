@@ -170,7 +170,7 @@ class DetailsStore {
     freeDelivery,
     vacationMode,
     paymentMethods,
-    shippingMethods,
+    deliveryMethods,
     deliveryType,
     ownDeliveryServiceFee,
     freeDeliveryMinimum,
@@ -182,7 +182,7 @@ class DetailsStore {
         freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
         vacationMode,
         paymentMethods,
-        shippingMethods,
+        deliveryMethods,
         deliveryType,
         ownDeliveryServiceFee: ownDeliveryServiceFee
           ? ownDeliveryServiceFee
