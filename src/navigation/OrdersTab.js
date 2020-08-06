@@ -93,11 +93,9 @@ class OrdersTab extends Component {
             style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
-            tabStyle: {width: 120},
+            tabStyle: {width: 'auto'},
             indicatorStyle: {
               backgroundColor: colors.primary,
-              width: 70,
-              left: (120 - 70) / 2,
             },
           }}
           headerMode="none"

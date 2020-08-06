@@ -14,12 +14,15 @@ import ItemsList from '../components/ItemsList';
 import BaseHeader from '../components/BaseHeader';
 import {observer, inject} from 'mobx-react';
 import Modal from 'react-native-modal';
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
 import {colors} from '../../assets/colors';
 import EditItemModal from '../components/EditItemModal';
 import Toast from '../components/Toast';
+import {Dimensions} from 'react-native';
 
 const TabBase = createMaterialTopTabNavigator();
+
+const SCREEN_WIDTH = Dimensions.get('screen').width;
 @inject('itemsStore')
 @inject('authStore')
 @inject('detailsStore')
@@ -36,6 +39,14 @@ class StoreItemsTab extends Component {
     : null;
   @observable addCategoryModal = false;
   @observable deleteCategoryModal = false;
+
+  @computed get tabWidth() {
+    const {itemCategories} = this.props.detailsStore.storeDetails;
+
+    return itemCategories && itemCategories.length > 5
+      ? 'auto'
+      : SCREEN_WIDTH / itemCategories.size;
+  }
 
   @action closeAddCategoryModal() {
     this.addCategoryModal = false;
@@ -277,13 +288,11 @@ class StoreItemsTab extends Component {
           tabBarOptions={{
             scrollEnabled: true,
             style: {backgroundColor: colors.icons},
+            tabStyle: {width: this.tabWidth},
             activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
-            tabStyle: {width: 120},
             indicatorStyle: {
               backgroundColor: colors.primary,
-              width: 70,
-              left: (120 - 70) / 2,
             },
           }}>
           <TabBase.Screen
