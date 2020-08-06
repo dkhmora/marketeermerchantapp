@@ -8,6 +8,7 @@ import {computed} from 'mobx';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
+import ConfirmationModal from './ConfirmationModal';
 
 @inject('ordersStore')
 @observer
@@ -17,6 +18,7 @@ class OrderCard extends PureComponent {
 
     this.state = {
       loading: false,
+      changeOrderStatusModal: false,
     };
   }
 
@@ -214,7 +216,7 @@ class OrderCard extends PureComponent {
                 title={buttonText}
                 titleStyle={{color: colors.icons}}
                 loading={this.state.loading}
-                loadingProps={{size: 'small', color: colors.accent}}
+                loadingProps={{size: 'small', color: colors.icons}}
                 buttonStyle={{backgroundColor: colors.accent}}
                 containerStyle={{
                   borderRadius: 24,
@@ -222,7 +224,7 @@ class OrderCard extends PureComponent {
                   borderColor: colors.accent,
                   width: '100%',
                 }}
-                onPress={this.handleChangeOrderStatus.bind(this)}
+                onPress={() => this.setState({changeOrderStatusModal: true})}
               />
             )}
           </Right>
@@ -232,6 +234,18 @@ class OrderCard extends PureComponent {
 
     return (
       <View>
+        <ConfirmationModal
+          isVisible={this.state.changeOrderStatusModal}
+          title={`${buttonText} Order # ${order.merchantOrderNumber}?`}
+          body={`Are you sure you want to ${buttonText} Order # ${order.merchantOrderNumber}?`}
+          onConfirm={() => {
+            this.setState({changeOrderStatusModal: false}, () => {
+              this.handleChangeOrderStatus();
+            });
+          }}
+          closeModal={() => this.setState({changeOrderStatusModal: false})}
+        />
+
         <Card {...otherProps} style={{borderRadius: 10, overflow: 'hidden'}}>
           <CardHeader />
           <CardItem bordered>

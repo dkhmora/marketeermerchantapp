@@ -9,6 +9,7 @@ import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
 import MapView, {Marker} from 'react-native-maps';
 import Toast from '../components/Toast';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -22,6 +23,7 @@ class OrderDetailsScreen extends Component {
       orderItems: [],
       loading: true,
       allowDragging: true,
+      changeOrderStatusModal: false,
     };
   }
 
@@ -139,6 +141,18 @@ class OrderDetailsScreen extends Component {
             },
           ]}
           navigation={navigation}
+        />
+
+        <ConfirmationModal
+          isVisible={this.state.changeOrderStatusModal}
+          title={`${buttonText} Order # ${order.merchantOrderNumber}?`}
+          body={`Are you sure you want to ${buttonText} Order # ${order.merchantOrderNumber}?`}
+          onConfirm={() => {
+            this.setState({changeOrderStatusModal: false}, () => {
+              this.handleChangeOrderStatus();
+            });
+          }}
+          closeModal={() => this.setState({changeOrderStatusModal: false})}
         />
 
         <ScrollView
@@ -487,7 +501,7 @@ class OrderDetailsScreen extends Component {
 
             {buttonText && (
               <Button
-                onPress={() => this.handleChangeOrderStatus()}
+                onPress={() => this.setState({changeOrderStatusModal: true})}
                 title={buttonText}
                 titleStyle={{color: colors.icons}}
                 containerStyle={{
