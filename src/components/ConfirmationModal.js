@@ -1,7 +1,8 @@
 import React, {PureComponent} from 'react';
 import {Overlay, Text, Button} from 'react-native-elements';
-import {View} from 'react-native';
+import {View, Dimensions} from 'react-native';
 import {inject, observer} from 'mobx-react';
+import FastImage from 'react-native-fast-image';
 
 @inject('authStore')
 @observer
@@ -11,7 +12,7 @@ class ConfirmationModal extends PureComponent {
   }
 
   render() {
-    const {closeModal, isVisible, onConfirm, title, body} = this.props;
+    const {closeModal, isVisible, onConfirm, title, body, image} = this.props;
 
     return (
       <Overlay
@@ -23,7 +24,11 @@ class ConfirmationModal extends PureComponent {
         overlayBackgroundColor="red"
         width="80%"
         height="auto"
-        overlayStyle={{borderRadius: 10, padding: 15, width: '80%'}}>
+        overlayStyle={{
+          borderRadius: 10,
+          padding: 15,
+          width: '80%',
+        }}>
         <View style={{flexDirection: 'column'}}>
           <Text
             style={{
@@ -34,12 +39,29 @@ class ConfirmationModal extends PureComponent {
             {title}
           </Text>
 
-          <Text
-            style={{
-              fontSize: 20,
-            }}>
-            {body}
-          </Text>
+          {body && (
+            <Text
+              style={{
+                fontSize: 20,
+              }}>
+              {body}
+            </Text>
+          )}
+
+          {image && (
+            <View
+              style={{
+                height: Dimensions.get('screen').height * 0.4,
+              }}>
+              <FastImage
+                source={{uri: image}}
+                style={{
+                  flex: 1,
+                }}
+                resizeMode={FastImage.resizeMode.contain}
+              />
+            </View>
+          )}
 
           <View
             style={{

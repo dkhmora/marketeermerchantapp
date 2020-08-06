@@ -9,6 +9,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import {observable} from 'mobx';
 import {colors} from '../../assets/colors';
 import Toast from '../components/Toast';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -23,6 +24,7 @@ class OrderChatScreen extends Component {
         _id: this.props.detailsStore.storeDetails.merchantId,
         name: this.props.detailsStore.storeDetails.storeName,
       },
+      confirmImageModal: false,
     };
 
     this.renderComposer.bind(this);
@@ -54,8 +56,6 @@ class OrderChatScreen extends Component {
   }
 
   handleTakePhoto() {
-    const {order} = this.props.route.params;
-
     ImagePicker.openCamera({
       width: 1280,
       height: 720,
@@ -65,21 +65,10 @@ class OrderChatScreen extends Component {
       .then((image) => {
         this.imagePath = image.path;
       })
-      .then(() =>
-        this.props.ordersStore.sendImage(
-          order.orderId,
-          order.userId,
-          order.merchantId,
-          this.state.user,
-          this.imagePath,
-        ),
-      )
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   handleSelectImage() {
-    const {order} = this.props.route.params;
-
     ImagePicker.openPicker({
       width: 1280,
       height: 720,
@@ -89,15 +78,6 @@ class OrderChatScreen extends Component {
       .then((image) => {
         this.imagePath = image.path;
       })
-      .then(() =>
-        this.props.ordersStore.sendImage(
-          order.orderId,
-          order.userId,
-          order.merchantId,
-          this.state.user,
-          this.imagePath,
-        ),
-      )
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
@@ -187,6 +167,23 @@ class OrderChatScreen extends Component {
     return (
       <Container style={{flex: 1}}>
         <BaseHeader title={headerTitle} backButton navigation={navigation} />
+
+        <ConfirmationModal
+          isVisible={this.imagePath !== ''}
+          title="Send Image?"
+          image={this.imagePath}
+          onConfirm={() => {
+            this.props.ordersStore.sendImage(
+              order.orderId,
+              order.userId,
+              order.merchantId,
+              this.state.user,
+              this.imagePath,
+            );
+            this.imagePath = '';
+          }}
+          closeModal={() => (this.imagePath = '')}
+        />
 
         <View style={{flex: 1}}>
           <GiftedChat
