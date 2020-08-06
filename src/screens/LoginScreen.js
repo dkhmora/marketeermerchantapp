@@ -7,6 +7,7 @@ import {
   StatusBar,
   Image,
   Linking,
+  Platform,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {observer, inject} from 'mobx-react';
@@ -166,6 +167,7 @@ class LoginScreen extends Component {
 
               <TextInput
                 placeholder="myemail@gmail.com"
+                placeholderTextColor={colors.text_secondary}
                 maxLength={256}
                 style={styles.textInput}
                 autoCapitalize="none"
@@ -196,6 +198,7 @@ class LoginScreen extends Component {
 
               <TextInput
                 placeholder="Password"
+                placeholderTextColor={colors.text_secondary}
                 maxLength={32}
                 secureTextEntry={this.state.secureTextEntry ? true : false}
                 style={styles.textInput}
@@ -260,19 +263,23 @@ class LoginScreen extends Component {
               buttonStyle={{height: 50}}
             />
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                paddingTop: 10,
-                flexWrap: 'wrap',
-              }}>
-              <Text style={styles.color_textPrivate}>Are you a merchant? </Text>
+            {Platform.OS === 'android' && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  paddingTop: 10,
+                  flexWrap: 'wrap',
+                }}>
+                <Text style={styles.color_textPrivate}>
+                  Are you a merchant?{' '}
+                </Text>
 
-              <TouchableOpacity onPress={() => this.openMerchantSignUpForm()}>
-                <Text style={styles.touchable_text}>Come and join us!</Text>
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity onPress={() => this.openMerchantSignUpForm()}>
+                  <Text style={styles.touchable_text}>Come and join us!</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </KeyboardAwareScrollView>
         </Animatable.View>
       </View>
