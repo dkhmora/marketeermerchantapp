@@ -84,8 +84,8 @@ class LoginScreen extends Component {
           preferredControlTintColor: 'white',
           readerMode: false,
           animated: true,
-          modalPresentationStyle: 'overFullScreen',
-          modalTransitionStyle: 'partialCurl',
+          modalPresentationStyle: 'pageSheet',
+          modalTransitionStyle: 'coverVertical',
           modalEnabled: true,
           enableBarCollapsing: false,
           // Android Properties
