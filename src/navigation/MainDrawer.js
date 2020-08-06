@@ -12,10 +12,12 @@ import DeliveryAreaScreen from '../screens/DeliveryAreaScreen';
 import {Button, Icon} from 'react-native-elements';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import {View, Platform, Linking} from 'react-native';
+import {View, Platform, Linking, Alert} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ReviewsScreen from '../screens/ReviewsScreen';
 import AccountScreen from '../screens/AccountScreen';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
+import Toast from '../components/Toast';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -27,26 +29,51 @@ class MainDrawer extends Component {
     super(props);
   }
 
+  async openLink(url) {
+    try {
+      if (await InAppBrowser.isAvailable()) {
+        await InAppBrowser.open(url, {
+          dismissButtonStyle: 'cancel',
+          preferredBarTintColor: colors.primary,
+          preferredControlTintColor: 'white',
+          readerMode: false,
+          animated: true,
+          modalPresentationStyle: 'overFullScreen',
+          modalTransitionStyle: 'partialCurl',
+          modalEnabled: true,
+          enableBarCollapsing: false,
+          // Android Properties
+          showTitle: true,
+          toolbarColor: colors.primary,
+          secondaryToolbarColor: 'black',
+          enableUrlBarHiding: true,
+          enableDefaultShare: true,
+          forceCloseOnRedirection: false,
+          animations: {
+            startEnter: 'slide_in_right',
+            startExit: 'slide_out_left',
+            endEnter: 'slide_in_left',
+            endExit: 'slide_out_right',
+          },
+        });
+      } else {
+        Linking.openURL(url);
+      }
+    } catch (err) {
+      Toast({text: err.message, type: 'danger'});
+    }
+  }
+
   openTermsAndConditions() {
-    const {navigation} = this.props;
+    const url = 'https://marketeer.ph/components/pages/termsandconditions';
 
-    const uri = 'https://marketeer.ph/components/pages/termsandconditions';
-
-    navigation.navigate('Browser', {
-      uri,
-      title: 'Marketeer Terms and Conditions',
-    });
+    this.openLink(url);
   }
 
   openPrivacyPolicy() {
-    const {navigation} = this.props;
+    const url = 'https://marketeer.ph/components/pages/privacypolicy';
 
-    const uri = 'https://marketeer.ph/components/pages/privacypolicy';
-
-    navigation.navigate('Browser', {
-      uri,
-      title: 'Marketeer Privacy Policy',
-    });
+    this.openLink(url);
   }
 
   handleSignOut() {
