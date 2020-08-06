@@ -27,6 +27,7 @@ class OrderDetailsScreen extends Component {
     this.state = {
       orderItems: [],
       loading: true,
+      allowDragging: true,
     };
   }
 
@@ -111,7 +112,7 @@ class OrderDetailsScreen extends Component {
     return (
       <View style={{flex: 1}}>
         <BaseHeader
-          title={`Order #${order.merchantOrderNumber} Details`}
+          title={`Order # ${order.merchantOrderNumber}`}
           backButton
           optionsButton
           actions={actions}
@@ -120,6 +121,7 @@ class OrderDetailsScreen extends Component {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
+          scrollEnabled={this.state.allowDragging}
           style={{
             flex: 1,
             flexDirection: 'column',
@@ -146,9 +148,8 @@ class OrderDetailsScreen extends Component {
               <Right>
                 <Text
                   style={{
-                    color: colors.primary,
+                    color: colors.text_primary,
                     fontSize: 16,
-                    fontFamily: 'ProductSans-Bold',
                     textAlign: 'right',
                   }}>
                   {order.userName}
@@ -166,9 +167,8 @@ class OrderDetailsScreen extends Component {
               <Right>
                 <Text
                   style={{
-                    color: colors.primary,
+                    color: colors.text_primary,
                     fontSize: 16,
-                    fontFamily: 'ProductSans-Bold',
                     textAlign: 'right',
                   }}>
                   {order.userPhoneNumber}
@@ -187,9 +187,8 @@ class OrderDetailsScreen extends Component {
                   <View style={{justifyContent: 'flex-end'}}>
                     <Text
                       style={{
-                        color: colors.primary,
+                        color: colors.text_primary,
                         fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
                         textAlign: 'right',
                       }}>
                       {order.deliveryAddress}
@@ -198,9 +197,8 @@ class OrderDetailsScreen extends Component {
                 ) : (
                   <Text
                     style={{
-                      color: colors.primary,
+                      color: colors.text_primary,
                       fontSize: 16,
-                      fontFamily: 'ProductSans-Bold',
                       textAlign: 'right',
                     }}>
                     No user location details found. Please cancel this order.
@@ -218,6 +216,9 @@ class OrderDetailsScreen extends Component {
               }}>
               <View style={{flex: 1, borderRadius: 10, overflow: 'hidden'}}>
                 <MapView
+                  onTouchStart={() => this.setState({allowDragging: false})}
+                  onTouchEnd={() => this.setState({allowDragging: true})}
+                  onTouchCancel={() => this.setState({allowDragging: true})}
                   provider="google"
                   style={{
                     height: 300,
@@ -274,6 +275,59 @@ class OrderDetailsScreen extends Component {
           </Card>
 
           <SafeAreaView>
+            <Card
+              style={{
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}>
+              <CardItem
+                header
+                bordered
+                style={{backgroundColor: colors.primary}}>
+                <Text style={{color: colors.icons, fontSize: 20}}>
+                  Order Details
+                </Text>
+              </CardItem>
+
+              <CardItem bordered>
+                <Left>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Delivery Method:
+                  </Text>
+                </Left>
+
+                <Right>
+                  <Text
+                    style={{
+                      color: colors.text_primary,
+                      fontSize: 16,
+                      textAlign: 'right',
+                    }}>
+                    {order.deliveryMethod}
+                  </Text>
+                </Right>
+              </CardItem>
+
+              <CardItem bordered>
+                <Left>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Payment Method:
+                  </Text>
+                </Left>
+
+                <Right>
+                  <Text
+                    style={{
+                      color: colors.text_primary,
+                      fontSize: 16,
+                      textAlign: 'right',
+                    }}>
+                    {order.paymentMethod}
+                  </Text>
+                </Right>
+              </CardItem>
+            </Card>
+
             <Card
               style={{
                 borderRadius: 10,
