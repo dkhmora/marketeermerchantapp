@@ -86,6 +86,8 @@ class OrdersTab extends Component {
         <CancelOrderModal />
 
         <TabOrders.Navigator
+          lazy
+          lazyPreloadDistance={1}
           tabBarOptions={{
             scrollEnabled: true,
             style: {backgroundColor: colors.icons},

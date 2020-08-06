@@ -276,6 +276,8 @@ class StoreItemsTab extends Component {
         <EditItemModal isVisible={this.props.itemsStore.editItemModal} />
 
         <TabBase.Navigator
+          lazy
+          lazyPreloadDistance={1}
           tabBarOptions={{
             scrollEnabled: true,
             style: {backgroundColor: colors.icons},
