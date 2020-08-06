@@ -448,7 +448,9 @@ class StoreDetailsScreen extends Component {
           <KeyboardAwareScrollView
             style={{paddingHorizontal: 10}}
             showsVerticalScrollIndicator={false}
-            contentInsetAdjustmentBehavior="automatic">
+            contentInsetAdjustmentBehavior="automatic"
+            keyboardOpeningTime={20}
+            extraScrollHeight={20}>
             <SafeAreaView>
               <Card
                 style={{

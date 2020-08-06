@@ -33,7 +33,7 @@ class MainDrawer extends Component {
     try {
       if (await InAppBrowser.isAvailable()) {
         await InAppBrowser.open(url, {
-          dismissButtonStyle: 'cancel',
+          dismissButtonStyle: 'close',
           preferredBarTintColor: colors.primary,
           preferredControlTintColor: 'white',
           readerMode: false,

@@ -267,7 +267,8 @@ class AddItemScreen extends Component {
         <BaseHeader title={name} backButton navigation={navigation} />
         <KeyboardAwareScrollView
           showsVerticalScrollIndicator={false}
-          contentInsetAdjustmentBehavior="automatic">
+          contentInsetAdjustmentBehavior="automatic"
+          keyboardOpeningTime={20}>
           <SafeAreaView>
             <Grid style={{padding: 18}}>
               <Row size={3} style={{marginBottom: 10}}>
@@ -341,6 +342,7 @@ class AddItemScreen extends Component {
                     style={{
                       fontSize: 16,
                       fontFamily: 'ProductSans-Regular',
+                      flex: 1,
                     }}>
                     Category:
                   </Text>

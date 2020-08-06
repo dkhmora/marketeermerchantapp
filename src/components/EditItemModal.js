@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Overlay, Text, Button, Icon, Image, Input} from 'react-native-elements';
-import {View, TextInput, SafeAreaView} from 'react-native';
+import {View, TextInput, SafeAreaView, StatusBar} from 'react-native';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
@@ -8,7 +8,7 @@ import {inject, observer} from 'mobx-react';
 import Toast from './Toast';
 import {observable, computed} from 'mobx';
 import ImagePicker from 'react-native-image-crop-picker';
-import {Card, CardItem, Picker, Item} from 'native-base';
+import {Card, CardItem, Picker, Item, Label} from 'native-base';
 import storage from '@react-native-firebase/storage';
 import FastImage from 'react-native-fast-image';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -325,6 +325,7 @@ class EditItemModal extends Component {
         height="auto"
         overlayStyle={{flex: 1, padding: 0}}>
         <SafeAreaView style={{flex: 1}}>
+          <StatusBar barStyle="dark-content" />
           <View
             style={{
               flexDirection: 'row',
@@ -360,9 +361,12 @@ class EditItemModal extends Component {
           <KeyboardAwareScrollView
             showsVerticalScrollIndicator={false}
             contentInsetAdjustmentBehavior="automatic"
+            keyboardOpeningTime={20}
+            extraScrollHeight={20}
             style={{paddingHorizontal: 15, paddingTop: 15}}>
             <View
               style={{
+                flex: 1,
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 paddingBottom: 10,
@@ -421,17 +425,21 @@ class EditItemModal extends Component {
 
             <View style={styles.action}>
               <Item
-                style={{paddingHorizontal: 10, flex: 1, borderBottomWidth: 0}}>
-                <View style={styles.icon_container}>
+                style={{
+                  paddingHorizontal: 10,
+                  flex: 1,
+                  borderBottomWidth: 0,
+                }}>
+                <View style={[styles.icon_container, {flex: 1}]}>
                   <Icon name="folder" color={colors.primary} size={20} />
                 </View>
-
                 <Picker
                   note={false}
                   placeholder="Select Item Category"
                   mode="dropdown"
                   selectedValue={newCategory}
-                  iosIcon={<Icon name="arrow-down" />}
+                  iosIcon={<Icon name="chevron-down" />}
+                  itemTextStyle={{textAlign: 'right'}}
                   onValueChange={this.handleCategory.bind(this)}>
                   {this.categories &&
                     this.categories.map((cat, index) => {
@@ -539,6 +547,7 @@ class EditItemModal extends Component {
                 this.props.itemsStore.selectedItem &&
                 this.props.itemsStore.selectedItem.name
               } Stock`}
+              placeholderStyle={{color: colors.primary}}
               leftIcon={<Icon name="hash" color={colors.primary} size={20} />}
               maxLength={10}
               errorMessage={newDescriptionError && newDescriptionError}

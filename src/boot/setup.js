@@ -44,6 +44,7 @@ const theme = {
     inputStyle: {
       fontFamily: 'ProductSans-Light',
     },
+    placeholderTextColor: colors.text_secondary,
   },
   CheckBox: {
     checkedColor: colors.accent,
