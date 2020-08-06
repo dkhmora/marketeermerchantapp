@@ -270,7 +270,7 @@ class AddItemScreen extends Component {
 
         <ConfirmationModal
           isVisible={this.state.addItemModal}
-          title={`${this.name}`}
+          title={`Add Item "${this.name}"`}
           body={`Are you sure you want to add ${this.name} to your Store Items? Buyers can immediately order it from your store.`}
           onConfirm={() => {
             this.setState({addItemModal: false}, () => {
@@ -484,7 +484,7 @@ class AddItemScreen extends Component {
                   titleStyle={{color: colors.icons}}
                   buttonStyle={{backgroundColor: colors.primary, height: 50}}
                   containerStyle={{marginTop: 20}}
-                  onPress={() => this.setState({addItemModal: false})}
+                  onPress={() => this.setState({addItemModal: true})}
                   disabled={!this.formValid}
                 />
               </View>

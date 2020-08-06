@@ -566,10 +566,10 @@ class EditItemModal extends Component {
             />
 
             <Input
-              placeholder={`Additional ${
+              placeholder={`Increase/Decrease ${
                 this.props.itemsStore.selectedItem &&
                 this.props.itemsStore.selectedItem.name
-              } Stock`}
+              } Stock (+/- values)`}
               placeholderStyle={{color: colors.primary}}
               leftIcon={<Icon name="hash" color={colors.primary} size={20} />}
               maxLength={10}

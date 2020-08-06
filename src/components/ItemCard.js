@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import {Card, CardItem, Body} from 'native-base';
-import {View} from 'react-native';
+import {View, ActivityIndicator} from 'react-native';
 import {Text} from 'react-native-elements';
 import moment from 'moment';
 import storage from '@react-native-firebase/storage';
@@ -11,6 +11,7 @@ import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import FastImage from 'react-native-fast-image';
+import ConfirmationModal from './ConfirmationModal';
 
 @inject('itemsStore')
 @inject('authStore')
@@ -23,6 +24,8 @@ class ItemCard extends PureComponent {
     this.state = {
       url: require('../../assets/placeholder.jpg'),
       loaded: false,
+      deleting: false,
+      deleteItemConfirmModal: false,
     };
   }
 
@@ -87,6 +90,21 @@ class ItemCard extends PureComponent {
           marginHorizontal: 6,
           marginVertical: 3,
         }}>
+        <ConfirmationModal
+          isVisible={this.state.deleteItemConfirmModal}
+          title={`Delete Item "${item.name}"?`}
+          body={`Are you sure you want to delete "${item.name}"? Shoppers will immediately see changes.`}
+          onConfirm={() => {
+            this.setState(
+              {deleteItemConfirmModal: false, deleting: true},
+              () => {
+                this.handleDelete();
+              },
+            );
+          }}
+          closeModal={() => this.setState({deleteItemConfirmModal: false})}
+        />
+
         <Card
           {...otherProps}
           style={{
@@ -118,15 +136,19 @@ class ItemCard extends PureComponent {
               <Text style={{color: '#ddd'}}>{item.sales} Sold</Text>
             </View>
 
-            <BaseOptionsMenu
-              destructiveIndex={1}
-              iconStyle={{color: '#fff', fontSize: 24}}
-              options={['Edit Item', 'Delete Item']}
-              actions={[
-                this.handleEditItem.bind(this),
-                this.handleDelete.bind(this),
-              ]}
-            />
+            {this.state.deleting ? (
+              <ActivityIndicator size="small" color={colors.icons} />
+            ) : (
+              <BaseOptionsMenu
+                destructiveIndex={1}
+                iconStyle={{color: '#fff', fontSize: 24}}
+                options={['Edit Item', 'Delete Item']}
+                actions={[
+                  this.handleEditItem.bind(this),
+                  () => this.setState({deleteItemConfirmModal: true}),
+                ]}
+              />
+            )}
           </CardItem>
 
           <CardItem cardBody>
