@@ -425,7 +425,7 @@ class StoreDetailsScreen extends Component {
                 iconStyle={{
                   color: colors.icons,
                   fontSize: 25,
-                  marginRight: 10,
+                  marginRight: Platform.OS === 'android' ? 10 : 0,
                 }}
                 options={['Edit Details']}
                 actions={[this.toggleEditing.bind(this)]}

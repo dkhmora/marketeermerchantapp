@@ -63,7 +63,10 @@ class BaseHeader extends Component {
     if (options && actions) {
       return (
         <BaseOptionsMenu
-          iconStyle={{color: colors.primary, marginRight: 10}}
+          iconStyle={{
+            color: colors.primary,
+            marginRight: Platform.OS === 'android' ? 10 : 0,
+          }}
           options={options}
           actions={actions}
           destructiveIndex={destructiveIndex}
