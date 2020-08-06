@@ -41,7 +41,7 @@ class DetailsStore {
         return data;
       })
       .catch((err) => {
-        Toast({text: err, type: 'danger'});
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -52,7 +52,7 @@ class DetailsStore {
         return response.data.locationDetails;
       })
       .catch((err) => {
-        Toast({text: err, type: 'danger'});
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -119,7 +119,7 @@ class DetailsStore {
               firestore.FieldValue.arrayUnion(token),
             );
           })
-          .catch((err) => Toast({text: err, type: 'danger'}));
+          .catch((err) => Toast({text: err.message, type: 'danger'}));
       }
     }
   }
@@ -134,7 +134,7 @@ class DetailsStore {
             firestore.FieldValue.arrayRemove(token),
           ),
         )
-        .catch((err) => Toast({text: err, type: 'danger'}));
+        .catch((err) => Toast({text: err.message, type: 'danger'}));
     }
   }
 
@@ -143,7 +143,7 @@ class DetailsStore {
       .ref(image)
       .delete()
       .catch((err) => {
-        Toast({text: err, type: 'danger'});
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -161,7 +161,7 @@ class DetailsStore {
           updatedAt: firestore.Timestamp.now().toMillis(),
         }),
       )
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action async updateStoreDetails(

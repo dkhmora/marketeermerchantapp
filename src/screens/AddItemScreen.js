@@ -233,7 +233,7 @@ class AddItemScreen extends Component {
         this.imagePath = image.path;
         this.setState({imageDisplay: {uri: image.path}});
       })
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   handleSelectImage() {
@@ -247,7 +247,7 @@ class AddItemScreen extends Component {
         this.imagePath = image.path;
         this.setState({imageDisplay: {uri: image.path}});
       })
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   render() {

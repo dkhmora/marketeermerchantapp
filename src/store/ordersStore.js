@@ -54,7 +54,7 @@ class OrdersStore {
       .then((imageLink) =>
         this.createImageMessage(orderId, messageId, user, imageLink),
       )
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action async createImageMessage(orderId, messageId, user, imageLink) {
@@ -70,7 +70,7 @@ class OrdersStore {
       .collection('orders')
       .doc(orderId)
       .update('messages', firestore.FieldValue.arrayUnion(message))
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action async sendMessage(orderId, message) {
@@ -81,7 +81,7 @@ class OrdersStore {
       .collection('orders')
       .doc(orderId)
       .update('messages', firestore.FieldValue.arrayUnion(message))
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action getMessages(orderId) {
@@ -124,7 +124,7 @@ class OrdersStore {
         }
       })
       .catch((err) => {
-        Toast({text: err, type: 'danger'});
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -167,7 +167,7 @@ class OrdersStore {
         return response.data;
       })
       .catch((err) => {
-        Toast({text: err, type: 'danger'});
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -178,7 +178,7 @@ class OrdersStore {
         return response.data;
       })
       .catch((err) => {
-        Toast({text: err, type: 'danger'});
+        Toast({text: err.message, type: 'danger'});
       });
   }
 }

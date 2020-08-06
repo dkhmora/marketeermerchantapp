@@ -89,7 +89,7 @@ class ItemsStore {
 
     await merchantItemsRef
       .update('itemCategories', firestore.FieldValue.arrayRemove(category))
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action async addItemCategory(merchantId, newCategory) {
@@ -115,7 +115,7 @@ class ItemsStore {
           Toast({text: `${formattedCategory} already exists`, type: 'danger'});
         }
       })
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action setStoreItems(merchantId, itemCategories) {
@@ -163,7 +163,7 @@ class ItemsStore {
       return await storage()
         .ref(imageRef)
         .putFile(imagePath)
-        .catch((err) => Toast({text: err, type: 'danger'}));
+        .catch((err) => Toast({text: err.message, type: 'danger'}));
     }
   }
 

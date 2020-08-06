@@ -13,7 +13,9 @@ class AuthStore {
   @action async signIn(email, password) {
     return await auth()
       .signInWithEmailAndPassword(email, password)
-      .catch((err) => Toast({text: err, type: 'danger', duration: 5000}));
+      .catch((err) =>
+        Toast({text: err.message, type: 'danger', duration: 5000}),
+      );
   }
 
   @action async signOut() {
@@ -56,7 +58,7 @@ class AuthStore {
         }
 
         return Toast({
-          text: err,
+          text: err.message,
           type: 'danger',
         });
       });

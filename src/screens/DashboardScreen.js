@@ -175,7 +175,7 @@ class StoreDetailsScreen extends Component {
           this.setState({coverImageUrl: {uri: image.path}});
         }
       })
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   handleSelectImage(type) {
@@ -194,7 +194,7 @@ class StoreDetailsScreen extends Component {
           this.setState({coverImageUrl: {uri: image.path}});
         }
       })
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   handlePaymentMethods(paymentMethod) {

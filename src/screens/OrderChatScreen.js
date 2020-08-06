@@ -74,7 +74,7 @@ class OrderChatScreen extends Component {
           this.imagePath,
         ),
       )
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   handleSelectImage() {
@@ -98,7 +98,7 @@ class OrderChatScreen extends Component {
           this.imagePath,
         ),
       )
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   renderBubble(props) {
@@ -114,65 +114,47 @@ class OrderChatScreen extends Component {
     );
   }
 
-  renderComposer(props) {
+  renderComposer() {
     const {orderStatus} = this.props.route.params;
 
     return (
       <View
         style={{
-          flexDirection: 'row',
+          flex: 1,
           alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'row',
         }}>
-        {orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED' ? (
-          <View
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text>Chat is disabled since order is {orderStatus[0]}</Text>
-          </View>
-        ) : (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingHorizontal: 10,
-            }}>
-            <Button
-              type="clear"
-              onPress={() => this.handleSelectImage()}
-              color={colors.primary}
-              containerStyle={{borderRadius: 24}}
-              icon={<Icon name="image" color={colors.primary} />}
-            />
-            <Button
-              type="clear"
-              onPress={() => this.handleTakePhoto()}
-              color={colors.primary}
-              containerStyle={{borderRadius: 24}}
-              icon={<Icon name="camera" color={colors.primary} />}
-            />
-            <View
-              style={{
-                flex: 1,
-                marginLeft: 5,
-                marginVertical: 10,
-                borderWidth: 1,
-                borderColor: colors.primary,
-                borderRadius: 24,
-              }}>
-              <Composer {...props} />
-            </View>
-            <Send {...props} containerStyle={{paddingHorizontal: 10}}>
-              <Icon
-                name="send"
-                color={colors.primary}
-                style={{marginBottom: 8}}
-              />
-            </Send>
-          </View>
-        )}
+        <Text>Chat is disabled since order is {orderStatus[0]}</Text>
+      </View>
+    );
+  }
+
+  renderSend(props) {
+    return (
+      <Send {...props} containerStyle={{paddingHorizontal: 10}}>
+        <Icon name="send" color={colors.primary} style={{marginBottom: 8}} />
+      </Send>
+    );
+  }
+
+  renderActions() {
+    return (
+      <View style={{flexDirection: 'row'}}>
+        <Button
+          type="clear"
+          onPress={() => this.handleSelectImage()}
+          color={colors.primary}
+          containerStyle={{borderRadius: 24}}
+          icon={<Icon name="image" color={colors.primary} />}
+        />
+        <Button
+          type="clear"
+          onPress={() => this.handleTakePhoto()}
+          color={colors.primary}
+          containerStyle={{borderRadius: 24}}
+          icon={<Icon name="camera" color={colors.primary} />}
+        />
       </View>
     );
   }
@@ -194,7 +176,7 @@ class OrderChatScreen extends Component {
 
   render() {
     const {navigation} = this.props;
-    const {order} = this.props.route.params;
+    const {order, orderStatus} = this.props.route.params;
 
     const headerTitle = `Order # ${order.merchantOrderNumber} | ${order.userName}`;
 
@@ -211,10 +193,32 @@ class OrderChatScreen extends Component {
             textStyle={{color: colors.primary}}
             renderAvatar={this.renderAvatar}
             renderBubble={this.renderBubble}
-            renderComposer={this.renderComposer.bind(this)}
-            maxComposerHeight={150}
+            renderActions={
+              !(
+                orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
+              ) && this.renderActions.bind(this)
+            }
+            renderSend={
+              !(
+                orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
+              ) && this.renderSend
+            }
+            renderComposer={
+              (orderStatus[0] === 'CANCELLED' ||
+                orderStatus[0] === 'COMPLETED') &&
+              this.renderComposer.bind(this)
+            }
+            textInputStyle={{
+              fontFamily: 'ProductSans-Light',
+              borderBottomWidth: 1,
+              borderBottomColor: colors.primary,
+            }}
             listViewProps={{marginBottom: 20}}
-            alwaysShowSend
+            alwaysShowSend={
+              !(
+                orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
+              )
+            }
             showAvatarForEveryMessage
             messages={dataSource}
             onSend={(messages) => this.onSend(messages)}

@@ -156,7 +156,7 @@ class DeliveryAreaScreen extends Component {
           distance: newDistance,
         });
       })
-      .catch((err) => Toast({text: err, type: 'danger'}));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   panMapToLocation(position) {
