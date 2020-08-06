@@ -131,7 +131,7 @@ class OrderDetailsScreen extends Component {
         <BaseHeader
           title={`Order # ${order.merchantOrderNumber} | ${orderStatus}`}
           backButton
-          options={['Cancel Order']}
+          options={orderStatus[0] === 'PENDING' ? ['Cancel Order'] : null}
           actions={[
             () => {
               this.props.ordersStore.cancelOrderModal = true;
