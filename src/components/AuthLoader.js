@@ -1,7 +1,6 @@
-import React, {setState} from 'react';
-import {StyleSheet, ActivityIndicator} from 'react-native';
+import React from 'react';
+import {ActivityIndicator} from 'react-native';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 import {inject, observer} from 'mobx-react';
 import {View} from 'native-base';
 import {colors} from '../../assets/colors';
@@ -21,7 +20,7 @@ class AuthLoader extends React.Component {
   async onAuthStateChanged(user) {
     const {navigation} = this.props;
 
-    if (auth().currentUser != null) {
+    if (user) {
       await auth()
         .currentUser.getIdTokenResult(true)
         .then(async (idToken) => {
@@ -35,8 +34,6 @@ class AuthLoader extends React.Component {
                   text:
                     'Error, user account is not set as admin. Please contact Marketeer business support at business@marketeer.ph if you are supposed to be an admin.',
                   type: 'danger',
-                  duration: 0,
-                  buttonText: 'Okay',
                 });
               });
           } else {
@@ -47,9 +44,7 @@ class AuthLoader extends React.Component {
               merchantId,
             });
 
-            this.setState({user}, () => {
-              this.props.authStore.appReady = true;
-            });
+            this.authStateSubscriber && this.authStateSubscriber();
           }
         });
     } else {
@@ -60,27 +55,20 @@ class AuthLoader extends React.Component {
         this.props.itemsStore.unsubscribeSetStoreItems();
 
       navigation.replace('Login');
-
-      this.setState({user}, () => {
-        this.props.authStore.appReady = true;
-      });
     }
+
+    this.setState({user});
   }
 
   componentDidMount() {
-    const subscriber = auth().onAuthStateChanged(
+    const {navigation} = this.props;
+    const {merchantId} = this.props.detailsStore.storeDetails;
+
+    this.authStateSubscriber = auth().onAuthStateChanged(
       this.onAuthStateChanged.bind(this),
     );
 
-    return subscriber;
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const {navigation} = this.props;
-    const {merchantId} = this.props.detailsStore.storeDetails;
-    const {user} = this.state;
-
-    if (!user) {
+    if (!this.state.user) {
       navigation.replace('Login');
     } else {
       navigation.replace('Home', {

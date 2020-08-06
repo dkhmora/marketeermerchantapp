@@ -1,14 +1,6 @@
-import React, {Component, setState} from 'react';
-import {
-  StyleSheet,
-  Image,
-  ScrollView,
-  Platform,
-  ActivityIndicator,
-  View,
-  SafeAreaView,
-} from 'react-native';
-import {Card, Body, CardItem, Left, Toast} from 'native-base';
+import React, {Component} from 'react';
+import {ActivityIndicator, View, SafeAreaView} from 'react-native';
+import {Card, Body, CardItem, Left} from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
 // Mobx
@@ -23,6 +15,7 @@ import {Switch} from 'react-native-gesture-handler';
 import StoreCard from '../components/StoreCard';
 import FastImage from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import Toast from '../components/Toast';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -58,7 +51,7 @@ class StoreDetailsScreen extends Component {
   @observable newFreeDelivery = null;
   @observable newVacationMode = null;
   @observable newPaymentMethods = [];
-  @observable newShippingMethods = [];
+  @observable newDeliveryMethods = [];
   @observable newDeliveryType = '';
   @observable newOwnDeliveryServiceFee = '0';
   @observable newFreeDeliveryMinimum = '0';
@@ -94,7 +87,7 @@ class StoreDetailsScreen extends Component {
     this.newStoreDescription = '';
     this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
     this.newPaymentMethods = [];
-    this.newShippingMethods = [];
+    this.newDeliveryMethods = [];
     this.newOwnDeliveryServiceFee = '0';
     this.newFreeDeliveryMinimum = '0';
     this.editModeHeaderColor = colors.primary;
@@ -114,7 +107,7 @@ class StoreDetailsScreen extends Component {
       vacationMode,
       deliveryType,
       paymentMethods,
-      shippingMethods,
+      deliveryMethods,
       ownDeliveryServiceFee,
       freeDeliveryMinimum,
     } = this.props.detailsStore.storeDetails;
@@ -128,7 +121,7 @@ class StoreDetailsScreen extends Component {
       this.newVacationMode = vacationMode;
       this.newDeliveryType = deliveryType;
       this.newPaymentMethods = paymentMethods ? [...paymentMethods] : [];
-      this.newShippingMethods = shippingMethods ? [...shippingMethods] : [];
+      this.newDeliveryMethods = deliveryMethods ? [...deliveryMethods] : [];
       this.newOwnDeliveryServiceFee = ownDeliveryServiceFee
         ? String(ownDeliveryServiceFee)
         : '0';
@@ -182,8 +175,7 @@ class StoreDetailsScreen extends Component {
           this.setState({coverImageUrl: {uri: image.path}});
         }
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   handleSelectImage(type) {
@@ -202,8 +194,7 @@ class StoreDetailsScreen extends Component {
           this.setState({coverImageUrl: {uri: image.path}});
         }
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   handlePaymentMethods(paymentMethod) {
@@ -218,15 +209,15 @@ class StoreDetailsScreen extends Component {
     }
   }
 
-  handleShippingMethods(shippingMethod) {
-    const {newShippingMethods} = this;
+  handledeliveryMethods(deliveryMethod) {
+    const {newDeliveryMethods} = this;
 
-    if (newShippingMethods.includes(shippingMethod)) {
-      this.newShippingMethods = newShippingMethods.filter(
-        (item) => item !== shippingMethod,
+    if (newDeliveryMethods.includes(deliveryMethod)) {
+      this.newDeliveryMethods = newDeliveryMethods.filter(
+        (item) => item !== deliveryMethod,
       );
     } else {
-      newShippingMethods.push(shippingMethod);
+      newDeliveryMethods.push(deliveryMethod);
     }
   }
 
@@ -274,7 +265,7 @@ class StoreDetailsScreen extends Component {
       storeDescription,
       vacationMode,
       paymentMethods,
-      shippingMethods,
+      deliveryMethods,
       deliveryType,
       ownDeliveryServiceFee,
       freeDeliveryMinimum,
@@ -303,7 +294,7 @@ class StoreDetailsScreen extends Component {
       storeDescription !== this.newStoreDescription ||
       vacationMode !== this.newVacationMode ||
       paymentMethods !== this.newPaymentMethods ||
-      shippingMethods !== this.newShippingMethods ||
+      deliveryMethods !== this.newDeliveryMethods ||
       deliveryType !== this.newDeliveryType ||
       ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee ||
       freeDeliveryMinimum !== this.newFreeDeliveryMinimum
@@ -314,24 +305,22 @@ class StoreDetailsScreen extends Component {
           this.newFreeDelivery,
           this.newVacationMode,
           this.newPaymentMethods,
-          this.newShippingMethods,
+          this.newDeliveryMethods,
           this.newDeliveryType,
           Number(this.newOwnDeliveryServiceFee),
           Number(this.newFreeDeliveryMinimum),
         )
         .then(() => {
-          Toast.show({
+          Toast({
             text: 'Store details successfully updated!',
             type: 'success',
-            style: {margin: 20, borderRadius: 16},
             duration: 3000,
           });
         });
     } else {
-      Toast.show({
+      Toast({
         text: 'Store details successfully updated!',
         type: 'success',
-        style: {margin: 20, borderRadius: 16},
         duration: 3000,
       });
     }
@@ -379,7 +368,7 @@ class StoreDetailsScreen extends Component {
       storeName,
       vacationMode,
       paymentMethods,
-      shippingMethods,
+      deliveryMethods,
       deliveryType,
       creditData,
       orderNumber,
@@ -396,57 +385,72 @@ class StoreDetailsScreen extends Component {
       newFreeDeliveryMinimumError,
     } = this.state;
 
-    const {editMode, newPaymentMethods, newShippingMethods} = this;
+    const {editMode, newPaymentMethods, newDeliveryMethods} = this;
 
-    if (Object.keys(this.props.detailsStore.storeDetails).length > 0) {
-      return (
-        <View style={{flex: 1}}>
-          <BaseHeader
-            title={this.props.route.name}
-            navigation={this.props.navigation}
-            rightComponent={
-              editMode ? (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'flex-end',
-                    justifyContent: 'space-between',
-                  }}>
-                  <Button
-                    type="clear"
-                    title="Save"
-                    titleStyle={{color: colors.icons}}
-                    loading={loading}
-                    loadingProps={{color: colors.icons}}
-                    onPress={() => this.handleConfirmDetails()}
-                  />
-
-                  <Button
-                    type="clear"
-                    color={colors.icons}
-                    icon={<Icon name="x" color={colors.icons} />}
-                    onPress={() => this.cancelEditing()}
-                    titleStyle={{color: colors.icons}}
-                    containerStyle={{
-                      borderRadius: 24,
-                    }}
-                  />
-                </View>
-              ) : (
-                <BaseOptionsMenu
-                  iconStyle={{
-                    color: colors.icons,
-                    fontSize: 25,
-                    marginRight: 10,
-                  }}
-                  options={['Edit Details']}
-                  actions={[this.toggleEditing.bind(this)]}
+    return (
+      <View style={{flex: 1}}>
+        <BaseHeader
+          title={this.props.route.name}
+          navigation={this.props.navigation}
+          rightComponent={
+            editMode ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  justifyContent: 'space-between',
+                }}>
+                <Button
+                  type="clear"
+                  title="Save"
+                  titleStyle={{color: colors.icons}}
+                  loading={loading}
+                  loadingProps={{color: colors.icons}}
+                  onPress={() => this.handleConfirmDetails()}
                 />
-              )
-            }
-          />
 
-          <KeyboardAwareScrollView style={{paddingHorizontal: 10}}>
+                <Button
+                  type="clear"
+                  color={colors.icons}
+                  icon={<Icon name="x" color={colors.icons} />}
+                  onPress={() => this.cancelEditing()}
+                  titleStyle={{color: colors.icons}}
+                  containerStyle={{
+                    borderRadius: 24,
+                  }}
+                />
+              </View>
+            ) : (
+              <BaseOptionsMenu
+                iconStyle={{
+                  color: colors.icons,
+                  fontSize: 25,
+                  marginRight: Platform.OS === 'android' ? 10 : 0,
+                }}
+                options={['Edit Details']}
+                actions={[this.toggleEditing.bind(this)]}
+              />
+            )
+          }
+        />
+
+        {Object.keys(this.props.detailsStore.storeDetails).length <= 0 ? (
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: colors.primary,
+            }}>
+            <ActivityIndicator size="large" color={colors.icons} />
+          </View>
+        ) : (
+          <KeyboardAwareScrollView
+            style={{paddingHorizontal: 10}}
+            showsVerticalScrollIndicator={false}
+            contentInsetAdjustmentBehavior="automatic"
+            keyboardOpeningTime={20}
+            extraScrollHeight={20}>
             <SafeAreaView>
               <Card
                 style={{
@@ -988,48 +992,48 @@ class StoreDetailsScreen extends Component {
                         <View>
                           <CheckBox
                             title="Grab Express"
-                            checked={newShippingMethods.includes(
+                            checked={newDeliveryMethods.includes(
                               'Grab Express',
                             )}
                             onPress={() =>
-                              this.handleShippingMethods('Grab Express')
+                              this.handledeliveryMethods('Grab Express')
                             }
                           />
                           <CheckBox
                             title="Lalamove"
-                            checked={newShippingMethods.includes('Lalamove')}
+                            checked={newDeliveryMethods.includes('Lalamove')}
                             onPress={() =>
-                              this.handleShippingMethods('Lalamove')
+                              this.handledeliveryMethods('Lalamove')
                             }
                           />
                           <CheckBox
                             title="Mr. Speedy"
-                            checked={newShippingMethods.includes('Mr. Speedy')}
+                            checked={newDeliveryMethods.includes('Mr. Speedy')}
                             onPress={() =>
-                              this.handleShippingMethods('Mr. Speedy')
+                              this.handledeliveryMethods('Mr. Speedy')
                             }
                           />
                           <CheckBox
                             title="Angkas Padala"
-                            checked={newShippingMethods.includes(
+                            checked={newDeliveryMethods.includes(
                               'Angkas Padala',
                             )}
                             onPress={() =>
-                              this.handleShippingMethods('Angkas Padala')
+                              this.handledeliveryMethods('Angkas Padala')
                             }
                           />
                           <CheckBox
                             title="Own Delivery"
-                            checked={newShippingMethods.includes(
+                            checked={newDeliveryMethods.includes(
                               'Own Delivery',
                             )}
                             onPress={() =>
-                              this.handleShippingMethods('Own Delivery')
+                              this.handledeliveryMethods('Own Delivery')
                             }
                           />
                         </View>
                       ) : (
-                        this.CategoryPills(shippingMethods)
+                        this.CategoryPills(deliveryMethods)
                       )}
                     </View>
                   </View>
@@ -1274,19 +1278,7 @@ class StoreDetailsScreen extends Component {
               </Card>
             </SafeAreaView>
           </KeyboardAwareScrollView>
-        </View>
-      );
-    }
-
-    return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'rgba(0,0,0,0.5)',
-        }}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        )}
       </View>
     );
   }

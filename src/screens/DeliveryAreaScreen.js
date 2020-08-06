@@ -1,26 +1,16 @@
 import React, {Component} from 'react';
-import MapView, {Circle, Marker, Polygon} from 'react-native-maps';
-import {
-  View,
-  StatusBar,
-  StyleSheet,
-  PermissionsAndroid,
-  Platform,
-  Dimensions,
-  ActivityIndicator,
-} from 'react-native';
+import MapView, {Marker, Polygon} from 'react-native-maps';
+import {View, StatusBar, StyleSheet} from 'react-native';
 import {Card, CardItem} from 'native-base';
 import {Slider, Button, Icon, Text} from 'react-native-elements';
 import {observer, inject} from 'mobx-react';
-import Geolocation from '@react-native-community/geolocation';
 import {colors} from '../../assets/colors';
 import geohash from 'ngeohash';
 import * as geolib from 'geolib';
 import BaseHeader from '../components/BaseHeader';
-import RNGooglePlaces from 'react-native-google-places';
-import Toast from '../components/Toast';
 import * as turf from '@turf/turf';
-import {computed} from 'mobx';
+import {computed, toJS} from 'mobx';
+import Toast from '../components/Toast';
 
 @inject('authStore')
 @inject('detailsStore')
@@ -30,26 +20,19 @@ class DeliveryAreaScreen extends Component {
     super(props);
 
     this.state = {
-      mapReady: false,
       editMode: false,
       updating: false,
-      boundingBox: [],
-      address: null,
       distance: 0,
       newDistance: 0,
-      newMarkerPosition: null,
-      centerOfScreen: (Dimensions.get('window').height - 17) / 2,
     };
   }
 
   @computed get boundingBox() {
-    const {newMarkerPosition, newDistance} = this.state;
+    const {storeLocation} = this.props.detailsStore.storeDetails;
+    const {newDistance, editMode} = this.state;
 
-    if (newMarkerPosition) {
-      const bounds = this.getBoundsOfDistance(
-        {...newMarkerPosition},
-        newDistance,
-      );
+    if (storeLocation && editMode) {
+      const bounds = this.getBoundsOfDistance({...storeLocation}, newDistance);
 
       const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
 
@@ -59,12 +42,20 @@ class DeliveryAreaScreen extends Component {
     return [];
   }
 
+  @computed get currentBoundingBox() {
+    const deliveryCoordinates = toJS(this.props.detailsStore.storeDetails)
+      .deliveryCoordinates;
+    if (deliveryCoordinates) {
+      return deliveryCoordinates.boundingBox;
+    }
+
+    return null;
+  }
+
   componentDidMount() {
     const {deliveryCoordinates} = this.props.detailsStore.storeDetails;
 
-    if (!deliveryCoordinates) {
-      this.setInitialMarkerPosition();
-    } else {
+    if (deliveryCoordinates) {
       this.decodeGeohash();
     }
   }
@@ -116,7 +107,7 @@ class DeliveryAreaScreen extends Component {
 
   decodeGeohash() {
     const {deliveryCoordinates} = this.props.detailsStore.storeDetails;
-    const {lowerRange, upperRange, latitude, longitude} = deliveryCoordinates;
+    const {lowerRange, upperRange} = deliveryCoordinates;
 
     const lower = geohash.decode(lowerRange);
     const upper = geohash.decode(upperRange);
@@ -134,125 +125,38 @@ class DeliveryAreaScreen extends Component {
       ) / 2000,
     );
 
-    const boundingBox = this.getBoundingBox(lower, upper);
-
     this.setState({
-      markerPosition: {latitude, longitude},
-      newMarkerPosition: {latitude, longitude},
-      boundingBox,
-      mapData: {
-        latitude,
-        longitude,
-        latitudeDelta: 0.04,
-        longitudeDelta: 0.05,
-      },
       distance,
       newDistance: distance,
-      mapReady: true,
     });
   }
 
-  async setInitialMarkerPosition() {
-    await Geolocation.getCurrentPosition(
-      (position) => {
-        const coords = {
-          latitude: parseFloat(position.coords.latitude),
-          longitude: parseFloat(position.coords.longitude),
-        };
-
-        this.setState({
-          newMarkerPosition: {
-            ...coords,
-          },
-          mapData: {
-            ...coords,
-            latitudeDelta: 0.04,
-            longitudeDelta: 0.05,
-          },
-          mapReady: true,
-        });
-      },
-      (err) => console.log(err),
-      {
-        timeout: 20000,
-      },
-    );
-  }
-
-  _onMapReady = () => {
-    if (Platform.OS === 'android') {
-      PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      ).then((granted) => {
-        console.log(granted); // just to ensure that permissions were granted
-      });
-    } else {
-      Geolocation.requestAuthorization();
-    }
-  };
-
   async handleSetStoreLocation() {
-    const {newMarkerPosition, newDistance, address} = this.state;
-
-    const range = this.getGeohashRange(
-      newMarkerPosition.latitude,
-      newMarkerPosition.longitude,
-      newDistance,
-    );
-
-    const bounds = this.getBoundsOfDistance(
-      {...newMarkerPosition},
-      newDistance,
-    );
-    const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
+    const {storeLocation} = this.props.detailsStore.storeDetails;
+    const {newDistance} = this.state;
+    const {boundingBox} = this;
 
     this.props.authStore.appReady = false;
 
-    if (!address) {
-      this.setState(
-        {
-          address: await this.props.detailsStore.getAddressFromCoordinates({
-            ...newMarkerPosition,
-          }),
-          boundingBox,
-        },
-        () => {
-          this.props.detailsStore
-            .updateCoordinates(
-              range.lower,
-              range.upper,
-              newMarkerPosition,
-              boundingBox,
-              this.state.address,
-            )
-            .then(() => {
-              Toast({text: 'Delivery Area successfully set!'});
-              this.props.authStore.appReady = true;
-            })
-            .catch((err) => Toast({text: err, type: 'danger'}));
-        },
-      );
-    } else {
-      this.props.detailsStore
-        .updateCoordinates(
-          range.lower,
-          range.upper,
-          newMarkerPosition,
-          boundingBox,
-          this.state.address,
-        )
-        .then(() => {
-          Toast({text: 'Delivery Area successfully set!'});
-          this.props.authStore.appReady = true;
-        })
-        .catch((err) => Toast({text: err, type: 'danger'}));
-    }
+    const range = await this.getGeohashRange(
+      storeLocation.latitude,
+      storeLocation.longitude,
+      newDistance,
+    );
 
-    this.setState({
-      editMode: false,
-      markerPosition: newMarkerPosition,
-      distance: newDistance,
-    });
+    this.props.detailsStore
+      .updateCoordinates(range.lower, range.upper, boundingBox)
+      .then(() => {
+        Toast({text: 'Delivery Area successfully set!'});
+
+        this.props.authStore.appReady = true;
+
+        this.setState({
+          editMode: false,
+          distance: newDistance,
+        });
+      })
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   panMapToLocation(position) {
@@ -268,152 +172,72 @@ class DeliveryAreaScreen extends Component {
     );
   }
 
-  panMapToMarker() {
-    this.map.animateCamera(
-      {
-        center: this.state.markerPosition,
-        pitch: 2,
-        heading: 1,
-        altitude: 500,
-        zoom: 18,
-      },
-      150,
-    );
-  }
-
   handleEditDeliveryArea() {
     this.setState({
-      mapData: {
-        ...this.state.newMarkerPosition,
-        latitudeDelta: 0.04,
-        longitudeDelta: 0.05,
-      },
-      newMarkerPosition: this.state.newMarkerPosition,
       newDistance: this.state.distance,
       editMode: true,
     });
-
-    this.panMapToMarker();
   }
 
   handleCancelChanges() {
-    const {newMarkerPosition, markerPosition, mapData, distance} = this.state;
+    const {distance} = this.state;
 
     this.setState({
-      mapData: markerPosition
-        ? {...markerPosition, latitudeDelta: 0.04, longitudeDelta: 0.05}
-        : mapData,
-      newMarkerPosition: markerPosition
-        ? {...markerPosition}
-        : newMarkerPosition,
       newDistance: distance,
       editMode: false,
     });
-
-    this.panMapToMarker();
-  }
-
-  handleRegionChange = (mapData) => {
-    const {editMode} = this.state;
-    const {latitude, longitude} = mapData;
-
-    if (editMode) {
-      this.setState({
-        newMarkerPosition: {
-          latitude,
-          longitude,
-        },
-      });
-    }
-  };
-
-  openSearchModal() {
-    RNGooglePlaces.openAutocompleteModal({country: 'PH'}, [
-      'address',
-      'location',
-    ])
-      .then((place) => {
-        const address = place.address;
-        const coordinates = place.location;
-
-        this.panMapToLocation(coordinates);
-
-        this.setState({
-          address,
-          newMarkerPosition: {...coordinates},
-          editMode: true,
-        });
-      })
-      .catch((error) => console.log(error.message));
   }
 
   render() {
     const {navigation} = this.props;
-    const {
-      markerPosition,
-      distance,
-      centerOfScreen,
-      mapData,
-      mapReady,
-      editMode,
-      newDistance,
-    } = this.state;
-
+    const {editMode, newDistance} = this.state;
+    const {storeLocation} = toJS(this.props.detailsStore.storeDetails);
     const {boundingBox} = this;
 
     return (
       <View style={{flex: 1}}>
         <StatusBar translucent backgroundColor="transparent" />
 
-        {mapReady && (
+        {storeLocation && (
           <MapView
             style={{...StyleSheet.absoluteFillObject}}
             provider="google"
             ref={(map) => {
               this.map = map;
             }}
-            onRegionChangeComplete={this.handleRegionChange}
-            showsUserLocation
-            followsUserLocation
-            onMapReady={() => {
-              this._onMapReady();
-            }}
-            initialRegion={mapData}>
-            {!editMode && markerPosition && (
-              <Marker
-                ref={(marker) => {
-                  this.marker = marker;
-                }}
-                tracksViewChanges={false}
-                coordinate={markerPosition}>
-                <View>
-                  <Icon color={colors.primary} name="map-pin" />
-                </View>
-              </Marker>
-            )}
-            {boundingBox && (
+            initialRegion={{
+              latitude: storeLocation.latitude,
+              longitude: storeLocation.longitude,
+              latitudeDelta: 0.04,
+              longitudeDelta: 0.05,
+            }}>
+            <Marker
+              ref={(marker) => {
+                this.marker = marker;
+              }}
+              tracksViewChanges={false}
+              coordinate={{...storeLocation}}>
+              <View>
+                <Icon color={colors.primary} name="map-pin" />
+              </View>
+            </Marker>
+            {this.currentBoundingBox && (
               <Polygon
-                coordinates={boundingBox}
+                coordinates={this.currentBoundingBox}
                 fillColor="rgba(233, 30, 99, 0.3)"
                 strokeColor="rgba(0,0,0,0.5)"
                 strokeWidth={1}
               />
             )}
+            {editMode && (
+              <Polygon
+                coordinates={boundingBox}
+                fillColor="rgba(68, 138, 255, 0.3)"
+                strokeColor="rgba(0,0,0,0.5)"
+                strokeWidth={1}
+              />
+            )}
           </MapView>
-        )}
-        {editMode && (
-          <View
-            style={{
-              left: 0,
-              right: 0,
-              marginLeft: 0,
-              marginTop: 0,
-              position: 'absolute',
-              top: centerOfScreen,
-              alignItems: 'center',
-            }}>
-            <Icon color={colors.primary} name="map-pin" />
-          </View>
         )}
 
         {editMode ? (
@@ -424,6 +248,8 @@ class DeliveryAreaScreen extends Component {
               alignSelf: 'center',
               justifyContent: 'center',
               bottom: 20,
+              left: 0,
+              right: 0,
             }}>
             <Card
               style={{
@@ -451,23 +277,6 @@ class DeliveryAreaScreen extends Component {
                   />
                   <Text style={{alignSelf: 'center'}}>{newDistance} KM</Text>
                 </View>
-              </CardItem>
-              <CardItem style={{alignSelf: 'center'}}>
-                <Card
-                  style={{
-                    borderRadius: 10,
-                    overflow: 'hidden',
-                    backgroundColor: '#eee',
-                  }}>
-                  <CardItem
-                    style={{
-                      backgroundColor: '#eef',
-                    }}>
-                    <Text note style={{margin: 6, width: '100%'}}>
-                      Tip: Pan around the map to move your store's location!
-                    </Text>
-                  </CardItem>
-                </Card>
               </CardItem>
               <CardItem>
                 <View
@@ -523,20 +332,7 @@ class DeliveryAreaScreen extends Component {
           />
         )}
 
-        <BaseHeader
-          backButton
-          navigation={navigation}
-          title="Delivery Area"
-          rightComponent={
-            <Button
-              type="clear"
-              icon={<Icon name="search" color={colors.icons} />}
-              titleStyle={{color: colors.icons}}
-              buttonStyle={{borderRadius: 24}}
-              onPress={() => this.openSearchModal()}
-            />
-          }
-        />
+        <BaseHeader backButton navigation={navigation} title="Delivery Area" />
       </View>
     );
   }

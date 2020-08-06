@@ -13,9 +13,8 @@ class AuthStore {
   @action async signIn(email, password) {
     return await auth()
       .signInWithEmailAndPassword(email, password)
-      .then(() => console.log('signed in succesfully'))
       .catch((err) =>
-        Toast({text: err, type: 'danger', duration: 5000, buttonText: 'Okay'}),
+        Toast({text: err.message, type: 'danger', duration: 5000}),
       );
   }
 
@@ -45,20 +44,23 @@ class AuthStore {
       })
       .catch((err) => {
         if (err.code === 'auth/invalid-password') {
-          Toast({
+          return Toast({
             text: 'Error, invalid password. No details have been changed.',
             type: 'danger',
           });
         }
 
         if (err.code === 'auth/wrong-password') {
-          Toast({
+          return Toast({
             text: 'Error, wrong password. Please try again.',
             type: 'danger',
           });
         }
 
-        console.log(err.message);
+        return Toast({
+          text: err.message,
+          type: 'danger',
+        });
       });
   }
 }

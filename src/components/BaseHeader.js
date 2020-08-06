@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import OptionsMenu from 'react-native-options-menu';
 import {Header, Button, Icon, Text} from 'react-native-elements';
-import {Platform, ActionSheetIOS, StyleSheet} from 'react-native';
+import {Platform, StyleSheet} from 'react-native';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 
@@ -64,7 +63,10 @@ class BaseHeader extends Component {
     if (options && actions) {
       return (
         <BaseOptionsMenu
-          iconStyle={{color: colors.primary, marginRight: 10}}
+          iconStyle={{
+            color: colors.primary,
+            marginRight: Platform.OS === 'android' ? 10 : 0,
+          }}
           options={options}
           actions={actions}
           destructiveIndex={destructiveIndex}

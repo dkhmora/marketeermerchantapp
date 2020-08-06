@@ -1,17 +1,17 @@
 import React, {Component} from 'react';
-import {Overlay, Text, Button, Icon, Image, Input} from 'react-native-elements';
-import {View, TextInput, SafeAreaView} from 'react-native';
+import {Overlay, Text, Button, Icon, Input} from 'react-native-elements';
+import {View, SafeAreaView, StatusBar, Platform} from 'react-native';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
-import * as Animatable from 'react-native-animatable';
 import {inject, observer} from 'mobx-react';
 import Toast from './Toast';
-import {observable, computed} from 'mobx';
+import {computed} from 'mobx';
 import ImagePicker from 'react-native-image-crop-picker';
-import {Card, CardItem, Picker, Item} from 'native-base';
+import {Card, CardItem, Picker, Item, Label} from 'native-base';
 import storage from '@react-native-firebase/storage';
 import FastImage from 'react-native-fast-image';
-import {ScrollView} from 'react-native-gesture-handler';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import ConfirmationModal from './ConfirmationModal';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -36,6 +36,7 @@ class EditItemModal extends Component {
       newDescriptionError: null,
       newPriceError: null,
       newDiscountedPriceError: null,
+      editItemConfirmModal: false,
     };
   }
 
@@ -77,7 +78,9 @@ class EditItemModal extends Component {
 
   getImage = async () => {
     const ref = storage().ref(this.props.itemsStore.selectedItem.image);
-    const link = await ref.getDownloadURL().catch((err) => console.log(err));
+    const link = await ref
+      .getDownloadURL()
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
 
     this.setState({imageDisplay: {uri: link}, imageLoading: false});
   };
@@ -200,8 +203,7 @@ class EditItemModal extends Component {
           imageDisplay: {uri: image.path},
         });
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   handleSelectImage() {
@@ -217,11 +219,10 @@ class EditItemModal extends Component {
           imageDisplay: {uri: image.path},
         });
       })
-      .then(() => console.log('Image path successfully set!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
-  handleConfirm() {
+  handleEditItem() {
     const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
     const {
       newName,
@@ -258,7 +259,6 @@ class EditItemModal extends Component {
 
         Toast({
           text: `Item ${this.props.itemsStore.selectedItem.name} successfully edited!`,
-          buttonText: 'Okay',
           type: 'success',
           duration: 3500,
           style: {margin: 20, borderRadius: 16},
@@ -325,6 +325,30 @@ class EditItemModal extends Component {
         height="auto"
         overlayStyle={{flex: 1, padding: 0}}>
         <SafeAreaView style={{flex: 1}}>
+          <StatusBar
+            barStyle={
+              Platform.OS === 'android' ? 'light-content' : 'dark-content'
+            }
+          />
+
+          <ConfirmationModal
+            isVisible={this.state.editItemConfirmModal}
+            title={`Edit Item "${
+              this.props.itemsStore.selectedItem &&
+              this.props.itemsStore.selectedItem.name
+            }"`}
+            body={`Are you sure you want to edit "${
+              this.props.itemsStore.selectedItem &&
+              this.props.itemsStore.selectedItem.name
+            }"? Buyers will immediately see changes.`}
+            onConfirm={() => {
+              this.setState({editItemConfirmModal: false}, () => {
+                this.handleEditItem();
+              });
+            }}
+            closeModal={() => this.setState({editItemConfirmModal: false})}
+          />
+
           <View
             style={{
               flexDirection: 'row',
@@ -357,9 +381,15 @@ class EditItemModal extends Component {
             )}
           </View>
 
-          <ScrollView style={{paddingHorizontal: 15, paddingTop: 15}}>
+          <KeyboardAwareScrollView
+            showsVerticalScrollIndicator={false}
+            contentInsetAdjustmentBehavior="automatic"
+            keyboardOpeningTime={20}
+            extraScrollHeight={20}
+            style={{paddingHorizontal: 15, paddingTop: 15}}>
             <View
               style={{
+                flex: 1,
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 paddingBottom: 10,
@@ -418,17 +448,21 @@ class EditItemModal extends Component {
 
             <View style={styles.action}>
               <Item
-                style={{paddingHorizontal: 10, flex: 1, borderBottomWidth: 0}}>
-                <View style={styles.icon_container}>
+                style={{
+                  paddingHorizontal: 10,
+                  flex: 1,
+                  borderBottomWidth: 0,
+                }}>
+                <View style={[styles.icon_container, {flex: 1}]}>
                   <Icon name="folder" color={colors.primary} size={20} />
                 </View>
-
                 <Picker
                   note={false}
                   placeholder="Select Item Category"
                   mode="dropdown"
                   selectedValue={newCategory}
-                  iosIcon={<Icon name="arrow-down" />}
+                  iosIcon={<Icon name="chevron-down" />}
+                  itemTextStyle={{textAlign: 'right'}}
                   onValueChange={this.handleCategory.bind(this)}>
                   {this.categories &&
                     this.categories.map((cat, index) => {
@@ -532,10 +566,11 @@ class EditItemModal extends Component {
             />
 
             <Input
-              placeholder={`Additional ${
+              placeholder={`Increase/Decrease ${
                 this.props.itemsStore.selectedItem &&
                 this.props.itemsStore.selectedItem.name
-              } Stock`}
+              } Stock (+/- values)`}
+              placeholderStyle={{color: colors.primary}}
               leftIcon={<Icon name="hash" color={colors.primary} size={20} />}
               maxLength={10}
               errorMessage={newDescriptionError && newDescriptionError}
@@ -546,7 +581,7 @@ class EditItemModal extends Component {
               onChangeText={(value) => this.handleStock(value)}
             />
 
-            <View
+            <SafeAreaView
               style={{
                 flexDirection: 'row',
                 alignItems: 'flex-end',
@@ -578,14 +613,15 @@ class EditItemModal extends Component {
                   )
                 }
                 loading={this.state.loading}
+                loadingProps={{size: 'small', color: colors.primary}}
                 containerStyle={{
                   alignSelf: 'flex-end',
                   borderRadius: 30,
                 }}
-                onPress={() => this.handleConfirm()}
+                onPress={() => this.setState({editItemConfirmModal: true})}
               />
-            </View>
-          </ScrollView>
+            </SafeAreaView>
+          </KeyboardAwareScrollView>
         </SafeAreaView>
       </Overlay>
     );

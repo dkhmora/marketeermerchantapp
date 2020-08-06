@@ -2,15 +2,7 @@ import React, {Component} from 'react';
 import {Text} from 'react-native-elements';
 import storage from '@react-native-firebase/storage';
 import FastImage from 'react-native-fast-image';
-import {
-  View,
-  StyleSheet,
-  Platform,
-  TouchableOpacity,
-  TouchableHighlight,
-  TouchableWithoutFeedback,
-  TouchableNativeFeedback,
-} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {Card, CardItem} from 'native-base';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';

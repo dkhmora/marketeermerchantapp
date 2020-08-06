@@ -1,5 +1,4 @@
 #import <GoogleMaps/GoogleMaps.h>
-#import <GooglePlaces/GooglePlaces.h>
 
 #import <Firebase.h>
 #import "AppDelegate.h"
@@ -32,7 +31,6 @@ static void InitializeFlipper(UIApplication *application) {
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   [GMSServices provideAPIKey:@"AIzaSyDm8mCUY6ht6s2k_3S62CStnF3QiA4wVqM"];
-  [GMSPlacesClient provideAPIKey:@"AIzaSyATHEQKHS5d1taeUBbfsP-IYgJWPLcPBTU"];
 
   if ([FIRApp defaultApp] == nil) {
     [FIRApp configure];

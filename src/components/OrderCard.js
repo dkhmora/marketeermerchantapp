@@ -1,25 +1,14 @@
 import React, {PureComponent} from 'react';
-import {
-  Card,
-  CardItem,
-  Left,
-  Body,
-  Right,
-  Toast,
-  View,
-  Item,
-  H3,
-  Textarea,
-} from 'native-base';
-import {ActionSheetIOS, Platform} from 'react-native';
-import moment, {ISO_8601} from 'moment';
+import {Card, CardItem, Left, Body, Right} from 'native-base';
+import {ActivityIndicator, View} from 'react-native';
+import moment from 'moment';
 import {observer, inject} from 'mobx-react';
-import Modal from 'react-native-modal';
 import {Icon, Button, Text} from 'react-native-elements';
-import {observable, action, computed} from 'mobx';
+import {computed} from 'mobx';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
-import CancelOrderModal from './CancelOrderModal';
+import Toast from './Toast';
+import ConfirmationModal from './ConfirmationModal';
 
 @inject('ordersStore')
 @observer
@@ -29,6 +18,7 @@ class OrderCard extends PureComponent {
 
     this.state = {
       loading: false,
+      changeOrderStatusModal: false,
     };
   }
 
@@ -54,19 +44,16 @@ class OrderCard extends PureComponent {
 
   handleChangeOrderStatus() {
     const {order} = this.props;
-    const orderFetchLimit = 5;
 
     this.setState({loading: true});
 
     this.props.ordersStore
-      .setOrderStatus(order.orderId, order.merchantId, orderFetchLimit)
+      .setOrderStatus(order.orderId, order.merchantId)
       .then(() => {
-        Toast.show({
+        Toast({
           text: `Successfully changed Order # ${order.merchantOrderNumber} status!`,
-          buttonText: 'Okay',
           type: 'success',
           duration: 3500,
-          style: {margin: 20, borderRadius: 16},
         });
       })
       .then(() => {
@@ -79,6 +66,7 @@ class OrderCard extends PureComponent {
 
     navigation.dangerouslyGetParent().navigate('Order Details', {
       order,
+      orderStatus: this.orderStatus,
     });
   }
 
@@ -175,7 +163,7 @@ class OrderCard extends PureComponent {
                   fontSize: 16,
                   textAlign: 'center',
                 }}>
-                ₱{(order.totalAmount * 0.05).toPrecision(3)}
+                ₱{(order.subTotal * 0.05).toPrecision(3)}
               </Text>
 
               <Text
@@ -191,17 +179,21 @@ class OrderCard extends PureComponent {
 
           {optionsButton && (
             <View>
-              <BaseOptionsMenu
-                iconStyle={{color: '#fff', fontSize: 27}}
-                destructiveIndex={1}
-                options={['Cancel Order']}
-                actions={[
-                  () => {
-                    this.props.ordersStore.cancelOrderModal = true;
-                    this.props.ordersStore.selectedOrder = order;
-                  },
-                ]}
-              />
+              {this.state.loading ? (
+                <ActivityIndicator size="small" color={colors.icons} />
+              ) : (
+                <BaseOptionsMenu
+                  iconStyle={{color: '#fff', fontSize: 27}}
+                  destructiveIndex={1}
+                  options={['Cancel Order']}
+                  actions={[
+                    () => {
+                      this.props.ordersStore.cancelOrderModal = true;
+                      this.props.ordersStore.selectedOrder = order;
+                    },
+                  ]}
+                />
+              )}
             </View>
           )}
         </CardItem>
@@ -224,6 +216,7 @@ class OrderCard extends PureComponent {
                 title={buttonText}
                 titleStyle={{color: colors.icons}}
                 loading={this.state.loading}
+                loadingProps={{size: 'small', color: colors.icons}}
                 buttonStyle={{backgroundColor: colors.accent}}
                 containerStyle={{
                   borderRadius: 24,
@@ -231,7 +224,7 @@ class OrderCard extends PureComponent {
                   borderColor: colors.accent,
                   width: '100%',
                 }}
-                onPress={this.handleChangeOrderStatus.bind(this)}
+                onPress={() => this.setState({changeOrderStatusModal: true})}
               />
             )}
           </Right>
@@ -241,6 +234,18 @@ class OrderCard extends PureComponent {
 
     return (
       <View>
+        <ConfirmationModal
+          isVisible={this.state.changeOrderStatusModal}
+          title={`${buttonText} Order # ${order.merchantOrderNumber}?`}
+          body={`Are you sure you want to ${buttonText} Order # ${order.merchantOrderNumber}?`}
+          onConfirm={() => {
+            this.setState({changeOrderStatusModal: false}, () => {
+              this.handleChangeOrderStatus();
+            });
+          }}
+          closeModal={() => this.setState({changeOrderStatusModal: false})}
+        />
+
         <Card {...otherProps} style={{borderRadius: 10, overflow: 'hidden'}}>
           <CardHeader />
           <CardItem bordered>
@@ -274,7 +279,7 @@ class OrderCard extends PureComponent {
                   fontFamily: 'ProductSans-Black',
                   fontSize: 16,
                 }}>
-                ₱ {order.totalAmount}
+                ₱ {order.subTotal}
               </Text>
               <Text note>{order.quantity} items</Text>
             </Right>

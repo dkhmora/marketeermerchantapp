@@ -4,17 +4,19 @@ import {
   Text,
   TouchableOpacity,
   TextInput,
-  ScrollView,
   StatusBar,
   Image,
   Linking,
+  Platform,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {observer, inject} from 'mobx-react';
-import {Icon, SocialIcon, Button} from 'react-native-elements';
+import {Icon, Button} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import Toast from '../components/Toast';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
 
 @inject('authStore')
 @observer
@@ -74,33 +76,60 @@ class LoginScreen extends Component {
     });
   }
 
-  openMerchantSignUpForm() {
-    const merchantFormUrl =
-      'https://marketeer.ph/components/pages/partnermerchantsignup';
-
-    Linking.canOpenURL(merchantFormUrl).then((supported) => {
-      if (supported) {
-        Linking.openURL(merchantFormUrl);
+  async openLink(url) {
+    try {
+      if (await InAppBrowser.isAvailable()) {
+        await InAppBrowser.open(url, {
+          dismissButtonStyle: 'close',
+          preferredBarTintColor: colors.primary,
+          preferredControlTintColor: 'white',
+          readerMode: false,
+          animated: true,
+          modalPresentationStyle: 'pageSheet',
+          modalTransitionStyle: 'coverVertical',
+          modalEnabled: true,
+          enableBarCollapsing: false,
+          // Android Properties
+          showTitle: true,
+          toolbarColor: colors.primary,
+          secondaryToolbarColor: 'black',
+          enableUrlBarHiding: true,
+          enableDefaultShare: true,
+          forceCloseOnRedirection: false,
+          animations: {
+            startEnter: 'slide_in_right',
+            startExit: 'slide_out_left',
+            endEnter: 'slide_in_left',
+            endExit: 'slide_out_right',
+          },
+        });
       } else {
-        console.log("Don't know how to open URI: " + merchantFormUrl);
+        Linking.openURL(url);
       }
-    });
+    } catch (err) {
+      Toast({text: err.message, type: 'danger'});
+    }
+  }
+
+  openMerchantSignUpForm() {
+    const url = 'https://marketeer.ph/components/pages/partnermerchantsignup';
+
+    this.openLink(url);
   }
 
   openTermsAndConditions() {
     const url = 'https://marketeer.ph/components/pages/termsandconditions';
 
-    Linking.openURL(url);
+    this.openLink(url);
   }
 
   openPrivacyPolicy() {
     const url = 'https://marketeer.ph/components/pages/privacypolicy';
 
-    Linking.openURL(url);
+    this.openLink(url);
   }
 
   render() {
-    const {navigation} = this.props;
     const {emailCheck} = this.state;
 
     return (
@@ -126,124 +155,138 @@ class LoginScreen extends Component {
           useNativeDriver
           animation="fadeInUpBig"
           style={styles.footer}>
-          <KeyboardAwareScrollView>
-            <Text style={styles.text_header}>Login</Text>
+          <KeyboardAwareScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardOpeningTime={20}
+            extraScrollHeight={20}
+            contentContainerStyle={{flex: 1}}>
+            <View>
+              <Text style={styles.text_header}>Login</Text>
 
-            <Text style={styles.text_footer}>Email Address</Text>
+              <Text style={styles.text_footer}>Email Address</Text>
 
-            <View style={styles.action}>
-              <View style={styles.icon_container}>
-                <Icon name="user" color={colors.primary} size={20} />
+              <View style={styles.action}>
+                <View style={styles.icon_container}>
+                  <Icon name="user" color={colors.primary} size={20} />
+                </View>
+
+                <TextInput
+                  placeholder="myemail@gmail.com"
+                  placeholderTextColor={colors.text_secondary}
+                  maxLength={256}
+                  style={styles.textInput}
+                  autoCapitalize="none"
+                  onChangeText={(value) => this.handleEmailChange(value)}
+                />
+
+                {this.state.emailCheck ? (
+                  <Animatable.View useNativeDriver animation="bounceIn">
+                    <Icon name="check-circle" color="#388e3c" size={20} />
+                  </Animatable.View>
+                ) : null}
               </View>
 
-              <TextInput
-                placeholder="myemail@gmail.com"
-                maxLength={256}
-                style={styles.textInput}
-                autoCapitalize="none"
-                onChangeText={(value) => this.handleEmailChange(value)}
-              />
+              <Text
+                style={[
+                  styles.text_footer,
+                  {
+                    marginTop: 20,
+                  },
+                ]}>
+                Password
+              </Text>
 
-              {this.state.emailCheck ? (
-                <Animatable.View useNativeDriver animation="bounceIn">
-                  <Icon name="check-circle" color="#388e3c" size={20} />
-                </Animatable.View>
-              ) : null}
-            </View>
+              <View style={styles.action}>
+                <View style={styles.icon_container}>
+                  <Icon name="lock" color={colors.primary} size={20} />
+                </View>
 
-            <Text
-              style={[
-                styles.text_footer,
-                {
-                  marginTop: 20,
-                },
-              ]}>
-              Password
-            </Text>
+                <TextInput
+                  placeholder="Password"
+                  placeholderTextColor={colors.text_secondary}
+                  maxLength={32}
+                  secureTextEntry={this.state.secureTextEntry ? true : false}
+                  style={styles.textInput}
+                  autoCapitalize="none"
+                  onChangeText={(value) => this.handlePasswordChange(value)}
+                />
 
-            <View style={styles.action}>
-              <View style={styles.icon_container}>
-                <Icon name="lock" color={colors.primary} size={20} />
+                <TouchableOpacity onPress={this.updateSecureTextEntry}>
+                  {this.state.secureTextEntry ? (
+                    <Icon name="eye" color="grey" size={20} />
+                  ) : (
+                    <Icon name="eye-off" color="grey" size={20} />
+                  )}
+                </TouchableOpacity>
               </View>
 
-              <TextInput
-                placeholder="Password"
-                maxLength={32}
-                secureTextEntry={this.state.secureTextEntry ? true : false}
-                style={styles.textInput}
-                autoCapitalize="none"
-                onChangeText={(value) => this.handlePasswordChange(value)}
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  paddingTop: 10,
+                  marginBottom: 50,
+                  flexWrap: 'wrap',
+                }}>
+                <Text
+                  style={([styles.color_textPrivate], {textAlign: 'justify'})}>
+                  By using our service, you agree to our
+                </Text>
+
+                <TouchableOpacity onPress={() => this.openTermsAndConditions()}>
+                  <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
+                    {' '}
+                    Terms and Conditions{' '}
+                  </Text>
+                </TouchableOpacity>
+
+                <Text
+                  style={([styles.color_textPrivate], {textAlign: 'justify'})}>
+                  and
+                </Text>
+
+                <TouchableOpacity onPress={() => this.openPrivacyPolicy()}>
+                  <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
+                    {' '}
+                    Privacy Policy
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <Button
+                onPress={() => this.handleSignIn()}
+                title="Login"
+                type="outline"
+                disabled={!emailCheck}
+                containerStyle={{
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  marginTop: 40,
+                  height: 50,
+                  borderColor: emailCheck ? colors.primary : 'grey',
+                }}
+                buttonStyle={{height: 50}}
               />
 
-              <TouchableOpacity onPress={this.updateSecureTextEntry}>
-                {this.state.secureTextEntry ? (
-                  <Icon name="eye" color="grey" size={20} />
-                ) : (
-                  <Icon name="eye-off" color="grey" size={20} />
-                )}
-              </TouchableOpacity>
-            </View>
+              {Platform.OS === 'android' && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    paddingTop: 10,
+                    flexWrap: 'wrap',
+                  }}>
+                  <Text style={styles.color_textPrivate}>
+                    Are you a merchant?{' '}
+                  </Text>
 
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'center',
-                paddingTop: 10,
-                flexWrap: 'wrap',
-              }}>
-              <Text
-                style={([styles.color_textPrivate], {textAlign: 'justify'})}>
-                By using our service, you agree to our
-              </Text>
-
-              <TouchableOpacity onPress={() => this.openTermsAndConditions()}>
-                <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
-                  {' '}
-                  Terms and Conditions{' '}
-                </Text>
-              </TouchableOpacity>
-
-              <Text
-                style={([styles.color_textPrivate], {textAlign: 'justify'})}>
-                and
-              </Text>
-
-              <TouchableOpacity onPress={() => this.openPrivacyPolicy()}>
-                <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
-                  {' '}
-                  Privacy Policy
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <Button
-              onPress={() => this.handleSignIn()}
-              title="Login"
-              type="outline"
-              disabled={!emailCheck}
-              containerStyle={{
-                borderRadius: 24,
-                borderWidth: 1,
-                marginTop: 40,
-                height: 50,
-                borderColor: emailCheck ? colors.primary : 'grey',
-              }}
-              buttonStyle={{height: 50}}
-            />
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                paddingTop: 10,
-                flexWrap: 'wrap',
-              }}>
-              <Text style={styles.color_textPrivate}>Are you a merchant? </Text>
-
-              <TouchableOpacity onPress={() => this.openMerchantSignUpForm()}>
-                <Text style={styles.touchable_text}>Come and join us!</Text>
-              </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => this.openMerchantSignUpForm()}>
+                    <Text style={styles.touchable_text}>Come and join us!</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           </KeyboardAwareScrollView>
         </Animatable.View>

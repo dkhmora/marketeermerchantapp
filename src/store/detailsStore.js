@@ -3,7 +3,6 @@ import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import firebase from '@react-native-firebase/app';
 import messaging from '@react-native-firebase/messaging';
-import auth from '@react-native-firebase/auth';
 import '@react-native-firebase/functions';
 import Toast from '../components/Toast';
 import {Platform} from 'react-native';
@@ -42,7 +41,7 @@ class DetailsStore {
         return data;
       })
       .catch((err) => {
-        console.log(err);
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -53,24 +52,16 @@ class DetailsStore {
         return response.data.locationDetails;
       })
       .catch((err) => {
-        console.log(err);
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
-  @action updateCoordinates(
-    lowerRange,
-    upperRange,
-    locationCoordinates,
-    boundingBox,
-    address,
-  ) {
+  @action updateCoordinates(lowerRange, upperRange, boundingBox) {
     return this.merchantRef.update({
       deliveryCoordinates: {
         lowerRange,
         upperRange,
-        ...locationCoordinates,
         boundingBox,
-        address,
       },
       updatedAt: firestore.Timestamp.now().toMillis(),
     });
@@ -128,7 +119,7 @@ class DetailsStore {
               firestore.FieldValue.arrayUnion(token),
             );
           })
-          .catch((err) => console.log(err));
+          .catch((err) => Toast({text: err.message, type: 'danger'}));
       }
     }
   }
@@ -143,7 +134,7 @@ class DetailsStore {
             firestore.FieldValue.arrayRemove(token),
           ),
         )
-        .catch((err) => console.log(err));
+        .catch((err) => Toast({text: err.message, type: 'danger'}));
     }
   }
 
@@ -151,8 +142,8 @@ class DetailsStore {
     await storage()
       .ref(image)
       .delete()
-      .then(() => {
-        console.log(`Image at ${image} successfully deleted!`);
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -165,24 +156,12 @@ class DetailsStore {
       .ref(imageRef)
       .putFile(imagePath)
       .then(() =>
-        console.log(
-          `${_.capitalize(
-            type,
-          )} image for ${merchantId} successfully uploaded!`,
-        ),
-      )
-      .then(() =>
         this.merchantRef.update({
           [`${type}Image`]: imageRef,
           updatedAt: firestore.Timestamp.now().toMillis(),
         }),
       )
-      .then(() =>
-        console.log(
-          `Merchant ${_.capitalize(type)} image path successfully set!`,
-        ),
-      )
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action async updateStoreDetails(
@@ -190,7 +169,7 @@ class DetailsStore {
     freeDelivery,
     vacationMode,
     paymentMethods,
-    shippingMethods,
+    deliveryMethods,
     deliveryType,
     ownDeliveryServiceFee,
     freeDeliveryMinimum,
@@ -202,16 +181,15 @@ class DetailsStore {
         freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
         vacationMode,
         paymentMethods,
-        shippingMethods,
+        deliveryMethods,
         deliveryType,
         ownDeliveryServiceFee: ownDeliveryServiceFee
           ? ownDeliveryServiceFee
           : 0,
         updatedAt: firestore.Timestamp.now().toMillis(),
       })
-      .then(() => console.log('Merchant details successfully updated!'))
       .catch((err) => {
-        console.log(`Something went wrong. Error: ${err}`);
+        Toast({text: `Something went wrong. Error: ${err}`, type: 'danger'});
       });
   }
 }

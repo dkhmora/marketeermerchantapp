@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>3</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
@@ -35,10 +35,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Camera needs to be accesed in order to upload captured item and store images</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Location needs to be obtained in order for User to set delivery bounds for their store in Maps.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Location needs to be obtained in order for User to set delivery bounds for their store in Maps.</string>
+	<string>Marketeer Merchant needs user location data</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Marketeer Merchant needs user location data</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>User Photos needs to be accessed in order to upload item and store images</string>
 	<key>UIAppFonts</key>

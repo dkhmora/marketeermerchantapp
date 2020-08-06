@@ -65,10 +65,6 @@ class ItemsStore {
             items: dbItems,
             updatedAt: timeStamp,
           });
-
-          Toast({
-            text: `Successfully updated ${item.name}'s stock!`,
-          });
         } else {
           Toast({
             text: 'Error: Item was not found.',
@@ -93,8 +89,7 @@ class ItemsStore {
 
     await merchantItemsRef
       .update('itemCategories', firestore.FieldValue.arrayRemove(category))
-      .then(() => console.log('Item deleted!'))
-      .catch((err) => console.error(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action async addItemCategory(merchantId, newCategory) {
@@ -112,26 +107,18 @@ class ItemsStore {
               .itemCategories.includes(formattedCategory)) ||
           !documentSnapshot.data().itemCategories
         ) {
-          documentSnapshot.ref
-            .update(
-              'itemCategories',
-              firestore.FieldValue.arrayUnion(formattedCategory),
-            )
-            .then(() =>
-              console.log(
-                `Successfully added new category "${formattedCategory}"`,
-              ),
-            );
+          documentSnapshot.ref.update(
+            'itemCategories',
+            firestore.FieldValue.arrayUnion(formattedCategory),
+          );
         } else {
-          console.error(`${formattedCategory} already exists`);
+          Toast({text: `${formattedCategory} already exists`, type: 'danger'});
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action setStoreItems(merchantId, itemCategories) {
-    //this.maxItemsUpdatedAt = 0;
-    //this.storeItems = [];
     this.unsubscribeSetStoreItems = firestore()
       .collection('merchants')
       .doc(merchantId)
@@ -143,17 +130,19 @@ class ItemsStore {
           await querySnapshot.docChanges().forEach(async (change, index) => {
             const newItems = change.doc.data().items;
 
-            if (this.storeItems.length > 0) {
-              this.storeItems = await this.storeItems.filter(
+            await new Promise((resolve, reject) => {
+              this.storeItems = this.storeItems.filter(
                 (storeItem) => storeItem.doc !== change.doc.id,
               );
-            }
 
-            await this.storeItems.push(...newItems);
+              resolve();
+            }).then(() => {
+              this.storeItems.push(...newItems);
 
-            if (change.doc.data().updatedAt > this.maxItemsUpdatedAt) {
-              this.maxItemsUpdatedAt = change.doc.data().updatedAt;
-            }
+              if (change.doc.data().updatedAt > this.maxItemsUpdatedAt) {
+                this.maxItemsUpdatedAt = change.doc.data().updatedAt;
+              }
+            });
           });
 
           this.storeItems = await this.storeItems
@@ -165,17 +154,7 @@ class ItemsStore {
               this.setCategoryItems(category);
             });
         }
-
         this.loaded = true;
-
-        this.storeItems = await this.storeItems
-          .slice()
-          .sort((a, b) => a.name > b.name);
-
-        itemCategories &&
-          itemCategories.map((category) => {
-            this.setCategoryItems(category);
-          });
       });
   }
 
@@ -184,8 +163,7 @@ class ItemsStore {
       return await storage()
         .ref(imageRef)
         .putFile(imagePath)
-        .then(() => console.log('Image successfully uploaded!'))
-        .catch((err) => console.error(err));
+        .catch((err) => Toast({text: err.message, type: 'danger'}));
     }
   }
 
@@ -217,7 +195,6 @@ class ItemsStore {
             if (response.data.s === 200) {
               Toast({
                 text: `"${newItem.name}" successfully added to Item List!`,
-                buttonText: 'Okay',
               });
             } else {
               Toast({
@@ -244,12 +221,7 @@ class ItemsStore {
   }
 
   @action async deleteImage(image) {
-    await storage()
-      .ref(image)
-      .delete()
-      .then(() => {
-        console.log(`Image at ${image} successfully deleted!`);
-      });
+    await storage().ref(image).delete();
   }
 
   @action async deleteStoreItem(merchantId, item) {

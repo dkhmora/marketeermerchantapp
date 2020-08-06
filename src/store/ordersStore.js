@@ -37,7 +37,6 @@ class OrdersStore {
     const messageId = uuidv4();
     const imageRef = `/images/orders/${orderId}/order_chat/${messageId}`;
     const storageRef = storage().ref(imageRef);
-    console.log(imagePath);
 
     await storageRef
       .putFile(imagePath)
@@ -55,8 +54,7 @@ class OrdersStore {
       .then((imageLink) =>
         this.createImageMessage(orderId, messageId, user, imageLink),
       )
-      .then(() => console.log('Image successfully uploaded and sent!'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action async createImageMessage(orderId, messageId, user, imageLink) {
@@ -72,8 +70,7 @@ class OrdersStore {
       .collection('orders')
       .doc(orderId)
       .update('messages', firestore.FieldValue.arrayUnion(message))
-      .then(() => console.log('Successfully sent the message'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action async sendMessage(orderId, message) {
@@ -84,8 +81,7 @@ class OrdersStore {
       .collection('orders')
       .doc(orderId)
       .update('messages', firestore.FieldValue.arrayUnion(message))
-      .then(() => console.log('Successfully sent the message'))
-      .catch((err) => console.log(err));
+      .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
   @action getMessages(orderId) {
@@ -128,7 +124,7 @@ class OrdersStore {
         }
       })
       .catch((err) => {
-        console.log(err);
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -171,7 +167,7 @@ class OrdersStore {
         return response.data;
       })
       .catch((err) => {
-        console.log(err);
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -179,12 +175,10 @@ class OrdersStore {
     return await functions
       .httpsCallable('cancelOrder')({orderId, merchantId, cancelReason})
       .then((response) => {
-        console.log(response.data);
-
         return response.data;
       })
       .catch((err) => {
-        console.log(err);
+        Toast({text: err.message, type: 'danger'});
       });
   }
 }

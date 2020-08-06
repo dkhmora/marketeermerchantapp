@@ -10,27 +10,26 @@
 		00E356F31AD99517003FC87E /* marketeermerchantappTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* marketeermerchantappTests.m */; };
 		01B9C121831D493885010C78 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D363313D738D485B8A06F9A0 /* MaterialCommunityIcons.ttf */; };
 		0DD7DB84A9F249B2B88A0471 /* ProductSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 423AFB770EB847A6BBBA4217 /* ProductSans-Medium.ttf */; };
+		100E4CF4F615BAC4D3435ABD /* libPods-marketeermerchantapp-marketeermerchantappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A4E1302146D6A57008187C6 /* libPods-marketeermerchantapp-marketeermerchantappTests.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1900EFAF3C5E71B5BBB61D1C /* libPods-marketeermerchantapp-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AF945E225FEACEA252EDA8D9 /* libPods-marketeermerchantapp-tvOSTests.a */; };
 		1DE5944CE3754D3092D63B7B /* Roboto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AFD460B803CA43A28579A11B /* Roboto.ttf */; };
 		228FF1824918403FAC973384 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 74F4EB0F2FB141CF90C2E621 /* Feather.ttf */; };
 		25F194F077904B4B9CD9D62A /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D68ED2F48D6840EFB387A810 /* Octicons.ttf */; };
 		260A31A34EE6417A92CAA678 /* ProductSans-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2C95826CF7C8466AA35BE27C /* ProductSans-Italic.ttf */; };
+		26E90A1FBF472D3D38AEC751 /* libPods-marketeermerchantapp-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D45A0D77E2F1EE0DD771F9D4 /* libPods-marketeermerchantapp-tvOS.a */; };
 		2AECED6724944034B38B19D4 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B92CA333E3AB41F2AED44EEF /* FontAwesome5_Brands.ttf */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* marketeermerchantappTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* marketeermerchantappTests.m */; };
-		321B4587B9256C56289A1190 /* libPods-marketeermerchantapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F01F696C579D613827651055 /* libPods-marketeermerchantapp.a */; };
 		32386ACA6140464D891A8792 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3AD065411BB54394B43A56E0 /* FontAwesome5_Solid.ttf */; };
 		35D9E3207E6340CE93889311 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 192A137F46E14281B9AF34C6 /* MaterialIcons.ttf */; };
 		39446CE4B6F54257A31B9F40 /* rubicon-icon-font.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9381DB20BC0B428FBFB8E6AB /* rubicon-icon-font.ttf */; };
 		3988F8B7E9784F60AD9AD429 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 49F58A7B8A0948EE8049AAF6 /* Entypo.ttf */; };
 		3A89BDC27A0C462A930E27E3 /* ProductSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1188E747655C46748307DC9A /* ProductSans-Regular.ttf */; };
-		47BB02E7A4C90A04955627D4 /* libPods-marketeermerchantapp-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 74BFEBE92CBB0712E5EA1259 /* libPods-marketeermerchantapp-tvOS.a */; };
 		4A211FF7E84E4E6B8B057C95 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 99E41FE510C24B35BB8C3C06 /* FontAwesome5_Regular.ttf */; };
 		5F8E77A8AB3A48C6A9BEDB89 /* ProductSans-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4CE8BBEE0F434F7DB6170EF9 /* ProductSans-BoldItalic.ttf */; };
 		6137F70DF8B44C86840E2191 /* ProductSans-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 52A276811648434BB3CC828B /* ProductSans-LightItalic.ttf */; };
@@ -40,8 +39,8 @@
 		86051B94309E4564A6E072F2 /* ProductSans-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC00631B0C604609A388DE92 /* ProductSans-BlackItalic.ttf */; };
 		8A47E91EF3FC4BFCAAC0F3D4 /* ProductSans-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F51924830EC044F8836382D7 /* ProductSans-ThinItalic.ttf */; };
 		9029CF63C8FD42E39822ED24 /* ProductSans-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0524920E0A43457381D3A30F /* ProductSans-MediumItalic.ttf */; };
-		90907B6241B1FD4245898804 /* libPods-marketeermerchantapp-marketeermerchantappTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D1AE70C7A9F45991D660725C /* libPods-marketeermerchantapp-marketeermerchantappTests.a */; };
 		9E3426075EE4442AB5386D95 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 756FF0ED16F64B8D9D0D691E /* SimpleLineIcons.ttf */; };
+		A128E9A7A020744C58C6F633 /* libPods-marketeermerchantapp-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 383B15780DCE3AD5960E107D /* libPods-marketeermerchantapp-tvOSTests.a */; };
 		ACB019C73FAB4B58A896CB3E /* Roboto_medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 374CAE5322614369B4AD3714 /* Roboto_medium.ttf */; };
 		ACF1B7798B73445C96573001 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BF59AD7968F14424BE5D8BD8 /* EvilIcons.ttf */; };
 		BEA697217A8440D79F7BE2CC /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F5A8602D065F4CF88E8662D5 /* Fontisto.ttf */; };
@@ -49,6 +48,7 @@
 		C1524C0539E74961AE02BC3A /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 98C14A12B3FC405EB915FA82 /* Foundation.ttf */; };
 		CA17F7535AD8468CBDA982E8 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CF25E96F2AA84B448BC32F59 /* Zocial.ttf */; };
 		CA5BA73727A74328A45765F4 /* ProductSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6A3187F1E60346579AC12507 /* ProductSans-Light.ttf */; };
+		DABDD4B49E66AD04F8F5360E /* libPods-marketeermerchantapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CD4B23E9FA3D925458DC3D7D /* libPods-marketeermerchantapp.a */; };
 		E8DC1CC024AA8C1D004C4929 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E8DC1CBF24AA8C1D004C4929 /* GoogleService-Info.plist */; };
 		FA36D5CBFDD942AB8E2B7C55 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DEE646FDEB6845B99023F346 /* Ionicons.ttf */; };
 		FAA35BB56E284CA9B47BACB8 /* ProductSans-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6A8017DDB4C5477689302EC0 /* ProductSans-Thin.ttf */; };
@@ -78,7 +78,6 @@
 		00E356F21AD99517003FC87E /* marketeermerchantappTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = marketeermerchantappTests.m; sourceTree = "<group>"; };
 		0524920E0A43457381D3A30F /* ProductSans-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-MediumItalic.ttf"; path = "../assets/fonts/ProductSans-MediumItalic.ttf"; sourceTree = "<group>"; };
 		1188E747655C46748307DC9A /* ProductSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-Regular.ttf"; path = "../assets/fonts/ProductSans-Regular.ttf"; sourceTree = "<group>"; };
-		11C2F1DAE55BD51A4623EADA /* Pods-marketeermerchantapp-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOSTests/Pods-marketeermerchantapp-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Marketeer Merchant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Marketeer Merchant.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = marketeermerchantapp/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = marketeermerchantapp/AppDelegate.m; sourceTree = "<group>"; };
@@ -87,10 +86,12 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = marketeermerchantapp/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = marketeermerchantapp/main.m; sourceTree = "<group>"; };
 		192A137F46E14281B9AF34C6 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
+		2A4E1302146D6A57008187C6 /* libPods-marketeermerchantapp-marketeermerchantappTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-marketeermerchantapp-marketeermerchantappTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C95826CF7C8466AA35BE27C /* ProductSans-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-Italic.ttf"; path = "../assets/fonts/ProductSans-Italic.ttf"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* marketeermerchantapp-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "marketeermerchantapp-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* marketeermerchantapp-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "marketeermerchantapp-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		374CAE5322614369B4AD3714 /* Roboto_medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto_medium.ttf; path = "../node_modules/native-base/Fonts/Roboto_medium.ttf"; sourceTree = "<group>"; };
+		383B15780DCE3AD5960E107D /* libPods-marketeermerchantapp-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-marketeermerchantapp-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A1B130A7571448FB2425F7F /* ProductSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-Bold.ttf"; path = "../assets/fonts/ProductSans-Bold.ttf"; sourceTree = "<group>"; };
 		3AD065411BB54394B43A56E0 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/native-base/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		423AFB770EB847A6BBBA4217 /* ProductSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-Medium.ttf"; path = "../assets/fonts/ProductSans-Medium.ttf"; sourceTree = "<group>"; };
@@ -98,38 +99,37 @@
 		4CE8BBEE0F434F7DB6170EF9 /* ProductSans-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-BoldItalic.ttf"; path = "../assets/fonts/ProductSans-BoldItalic.ttf"; sourceTree = "<group>"; };
 		4DEF9CE37E414719B2EF1312 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/native-base/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		52A276811648434BB3CC828B /* ProductSans-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-LightItalic.ttf"; path = "../assets/fonts/ProductSans-LightItalic.ttf"; sourceTree = "<group>"; };
+		5391FE4BF934004D8F8EF308 /* Pods-marketeermerchantapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp/Pods-marketeermerchantapp.debug.xcconfig"; sourceTree = "<group>"; };
 		6A3187F1E60346579AC12507 /* ProductSans-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-Light.ttf"; path = "../assets/fonts/ProductSans-Light.ttf"; sourceTree = "<group>"; };
 		6A8017DDB4C5477689302EC0 /* ProductSans-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-Thin.ttf"; path = "../assets/fonts/ProductSans-Thin.ttf"; sourceTree = "<group>"; };
 		746B47C74BD54C0E93F66B67 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
-		74BFEBE92CBB0712E5EA1259 /* libPods-marketeermerchantapp-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-marketeermerchantapp-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		74F4EB0F2FB141CF90C2E621 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/native-base/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		756FF0ED16F64B8D9D0D691E /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
+		7B1913889D0003337ACB9E38 /* Pods-marketeermerchantapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp/Pods-marketeermerchantapp.release.xcconfig"; sourceTree = "<group>"; };
+		87C56BBED57AAF751D4E33F0 /* Pods-marketeermerchantapp-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOS/Pods-marketeermerchantapp-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		8BF22709D891AAD8216318FF /* Pods-marketeermerchantapp-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOSTests/Pods-marketeermerchantapp-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		8E2F0628B52246CC9B606355 /* ProductSans-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-Black.ttf"; path = "../assets/fonts/ProductSans-Black.ttf"; sourceTree = "<group>"; };
 		9381DB20BC0B428FBFB8E6AB /* rubicon-icon-font.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "rubicon-icon-font.ttf"; path = "../node_modules/native-base/Fonts/rubicon-icon-font.ttf"; sourceTree = "<group>"; };
+		9865E4DED45007152AE5C74B /* Pods-marketeermerchantapp-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOS.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOS/Pods-marketeermerchantapp-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		98C14A12B3FC405EB915FA82 /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/native-base/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		99E41FE510C24B35BB8C3C06 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/native-base/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
-		A090CE1D085199EF2DBCE930 /* Pods-marketeermerchantapp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp/Pods-marketeermerchantapp.release.xcconfig"; sourceTree = "<group>"; };
-		AF945E225FEACEA252EDA8D9 /* libPods-marketeermerchantapp-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-marketeermerchantapp-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AFC7CF98A77EEE07E386A36A /* Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-marketeermerchantappTests/Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig"; sourceTree = "<group>"; };
+		AE77B3EC6C0769350640082C /* Pods-marketeermerchantapp-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOSTests/Pods-marketeermerchantapp-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		AFD460B803CA43A28579A11B /* Roboto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Roboto.ttf; path = "../node_modules/native-base/Fonts/Roboto.ttf"; sourceTree = "<group>"; };
-		B3EADCC10B31364993D1F450 /* Pods-marketeermerchantapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp/Pods-marketeermerchantapp.debug.xcconfig"; sourceTree = "<group>"; };
 		B92CA333E3AB41F2AED44EEF /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/native-base/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
+		BA793A1580F39BDA84EA1FC3 /* Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-marketeermerchantappTests/Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig"; sourceTree = "<group>"; };
 		BF59AD7968F14424BE5D8BD8 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/native-base/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
+		CD4B23E9FA3D925458DC3D7D /* libPods-marketeermerchantapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-marketeermerchantapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF25E96F2AA84B448BC32F59 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
-		D1AE70C7A9F45991D660725C /* libPods-marketeermerchantapp-marketeermerchantappTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-marketeermerchantapp-marketeermerchantappTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D363313D738D485B8A06F9A0 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/native-base/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
+		D45A0D77E2F1EE0DD771F9D4 /* libPods-marketeermerchantapp-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-marketeermerchantapp-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D68ED2F48D6840EFB387A810 /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/native-base/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		DC00631B0C604609A388DE92 /* ProductSans-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-BlackItalic.ttf"; path = "../assets/fonts/ProductSans-BlackItalic.ttf"; sourceTree = "<group>"; };
 		DEE646FDEB6845B99023F346 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/native-base/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
-		E145BCCA533CB62B3CEB9498 /* Pods-marketeermerchantapp-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOS.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOS/Pods-marketeermerchantapp-tvOS.release.xcconfig"; sourceTree = "<group>"; };
-		E412BF5BD3995AAF5DA4EAAE /* Pods-marketeermerchantapp-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOSTests/Pods-marketeermerchantapp-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
+		E1E2FC643936FAACDA85C581 /* Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-marketeermerchantappTests/Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig"; sourceTree = "<group>"; };
 		E89A0973249282A000007182 /* marketeermerchantapp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = marketeermerchantapp.entitlements; path = marketeermerchantapp/marketeermerchantapp.entitlements; sourceTree = "<group>"; };
 		E8DC1CBF24AA8C1D004C4929 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		EA6014E5D57E74B7685744A2 /* Pods-marketeermerchantapp-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-tvOS/Pods-marketeermerchantapp-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
-		EF8716FE6002B2BB3D80B24F /* Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig"; path = "Target Support Files/Pods-marketeermerchantapp-marketeermerchantappTests/Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig"; sourceTree = "<group>"; };
-		F01F696C579D613827651055 /* libPods-marketeermerchantapp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-marketeermerchantapp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F51924830EC044F8836382D7 /* ProductSans-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "ProductSans-ThinItalic.ttf"; path = "../assets/fonts/ProductSans-ThinItalic.ttf"; sourceTree = "<group>"; };
 		F5A8602D065F4CF88E8662D5 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = "../node_modules/native-base/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -139,7 +139,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				90907B6241B1FD4245898804 /* libPods-marketeermerchantapp-marketeermerchantappTests.a in Frameworks */,
+				100E4CF4F615BAC4D3435ABD /* libPods-marketeermerchantapp-marketeermerchantappTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -147,7 +147,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				321B4587B9256C56289A1190 /* libPods-marketeermerchantapp.a in Frameworks */,
+				DABDD4B49E66AD04F8F5360E /* libPods-marketeermerchantapp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,7 +155,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				47BB02E7A4C90A04955627D4 /* libPods-marketeermerchantapp-tvOS.a in Frameworks */,
+				26E90A1FBF472D3D38AEC751 /* libPods-marketeermerchantapp-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,7 +163,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1900EFAF3C5E71B5BBB61D1C /* libPods-marketeermerchantapp-tvOSTests.a in Frameworks */,
+				A128E9A7A020744C58C6F633 /* libPods-marketeermerchantapp-tvOSTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,10 +207,10 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				F01F696C579D613827651055 /* libPods-marketeermerchantapp.a */,
-				D1AE70C7A9F45991D660725C /* libPods-marketeermerchantapp-marketeermerchantappTests.a */,
-				74BFEBE92CBB0712E5EA1259 /* libPods-marketeermerchantapp-tvOS.a */,
-				AF945E225FEACEA252EDA8D9 /* libPods-marketeermerchantapp-tvOSTests.a */,
+				CD4B23E9FA3D925458DC3D7D /* libPods-marketeermerchantapp.a */,
+				2A4E1302146D6A57008187C6 /* libPods-marketeermerchantapp-marketeermerchantappTests.a */,
+				D45A0D77E2F1EE0DD771F9D4 /* libPods-marketeermerchantapp-tvOS.a */,
+				383B15780DCE3AD5960E107D /* libPods-marketeermerchantapp-tvOSTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -218,14 +218,14 @@
 		2FEECAD15F4E4BD5870C7C73 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				B3EADCC10B31364993D1F450 /* Pods-marketeermerchantapp.debug.xcconfig */,
-				A090CE1D085199EF2DBCE930 /* Pods-marketeermerchantapp.release.xcconfig */,
-				EF8716FE6002B2BB3D80B24F /* Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig */,
-				AFC7CF98A77EEE07E386A36A /* Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig */,
-				EA6014E5D57E74B7685744A2 /* Pods-marketeermerchantapp-tvOS.debug.xcconfig */,
-				E145BCCA533CB62B3CEB9498 /* Pods-marketeermerchantapp-tvOS.release.xcconfig */,
-				E412BF5BD3995AAF5DA4EAAE /* Pods-marketeermerchantapp-tvOSTests.debug.xcconfig */,
-				11C2F1DAE55BD51A4623EADA /* Pods-marketeermerchantapp-tvOSTests.release.xcconfig */,
+				5391FE4BF934004D8F8EF308 /* Pods-marketeermerchantapp.debug.xcconfig */,
+				7B1913889D0003337ACB9E38 /* Pods-marketeermerchantapp.release.xcconfig */,
+				BA793A1580F39BDA84EA1FC3 /* Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig */,
+				E1E2FC643936FAACDA85C581 /* Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig */,
+				87C56BBED57AAF751D4E33F0 /* Pods-marketeermerchantapp-tvOS.debug.xcconfig */,
+				9865E4DED45007152AE5C74B /* Pods-marketeermerchantapp-tvOS.release.xcconfig */,
+				AE77B3EC6C0769350640082C /* Pods-marketeermerchantapp-tvOSTests.debug.xcconfig */,
+				8BF22709D891AAD8216318FF /* Pods-marketeermerchantapp-tvOSTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -310,11 +310,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "marketeermerchantappTests" */;
 			buildPhases = (
-				87ED77DAA860C638452C4F99 /* [CP] Check Pods Manifest.lock */,
+				747E27F3501371F310FA761A /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				7AC54EC678C13E7FF7936BFD /* [CP] Copy Pods Resources */,
+				32E357427E67AB23094A29CA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -330,14 +330,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "marketeermerchantapp" */;
 			buildPhases = (
-				C13F21A9527DD305ECFA8DE4 /* [CP] Check Pods Manifest.lock */,
+				0CCE0D408D512EBB27075DD9 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				418BAC496FA743E511475550 /* [CP-User] [RNFB] Core Configuration */,
-				47ABD0C9E5BDA647D548B7D7 /* [CP] Copy Pods Resources */,
+				921EEFA8C7983A202D1D9273 /* [CP] Copy Pods Resources */,
+				6309324A7876339DF5B4BE2D /* [CP-User] [RNFB] Core Configuration */,
 			);
 			buildRules = (
 			);
@@ -352,7 +352,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "marketeermerchantapp-tvOS" */;
 			buildPhases = (
-				E9453F2563A23A1E78303644 /* [CP] Check Pods Manifest.lock */,
+				E4B04A82324236E8907B533E /* [CP] Check Pods Manifest.lock */,
 				FD10A7F122414F3F0027D42C /* Start Packager */,
 				2D02E4771E0B4A5D006451C7 /* Sources */,
 				2D02E4781E0B4A5D006451C7 /* Frameworks */,
@@ -372,7 +372,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "marketeermerchantapp-tvOSTests" */;
 			buildPhases = (
-				C90CC24A86DAA89CEBC6AFC1 /* [CP] Check Pods Manifest.lock */,
+				55BC46E4E639A96192E17514 /* [CP] Check Pods Manifest.lock */,
 				2D02E48C1E0B4A5D006451C7 /* Sources */,
 				2D02E48D1E0B4A5D006451C7 /* Frameworks */,
 				2D02E48E1E0B4A5D006451C7 /* Resources */,
@@ -516,105 +516,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Bundle React Native Code And Images";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
-		};
-		418BAC496FA743E511475550 /* [CP-User] [RNFB] Core Configuration */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			name = "[CP-User] [RNFB] Core Configuration";
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\nset -e\n\n_MAX_LOOKUPS=2;\n_SEARCH_RESULT=''\n_RN_ROOT_EXISTS=''\n_CURRENT_LOOKUPS=1\n_JSON_ROOT=\"'react-native'\"\n_JSON_FILE_NAME='firebase.json'\n_JSON_OUTPUT_BASE64='e30=' # { }\n_CURRENT_SEARCH_DIR=${PROJECT_DIR}\n_PLIST_BUDDY=/usr/libexec/PlistBuddy\n_TARGET_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n_DSYM_PLIST=\"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist\"\n\n# plist arrays\n_PLIST_ENTRY_KEYS=()\n_PLIST_ENTRY_TYPES=()\n_PLIST_ENTRY_VALUES=()\n\nfunction setPlistValue {\n  echo \"info:      setting plist entry '$1' of type '$2' in file '$4'\"\n  ${_PLIST_BUDDY} -c \"Add :$1 $2 '$3'\" $4 || echo \"info:      '$1' already exists\"\n}\n\nfunction getFirebaseJsonKeyValue () {\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    ruby -e \"require 'rubygems';require 'json'; output=JSON.parse('$1'); puts output[$_JSON_ROOT]['$2']\"\n  else\n    echo \"\"\n  fi;\n}\n\nfunction jsonBoolToYesNo () {\n  if [[ $1 == \"false\" ]]; then\n    echo \"NO\"\n  elif [[ $1 == \"true\" ]]; then\n    echo \"YES\"\n  else echo \"NO\"\n  fi\n}\n\necho \"info: -> RNFB build script started\"\necho \"info: 1) Locating ${_JSON_FILE_NAME} file:\"\n\nif [[ -z ${_CURRENT_SEARCH_DIR} ]]; then\n  _CURRENT_SEARCH_DIR=$(pwd)\nfi;\n\nwhile true; do\n  _CURRENT_SEARCH_DIR=$(dirname \"$_CURRENT_SEARCH_DIR\")\n  if [[ \"$_CURRENT_SEARCH_DIR\" == \"/\" ]] || [[ ${_CURRENT_LOOKUPS} -gt ${_MAX_LOOKUPS} ]]; then break; fi;\n  echo \"info:      ($_CURRENT_LOOKUPS of $_MAX_LOOKUPS) Searching in '$_CURRENT_SEARCH_DIR' for a ${_JSON_FILE_NAME} file.\"\n  _SEARCH_RESULT=$(find \"$_CURRENT_SEARCH_DIR\" -maxdepth 2 -name ${_JSON_FILE_NAME} -print | head -n 1)\n  if [[ ${_SEARCH_RESULT} ]]; then\n    echo \"info:      ${_JSON_FILE_NAME} found at $_SEARCH_RESULT\"\n    break;\n  fi;\n  _CURRENT_LOOKUPS=$((_CURRENT_LOOKUPS+1))\ndone\n\nif [[ ${_SEARCH_RESULT} ]]; then\n  _JSON_OUTPUT_RAW=$(cat \"${_SEARCH_RESULT}\")\n  _RN_ROOT_EXISTS=$(ruby -e \"require 'rubygems';require 'json'; output=JSON.parse('$_JSON_OUTPUT_RAW'); puts output[$_JSON_ROOT]\" || echo '')\n\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    _JSON_OUTPUT_BASE64=$(python -c 'import json,sys,base64;print(base64.b64encode(json.dumps(json.loads(open('\"'${_SEARCH_RESULT}'\"').read())['${_JSON_ROOT}'])))' || echo \"e30=\")\n  fi\n\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n\n  # config.messaging_auto_init_enabled\n  _MESSAGING_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"messaging_auto_init_enabled\")\n  if [[ $_MESSAGING_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseMessagingAutoInitEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_MESSAGING_AUTO_INIT\")\")\n  fi\n\n  # config.crashlytics_disable_auto_disabler - undocumented for now - mainly for debugging, document if becomes usful\n  _CRASHLYTICS_AUTO_DISABLE_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"crashlytics_disable_auto_disabler\")\n  if [[ $_CRASHLYTICS_AUTO_DISABLE_ENABLED == \"true\" ]]; then\n    echo \"Disabled Crashlytics auto disabler.\" # do nothing\n  else\n    _PLIST_ENTRY_KEYS+=(\"firebase_crashlytics_collection_enabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"NO\")\n  fi\n\n  # config.admob_delay_app_measurement_init\n  _ADMOB_DELAY_APP_MEASUREMENT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"admob_delay_app_measurement_init\")\n  if [[ $_ADMOB_DELAY_APP_MEASUREMENT == \"true\" ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GADDelayAppMeasurementInit\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"YES\")\n  fi\n\n  # config.admob_ios_app_id\n  _ADMOB_IOS_APP_ID=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"admob_ios_app_id\")\n  if [[ $_ADMOB_IOS_APP_ID ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GADApplicationIdentifier\")\n    _PLIST_ENTRY_TYPES+=(\"string\")\n    _PLIST_ENTRY_VALUES+=(\"$_ADMOB_IOS_APP_ID\")\n  fi\nelse\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n  echo \"warning:   A firebase.json file was not found, whilst this file is optional it is recommended to include it to configure firebase services in React Native Firebase.\"\nfi;\n\necho \"info: 2) Injecting Info.plist entries: \"\n\n# Log out the keys we're adding\nfor i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n  echo \"    ->  $i) ${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\"\ndone\n\nfor plist in \"${_TARGET_PLIST}\" \"${_DSYM_PLIST}\" ; do\n  if [[ -f \"${plist}\" ]]; then\n\n    # paths with spaces break the call to setPlistValue. temporarily modify\n    # the shell internal field separator variable (IFS), which normally \n    # includes spaces, to consist only of line breaks\n    oldifs=$IFS\n    IFS=\"\n\"\n\n    for i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n      setPlistValue \"${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\" \"${plist}\"\n    done\n\n    # restore the original internal field separator value\n    IFS=$oldifs\n  else\n    echo \"warning:   A Info.plist build output file was not found (${plist})\"\n  fi\ndone\n\necho \"info: <- RNFB build script finished\"\n\n";
-		};
-		47ABD0C9E5BDA647D548B7D7 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-marketeermerchantapp/Pods-marketeermerchantapp-resources.sh",
-				"${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle",
-				"${PODS_ROOT}/GooglePlaces/Frameworks/GooglePlaces.framework/Resources/GooglePlaces.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/RNImageCropPicker/QBImagePicker.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/TOCropViewController/TOCropViewControllerBundle.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/gRPC-C++/gRPCCertificates-Cpp.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleMaps.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GooglePlaces.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/QBImagePicker.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gRPCCertificates-Cpp.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-marketeermerchantapp/Pods-marketeermerchantapp-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		7AC54EC678C13E7FF7936BFD /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-marketeermerchantapp-marketeermerchantappTests/Pods-marketeermerchantapp-marketeermerchantappTests-resources.sh",
-				"${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle",
-				"${PODS_ROOT}/GooglePlaces/Frameworks/GooglePlaces.framework/Resources/GooglePlaces.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/RNImageCropPicker/QBImagePicker.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/TOCropViewController/TOCropViewControllerBundle.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/gRPC-C++/gRPCCertificates-Cpp.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleMaps.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GooglePlaces.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/QBImagePicker.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gRPCCertificates-Cpp.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-marketeermerchantapp-marketeermerchantappTests/Pods-marketeermerchantapp-marketeermerchantappTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		87ED77DAA860C638452C4F99 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-marketeermerchantapp-marketeermerchantappTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C13F21A9527DD305ECFA8DE4 /* [CP] Check Pods Manifest.lock */ = {
+		0CCE0D408D512EBB27075DD9 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -636,7 +538,45 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C90CC24A86DAA89CEBC6AFC1 /* [CP] Check Pods Manifest.lock */ = {
+		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle React Native Code And Images";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+		};
+		32E357427E67AB23094A29CA /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-marketeermerchantapp-marketeermerchantappTests/Pods-marketeermerchantapp-marketeermerchantappTests-resources.sh",
+				"${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RNImageCropPicker/QBImagePicker.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/TOCropViewController/TOCropViewControllerBundle.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/gRPC-C++/gRPCCertificates-Cpp.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleMaps.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/QBImagePicker.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gRPCCertificates-Cpp.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-marketeermerchantapp-marketeermerchantappTests/Pods-marketeermerchantapp-marketeermerchantappTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		55BC46E4E639A96192E17514 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -658,7 +598,63 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E9453F2563A23A1E78303644 /* [CP] Check Pods Manifest.lock */ = {
+		6309324A7876339DF5B4BE2D /* [CP-User] [RNFB] Core Configuration */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "[CP-User] [RNFB] Core Configuration";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\nset -e\n\n_MAX_LOOKUPS=2;\n_SEARCH_RESULT=''\n_RN_ROOT_EXISTS=''\n_CURRENT_LOOKUPS=1\n_JSON_ROOT=\"'react-native'\"\n_JSON_FILE_NAME='firebase.json'\n_JSON_OUTPUT_BASE64='e30=' # { }\n_CURRENT_SEARCH_DIR=${PROJECT_DIR}\n_PLIST_BUDDY=/usr/libexec/PlistBuddy\n_TARGET_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\n_DSYM_PLIST=\"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Info.plist\"\n\n# plist arrays\n_PLIST_ENTRY_KEYS=()\n_PLIST_ENTRY_TYPES=()\n_PLIST_ENTRY_VALUES=()\n\nfunction setPlistValue {\n  echo \"info:      setting plist entry '$1' of type '$2' in file '$4'\"\n  ${_PLIST_BUDDY} -c \"Add :$1 $2 '$3'\" $4 || echo \"info:      '$1' already exists\"\n}\n\nfunction getFirebaseJsonKeyValue () {\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    ruby -e \"require 'rubygems';require 'json'; output=JSON.parse('$1'); puts output[$_JSON_ROOT]['$2']\"\n  else\n    echo \"\"\n  fi;\n}\n\nfunction jsonBoolToYesNo () {\n  if [[ $1 == \"false\" ]]; then\n    echo \"NO\"\n  elif [[ $1 == \"true\" ]]; then\n    echo \"YES\"\n  else echo \"NO\"\n  fi\n}\n\necho \"info: -> RNFB build script started\"\necho \"info: 1) Locating ${_JSON_FILE_NAME} file:\"\n\nif [[ -z ${_CURRENT_SEARCH_DIR} ]]; then\n  _CURRENT_SEARCH_DIR=$(pwd)\nfi;\n\nwhile true; do\n  _CURRENT_SEARCH_DIR=$(dirname \"$_CURRENT_SEARCH_DIR\")\n  if [[ \"$_CURRENT_SEARCH_DIR\" == \"/\" ]] || [[ ${_CURRENT_LOOKUPS} -gt ${_MAX_LOOKUPS} ]]; then break; fi;\n  echo \"info:      ($_CURRENT_LOOKUPS of $_MAX_LOOKUPS) Searching in '$_CURRENT_SEARCH_DIR' for a ${_JSON_FILE_NAME} file.\"\n  _SEARCH_RESULT=$(find \"$_CURRENT_SEARCH_DIR\" -maxdepth 2 -name ${_JSON_FILE_NAME} -print | head -n 1)\n  if [[ ${_SEARCH_RESULT} ]]; then\n    echo \"info:      ${_JSON_FILE_NAME} found at $_SEARCH_RESULT\"\n    break;\n  fi;\n  _CURRENT_LOOKUPS=$((_CURRENT_LOOKUPS+1))\ndone\n\nif [[ ${_SEARCH_RESULT} ]]; then\n  _JSON_OUTPUT_RAW=$(cat \"${_SEARCH_RESULT}\")\n  _RN_ROOT_EXISTS=$(ruby -e \"require 'rubygems';require 'json'; output=JSON.parse('$_JSON_OUTPUT_RAW'); puts output[$_JSON_ROOT]\" || echo '')\n\n  if [[ ${_RN_ROOT_EXISTS} ]]; then\n    _JSON_OUTPUT_BASE64=$(python -c 'import json,sys,base64;print(base64.b64encode(json.dumps(json.loads(open('\"'${_SEARCH_RESULT}'\"').read())['${_JSON_ROOT}'])))' || echo \"e30=\")\n  fi\n\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n\n  # config.messaging_auto_init_enabled\n  _MESSAGING_AUTO_INIT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"messaging_auto_init_enabled\")\n  if [[ $_MESSAGING_AUTO_INIT ]]; then\n    _PLIST_ENTRY_KEYS+=(\"FirebaseMessagingAutoInitEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"$(jsonBoolToYesNo \"$_MESSAGING_AUTO_INIT\")\")\n  fi\n\n  # config.crashlytics_disable_auto_disabler - undocumented for now - mainly for debugging, document if becomes usful\n  _CRASHLYTICS_AUTO_DISABLE_ENABLED=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"crashlytics_disable_auto_disabler\")\n  if [[ $_CRASHLYTICS_AUTO_DISABLE_ENABLED == \"true\" ]]; then\n    echo \"Disabled Crashlytics auto disabler.\" # do nothing\n  else\n    _PLIST_ENTRY_KEYS+=(\"FirebaseCrashlyticsCollectionEnabled\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"NO\")\n  fi\n\n  # config.admob_delay_app_measurement_init\n  _ADMOB_DELAY_APP_MEASUREMENT=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"admob_delay_app_measurement_init\")\n  if [[ $_ADMOB_DELAY_APP_MEASUREMENT == \"true\" ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GADDelayAppMeasurementInit\")\n    _PLIST_ENTRY_TYPES+=(\"bool\")\n    _PLIST_ENTRY_VALUES+=(\"YES\")\n  fi\n\n  # config.admob_ios_app_id\n  _ADMOB_IOS_APP_ID=$(getFirebaseJsonKeyValue \"$_JSON_OUTPUT_RAW\" \"admob_ios_app_id\")\n  if [[ $_ADMOB_IOS_APP_ID ]]; then\n    _PLIST_ENTRY_KEYS+=(\"GADApplicationIdentifier\")\n    _PLIST_ENTRY_TYPES+=(\"string\")\n    _PLIST_ENTRY_VALUES+=(\"$_ADMOB_IOS_APP_ID\")\n  fi\nelse\n  _PLIST_ENTRY_KEYS+=(\"firebase_json_raw\")\n  _PLIST_ENTRY_TYPES+=(\"string\")\n  _PLIST_ENTRY_VALUES+=(\"$_JSON_OUTPUT_BASE64\")\n  echo \"warning:   A firebase.json file was not found, whilst this file is optional it is recommended to include it to configure firebase services in React Native Firebase.\"\nfi;\n\necho \"info: 2) Injecting Info.plist entries: \"\n\n# Log out the keys we're adding\nfor i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n  echo \"    ->  $i) ${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\"\ndone\n\nfor plist in \"${_TARGET_PLIST}\" \"${_DSYM_PLIST}\" ; do\n  if [[ -f \"${plist}\" ]]; then\n\n    # paths with spaces break the call to setPlistValue. temporarily modify\n    # the shell internal field separator variable (IFS), which normally \n    # includes spaces, to consist only of line breaks\n    oldifs=$IFS\n    IFS=\"\n\"\n\n    for i in \"${!_PLIST_ENTRY_KEYS[@]}\"; do\n      setPlistValue \"${_PLIST_ENTRY_KEYS[$i]}\" \"${_PLIST_ENTRY_TYPES[$i]}\" \"${_PLIST_ENTRY_VALUES[$i]}\" \"${plist}\"\n    done\n\n    # restore the original internal field separator value\n    IFS=$oldifs\n  else\n    echo \"warning:   A Info.plist build output file was not found (${plist})\"\n  fi\ndone\n\necho \"info: <- RNFB build script finished\"\n\n";
+		};
+		747E27F3501371F310FA761A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-marketeermerchantapp-marketeermerchantappTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		921EEFA8C7983A202D1D9273 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-marketeermerchantapp/Pods-marketeermerchantapp-resources.sh",
+				"${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/RNImageCropPicker/QBImagePicker.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/TOCropViewController/TOCropViewControllerBundle.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/gRPC-C++/gRPCCertificates-Cpp.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleMaps.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/QBImagePicker.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TOCropViewControllerBundle.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/gRPCCertificates-Cpp.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-marketeermerchantapp/Pods-marketeermerchantapp-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E4B04A82324236E8907B533E /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -785,7 +781,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EF8716FE6002B2BB3D80B24F /* Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig */;
+			baseConfigurationReference = BA793A1580F39BDA84EA1FC3 /* Pods-marketeermerchantapp-marketeermerchantappTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -808,7 +804,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AFC7CF98A77EEE07E386A36A /* Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig */;
+			baseConfigurationReference = E1E2FC643936FAACDA85C581 /* Pods-marketeermerchantapp-marketeermerchantappTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -828,12 +824,12 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B3EADCC10B31364993D1F450 /* Pods-marketeermerchantapp.debug.xcconfig */;
+			baseConfigurationReference = 5391FE4BF934004D8F8EF308 /* Pods-marketeermerchantapp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = marketeermerchantapp/marketeermerchantapp.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = PZMSB9A5CN;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -843,6 +839,7 @@
 				INFOPLIST_FILE = marketeermerchantapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -859,16 +856,17 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A090CE1D085199EF2DBCE930 /* Pods-marketeermerchantapp.release.xcconfig */;
+			baseConfigurationReference = 7B1913889D0003337ACB9E38 /* Pods-marketeermerchantapp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = marketeermerchantapp/marketeermerchantapp.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = PZMSB9A5CN;
 				INFOPLIST_FILE = marketeermerchantapp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -884,7 +882,7 @@
 		};
 		2D02E4971E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EA6014E5D57E74B7685744A2 /* Pods-marketeermerchantapp-tvOS.debug.xcconfig */;
+			baseConfigurationReference = 87C56BBED57AAF751D4E33F0 /* Pods-marketeermerchantapp-tvOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -912,7 +910,7 @@
 		};
 		2D02E4981E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E145BCCA533CB62B3CEB9498 /* Pods-marketeermerchantapp-tvOS.release.xcconfig */;
+			baseConfigurationReference = 9865E4DED45007152AE5C74B /* Pods-marketeermerchantapp-tvOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -940,7 +938,7 @@
 		};
 		2D02E4991E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E412BF5BD3995AAF5DA4EAAE /* Pods-marketeermerchantapp-tvOSTests.debug.xcconfig */;
+			baseConfigurationReference = AE77B3EC6C0769350640082C /* Pods-marketeermerchantapp-tvOSTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -967,7 +965,7 @@
 		};
 		2D02E49A1E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 11C2F1DAE55BD51A4623EADA /* Pods-marketeermerchantapp-tvOSTests.release.xcconfig */;
+			baseConfigurationReference = 8BF22709D891AAD8216318FF /* Pods-marketeermerchantapp-tvOSTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;

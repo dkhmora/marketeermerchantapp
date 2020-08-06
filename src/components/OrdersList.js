@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {FlatList, RefreshControl, ActivityIndicator} from 'react-native';
+import {FlatList, RefreshControl} from 'react-native';
 import {View} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components

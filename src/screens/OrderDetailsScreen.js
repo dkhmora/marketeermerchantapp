@@ -1,23 +1,19 @@
 import React, {Component} from 'react';
-import {Container, Card, CardItem, Left, Right, Body, Toast} from 'native-base';
-import {Text, Button, Icon} from 'react-native-elements';
-import {
-  View,
-  Platform,
-  Linking,
-  ActivityIndicator,
-  SectionList,
-  SafeAreaView,
-} from 'react-native';
+import {Card, CardItem, Left, Right, Body} from 'native-base';
+import {Text, Icon, Button} from 'react-native-elements';
+import {View, ActivityIndicator, SafeAreaView} from 'react-native';
 import BaseHeader from '../components/BaseHeader';
-import {FlatList, ScrollView} from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native-gesture-handler';
 import OrderItemListItem from '../components/OrderItemListItem';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
 import MapView, {Marker} from 'react-native-maps';
+import Toast from '../components/Toast';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 @inject('ordersStore')
 @inject('detailsStore')
+@inject('authStore')
 @observer
 class OrderDetailsScreen extends Component {
   constructor(props) {
@@ -26,6 +22,8 @@ class OrderDetailsScreen extends Component {
     this.state = {
       orderItems: [],
       loading: true,
+      allowDragging: true,
+      changeOrderStatusModal: false,
     };
   }
 
@@ -60,8 +58,8 @@ class OrderDetailsScreen extends Component {
           longitude: order.deliveryCoordinates.longitude,
         },
         {
-          latitude: storeDetails.deliveryCoordinates.latitude,
-          longitude: storeDetails.deliveryCoordinates.longitude,
+          latitude: storeDetails.storeLocation.latitude,
+          longitude: storeDetails.storeLocation.longitude,
         },
       ],
       {
@@ -85,28 +83,25 @@ class OrderDetailsScreen extends Component {
     );
   }
 
-  openInMaps() {
+  handleChangeOrderStatus() {
     const {order} = this.props.route.params;
 
-    if (order.deliveryCoordinates) {
-      const markerName = `Customer ${order.userName}'s Location`;
+    this.props.authStore.appReady = false;
 
-      const latLng = `${order.deliveryCoordinates.latitude},${order.deliveryCoordinates.longitude}`;
-      const url = Platform.select({
-        ios: `http://maps.apple.com/?q=${markerName}&ll=${latLng}`,
-        android: `https://www.google.com/maps/search/?api=1&query=${latLng}`,
-      });
+    this.props.ordersStore
+      .setOrderStatus(order.orderId, order.merchantId)
+      .then(() => {
+        this.props.navigation.goBack();
+      })
+      .then(() => {
+        this.props.authStore.appReady = true;
 
-      Linking.openURL(url);
-    } else {
-      Toast.show({
-        text: 'Error, no user deliveryCoordinates found!',
-        buttonText: 'Okay',
-        type: 'danger',
-        duration: 7000,
-        style: {margin: 20, borderRadius: 16},
+        Toast({
+          text: `Successfully changed Order # ${order.merchantOrderNumber} status!`,
+          type: 'success',
+          duration: 3500,
+        });
       });
-    }
   }
 
   OrderItemsList(orderItems) {
@@ -120,29 +115,49 @@ class OrderDetailsScreen extends Component {
   }
 
   render() {
-    const {order} = this.props.route.params;
+    const {order, orderStatus} = this.props.route.params;
     const {navigation} = this.props;
     const {orderItems, loading} = this.state;
     const {storeDetails} = this.props.detailsStore;
-    const actions = [
-      {
-        name: 'Accept Order',
-        action: 'navigation.navigate("Order List")',
-      },
-    ];
+    const buttonText =
+      orderStatus[0] === 'PAID'
+        ? 'SHIP'
+        : orderStatus[0] === 'PENDING'
+        ? 'ACCEPT'
+        : orderStatus[0] === 'SHIPPED'
+        ? 'COMPLETE'
+        : null;
 
     return (
       <View style={{flex: 1}}>
         <BaseHeader
-          title={`Order #${order.merchantOrderNumber} Details`}
+          title={`Order # ${order.merchantOrderNumber} | ${orderStatus}`}
           backButton
-          optionsButton
-          actions={actions}
+          options={orderStatus[0] === 'PENDING' ? ['Cancel Order'] : null}
+          actions={[
+            () => {
+              this.props.ordersStore.cancelOrderModal = true;
+              this.props.ordersStore.selectedOrder = order;
+            },
+          ]}
           navigation={navigation}
+        />
+
+        <ConfirmationModal
+          isVisible={this.state.changeOrderStatusModal}
+          title={`${buttonText} Order # ${order.merchantOrderNumber}?`}
+          body={`Are you sure you want to ${buttonText} Order # ${order.merchantOrderNumber}?`}
+          onConfirm={() => {
+            this.setState({changeOrderStatusModal: false}, () => {
+              this.handleChangeOrderStatus();
+            });
+          }}
+          closeModal={() => this.setState({changeOrderStatusModal: false})}
         />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
+          scrollEnabled={this.state.allowDragging}
           style={{
             flex: 1,
             flexDirection: 'column',
@@ -153,10 +168,28 @@ class OrderDetailsScreen extends Component {
               borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem header bordered style={{backgroundColor: colors.primary}}>
+            <CardItem
+              header
+              bordered
+              button
+              onPress={() => {
+                navigation.navigate('Order Chat', {
+                  order,
+                  orderStatus,
+                });
+              }}
+              style={{
+                backgroundColor: colors.primary,
+                justifyContent: 'space-between',
+              }}>
               <Text style={{color: colors.icons, fontSize: 20}}>
                 Customer Details
               </Text>
+
+              <View>
+                <Icon name="message-square" color={colors.icons} />
+                <Text style={{color: colors.icons}}>Chat</Text>
+              </View>
             </CardItem>
 
             <CardItem bordered>
@@ -169,9 +202,8 @@ class OrderDetailsScreen extends Component {
               <Right>
                 <Text
                   style={{
-                    color: colors.primary,
+                    color: colors.text_primary,
                     fontSize: 16,
-                    fontFamily: 'ProductSans-Bold',
                     textAlign: 'right',
                   }}>
                   {order.userName}
@@ -189,9 +221,8 @@ class OrderDetailsScreen extends Component {
               <Right>
                 <Text
                   style={{
-                    color: colors.primary,
+                    color: colors.text_primary,
                     fontSize: 16,
-                    fontFamily: 'ProductSans-Bold',
                     textAlign: 'right',
                   }}>
                   {order.userPhoneNumber}
@@ -210,9 +241,8 @@ class OrderDetailsScreen extends Component {
                   <View style={{justifyContent: 'flex-end'}}>
                     <Text
                       style={{
-                        color: colors.primary,
+                        color: colors.text_primary,
                         fontSize: 16,
-                        fontFamily: 'ProductSans-Bold',
                         textAlign: 'right',
                       }}>
                       {order.deliveryAddress}
@@ -221,9 +251,8 @@ class OrderDetailsScreen extends Component {
                 ) : (
                   <Text
                     style={{
-                      color: colors.primary,
+                      color: colors.text_primary,
                       fontSize: 16,
-                      fontFamily: 'ProductSans-Bold',
                       textAlign: 'right',
                     }}>
                     No user location details found. Please cancel this order.
@@ -241,6 +270,9 @@ class OrderDetailsScreen extends Component {
               }}>
               <View style={{flex: 1, borderRadius: 10, overflow: 'hidden'}}>
                 <MapView
+                  onTouchStart={() => this.setState({allowDragging: false})}
+                  onTouchEnd={() => this.setState({allowDragging: true})}
+                  onTouchCancel={() => this.setState({allowDragging: true})}
                   provider="google"
                   style={{
                     height: 300,
@@ -250,7 +282,6 @@ class OrderDetailsScreen extends Component {
                     this.map = map;
                   }}
                   onMapReady={() => this.onMapReady()}
-                  showsUserLocation
                   initialRegion={{
                     latitude: order.deliveryCoordinates.latitude,
                     longitude: order.deliveryCoordinates.longitude,
@@ -275,8 +306,8 @@ class OrderDetailsScreen extends Component {
                       </Marker>
                     )}
 
-                  {storeDetails.deliveryCoordinates.latitude &&
-                    storeDetails.deliveryCoordinates.longitude && (
+                  {storeDetails.storeLocation.latitude &&
+                    storeDetails.storeLocation.longitude && (
                       <Marker
                         ref={(marker) => {
                           this.storeMarker = marker;
@@ -284,8 +315,8 @@ class OrderDetailsScreen extends Component {
                         title={`${storeDetails.storeName} Set Location`}
                         tracksViewChanges={false}
                         coordinate={{
-                          latitude: storeDetails.deliveryCoordinates.latitude,
-                          longitude: storeDetails.deliveryCoordinates.longitude,
+                          latitude: storeDetails.storeLocation.latitude,
+                          longitude: storeDetails.storeLocation.longitude,
                         }}>
                         <View>
                           <Icon color={colors.primary} name="map-pin" />
@@ -298,6 +329,78 @@ class OrderDetailsScreen extends Component {
           </Card>
 
           <SafeAreaView>
+            <Card
+              style={{
+                borderRadius: 10,
+                overflow: 'hidden',
+              }}>
+              <CardItem
+                header
+                bordered
+                style={{backgroundColor: colors.primary}}>
+                <Text style={{color: colors.icons, fontSize: 20}}>
+                  Order Details
+                </Text>
+              </CardItem>
+
+              <CardItem bordered>
+                <Left>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Order Status:
+                  </Text>
+                </Left>
+
+                <Right>
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      textAlign: 'right',
+                    }}>
+                    {orderStatus}
+                  </Text>
+                </Right>
+              </CardItem>
+
+              <CardItem bordered>
+                <Left>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Delivery Method:
+                  </Text>
+                </Left>
+
+                <Right>
+                  <Text
+                    style={{
+                      color: colors.text_primary,
+                      fontSize: 16,
+                      textAlign: 'right',
+                    }}>
+                    {order.deliveryMethod}
+                  </Text>
+                </Right>
+              </CardItem>
+
+              <CardItem bordered>
+                <Left>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Payment Method:
+                  </Text>
+                </Left>
+
+                <Right>
+                  <Text
+                    style={{
+                      color: colors.text_primary,
+                      fontSize: 16,
+                      textAlign: 'right',
+                    }}>
+                    {order.paymentMethod}
+                  </Text>
+                </Right>
+              </CardItem>
+            </Card>
+
             <Card
               style={{
                 borderRadius: 10,
@@ -335,12 +438,13 @@ class OrderDetailsScreen extends Component {
                     <Text
                       style={{
                         fontSize: 18,
-                        color: colors.primary,
+                        color: colors.text_primary,
                         fontFamily: 'ProductSans-Black',
                       }}>
-                      ₱ {order.totalAmount}
+                      ₱ {order.subTotal}
                     </Text>
                   </View>
+
                   <View style={{flexDirection: 'row', alignItems: 'center'}}>
                     <Text
                       style={{
@@ -348,15 +452,19 @@ class OrderDetailsScreen extends Component {
                         color: colors.text_primary,
                         fontFamily: 'ProductSans-Light',
                       }}>
-                      Estimated Shipping Price:{' '}
+                      Delivery Price:{' '}
                     </Text>
                     <Text
                       style={{
                         fontSize: 18,
-                        color: colors.primary,
+                        color: colors.text_primary,
                         fontFamily: 'ProductSans-Black',
                       }}>
-                      ₱ {order.shippingPrice}130-200
+                      {order.deliveryPrice && order.deliveryPrice > 0
+                        ? `₱${order.deliveryPrice}`
+                        : order.deliveryPrice === null
+                        ? '(Contact Merchant)'
+                        : '₱0 (Free Delivery)'}
                     </Text>
                   </View>
                 </Right>
@@ -379,15 +487,31 @@ class OrderDetailsScreen extends Component {
                     <Text
                       style={{
                         fontSize: 18,
-                        color: colors.primary,
+                        color: colors.text_primary,
                         fontFamily: 'ProductSans-Black',
                       }}>
-                      ₱ {order.totalAmount + 130} - ₱ {order.totalAmount + 200}
+                      ₱
+                      {order.subTotal +
+                        (order.deliveryPrice ? order.deliveryPrice : 0)}
                     </Text>
                   </View>
                 </Right>
               </CardItem>
             </Card>
+
+            {buttonText && (
+              <Button
+                onPress={() => this.setState({changeOrderStatusModal: true})}
+                title={buttonText}
+                titleStyle={{color: colors.icons}}
+                containerStyle={{
+                  borderRadius: 24,
+                  marginTop: 10,
+                  height: 50,
+                }}
+                buttonStyle={{height: 50, backgroundColor: colors.accent}}
+              />
+            )}
 
             {order.orderStatus.cancelled.status && (
               <Card

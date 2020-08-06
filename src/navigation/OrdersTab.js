@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {Container, Toast} from 'native-base';
+import {Container} from 'native-base';
 // Custom Components
 import OrdersList from '../components/OrdersList';
 import BaseHeader from '../components/BaseHeader';
@@ -8,6 +8,7 @@ import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
 import {computed} from 'mobx';
 import CancelOrderModal from '../components/CancelOrderModal';
+import Toast from '../components/Toast';
 
 const TabOrders = createMaterialTopTabNavigator();
 
@@ -47,9 +48,8 @@ class OrdersTab extends Component {
       ).then(() => {
         this.props.authStore.appReady = true;
 
-        Toast.show({
+        Toast({
           text: `Successfully ${notificationSubscriptionStatus} to Order Notifications!`,
-          buttonText: 'Okay',
           type: 'success',
           duration: 3500,
           style: {margin: 20, borderRadius: 16},
@@ -86,16 +86,16 @@ class OrdersTab extends Component {
         <CancelOrderModal />
 
         <TabOrders.Navigator
+          lazy
+          lazyPreloadDistance={1}
           tabBarOptions={{
             scrollEnabled: true,
             style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
             inactiveTintcolor: '#eee',
-            tabStyle: {width: 120},
+            tabStyle: {width: 'auto'},
             indicatorStyle: {
               backgroundColor: colors.primary,
-              width: 70,
-              left: (120 - 70) / 2,
             },
           }}
           headerMode="none"
