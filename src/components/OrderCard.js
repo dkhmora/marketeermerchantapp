@@ -42,12 +42,11 @@ class OrderCard extends PureComponent {
 
   handleChangeOrderStatus() {
     const {order} = this.props;
-    const orderFetchLimit = 5;
 
     this.setState({loading: true});
 
     this.props.ordersStore
-      .setOrderStatus(order.orderId, order.merchantId, orderFetchLimit)
+      .setOrderStatus(order.orderId, order.merchantId)
       .then(() => {
         Toast({
           text: `Successfully changed Order # ${order.merchantOrderNumber} status!`,
@@ -65,6 +64,7 @@ class OrderCard extends PureComponent {
 
     navigation.dangerouslyGetParent().navigate('Order Details', {
       order,
+      orderStatus: this.orderStatus,
     });
   }
 

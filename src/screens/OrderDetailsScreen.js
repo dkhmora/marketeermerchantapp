@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, CardItem, Left, Right, Body} from 'native-base';
-import {Text, Icon} from 'react-native-elements';
+import {Text, Icon, Button} from 'react-native-elements';
 import {View, ActivityIndicator, SafeAreaView} from 'react-native';
 import BaseHeader from '../components/BaseHeader';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -8,9 +8,11 @@ import OrderItemListItem from '../components/OrderItemListItem';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
 import MapView, {Marker} from 'react-native-maps';
+import Toast from '../components/Toast';
 
 @inject('ordersStore')
 @inject('detailsStore')
+@inject('authStore')
 @observer
 class OrderDetailsScreen extends Component {
   constructor(props) {
@@ -79,6 +81,27 @@ class OrderDetailsScreen extends Component {
     );
   }
 
+  handleChangeOrderStatus() {
+    const {order} = this.props.route.params;
+
+    this.props.authStore.appReady = false;
+
+    this.props.ordersStore
+      .setOrderStatus(order.orderId, order.merchantId)
+      .then(() => {
+        this.props.navigation.goBack();
+      })
+      .then(() => {
+        this.props.authStore.appReady = true;
+
+        Toast({
+          text: `Successfully changed Order # ${order.merchantOrderNumber} status!`,
+          type: 'success',
+          duration: 3500,
+        });
+      });
+  }
+
   OrderItemsList(orderItems) {
     return (
       <View>
@@ -90,24 +113,31 @@ class OrderDetailsScreen extends Component {
   }
 
   render() {
-    const {order} = this.props.route.params;
+    const {order, orderStatus} = this.props.route.params;
     const {navigation} = this.props;
     const {orderItems, loading} = this.state;
     const {storeDetails} = this.props.detailsStore;
-    const actions = [
-      {
-        name: 'Accept Order',
-        action: 'navigation.navigate("Order List")',
-      },
-    ];
+    const buttonText =
+      orderStatus[0] === 'PAID'
+        ? 'SHIP'
+        : orderStatus[0] === 'PENDING'
+        ? 'ACCEPT'
+        : orderStatus[0] === 'SHIPPED'
+        ? 'COMPLETE'
+        : null;
 
     return (
       <View style={{flex: 1}}>
         <BaseHeader
-          title={`Order # ${order.merchantOrderNumber}`}
+          title={`Order # ${order.merchantOrderNumber} | ${orderStatus}`}
           backButton
-          optionsButton
-          actions={actions}
+          options={['Cancel Order']}
+          actions={[
+            () => {
+              this.props.ordersStore.cancelOrderModal = true;
+              this.props.ordersStore.selectedOrder = order;
+            },
+          ]}
           navigation={navigation}
         />
 
@@ -124,10 +154,28 @@ class OrderDetailsScreen extends Component {
               borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem header bordered style={{backgroundColor: colors.primary}}>
+            <CardItem
+              header
+              bordered
+              button
+              onPress={() => {
+                navigation.navigate('Order Chat', {
+                  order,
+                  orderStatus,
+                });
+              }}
+              style={{
+                backgroundColor: colors.primary,
+                justifyContent: 'space-between',
+              }}>
               <Text style={{color: colors.icons, fontSize: 20}}>
                 Customer Details
               </Text>
+
+              <View>
+                <Icon name="message-square" color={colors.icons} />
+                <Text style={{color: colors.icons}}>Chat</Text>
+              </View>
             </CardItem>
 
             <CardItem bordered>
@@ -284,6 +332,25 @@ class OrderDetailsScreen extends Component {
               <CardItem bordered>
                 <Left>
                   <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                    Order Status:
+                  </Text>
+                </Left>
+
+                <Right>
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      textAlign: 'right',
+                    }}>
+                    {orderStatus}
+                  </Text>
+                </Right>
+              </CardItem>
+
+              <CardItem bordered>
+                <Left>
+                  <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
                     Delivery Method:
                   </Text>
                 </Left>
@@ -417,6 +484,20 @@ class OrderDetailsScreen extends Component {
                 </Right>
               </CardItem>
             </Card>
+
+            {buttonText && (
+              <Button
+                onPress={() => this.handleChangeOrderStatus()}
+                title={buttonText}
+                titleStyle={{color: colors.icons}}
+                containerStyle={{
+                  borderRadius: 24,
+                  marginTop: 10,
+                  height: 50,
+                }}
+                buttonStyle={{height: 50, backgroundColor: colors.accent}}
+              />
+            )}
 
             {order.orderStatus.cancelled.status && (
               <Card
