@@ -226,6 +226,7 @@ class LoginScreen extends Component {
                   flexDirection: 'row',
                   justifyContent: 'center',
                   paddingTop: 10,
+                  marginBottom: 50,
                   flexWrap: 'wrap',
                 }}>
                 <Text

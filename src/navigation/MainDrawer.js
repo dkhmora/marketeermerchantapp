@@ -18,6 +18,7 @@ import ReviewsScreen from '../screens/ReviewsScreen';
 import AccountScreen from '../screens/AccountScreen';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import Toast from '../components/Toast';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -27,6 +28,10 @@ import Toast from '../components/Toast';
 class MainDrawer extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      signOutConfirmModal: false,
+    };
   }
 
   async openLink(url) {
@@ -101,68 +106,96 @@ class MainDrawer extends Component {
     const Drawer = createDrawerNavigator();
 
     return (
-      <Drawer.Navigator
-        initialRouteName="Dashboard"
-        drawerStyle={{backgroundColor: '#eee', width: 240}}
-        drawerContent={(props) => {
-          return (
-            <DrawerContentScrollView
-              {...props}
-              contentContainerStyle={{
-                flex: 1,
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-              }}>
-              <View style={{justifyContent: 'flex-start'}}>
-                <DrawerItemList
-                  {...props}
-                  labelStyle={{
-                    fontFamily: 'ProductSans-Light',
-                    padding: 10,
-                  }}
-                  itemStyle={{
-                    marginHorizontal: 0,
-                    marginVertical: 0,
-                    borderRadius: 0,
-                  }}
-                />
+      <View style={{flex: 1}}>
+        <ConfirmationModal
+          isVisible={this.state.signOutConfirmModal}
+          title="Sign Out?"
+          body="Are you sure you want to sign out?"
+          onConfirm={() => {
+            this.setState({signOutConfirmModal: false}, () => {
+              this.handleSignOut();
+            });
+          }}
+          closeModal={() => this.setState({signOutConfirmModal: false})}
+        />
 
-                <DrawerItem
-                  onPress={() => this.openTermsAndConditions()}
-                  label="Terms and Conditions"
-                  labelStyle={{
-                    fontFamily: 'ProductSans-Light',
-                    padding: 10,
-                  }}
-                  style={{
-                    marginHorizontal: 0,
-                    marginVertical: 0,
-                    borderRadius: 0,
-                  }}
-                />
+        <Drawer.Navigator
+          initialRouteName="Dashboard"
+          drawerStyle={{backgroundColor: '#eee', width: 240}}
+          drawerContent={(props) => {
+            return (
+              <DrawerContentScrollView
+                {...props}
+                contentContainerStyle={{
+                  flex: 1,
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                }}>
+                <View style={{justifyContent: 'flex-start'}}>
+                  <DrawerItemList
+                    {...props}
+                    labelStyle={{
+                      fontFamily: 'ProductSans-Light',
+                      padding: 10,
+                    }}
+                    itemStyle={{
+                      marginHorizontal: 0,
+                      marginVertical: 0,
+                      borderRadius: 0,
+                    }}
+                  />
 
-                <DrawerItem
-                  onPress={() => this.openPrivacyPolicy()}
-                  label="Privacy Policy"
-                  labelStyle={{
-                    fontFamily: 'ProductSans-Light',
-                    padding: 10,
-                  }}
-                  style={{
-                    marginHorizontal: 0,
-                    marginVertical: 0,
-                    borderRadius: 0,
-                  }}
-                />
-              </View>
+                  <DrawerItem
+                    onPress={() => this.openTermsAndConditions()}
+                    label="Terms and Conditions"
+                    labelStyle={{
+                      fontFamily: 'ProductSans-Light',
+                      padding: 10,
+                    }}
+                    style={{
+                      marginHorizontal: 0,
+                      marginVertical: 0,
+                      borderRadius: 0,
+                    }}
+                  />
 
-              {Platform.OS === 'ios' ? (
-                <SafeAreaView>
+                  <DrawerItem
+                    onPress={() => this.openPrivacyPolicy()}
+                    label="Privacy Policy"
+                    labelStyle={{
+                      fontFamily: 'ProductSans-Light',
+                      padding: 10,
+                    }}
+                    style={{
+                      marginHorizontal: 0,
+                      marginVertical: 0,
+                      borderRadius: 0,
+                    }}
+                  />
+                </View>
+
+                {Platform.OS === 'ios' ? (
+                  <SafeAreaView>
+                    <Button
+                      title="Sign Out"
+                      icon={<Icon name="log-out" color={colors.icons} />}
+                      iconRight
+                      onPress={() => this.setState({signOutConfirmModal: true})}
+                      titleStyle={{color: colors.icons, paddingRight: 5}}
+                      buttonStyle={{backgroundColor: colors.primary}}
+                      containerStyle={{
+                        borderRadius: 24,
+                        marginHorizontal: 12,
+                        marginVertical: 10,
+                      }}
+                    />
+                  </SafeAreaView>
+                ) : (
                   <Button
                     title="Sign Out"
                     icon={<Icon name="log-out" color={colors.icons} />}
                     iconRight
-                    onPress={() => this.handleSignOut()}
+                    onPress={() => this.setState({signOutConfirmModal: true})}
                     titleStyle={{color: colors.icons, paddingRight: 5}}
                     buttonStyle={{backgroundColor: colors.primary}}
                     containerStyle={{
@@ -171,61 +204,47 @@ class MainDrawer extends Component {
                       marginVertical: 10,
                     }}
                   />
-                </SafeAreaView>
-              ) : (
-                <Button
-                  title="Sign Out"
-                  icon={<Icon name="log-out" color={colors.icons} />}
-                  iconRight
-                  onPress={() => this.handleSignOut()}
-                  titleStyle={{color: colors.icons, paddingRight: 5}}
-                  buttonStyle={{backgroundColor: colors.primary}}
-                  containerStyle={{
-                    borderRadius: 24,
-                    marginHorizontal: 12,
-                    marginVertical: 10,
-                  }}
-                />
-              )}
-            </DrawerContentScrollView>
-          );
-        }}>
-        <Drawer.Screen
-          name="Dashboard"
-          component={DashboardScreen}
-          initialParams={{merchantId}}
-        />
+                )}
+              </DrawerContentScrollView>
+            );
+          }}>
+          <Drawer.Screen
+            name="Dashboard"
+            component={DashboardScreen}
+            initialParams={{merchantId}}
+          />
 
-        <Drawer.Screen
-          name="Store Items"
-          component={StoreItemsScreen}
-          initialParams={{merchantId}}
-        />
+          <Drawer.Screen
+            name="Store Items"
+            component={StoreItemsScreen}
+            initialParams={{merchantId}}
+          />
 
-        <Drawer.Screen
-          name="Orders"
-          component={OrdersScreen}
-          initialParams={{merchantId}}
-        />
+          <Drawer.Screen
+            name="Orders"
+            component={OrdersScreen}
+            initialParams={{merchantId}}
+          />
 
-        <Drawer.Screen
-          name="Reviews"
-          component={ReviewsScreen}
-          initialParams={{merchantId}}
-        />
+          <Drawer.Screen
+            name="Reviews"
+            component={ReviewsScreen}
+            initialParams={{merchantId}}
+          />
 
-        <Drawer.Screen
-          name="Delivery Area"
-          component={DeliveryAreaScreen}
-          initialParams={{merchantId}}
-        />
+          <Drawer.Screen
+            name="Delivery Area"
+            component={DeliveryAreaScreen}
+            initialParams={{merchantId}}
+          />
 
-        <Drawer.Screen
-          name="Account Settings"
-          component={AccountScreen}
-          initialParams={{merchantId}}
-        />
-      </Drawer.Navigator>
+          <Drawer.Screen
+            name="Account Settings"
+            component={AccountScreen}
+            initialParams={{merchantId}}
+          />
+        </Drawer.Navigator>
+      </View>
     );
   }
 }
