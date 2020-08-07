@@ -194,6 +194,8 @@ class EditItemModal extends Component {
     ImagePicker.openCamera({
       width: 400,
       height: 400,
+      forceJpg: true,
+      mediaType: 'photo',
       cropping: true,
       compressImageQuality: 0.85,
     })
@@ -210,6 +212,8 @@ class EditItemModal extends Component {
     ImagePicker.openPicker({
       width: 400,
       height: 400,
+      forceJpg: true,
+      mediaType: 'photo',
       cropping: true,
       compressImageQuality: 0.85,
     })

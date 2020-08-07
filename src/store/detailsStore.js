@@ -138,9 +138,9 @@ class DetailsStore {
     }
   }
 
-  @action async deleteImage(image) {
-    await storage()
-      .ref(image)
+  @action async deleteImage(imageRef) {
+    return await storage()
+      .ref(imageRef)
       .delete()
       .catch((err) => {
         Toast({text: err.message, type: 'danger'});
@@ -152,7 +152,7 @@ class DetailsStore {
     const fileExtension = imagePath.split('.').pop();
     const imageRef = `/images/merchants/${merchantId}/${type}.${fileExtension}`;
 
-    await storage()
+    return await storage()
       .ref(imageRef)
       .putFile(imagePath)
       .then(() =>

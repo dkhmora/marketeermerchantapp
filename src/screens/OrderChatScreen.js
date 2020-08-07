@@ -60,6 +60,7 @@ class OrderChatScreen extends Component {
       width: 1280,
       height: 720,
       mediaType: 'photo',
+      forceJpg: true,
       compressImageQuality: 0.8,
     })
       .then((image) => {
@@ -73,6 +74,7 @@ class OrderChatScreen extends Component {
       width: 1280,
       height: 720,
       mediaType: 'photo',
+      forceJpg: true,
       compressImageQuality: 0.8,
     })
       .then((image) => {

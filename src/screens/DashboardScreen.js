@@ -162,6 +162,8 @@ class StoreDetailsScreen extends Component {
       width,
       height: 1080,
       cropping: true,
+      mediaType: 'photo',
+      forceJpg: true,
       compressImageQuality: 0.85,
     })
       .then((image) => {
@@ -181,6 +183,8 @@ class StoreDetailsScreen extends Component {
       width,
       height: 1080,
       cropping: true,
+      mediaType: 'photo',
+      forceJpg: true,
       compressImageQuality: 0.85,
     })
       .then((image) => {
