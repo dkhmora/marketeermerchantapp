@@ -45,7 +45,7 @@ class StoreItemsTab extends Component {
 
     return itemCategories && itemCategories.length > 5
       ? 'auto'
-      : SCREEN_WIDTH / itemCategories.size;
+      : SCREEN_WIDTH / itemCategories.length;
   }
 
   @action closeAddCategoryModal() {
