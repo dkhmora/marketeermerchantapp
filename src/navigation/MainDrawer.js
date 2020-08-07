@@ -89,6 +89,8 @@ class MainDrawer extends Component {
       this.props.detailsStore.subscribedToNotifications = false;
       this.props.detailsStore.unsubscribeSetStoreDetails();
       this.props.detailsStore.unsubscribeSetStoreDetails = null;
+      this.props.itemsStore.unsubscribeSetStoreItems();
+      this.props.itemsStore.unsubscribeSetStoreItems = null;
       this.props.ordersStore.orders = [];
       this.props.ordersStore.maxOrderUpdatedAt = 0;
       this.props.itemsStore.categoryItems = new Map();
