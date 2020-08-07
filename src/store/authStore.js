@@ -22,7 +22,10 @@ class AuthStore {
     return await messaging()
       .deleteToken()
       .then(() => {
-        auth().signOut();
+        return auth().signOut();
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger', duration: 5000});
       });
   }
 
