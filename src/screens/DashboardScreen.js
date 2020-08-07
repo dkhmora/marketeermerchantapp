@@ -66,7 +66,6 @@ class StoreDetailsScreen extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
     const {displayImageUrl, coverImageUrl} = this.state;
 
     if (
@@ -77,9 +76,6 @@ class StoreDetailsScreen extends Component {
     ) {
       this.getImage();
     }
-
-    !this.props.itemsStore.unsubscribeSetStoreItems &&
-      this.props.itemsStore.setStoreItems(merchantId, itemCategories);
   }
 
   @action cancelEditing() {

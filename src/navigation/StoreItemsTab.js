@@ -30,6 +30,10 @@ const SCREEN_WIDTH = Dimensions.get('screen').width;
 class StoreItemsTab extends Component {
   constructor(props) {
     super(props);
+
+    const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
+
+    this.props.itemsStore.setStoreItems(merchantId, itemCategories);
   }
 
   @observable newCategory = '';
@@ -43,9 +47,12 @@ class StoreItemsTab extends Component {
   @computed get tabWidth() {
     const {itemCategories} = this.props.detailsStore.storeDetails;
 
-    return itemCategories && itemCategories.length > 5
-      ? 'auto'
-      : SCREEN_WIDTH / itemCategories.size;
+    if (itemCategories) {
+      return itemCategories.length > 5
+        ? 'auto'
+        : SCREEN_WIDTH / itemCategories.length;
+    }
+    return 'auto';
   }
 
   @action closeAddCategoryModal() {

@@ -35,16 +35,17 @@ class AuthLoader extends React.Component {
                     'Error, user account is not set as admin. Please contact Marketeer business support at business@marketeer.ph if you are supposed to be an admin.',
                   type: 'danger',
                 });
-              });
+              })
+              .catch((err) =>
+                Toast({text: err.message, type: 'danger', duration: 5000}),
+              );
           } else {
             !this.props.detailsStore.unsubscribeSetStoreDetails &&
               this.props.detailsStore.setStoreDetails(merchantId);
 
-            navigation.replace('Home', {
-              merchantId,
-            });
-
             this.authStateSubscriber && this.authStateSubscriber();
+
+            navigation.navigate('Home', {reset: true});
           }
         });
     } else {
@@ -54,27 +55,16 @@ class AuthLoader extends React.Component {
       this.props.itemsStore.unsubscribeSetStoreItems &&
         this.props.itemsStore.unsubscribeSetStoreItems();
 
-      navigation.replace('Login');
+      navigation.replace('Login', {reset: true});
     }
 
     this.setState({user});
   }
 
   componentDidMount() {
-    const {navigation} = this.props;
-    const {merchantId} = this.props.detailsStore.storeDetails;
-
     this.authStateSubscriber = auth().onAuthStateChanged(
       this.onAuthStateChanged.bind(this),
     );
-
-    if (!this.state.user) {
-      navigation.replace('Login');
-    } else {
-      navigation.replace('Home', {
-        merchantId,
-      });
-    }
   }
 
   render() {

@@ -34,6 +34,17 @@ class LoginScreen extends Component {
 
   componentDidMount() {
     this.props.authStore.appReady = true;
+
+    if (this.props.route.params) {
+      const {reset} = this.props.route.params;
+
+      if (reset) {
+        this.props.navigation.reset({
+          index: 0,
+          routes: [{name: 'Login'}],
+        });
+      }
+    }
   }
 
   handleEmailChange = (email) => {

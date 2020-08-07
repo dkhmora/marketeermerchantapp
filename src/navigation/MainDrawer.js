@@ -34,6 +34,19 @@ class MainDrawer extends Component {
     };
   }
 
+  componentDidMount() {
+    if (this.props.route.params) {
+      const {reset} = this.props.route.params;
+
+      if (reset) {
+        this.props.navigation.reset({
+          index: 0,
+          routes: [{name: 'Home'}],
+        });
+      }
+    }
+  }
+
   async openLink(url) {
     try {
       if (await InAppBrowser.isAvailable()) {
@@ -87,8 +100,12 @@ class MainDrawer extends Component {
     this.props.authStore.signOut().then(() => {
       this.props.detailsStore.storeDetails = {};
       this.props.detailsStore.subscribedToNotifications = false;
-      this.props.detailsStore.unsubscribeSetStoreDetails();
+      this.props.detailsStore.unsubscribeSetStoreDetails &&
+        this.props.detailsStore.unsubscribeSetStoreDetails();
       this.props.detailsStore.unsubscribeSetStoreDetails = null;
+      this.props.itemsStore.unsubscribeSetStoreItems &&
+        this.props.itemsStore.unsubscribeSetStoreItems();
+      this.props.itemsStore.unsubscribeSetStoreItems = null;
       this.props.ordersStore.orders = [];
       this.props.ordersStore.maxOrderUpdatedAt = 0;
       this.props.itemsStore.categoryItems = new Map();
@@ -102,7 +119,6 @@ class MainDrawer extends Component {
   }
 
   render() {
-    const {merchantId} = this.props.route.params;
     const Drawer = createDrawerNavigator();
 
     return (
@@ -208,41 +224,17 @@ class MainDrawer extends Component {
               </DrawerContentScrollView>
             );
           }}>
-          <Drawer.Screen
-            name="Dashboard"
-            component={DashboardScreen}
-            initialParams={{merchantId}}
-          />
+          <Drawer.Screen name="Dashboard" component={DashboardScreen} />
 
-          <Drawer.Screen
-            name="Store Items"
-            component={StoreItemsScreen}
-            initialParams={{merchantId}}
-          />
+          <Drawer.Screen name="Store Items" component={StoreItemsScreen} />
 
-          <Drawer.Screen
-            name="Orders"
-            component={OrdersScreen}
-            initialParams={{merchantId}}
-          />
+          <Drawer.Screen name="Orders" component={OrdersScreen} />
 
-          <Drawer.Screen
-            name="Reviews"
-            component={ReviewsScreen}
-            initialParams={{merchantId}}
-          />
+          <Drawer.Screen name="Reviews" component={ReviewsScreen} />
 
-          <Drawer.Screen
-            name="Delivery Area"
-            component={DeliveryAreaScreen}
-            initialParams={{merchantId}}
-          />
+          <Drawer.Screen name="Delivery Area" component={DeliveryAreaScreen} />
 
-          <Drawer.Screen
-            name="Account Settings"
-            component={AccountScreen}
-            initialParams={{merchantId}}
-          />
+          <Drawer.Screen name="Account Settings" component={AccountScreen} />
         </Drawer.Navigator>
       </View>
     );

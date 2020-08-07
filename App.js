@@ -38,7 +38,7 @@ YellowBox.ignoreWarnings([
 
 export default class App extends React.Component {
   componentDidMount() {
-    SplashScreen.hide();
+    setTimeout(() => SplashScreen.hide(), 500);
   }
 
   render() {
