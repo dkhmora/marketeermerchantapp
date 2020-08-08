@@ -322,8 +322,7 @@ class EditItemModal extends Component {
         onBackdropPress={() => {
           this.closeModal();
         }}
-        windowBackgroundColor="rgba(255, 255, 255, .5)"
-        overlayBackgroundColor="red"
+        statusBarTranslucent
         fullScreen
         width="auto"
         height="auto"

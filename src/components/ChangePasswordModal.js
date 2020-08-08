@@ -108,8 +108,7 @@ class ChangePasswordModal extends Component {
         onBackdropPress={() => {
           closeModal();
         }}
-        windowBackgroundColor="rgba(255, 255, 255, .5)"
-        overlayBackgroundColor="red"
+        statusBarTranslucent
         width="80%"
         height="auto"
         overlayStyle={{borderRadius: 10, padding: 15, width: '80%'}}>

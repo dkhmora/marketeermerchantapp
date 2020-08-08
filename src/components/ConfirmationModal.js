@@ -20,8 +20,7 @@ class ConfirmationModal extends PureComponent {
         onBackdropPress={() => {
           closeModal();
         }}
-        windowBackgroundColor="rgba(255, 255, 255, .5)"
-        overlayBackgroundColor="red"
+        statusBarTranslucent
         width="80%"
         height="auto"
         overlayStyle={{
