@@ -50,7 +50,12 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    VersionCheck.needUpdate().then(async (res) => {
+    const provider = Platform.OS === 'android' ? 'playStore' : 'appStore';
+
+    VersionCheck.needUpdate({
+      provider,
+      forceUpdate: true,
+    }).then(async (res) => {
       if (res.isNeeded) {
         this.setState({appUpdateModal: true, appUrl: res.storeUrl});
       } else {
