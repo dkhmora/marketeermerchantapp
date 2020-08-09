@@ -172,7 +172,7 @@ class OrdersStore {
     return await functions
       .httpsCallable('cancelOrder')({orderId, merchantId, cancelReason})
       .then((response) => {
-        return response.data;
+        return response;
       })
       .catch((err) => {
         Toast({text: err.message, type: 'danger'});

@@ -42,17 +42,28 @@ class CancelOrderModal extends Component {
         this.props.ordersStore.selectedOrder.merchantId,
         this.state.cancelReason,
       )
-      .then(() => {
-        this.setState({loading: false, cancelReason: ''});
+      .then((response) => {
+        this.setState({
+          loading: false,
+          cancelReason: '',
+          cancelReasonCheck: false,
+        });
 
         this.closeModal();
 
-        Toast({
-          text: `Order # ${this.props.ordersStore.selectedOrder.merchantOrderNumber} successfully cancelled!`,
-          type: 'success',
-          duration: 3500,
-          style: {margin: 20, borderRadius: 16},
-        });
+        if (response.data.s !== 500 && response.data.s !== 400) {
+          Toast({
+            text: `Order # ${this.props.ordersStore.selectedOrder.merchantOrderNumber} successfully cancelled!`,
+            type: 'success',
+            duration: 3500,
+          });
+        } else {
+          Toast({
+            text: response.data.m,
+            type: 'danger',
+            duration: 3500,
+          });
+        }
 
         this.props.ordersStore.selectedOrder = null;
       });

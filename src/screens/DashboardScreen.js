@@ -349,6 +349,7 @@ class StoreDetailsScreen extends Component {
                   fontSize: 13,
                   fontFamily: 'ProductSans-Regular',
                   color: colors.icons,
+                  textAlign: 'center',
                 }}>
                 {item}
               </Text>
@@ -861,12 +862,12 @@ class StoreDetailsScreen extends Component {
                             onPress={() => this.handlePaymentMethods('COD')}
                           />
                           <CheckBox
-                            title="Online Banking"
+                            title="Online Payment"
                             checked={newPaymentMethods.includes(
-                              'Online Banking',
+                              'Online Payment',
                             )}
                             onPress={() =>
-                              this.handlePaymentMethods('Online Banking')
+                              this.handlePaymentMethods('Online Payment')
                             }
                           />
                         </View>

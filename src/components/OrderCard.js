@@ -75,11 +75,15 @@ class OrderCard extends PureComponent {
 
     const buttonText =
       (tabName === 'Paid' && 'Ship') ||
+      (tabName === 'Unpaid' &&
+        order.paymentMethod === 'Online Payment' &&
+        'Mark as Paid') ||
       (tabName === 'Pending' && 'Accept') ||
       (tabName === 'Shipped' && 'Complete');
 
     const CardHeader = () => {
-      const optionsButton = tabName === 'Pending' ? true : false;
+      const optionsButton =
+        tabName === 'Pending' || tabName === 'Unpaid' ? true : false;
 
       return (
         <CardItem
