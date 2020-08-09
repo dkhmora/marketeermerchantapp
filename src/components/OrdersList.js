@@ -30,15 +30,13 @@ class OrdersList extends Component {
       return orderList.length > 0 ? orderList : [];
     }
 
-    return null;
+    return [];
   }
 
   @computed get orderLoading() {
     if (
-      this.props.detailsStore.storeDetails.orderNumber &&
       this.props.ordersStore.orders.length ===
-        this.props.detailsStore.storeDetails.orderNumber &&
-      this.orders
+      this.props.detailsStore.storeDetails.orderNumber
     ) {
       return false;
     }
