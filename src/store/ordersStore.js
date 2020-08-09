@@ -39,14 +39,11 @@ class OrdersStore {
     const storageRef = storage().ref(imageRef);
 
     await storageRef
-      .putFile(imagePath)
-      .then(() => {
-        storageRef.updateMetadata({
-          customMetadata: {
-            customerUserId,
-            merchantId,
-          },
-        });
+      .putFile(imagePath, {
+        customMetadata: {
+          customerUserId,
+          merchantId,
+        },
       })
       .then(() => {
         return this.getImageUrl(imageRef);
