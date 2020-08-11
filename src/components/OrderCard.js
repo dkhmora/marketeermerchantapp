@@ -253,7 +253,16 @@ class OrderCard extends PureComponent {
     };
 
     return (
-      <View>
+      <View
+        style={{
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 1,
+          },
+          shadowOpacity: 0.2,
+          shadowRadius: 1.41,
+        }}>
         <ConfirmationModal
           isVisible={this.state.changeOrderStatusModal}
           title={`${buttonText} Order # ${order.merchantOrderNumber}?`}
