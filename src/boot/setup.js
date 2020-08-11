@@ -48,6 +48,7 @@ const theme = {
   },
   CheckBox: {
     checkedColor: colors.accent,
+    fontFamily: 'ProductSans-Light',
     containerStyle: {
       borderRadius: 30,
       backgroundColor: colors.icons,

@@ -60,6 +60,7 @@ class OrderChatScreen extends Component {
       width: 1280,
       height: 720,
       mediaType: 'photo',
+      forceJpg: true,
       compressImageQuality: 0.8,
     })
       .then((image) => {
@@ -73,6 +74,7 @@ class OrderChatScreen extends Component {
       width: 1280,
       height: 720,
       mediaType: 'photo',
+      forceJpg: true,
       compressImageQuality: 0.8,
     })
       .then((image) => {
@@ -193,17 +195,21 @@ class OrderChatScreen extends Component {
             renderActions={
               !(
                 orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
-              ) && this.renderActions.bind(this)
+              )
+                ? this.renderActions.bind(this)
+                : null
             }
             renderSend={
               !(
                 orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
-              ) && this.renderSend
+              )
+                ? this.renderSend
+                : null
             }
             renderComposer={
-              (orderStatus[0] === 'CANCELLED' ||
-                orderStatus[0] === 'COMPLETED') &&
-              this.renderComposer.bind(this)
+              orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
+                ? this.renderComposer.bind(this)
+                : null
             }
             textInputStyle={{
               fontFamily: 'ProductSans-Light',

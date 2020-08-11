@@ -6,13 +6,15 @@ import messaging from '@react-native-firebase/messaging';
 import '@react-native-firebase/functions';
 import Toast from '../components/Toast';
 import {Platform} from 'react-native';
+import {persist} from 'mobx-persist';
 
 const functions = firebase.app().functions('asia-northeast1');
 const merchantsCollection = firestore().collection('merchants');
 class DetailsStore {
   @observable storeDetails = {};
-  @observable subscribedToNotifications = false;
   @observable unsubscribeSetStoreDetails = null;
+  @persist @observable subscribedToNotifications = false;
+  @persist @observable firstLoad = true;
 
   @computed get merchantRef() {
     const {merchantId} = this.storeDetails;
@@ -77,24 +79,6 @@ class DetailsStore {
               ...documentSnapshot.data(),
               merchantId,
             };
-
-            const token = await messaging().getToken();
-
-            if (documentSnapshot.data().fcmTokens) {
-              if (documentSnapshot.data().fcmTokens.includes(token)) {
-                this.subscribedToNotifications = true;
-              } else {
-                this.subscribedToNotifications = false;
-              }
-            } else {
-              this.subscribedToNotifications = false;
-            }
-          } else {
-            Toast({
-              text: 'Store Details are still empty.',
-              type: 'warning',
-              duration: 5000,
-            });
           }
         });
     }
@@ -109,15 +93,21 @@ class DetailsStore {
       authorizationStatus = true;
     }
 
-    if (!this.subscribedToNotifications) {
+    const token = await messaging().getToken();
+
+    if (
+      !this.storeDetails.fcmTokens.includes(token) &&
+      !this.subscribedToNotifications
+    ) {
       if (authorizationStatus) {
-        await messaging()
+        return await messaging()
           .getToken()
           .then((token) => {
-            this.merchantRef.update(
-              'fcmTokens',
-              firestore.FieldValue.arrayUnion(token),
-            );
+            this.merchantRef
+              .update('fcmTokens', firestore.FieldValue.arrayUnion(token))
+              .then(() => {
+                this.subscribedToNotifications = true;
+              });
           })
           .catch((err) => Toast({text: err.message, type: 'danger'}));
       }
@@ -129,18 +119,19 @@ class DetailsStore {
       await messaging()
         .getToken()
         .then((token) =>
-          this.merchantRef.update(
-            'fcmTokens',
-            firestore.FieldValue.arrayRemove(token),
-          ),
+          this.merchantRef
+            .update('fcmTokens', firestore.FieldValue.arrayRemove(token))
+            .then(() => {
+              this.subscribedToNotifications = false;
+            }),
         )
         .catch((err) => Toast({text: err.message, type: 'danger'}));
     }
   }
 
-  @action async deleteImage(image) {
-    await storage()
-      .ref(image)
+  @action async deleteImage(imageRef) {
+    return await storage()
+      .ref(imageRef)
       .delete()
       .catch((err) => {
         Toast({text: err.message, type: 'danger'});
@@ -152,7 +143,7 @@ class DetailsStore {
     const fileExtension = imagePath.split('.').pop();
     const imageRef = `/images/merchants/${merchantId}/${type}.${fileExtension}`;
 
-    await storage()
+    return await storage()
       .ref(imageRef)
       .putFile(imagePath)
       .then(() =>

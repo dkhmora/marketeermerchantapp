@@ -1,25 +1,18 @@
 import React, {PureComponent} from 'react';
 import {Overlay, Text, Button} from 'react-native-elements';
-import {View, Dimensions} from 'react-native';
-import {inject, observer} from 'mobx-react';
-import FastImage from 'react-native-fast-image';
+import {View} from 'react-native';
 
-@inject('authStore')
-@observer
-class ConfirmationModal extends PureComponent {
+class AlertModal extends PureComponent {
   constructor(props) {
     super(props);
   }
 
   render() {
-    const {closeModal, isVisible, onConfirm, title, body, image} = this.props;
+    const {isVisible, onConfirm, title, body, buttonText} = this.props;
 
     return (
       <Overlay
         isVisible={isVisible}
-        onBackdropPress={() => {
-          closeModal();
-        }}
         statusBarTranslucent
         width="80%"
         height="auto"
@@ -47,21 +40,6 @@ class ConfirmationModal extends PureComponent {
             </Text>
           )}
 
-          {image && (
-            <View
-              style={{
-                height: Dimensions.get('screen').height * 0.4,
-              }}>
-              <FastImage
-                source={{uri: image}}
-                style={{
-                  flex: 1,
-                }}
-                resizeMode={FastImage.resizeMode.contain}
-              />
-            </View>
-          )}
-
           <View
             style={{
               flexDirection: 'row',
@@ -70,17 +48,7 @@ class ConfirmationModal extends PureComponent {
               marginTop: 40,
             }}>
             <Button
-              title="Cancel"
-              type="clear"
-              containerStyle={{
-                alignSelf: 'flex-end',
-                borderRadius: 30,
-              }}
-              onPress={() => closeModal()}
-            />
-
-            <Button
-              title="Confirm"
+              title={buttonText}
               type="clear"
               containerStyle={{
                 alignSelf: 'flex-end',
@@ -95,4 +63,4 @@ class ConfirmationModal extends PureComponent {
   }
 }
 
-export default ConfirmationModal;
+export default AlertModal;

@@ -271,13 +271,14 @@ class LoginScreen extends Component {
                 type="outline"
                 disabled={!emailCheck}
                 containerStyle={{
-                  borderRadius: 24,
-                  borderWidth: 1,
                   marginTop: 40,
+                }}
+                buttonStyle={{
                   height: 50,
                   borderColor: emailCheck ? colors.primary : 'grey',
+                  borderRadius: 24,
+                  borderWidth: 1,
                 }}
-                buttonStyle={{height: 50}}
               />
 
               {Platform.OS === 'android' && (

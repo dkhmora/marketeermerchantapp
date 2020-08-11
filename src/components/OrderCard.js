@@ -3,7 +3,7 @@ import {Card, CardItem, Left, Body, Right} from 'native-base';
 import {ActivityIndicator, View} from 'react-native';
 import moment from 'moment';
 import {observer, inject} from 'mobx-react';
-import {Icon, Button, Text} from 'react-native-elements';
+import {Icon, Button, Text, Badge} from 'react-native-elements';
 import {computed} from 'mobx';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
@@ -75,11 +75,15 @@ class OrderCard extends PureComponent {
 
     const buttonText =
       (tabName === 'Paid' && 'Ship') ||
+      (tabName === 'Unpaid' &&
+        order.paymentMethod === 'Online Payment' &&
+        'Mark as Paid') ||
       (tabName === 'Pending' && 'Accept') ||
       (tabName === 'Shipped' && 'Complete');
 
     const CardHeader = () => {
-      const optionsButton = tabName === 'Pending' ? true : false;
+      const optionsButton =
+        tabName === 'Pending' || tabName === 'Unpaid' ? true : false;
 
       return (
         <CardItem
@@ -99,8 +103,24 @@ class OrderCard extends PureComponent {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <View>
-              <Icon name="message-square" color={colors.icons} />
+            <View style={{alignItems: 'center'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  paddingHorizontal: 5,
+                  paddingTop: 5,
+                }}>
+                <Icon name="message-square" color={colors.icons} />
+
+                {order.merchantUnreadCount !== null &&
+                  order.merchantUnreadCount > 0 && (
+                    <Badge
+                      value={order.merchantUnreadCount}
+                      badgeStyle={{backgroundColor: colors.accent}}
+                      containerStyle={{position: 'absolute', top: 0, right: 0}}
+                    />
+                  )}
+              </View>
               <Text style={{color: colors.icons}}>Chat</Text>
             </View>
 
@@ -233,7 +253,16 @@ class OrderCard extends PureComponent {
     };
 
     return (
-      <View>
+      <View
+        style={{
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 1,
+          },
+          shadowOpacity: 0.2,
+          shadowRadius: 1.41,
+        }}>
         <ConfirmationModal
           isVisible={this.state.changeOrderStatusModal}
           title={`${buttonText} Order # ${order.merchantOrderNumber}?`}

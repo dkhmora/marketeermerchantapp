@@ -7,6 +7,7 @@ import ItemCard from './ItemCard';
 import {colors} from '../../assets/colors';
 import {Text, Icon} from 'react-native-elements';
 import Toast from './Toast';
+import DeviceInfo from 'react-native-device-info';
 
 @inject('itemsStore')
 @inject('detailsStore')
@@ -44,7 +45,8 @@ class ItemsList extends Component {
       dataSource = this.props.itemsStore.storeItems.slice();
     }
 
-    const numColumns = 2;
+    const isTablet = DeviceInfo.isTablet();
+    const numColumns = isTablet ? 3 : 2;
 
     return (
       <Container style={{flex: 1}}>

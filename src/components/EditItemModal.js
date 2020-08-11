@@ -194,6 +194,8 @@ class EditItemModal extends Component {
     ImagePicker.openCamera({
       width: 400,
       height: 400,
+      forceJpg: true,
+      mediaType: 'photo',
       cropping: true,
       compressImageQuality: 0.85,
     })
@@ -210,6 +212,8 @@ class EditItemModal extends Component {
     ImagePicker.openPicker({
       width: 400,
       height: 400,
+      forceJpg: true,
+      mediaType: 'photo',
       cropping: true,
       compressImageQuality: 0.85,
     })
@@ -318,8 +322,6 @@ class EditItemModal extends Component {
         onBackdropPress={() => {
           this.closeModal();
         }}
-        windowBackgroundColor="rgba(255, 255, 255, .5)"
-        overlayBackgroundColor="red"
         fullScreen
         width="auto"
         height="auto"
@@ -353,15 +355,17 @@ class EditItemModal extends Component {
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              borderBottomWidth: 2,
-              padding: 10,
-              borderColor: colors.divider,
+              paddingHorizontal: 15,
+              paddingVertical: 10,
+              backgroundColor: colors.primary,
               alignItems: 'center',
+              elevation: 6,
             }}>
             <Text
               style={{
                 fontSize: 24,
                 fontFamily: 'ProductSans-Regular',
+                color: colors.icons,
               }}>
               Edit{' '}
               {this.props.itemsStore.selectedItem &&
@@ -371,8 +375,8 @@ class EditItemModal extends Component {
             {!this.state.loading && (
               <Button
                 type="clear"
-                icon={<Icon name="x" color={colors.primary} />}
-                titleStyle={{color: colors.primary}}
+                icon={<Icon name="x" color={colors.icons} />}
+                titleStyle={{color: colors.icons}}
                 containerStyle={{
                   borderRadius: 30,
                 }}

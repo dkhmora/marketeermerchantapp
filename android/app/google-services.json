@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1549607298-6qvkrio02jkfb39eq89m0sc9f66hk87c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marketeerph.marketeerclientapp.android",
+            "certificate_hash": "677118fe4a6d766f0a692f7e423c0f0adb63dc91"
+          }
+        },
+        {
           "client_id": "1549607298-l9ecpmg0o7mo7pcftmqp2vomt9to2e2m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -62,19 +70,27 @@
       },
       "oauth_client": [
         {
+          "client_id": "1549607298-f49lmo52kdl4kf64a0egn9sckps7mik3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marketeerph.marketeermerchantapp.android",
+            "certificate_hash": "970bf2795dbdd8e4011a70e4b52ed0c9db293b75"
+          }
+        },
+        {
+          "client_id": "1549607298-vnlnnehapvcjacbo7luo5qld71la3967.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marketeerph.marketeermerchantapp.android",
+            "certificate_hash": "e5e53ea2194a8c3cccc14bc261cd257e3134aceb"
+          }
+        },
+        {
           "client_id": "1549607298-ah62onrnt7vkcoqr8khpg7k2a2mhte1p.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.marketeerph.marketeermerchantapp.android",
             "certificate_hash": "9b3a7020802581a55d7d888880235be320cba2a8"
-          }
-        },
-        {
-          "client_id": "1549607298-u25idokn4fh6a7kb1cntqdp451j4ss6a.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.marketeerph.marketeermerchantapp.android",
-            "certificate_hash": "e5e53ea2194a8c3cccc14bc261cd257e3134aceb"
           }
         },
         {

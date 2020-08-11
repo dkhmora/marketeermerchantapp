@@ -39,14 +39,11 @@ class OrdersStore {
     const storageRef = storage().ref(imageRef);
 
     await storageRef
-      .putFile(imagePath)
-      .then(() => {
-        storageRef.updateMetadata({
-          customMetadata: {
-            customerUserId,
-            merchantId,
-          },
-        });
+      .putFile(imagePath, {
+        customMetadata: {
+          customerUserId,
+          merchantId,
+        },
       })
       .then(() => {
         return this.getImageUrl(imageRef);
@@ -69,7 +66,11 @@ class OrdersStore {
     await firestore()
       .collection('orders')
       .doc(orderId)
-      .update('messages', firestore.FieldValue.arrayUnion(message))
+      .update({
+        messages: firestore.FieldValue.arrayUnion(message),
+        userUnreadCount: firestore.FieldValue.increment(1),
+        updatedAt: firestore.Timestamp.now().toMillis(),
+      })
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
@@ -80,7 +81,11 @@ class OrdersStore {
     await firestore()
       .collection('orders')
       .doc(orderId)
-      .update('messages', firestore.FieldValue.arrayUnion(message))
+      .update({
+        messages: firestore.FieldValue.arrayUnion(message),
+        userUnreadCount: firestore.FieldValue.increment(1),
+        updatedAt: firestore.Timestamp.now().toMillis(),
+      })
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
@@ -94,6 +99,10 @@ class OrdersStore {
         .onSnapshot((documentSnapshot) => {
           if (documentSnapshot) {
             if (documentSnapshot.exists) {
+              if (documentSnapshot.data().merchantUnreadCount !== 0) {
+                this.markMessagesAsRead(orderId);
+              }
+
               if (
                 documentSnapshot.data().messages.length <= 0 &&
                 this.orderMessages.length > 0
@@ -109,6 +118,18 @@ class OrdersStore {
           }
         });
     }
+  }
+
+  @action async markMessagesAsRead(orderId) {
+    this.markMessagesAsReadTimeout &&
+      clearTimeout(this.markMessagesAsReadTimeout);
+
+    this.markMessagesAsReadTimeout = setTimeout(() => {
+      firestore().collection('orders').doc(orderId).update({
+        merchantUnreadCount: 0,
+        updatedAt: firestore.Timestamp.now().toMillis(),
+      });
+    }, 100);
   }
 
   @action async getOrderItems(orderId) {
@@ -175,7 +196,7 @@ class OrdersStore {
     return await functions
       .httpsCallable('cancelOrder')({orderId, merchantId, cancelReason})
       .then((response) => {
-        return response.data;
+        return response;
       })
       .catch((err) => {
         Toast({text: err.message, type: 'danger'});

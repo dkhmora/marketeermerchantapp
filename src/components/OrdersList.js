@@ -7,6 +7,7 @@ import OrderCard from './OrderCard';
 import {colors} from '../../assets/colors';
 import {computed} from 'mobx';
 import {Text} from 'react-native-elements';
+import DeviceInfo from 'react-native-device-info';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -30,15 +31,13 @@ class OrdersList extends Component {
       return orderList.length > 0 ? orderList : [];
     }
 
-    return null;
+    return [];
   }
 
   @computed get orderLoading() {
     if (
-      this.props.detailsStore.storeDetails.orderNumber &&
       this.props.ordersStore.orders.length ===
-        this.props.detailsStore.storeDetails.orderNumber &&
-      this.orders
+      this.props.detailsStore.storeDetails.orderNumber
     ) {
       return false;
     }
@@ -76,6 +75,21 @@ class OrdersList extends Component {
     });
   }
 
+  formatData(data, numColumns) {
+    const numberOfFullRows = Math.floor(data.length / numColumns);
+
+    let numberOfElementsLastRow = data.length - numberOfFullRows * numColumns;
+    while (
+      numberOfElementsLastRow !== numColumns &&
+      numberOfElementsLastRow !== 0
+    ) {
+      data.push({key: `blank-${numberOfElementsLastRow}`, empty: true});
+      numberOfElementsLastRow += 1;
+    }
+
+    return data;
+  }
+
   renderItem = ({item, index}) => (
     <OrderCard
       order={item}
@@ -89,11 +103,15 @@ class OrdersList extends Component {
     const {loading} = this.state;
     const dataSource = this.orders ? this.orders.slice() : [];
 
+    const isTablet = DeviceInfo.isTablet();
+    const numColumns = isTablet ? 2 : 1;
+
     return (
       <View style={{flex: 1}}>
         <FlatList
           ref={(flatList) => (this.flatList = flatList)}
-          data={dataSource}
+          data={this.formatData(dataSource, numColumns)}
+          numColumns={numColumns}
           contentContainerStyle={{flexGrow: 1}}
           initialNumToRender={5}
           windowSize={11}

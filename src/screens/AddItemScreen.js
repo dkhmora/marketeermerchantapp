@@ -229,6 +229,8 @@ class AddItemScreen extends Component {
       width: 400,
       height: 400,
       cropping: true,
+      mediaType: 'photo',
+      forceJpg: true,
       compressImageQuality: 0.85,
     })
       .then((image) => {
@@ -243,6 +245,8 @@ class AddItemScreen extends Component {
       width: 400,
       height: 400,
       cropping: true,
+      mediaType: 'photo',
+      forceJpg: true,
       compressImageQuality: 0.85,
     })
       .then((image) => {

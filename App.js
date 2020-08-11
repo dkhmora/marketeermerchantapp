@@ -7,7 +7,7 @@
  */
 import 'react-native-gesture-handler';
 import React from 'react';
-import {YellowBox} from 'react-native';
+import {YellowBox, Linking, Platform} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import _ from 'lodash';
 import moment from 'moment';
@@ -23,22 +23,56 @@ import AuthStore from './src/store/authStore';
 import DetailsStore from './src/store/detailsStore';
 import ItemsStore from './src/store/itemsStore';
 import {create} from 'mobx-persist';
+import VersionCheck from 'react-native-version-check';
+import AlertModal from './src/components/AlertModal';
 
 const hydrate = create({storage: AsyncStorage});
 const ordersStore = (window.store = new OrdersStore());
 const authStore = (window.store = new AuthStore());
 const detailsStore = (window.store = new DetailsStore());
 const itemsStore = (window.store = new ItemsStore());
+
 hydrate('list', ordersStore);
 hydrate('list', itemsStore);
+hydrate('list', detailsStore);
 
 YellowBox.ignoreWarnings([
   'Animated: `useNativeDriver` was not specified. This is a required option and must be explicitly set to `true` or `false`',
 ]);
 
 export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      appUpdateModal: false,
+      appUrl: null,
+    };
+  }
+
   componentDidMount() {
-    setTimeout(() => SplashScreen.hide(), 500);
+    const provider = Platform.OS === 'android' ? 'playStore' : 'appStore';
+
+    VersionCheck.needUpdate({
+      provider,
+      forceUpdate: true,
+    }).then(async (res) => {
+      if (res) {
+        if (res.isNeeded) {
+          this.setState({appUpdateModal: true, appUrl: res.storeUrl});
+        } else {
+          setTimeout(() => SplashScreen.hide(), 500);
+        }
+      } else {
+        setTimeout(() => SplashScreen.hide(), 500);
+      }
+    });
+  }
+
+  openAppUrl() {
+    if (this.state.appUrl) {
+      Linking.openURL(this.state.appUrl);
+    }
   }
 
   render() {
@@ -48,6 +82,17 @@ export default class App extends React.Component {
         authStore={authStore}
         detailsStore={detailsStore}
         itemsStore={itemsStore}>
+        <AlertModal
+          isVisible={this.state.appUpdateModal}
+          onConfirm={() => {
+            this.openAppUrl();
+          }}
+          buttonText={`Go to ${
+            Platform.OS === 'android' ? 'Play Store' : 'App Store'
+          }`}
+          title="Please update Marketeer Merchant"
+          body="Your Marketeer Merchant app is out of date. Please update."
+        />
         <Setup />
       </Provider>
     );

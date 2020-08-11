@@ -50,7 +50,7 @@ class StoreItemsTab extends Component {
     if (itemCategories) {
       return itemCategories.length > 5
         ? 'auto'
-        : SCREEN_WIDTH / itemCategories.length;
+        : SCREEN_WIDTH / (itemCategories.length + 1);
     }
     return 'auto';
   }

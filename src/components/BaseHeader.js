@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Header, Button, Icon, Text} from 'react-native-elements';
-import {Platform, StyleSheet} from 'react-native';
+import {Platform, StyleSheet, View} from 'react-native';
 import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 
@@ -78,7 +78,7 @@ class BaseHeader extends Component {
       return rightComponent;
     }
 
-    return null;
+    return <View style={{width: 40}} />;
   };
 
   centerComponent = () => {
@@ -88,7 +88,14 @@ class BaseHeader extends Component {
       return centerComponent;
     }
 
-    return <Text style={{fontSize: 20, color: colors.icons}}>{title}</Text>;
+    return (
+      <Text
+        adjustsFontSizeToFit
+        numberOfLines={1}
+        style={{fontSize: 20, color: colors.icons}}>
+        {title}
+      </Text>
+    );
   };
 
   render() {
@@ -106,8 +113,10 @@ class BaseHeader extends Component {
           translucent: true,
         }}
         containerStyle={styles.header}
+        leftContainerStyle={{flex: 0}}
+        rightContainerStyle={{flex: 0}}
         centerContainerStyle={{
-          flex: 3,
+          flex: 1,
         }}
         {...otherProps}
       />
