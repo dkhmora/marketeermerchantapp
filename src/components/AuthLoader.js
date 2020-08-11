@@ -5,6 +5,7 @@ import {inject, observer} from 'mobx-react';
 import {View} from 'native-base';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
+import {when} from 'mobx';
 
 @inject('authStore')
 @inject('ordersStore')
@@ -44,6 +45,17 @@ class AuthLoader extends React.Component {
 
             !this.props.detailsStore.unsubscribeSetStoreDetails &&
               this.props.detailsStore.setStoreDetails(merchantId);
+
+            if (this.props.detailsStore.firstLoad) {
+              when(
+                () =>
+                  Object.keys(this.props.detailsStore.storeDetails).length > 0,
+                () =>
+                  this.props.detailsStore
+                    .subscribeToNotifications()
+                    .then(() => (this.props.detailsStore.firstLoad = false)),
+              );
+            }
 
             this.authStateSubscriber && this.authStateSubscriber();
 
