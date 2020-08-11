@@ -57,8 +57,12 @@ export default class App extends React.Component {
       provider,
       forceUpdate: true,
     }).then(async (res) => {
-      if (res.isNeeded) {
-        this.setState({appUpdateModal: true, appUrl: res.storeUrl});
+      if (res) {
+        if (res.isNeeded) {
+          this.setState({appUpdateModal: true, appUrl: res.storeUrl});
+        } else {
+          setTimeout(() => SplashScreen.hide(), 500);
+        }
       } else {
         setTimeout(() => SplashScreen.hide(), 500);
       }
