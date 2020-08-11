@@ -322,7 +322,6 @@ class EditItemModal extends Component {
         onBackdropPress={() => {
           this.closeModal();
         }}
-        statusBarTranslucent
         fullScreen
         width="auto"
         height="auto"
