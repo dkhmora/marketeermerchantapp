@@ -66,7 +66,11 @@ class OrdersStore {
     await firestore()
       .collection('orders')
       .doc(orderId)
-      .update('messages', firestore.FieldValue.arrayUnion(message))
+      .update({
+        messages: firestore.FieldValue.arrayUnion(message),
+        userUnreadCount: firestore.FieldValue.increment(1),
+        updatedAt: firestore.Timestamp.now().toMillis(),
+      })
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
@@ -77,7 +81,11 @@ class OrdersStore {
     await firestore()
       .collection('orders')
       .doc(orderId)
-      .update('messages', firestore.FieldValue.arrayUnion(message))
+      .update({
+        messages: firestore.FieldValue.arrayUnion(message),
+        userUnreadCount: firestore.FieldValue.increment(1),
+        updatedAt: firestore.Timestamp.now().toMillis(),
+      })
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
