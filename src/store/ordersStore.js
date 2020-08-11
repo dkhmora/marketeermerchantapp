@@ -91,6 +91,10 @@ class OrdersStore {
         .onSnapshot((documentSnapshot) => {
           if (documentSnapshot) {
             if (documentSnapshot.exists) {
+              if (documentSnapshot.data().merchantUnreadCount !== 0) {
+                this.markMessagesAsRead(orderId);
+              }
+
               if (
                 documentSnapshot.data().messages.length <= 0 &&
                 this.orderMessages.length > 0
@@ -106,6 +110,18 @@ class OrdersStore {
           }
         });
     }
+  }
+
+  @action async markMessagesAsRead(orderId) {
+    this.markMessagesAsReadTimeout &&
+      clearTimeout(this.markMessagesAsReadTimeout);
+
+    this.markMessagesAsReadTimeout = setTimeout(() => {
+      firestore().collection('orders').doc(orderId).update({
+        merchantUnreadCount: 0,
+        updatedAt: firestore.Timestamp.now().toMillis(),
+      });
+    }, 100);
   }
 
   @action async getOrderItems(orderId) {
