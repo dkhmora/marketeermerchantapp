@@ -355,15 +355,17 @@ class EditItemModal extends Component {
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              borderBottomWidth: 2,
-              padding: 10,
-              borderColor: colors.divider,
+              paddingHorizontal: 15,
+              paddingVertical: 10,
+              backgroundColor: colors.primary,
               alignItems: 'center',
+              elevation: 6,
             }}>
             <Text
               style={{
                 fontSize: 24,
                 fontFamily: 'ProductSans-Regular',
+                color: colors.icons,
               }}>
               Edit{' '}
               {this.props.itemsStore.selectedItem &&
@@ -373,8 +375,8 @@ class EditItemModal extends Component {
             {!this.state.loading && (
               <Button
                 type="clear"
-                icon={<Icon name="x" color={colors.primary} />}
-                titleStyle={{color: colors.primary}}
+                icon={<Icon name="x" color={colors.icons} />}
+                titleStyle={{color: colors.icons}}
                 containerStyle={{
                   borderRadius: 30,
                 }}
