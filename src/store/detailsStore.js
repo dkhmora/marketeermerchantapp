@@ -100,14 +100,10 @@ class DetailsStore {
       !this.subscribedToNotifications
     ) {
       if (authorizationStatus) {
-        return await messaging()
-          .getToken()
-          .then((token) => {
-            this.merchantRef
-              .update('fcmTokens', firestore.FieldValue.arrayUnion(token))
-              .then(() => {
-                this.subscribedToNotifications = true;
-              });
+        return await this.merchantRef
+          .update('fcmTokens', firestore.FieldValue.arrayUnion(token))
+          .then(() => {
+            this.subscribedToNotifications = true;
           })
           .catch((err) => Toast({text: err.message, type: 'danger'}));
       }
