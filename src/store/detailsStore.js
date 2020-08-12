@@ -95,10 +95,7 @@ class DetailsStore {
 
     const token = await messaging().getToken();
 
-    if (
-      !this.storeDetails.fcmTokens.includes(token) &&
-      !this.subscribedToNotifications
-    ) {
+    if (!this.storeDetails.fcmTokens.includes(token)) {
       if (authorizationStatus) {
         return await this.merchantRef
           .update('fcmTokens', firestore.FieldValue.arrayUnion(token))
