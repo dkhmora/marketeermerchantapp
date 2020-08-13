@@ -5,15 +5,30 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Text, ListItem, Button} from 'react-native-elements';
 import BaseHeader from '../components/BaseHeader';
 import {colors} from '../../assets/colors';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 class TopUpScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {topUpModal: false, amount: 0, selectedPaymentMethod: null};
+    this.state = {
+      paymentOptionsModal: false,
+      confirmTopUpModal: false,
+      amount: 0,
+      selectedPaymentMethod: null,
+    };
+  }
+
+  handleTopUp() {
+    console.log(`Top up ${this.state.selectedPaymentMethod}`);
   }
 
   render() {
-    const {amount, topUpModal, selectedPaymentMethod} = this.state;
+    const {
+      amount,
+      paymentOptionsModal,
+      selectedPaymentMethod,
+      confirmTopUpModal,
+    } = this.state;
 
     return (
       <View style={{flex: 1}}>
@@ -24,13 +39,22 @@ class TopUpScreen extends Component {
         />
 
         <PaymentOptionsModal
-          isVisible={topUpModal}
-          closeModal={() => this.setState({topUpModal: false})}
+          isVisible={paymentOptionsModal}
+          closeModal={() => this.setState({paymentOptionsModal: false})}
           onConfirm={(paymentMethod) => {
             this.setState({
               selectedPaymentMethod: paymentMethod,
-              topUpModal: false,
+              paymentOptionsModal: false,
             });
+          }}
+        />
+
+        <ConfirmationModal
+          isVisible={confirmTopUpModal}
+          closeModal={() => this.setState({confirmTopUpModal: false})}
+          onConfirm={() => {
+            this.handleTopUp();
+            this.setState({confirmTopUpModal: false});
           }}
         />
 
@@ -58,7 +82,7 @@ class TopUpScreen extends Component {
 
           <ListItem
             title="Payment Method"
-            onPress={() => this.setState({topUpModal: true})}
+            onPress={() => this.setState({paymentOptionsModal: true})}
             subtitle={
               selectedPaymentMethod
                 ? Object.values(selectedPaymentMethod)[0].name
@@ -85,6 +109,7 @@ class TopUpScreen extends Component {
           <Button
             title="Top Up"
             titleStyle={{color: colors.icons}}
+            onPress={() => this.setState({confirmTopUpModal: true})}
             disabled={!selectedPaymentMethod}
             buttonStyle={{backgroundColor: colors.accent, height: 50}}
             containerStyle={{
