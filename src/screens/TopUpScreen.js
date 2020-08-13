@@ -1,19 +1,19 @@
 import React, {Component} from 'react';
 import PaymentOptionsModal from '../components/PaymentOptionsModal';
-import {View} from 'react-native';
+import {View, SafeAreaView} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {Input, Text, ListItem} from 'react-native-elements';
+import {Text, ListItem, Button} from 'react-native-elements';
 import BaseHeader from '../components/BaseHeader';
 import {colors} from '../../assets/colors';
 
 class TopUpScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {topUpModal: false, amount: 0};
+    this.state = {topUpModal: false, amount: 0, selectedPaymentMethod: null};
   }
 
   render() {
-    const {amount, topUpModal} = this.state;
+    const {amount, topUpModal, selectedPaymentMethod} = this.state;
 
     return (
       <View style={{flex: 1}}>
@@ -26,13 +26,18 @@ class TopUpScreen extends Component {
         <PaymentOptionsModal
           isVisible={topUpModal}
           closeModal={() => this.setState({topUpModal: false})}
-          onConfirm={(paymentMethod) => console.log(paymentMethod)}
+          onConfirm={(paymentMethod) => {
+            this.setState({
+              selectedPaymentMethod: paymentMethod,
+              topUpModal: false,
+            });
+          }}
         />
 
         <KeyboardAwareScrollView>
           <ListItem
             title="Top up value"
-            titleStyle={{fontSize: 24}}
+            titleStyle={{fontSize: 20}}
             bottomDivider
             input={{
               leftIcon: (
@@ -54,13 +59,41 @@ class TopUpScreen extends Component {
           <ListItem
             title="Payment Method"
             onPress={() => this.setState({topUpModal: true})}
-            subtitle="BPI"
+            subtitle={
+              selectedPaymentMethod
+                ? Object.values(selectedPaymentMethod)[0].name
+                : 'Please select a payment method'
+            }
             subtitleStyle={{fontSize: 16, color: colors.primary}}
             titleStyle={{fontSize: 20}}
             bottomDivider
             chevron
           />
         </KeyboardAwareScrollView>
+
+        <SafeAreaView
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 10,
+            elevation: 10,
+            backgroundColor: colors.primary,
+            borderTopRightRadius: 24,
+            borderTopLeftRadius: 24,
+          }}>
+          <Button
+            title="Top Up"
+            titleStyle={{color: colors.icons}}
+            disabled={!selectedPaymentMethod}
+            buttonStyle={{backgroundColor: colors.accent, height: 50}}
+            containerStyle={{
+              alignSelf: 'flex-end',
+              borderRadius: 30,
+              flex: 1,
+            }}
+          />
+        </SafeAreaView>
       </View>
     );
   }
