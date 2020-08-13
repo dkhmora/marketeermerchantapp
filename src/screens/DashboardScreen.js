@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {ActivityIndicator, View, SafeAreaView} from 'react-native';
-import {Card, Body, CardItem, Left} from 'native-base';
+import {Card, CardItem} from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
 // Mobx
@@ -386,6 +386,8 @@ class StoreDetailsScreen extends Component {
       newFreeDeliveryMinimumError,
     } = this.state;
 
+    const {navigation} = this.props;
+
     const {editMode, newPaymentMethods, newDeliveryMethods} = this;
 
     return (
@@ -471,14 +473,26 @@ class StoreDetailsScreen extends Component {
                   <CardItem
                     header
                     bordered
-                    style={{backgroundColor: colors.primary}}>
-                    <Left>
-                      <Body>
-                        <Text style={{color: colors.icons, fontSize: 20}}>
-                          Markee Credits
-                        </Text>
-                      </Body>
-                    </Left>
+                    style={{
+                      backgroundColor: colors.primary,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      height: 55,
+                    }}>
+                    <Text style={{color: colors.icons, fontSize: 20}}>
+                      Markee Credits
+                    </Text>
+
+                    <Button
+                      icon={<Icon name="plus" color={colors.icons} size={20} />}
+                      iconRight
+                      onPress={() => navigation.navigate('Top Up')}
+                      title="Top Up"
+                      titleStyle={{color: colors.icons}}
+                      buttonStyle={{
+                        backgroundColor: colors.accent,
+                      }}
+                    />
                   </CardItem>
 
                   <CardItem bordered>
@@ -567,14 +581,15 @@ class StoreDetailsScreen extends Component {
                   <CardItem
                     header
                     bordered
-                    style={{backgroundColor: colors.primary}}>
-                    <Left>
-                      <Body>
-                        <Text style={{color: colors.icons, fontSize: 20}}>
-                          Store Card Preview
-                        </Text>
-                      </Body>
-                    </Left>
+                    style={{
+                      backgroundColor: colors.primary,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      height: 55,
+                    }}>
+                    <Text style={{color: colors.icons, fontSize: 20}}>
+                      Store Card Preview
+                    </Text>
                   </CardItem>
                   <CardItem bordered style={{flex: 1}}>
                     <StoreCard store={this.props.detailsStore.storeDetails} />
@@ -606,9 +621,7 @@ class StoreDetailsScreen extends Component {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       backgroundColor: this.editModeHeaderColor,
-                      paddingLeft: 25,
-                      paddingBottom: 0,
-                      paddingTop: 0,
+                      height: 55,
                     }}>
                     <Text
                       style={{
@@ -1008,14 +1021,15 @@ class StoreDetailsScreen extends Component {
                   <CardItem
                     header
                     bordered
-                    style={{backgroundColor: this.editModeHeaderColor}}>
-                    <Left>
-                      <Body>
-                        <Text style={{color: colors.icons, fontSize: 20}}>
-                          Delivery Settings
-                        </Text>
-                      </Body>
-                    </Left>
+                    style={{
+                      backgroundColor: this.editModeHeaderColor,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      height: 55,
+                    }}>
+                    <Text style={{color: colors.icons, fontSize: 20}}>
+                      Delivery Settings
+                    </Text>
                   </CardItem>
 
                   <CardItem bordered>
@@ -1325,14 +1339,15 @@ class StoreDetailsScreen extends Component {
                   <CardItem
                     header
                     bordered
-                    style={{backgroundColor: colors.primary}}>
-                    <Left>
-                      <Body>
-                        <Text style={{color: colors.icons, fontSize: 20}}>
-                          Sales
-                        </Text>
-                      </Body>
-                    </Left>
+                    style={{
+                      backgroundColor: colors.primary,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      height: 55,
+                    }}>
+                    <Text style={{color: colors.icons, fontSize: 20}}>
+                      Sales
+                    </Text>
                   </CardItem>
 
                   <CardItem bordered>
