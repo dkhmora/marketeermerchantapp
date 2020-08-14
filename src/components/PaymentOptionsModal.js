@@ -66,7 +66,7 @@ class EditItemModal extends Component {
             'Use your BPI ExpressOnline/Mobile (EOLM) Banking account to make a Fund Transfer. Choose this option only if you have previously registered Dragonpay for 3rd Party Fund Transfer or enabled Fund Transfer to Anyone. A P15 Service Fee and a small random verification fee is added.',
           minTime: 400,
           maxTime: 2330,
-          minAmount: 49980.01,
+          minAmount: 1.0,
           maxAmount: 1000000.0,
           additionalCharge: 15.0,
         },
@@ -425,31 +425,32 @@ class EditItemModal extends Component {
 
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentInsetAdjustmentBehavior="automatic"
-            keyboardOpeningTime={20}
-            extraScrollHeight={20}
-            style={{paddingHorizontal: 15, paddingTop: 15}}>
+            contentInsetAdjustmentBehavior="automatic">
             {Object.entries(paymentMethods).map(([key, value]) => {
               const paymentMethod = {[key]: value};
 
-              return (
-                <ListItem
-                  title={value.name}
-                  subtitle={value.description}
-                  bottomDivider
-                  chevron
-                  key={key}
-                  rightIcon={
-                    selectedPaymentMethod &&
-                    selectedPaymentMethod[key] === paymentMethod[key] ? (
-                      <Icon name="check" color={colors.primary} />
-                    ) : null
-                  }
-                  onPress={() =>
-                    this.setState({selectedPaymentMethod: paymentMethod})
-                  }
-                />
-              );
+              if (!value.devOnly) {
+                return (
+                  <ListItem
+                    title={value.name}
+                    subtitle={value.description}
+                    bottomDivider={
+                      key !== Object.keys(paymentMethods).slice(-1)[0]
+                    }
+                    chevron
+                    key={key}
+                    rightIcon={
+                      selectedPaymentMethod &&
+                      selectedPaymentMethod[key] === paymentMethod[key] ? (
+                        <Icon name="check" color={colors.primary} />
+                      ) : null
+                    }
+                    onPress={() =>
+                      this.setState({selectedPaymentMethod: paymentMethod})
+                    }
+                  />
+                );
+              }
             })}
           </ScrollView>
 
