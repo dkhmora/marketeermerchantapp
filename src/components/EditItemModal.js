@@ -323,6 +323,7 @@ class EditItemModal extends Component {
           this.closeModal();
         }}
         fullScreen
+        animationType="fade"
         width="auto"
         height="auto"
         overlayStyle={{flex: 1, padding: 0}}>

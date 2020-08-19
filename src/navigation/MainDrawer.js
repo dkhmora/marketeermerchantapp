@@ -65,47 +65,43 @@ class MainDrawer extends Component {
   }
 
   handleDynamicLink = (link) => {
-    console.log(link);
-
-    if (link.url === 'https://marketeer.ph/merchant/payment/success') {
-      Toast({text: 'Payment successful!'});
-
-      this.props.navigation.navigate('Home');
-    }
-
     switch (link.url) {
-      case 'https://marketeer.ph/app/merchant/payment/success':
+      case 'https://marketeer.ph/merchant/payment/success':
         Toast({text: 'Payment successful!'});
         this.props.navigation.navigate('Home');
         break;
-      case 'https://marketeer.ph/app/merchant/payment/failure':
+      case 'https://marketeer.ph/merchant/payment/failure':
         Toast({
           text: 'Error: Payment failure. Please try again later.',
           type: 'danger',
         });
         this.props.navigation.navigate('Home');
         break;
-      case 'https://marketeer.ph/app/merchant/payment/pending':
-        Toast({text: 'Payment pending', type: 'info'});
+      case 'https://marketeer.ph/merchant/payment/pending':
+        Toast({
+          text:
+            'Payment pending. Please check your email for payment instructions.',
+          type: 'info',
+        });
         this.props.navigation.navigate('Home');
         break;
-      case 'https://marketeer.ph/app/merchant/payment/unknown':
+      case 'https://marketeer.ph/merchant/payment/unknown':
         Toast({text: 'Payment status unknown'});
         this.props.navigation.navigate('Home');
         break;
-      case 'https://marketeer.ph/app/merchant/payment/refund':
+      case 'https://marketeer.ph/merchant/payment/refund':
         Toast({text: 'Payment refunded'});
         this.props.navigation.navigate('Home');
         break;
-      case 'https://marketeer.ph/app/merchant/payment/chargeback':
+      case 'https://marketeer.ph/merchant/payment/chargeback':
         Toast({text: 'Payment chargedback'});
         this.props.navigation.navigate('Home');
         break;
-      case 'https://marketeer.ph/app/merchant/payment/void':
+      case 'https://marketeer.ph/merchant/payment/void':
         Toast({text: 'Payment voided'});
         this.props.navigation.navigate('Home');
         break;
-      case 'https://marketeer.ph/app/merchant/payment/authorized':
+      case 'https://marketeer.ph/merchant/payment/authorized':
         Toast({text: 'Payment authorized'});
         this.props.navigation.navigate('Home');
         break;

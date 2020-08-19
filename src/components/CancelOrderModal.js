@@ -82,6 +82,7 @@ class CancelOrderModal extends Component {
       <Overlay
         isVisible={this.props.ordersStore.cancelOrderModal}
         statusBarTranslucent
+        animationType="fade"
         width="80%"
         height="auto"
         overlayStyle={{borderRadius: 10, padding: 15, width: '80%'}}>

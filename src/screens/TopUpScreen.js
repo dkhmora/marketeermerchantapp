@@ -103,7 +103,7 @@ class TopUpScreen extends Component {
   };
 
   handleTopUp() {
-    const {email} = this.state;
+    const {email, topUpAmount} = this.state;
     const {selectedPaymentProcId, totalAmount} = this;
 
     this.props.authStore.appReady = false;
@@ -111,6 +111,7 @@ class TopUpScreen extends Component {
     this.props.paymentsStore
       .getPaymentLink({
         totalAmount,
+        topUpAmount,
         email,
         processId: selectedPaymentProcId,
       })
@@ -198,6 +199,7 @@ class TopUpScreen extends Component {
           body={
             <Card
               style={{
+                width: '100%',
                 borderRadius: 10,
                 overflow: 'hidden',
               }}>
@@ -217,6 +219,8 @@ class TopUpScreen extends Component {
 
               <CardItem bordered style={{justifyContent: 'space-between'}}>
                 <Text
+                  adjustsFontSizeToFit
+                  numberOfLines={2}
                   style={{
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
@@ -225,6 +229,8 @@ class TopUpScreen extends Component {
                 </Text>
 
                 <Text
+                  adjustsFontSizeToFit
+                  numberOfLines={2}
                   style={{
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
@@ -236,6 +242,8 @@ class TopUpScreen extends Component {
 
               <CardItem bordered style={{justifyContent: 'space-between'}}>
                 <Text
+                  adjustsFontSizeToFit
+                  numberOfLines={2}
                   style={{
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
@@ -244,6 +252,8 @@ class TopUpScreen extends Component {
                 </Text>
 
                 <Text
+                  adjustsFontSizeToFit
+                  numberOfLines={2}
                   style={{
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
@@ -477,7 +487,6 @@ class TopUpScreen extends Component {
           <Button
             title="Top Up"
             titleStyle={{color: colors.icons}}
-            raised
             onPress={() => this.setState({confirmTopUpModal: true})}
             disabled={
               !selectedPaymentMethod ||
@@ -488,7 +497,6 @@ class TopUpScreen extends Component {
             buttonStyle={{
               backgroundColor: colors.accent,
               height: 50,
-              borderRadius: 30,
             }}
             containerStyle={{
               alignSelf: 'flex-end',

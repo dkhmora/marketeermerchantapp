@@ -9,10 +9,11 @@ const functions = firebase.app().functions('asia-northeast1');
 class PaymentsStore {
   @observable payments = [];
 
-  @action async getPaymentLink({totalAmount, email, processId}) {
+  @action async getPaymentLink({totalAmount, topUpAmount, email, processId}) {
     return await functions
       .httpsCallable('getMerchantPaymentLink')({
         amount: totalAmount,
+        topUpAmount,
         email,
         processId,
       })
