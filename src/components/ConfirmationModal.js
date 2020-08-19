@@ -1,9 +1,15 @@
 import React, {PureComponent} from 'react';
 import {Overlay, Text, Button} from 'react-native-elements';
-import {View, Dimensions} from 'react-native';
+import {View, Dimensions, KeyboardAvoidingView} from 'react-native';
 import {inject, observer} from 'mobx-react';
 import FastImage from 'react-native-fast-image';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {TextInput} from 'react-native-gesture-handler';
+import {colors} from '../../assets/colors';
+import {styles} from '../../assets/styles';
 
+const SCREEN_WIDTH = Dimensions.get('screen').width;
+const SCREEN_HEIGHT = Dimensions.get('screen').height;
 @inject('authStore')
 @observer
 class ConfirmationModal extends PureComponent {
@@ -21,12 +27,11 @@ class ConfirmationModal extends PureComponent {
           closeModal();
         }}
         statusBarTranslucent
-        width="80%"
-        height="auto"
         overlayStyle={{
+          width: SCREEN_WIDTH * 0.8,
+          height: 'auto',
           borderRadius: 10,
           padding: 15,
-          width: '80%',
         }}>
         <View style={{flexDirection: 'column'}}>
           <Text
@@ -38,13 +43,15 @@ class ConfirmationModal extends PureComponent {
             {title}
           </Text>
 
-          {body && (
+          {typeof body === 'string' ? (
             <Text
               style={{
                 fontSize: 20,
               }}>
               {body}
             </Text>
+          ) : (
+            body
           )}
 
           {image && (

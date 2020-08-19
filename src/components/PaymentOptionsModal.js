@@ -429,28 +429,26 @@ class EditItemModal extends Component {
             {Object.entries(paymentMethods).map(([key, value]) => {
               const paymentMethod = {[key]: value};
 
-              if (!value.devOnly) {
-                return (
-                  <ListItem
-                    title={value.name}
-                    subtitle={value.description}
-                    bottomDivider={
-                      key !== Object.keys(paymentMethods).slice(-1)[0]
-                    }
-                    chevron
-                    key={key}
-                    rightIcon={
-                      selectedPaymentMethod &&
-                      selectedPaymentMethod[key] === paymentMethod[key] ? (
-                        <Icon name="check" color={colors.primary} />
-                      ) : null
-                    }
-                    onPress={() =>
-                      this.setState({selectedPaymentMethod: paymentMethod})
-                    }
-                  />
-                );
-              }
+              return (
+                <ListItem
+                  title={value.name}
+                  subtitle={value.description}
+                  bottomDivider={
+                    key !== Object.keys(paymentMethods).slice(-1)[0]
+                  }
+                  chevron
+                  key={key}
+                  rightIcon={
+                    selectedPaymentMethod &&
+                    selectedPaymentMethod[key] === paymentMethod[key] ? (
+                      <Icon name="check" color={colors.primary} />
+                    ) : null
+                  }
+                  onPress={() =>
+                    this.setState({selectedPaymentMethod: paymentMethod})
+                  }
+                />
+              );
             })}
           </ScrollView>
 
