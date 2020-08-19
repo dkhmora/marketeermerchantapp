@@ -25,6 +25,8 @@ class EditItemModal extends Component {
           description:
             'Use your Bogus Bank Online Banking account to make a payment (TEST ONLY).',
           devOnly: true,
+          fixedFee: 10,
+          percentageFee: 2,
         },
         BOGX: {
           name: 'Bogus Bank Over-The-Counter',

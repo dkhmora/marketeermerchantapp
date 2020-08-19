@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PaymentOptionsModal from '../components/PaymentOptionsModal';
-import {View, Linking, TextInput, Platform} from 'react-native';
+import {View, Linking, TextInput, Dimensions} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Text, ListItem, Button, Icon} from 'react-native-elements';
 import BaseHeader from '../components/BaseHeader';
@@ -13,11 +13,8 @@ import InAppBrowser from 'react-native-inappbrowser-reborn';
 import {CardItem, Card} from 'native-base';
 import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
-import {initialWindowMetrics} from 'react-native-safe-area-context';
 
-const inset = initialWindowMetrics && initialWindowMetrics.insets;
-const bottomPadding = Platform.OS === 'ios' ? inset.bottom : 0;
-
+const SCREEN_HEIGHT = Dimensions.get('screen').height;
 @inject('paymentsStore')
 @inject('authStore')
 @inject('detailsStore')
@@ -28,7 +25,7 @@ class TopUpScreen extends Component {
     this.state = {
       paymentOptionsModal: false,
       confirmTopUpModal: false,
-      amount: 0,
+      topUpAmount: null,
       email: this.props.authStore.userEmail,
       emailCheck: false,
       selectedPaymentMethod: null,
@@ -47,6 +44,36 @@ class TopUpScreen extends Component {
     const {selectedPaymentMethod} = this.state;
 
     return selectedPaymentMethod ? Object.keys(selectedPaymentMethod)[0] : null;
+  }
+
+  @computed get paymentGatewayCharge() {
+    if (this.state.topUpAmount) {
+      return this.totalAmount - this.state.topUpAmount;
+    }
+
+    return this.totalAmount;
+  }
+
+  @computed get totalAmount() {
+    const {selectedPayment} = this;
+
+    if (selectedPayment) {
+      const percentageFee = selectedPayment.percentageFee
+        ? 1 - selectedPayment.percentageFee * 0.01
+        : 1;
+
+      const fixedFee = selectedPayment.fixedFee ? selectedPayment.fixedFee : 0;
+
+      if (this.state.topUpAmount) {
+        const amount = this.state.topUpAmount / percentageFee + fixedFee;
+
+        return Math.round((amount + Number.EPSILON) * 100) / 100;
+      }
+
+      return selectedPayment.fixedFee;
+    }
+
+    return 0;
   }
 
   componentDidMount() {
@@ -76,14 +103,14 @@ class TopUpScreen extends Component {
   };
 
   handleTopUp() {
-    const {amount, email} = this.state;
-    const {selectedPaymentProcId} = this;
+    const {email} = this.state;
+    const {selectedPaymentProcId, totalAmount} = this;
 
     this.props.authStore.appReady = false;
 
     this.props.paymentsStore
       .getPaymentLink({
-        amount,
+        totalAmount,
         email,
         processId: selectedPaymentProcId,
       })
@@ -133,7 +160,7 @@ class TopUpScreen extends Component {
 
   render() {
     const {
-      amount,
+      topUpAmount,
       paymentOptionsModal,
       selectedPaymentMethod,
       confirmTopUpModal,
@@ -141,7 +168,7 @@ class TopUpScreen extends Component {
       emailCheck,
     } = this.state;
 
-    const {selectedPayment} = this;
+    const {selectedPayment, paymentGatewayCharge, totalAmount} = this;
 
     const {storeDetails} = this.props.detailsStore;
 
@@ -222,7 +249,7 @@ class TopUpScreen extends Component {
                     fontFamily: 'ProductSans-Bold',
                     color: colors.primary,
                   }}>
-                  ₱{(storeDetails.creditData.credits + amount).toFixed(2)}
+                  ₱{(storeDetails.creditData.credits + topUpAmount).toFixed(2)}
                 </Text>
               </CardItem>
             </Card>
@@ -233,83 +260,88 @@ class TopUpScreen extends Component {
           }}
         />
 
-        <KeyboardAwareScrollView contentInsetAdjustmentBehavior="automatic">
-          <ListItem
-            title="Top up value"
-            titleStyle={{fontSize: 20}}
-            bottomDivider
-            input={{
-              leftIcon: (
-                <Text style={{fontSize: 28, color: colors.primary}}>₱</Text>
-              ),
-              inputStyle: {
-                textAlign: 'left',
-                fontFamily: 'ProductSans-Light',
-                fontSize: 28,
-                color: colors.primary,
-              },
-              containerStyle: {borderBottomWidth: 1},
-              placeholderTextColor: colors.text_secondary,
-              keyboardType: 'numeric',
-              value: amount.toString(),
-              onChangeText: (amountText) =>
-                this.setState({amount: Number(amountText)}),
-            }}
-          />
+        <View style={{flex: 1}}>
+          <KeyboardAwareScrollView
+            contentInsetAdjustmentBehavior="automatic"
+            style={{height: SCREEN_HEIGHT}}>
+            <ListItem
+              title="Top up value"
+              titleStyle={{fontSize: 20}}
+              bottomDivider
+              input={{
+                leftIcon: (
+                  <Text style={{fontSize: 28, color: colors.primary}}>₱</Text>
+                ),
+                inputStyle: {
+                  textAlign: 'left',
+                  fontFamily: 'ProductSans-Light',
+                  fontSize: 28,
+                  color: colors.primary,
+                },
+                containerStyle: {borderBottomWidth: 1},
+                placeholder: '0',
+                placeholderTextColor: colors.text_secondary,
+                keyboardType: 'numeric',
+                value: topUpAmount ? topUpAmount.toString() : null,
+                onChangeText: (amountText) =>
+                  this.setState({topUpAmount: Number(amountText)}),
+              }}
+            />
 
-          <ListItem
-            title="Payment Method"
-            onPress={() => this.setState({paymentOptionsModal: true})}
-            subtitle={
-              selectedPaymentMethod
-                ? `${selectedPayment.name} ${
-                    selectedPayment.minAmount
-                      ? `(₱${selectedPayment.minAmount} - ₱${selectedPayment.maxAmount})`
-                      : ''
-                  }`
-                : 'Please select a payment method'
-            }
-            subtitleStyle={{fontSize: 16, color: colors.primary}}
-            titleStyle={{fontSize: 20}}
-            bottomDivider
-            chevron
-          />
+            <ListItem
+              title="Payment Method"
+              onPress={() => this.setState({paymentOptionsModal: true})}
+              subtitle={
+                selectedPaymentMethod
+                  ? `${selectedPayment.name} ${
+                      selectedPayment.minAmount
+                        ? `(₱${selectedPayment.minAmount} - ₱${selectedPayment.maxAmount})`
+                        : ''
+                    }`
+                  : 'Please select a payment method'
+              }
+              subtitleStyle={{fontSize: 16, color: colors.primary}}
+              titleStyle={{fontSize: 20}}
+              bottomDivider
+              chevron
+            />
 
-          <ListItem
-            title="Email Address"
-            titleStyle={{fontSize: 20, flex: 0}}
-            subtitle={
-              <View style={[styles.action, {flexDirection: 'column'}]}>
-                <View style={{flexDirection: 'row', width: '100%'}}>
-                  <View style={styles.icon_container}>
-                    <Icon name="mail" color={colors.primary} size={20} />
+            <ListItem
+              title="Email Address"
+              titleStyle={{fontSize: 20, flex: 0}}
+              subtitle={
+                <View style={[styles.action, {flexDirection: 'column'}]}>
+                  <View style={{flexDirection: 'row', width: '100%'}}>
+                    <View style={styles.icon_container}>
+                      <Icon name="mail" color={colors.primary} size={20} />
+                    </View>
+
+                    <TextInput
+                      placeholder="gordon_norman@gmail.com"
+                      placeholderTextColor={colors.text_secondary}
+                      maxLength={256}
+                      style={styles.textInput}
+                      autoCapitalize="none"
+                      value={email}
+                      onChangeText={(value) => this.handleEmailChange(value)}
+                    />
+
+                    {emailCheck ? (
+                      <Animatable.View useNativeDriver animation="bounceIn">
+                        <Icon name="check-circle" color="#388e3c" size={20} />
+                      </Animatable.View>
+                    ) : null}
                   </View>
 
-                  <TextInput
-                    placeholder="gordon_norman@gmail.com"
-                    placeholderTextColor={colors.text_secondary}
-                    maxLength={256}
-                    style={styles.textInput}
-                    autoCapitalize="none"
-                    value={email}
-                    onChangeText={(value) => this.handleEmailChange(value)}
-                  />
-
-                  {emailCheck ? (
-                    <Animatable.View useNativeDriver animation="bounceIn">
-                      <Icon name="check-circle" color="#388e3c" size={20} />
-                    </Animatable.View>
-                  ) : null}
+                  <Text style={{color: colors.text_secondary, fontSize: 12}}>
+                    We'll send you your receipt here
+                  </Text>
                 </View>
-
-                <Text style={{color: colors.text_secondary, fontSize: 12}}>
-                  We'll send you your receipt here
-                </Text>
-              </View>
-            }
-            bottomDivider
-          />
-        </KeyboardAwareScrollView>
+              }
+              bottomDivider
+            />
+          </KeyboardAwareScrollView>
+        </View>
 
         <View
           style={{
@@ -350,7 +382,7 @@ class TopUpScreen extends Component {
                     fontFamily: 'ProductSans-Regular',
                     fontSize: 18,
                   }}>
-                  ₱{amount}
+                  ₱{topUpAmount ? topUpAmount.toFixed(2) : 0}
                 </Text>
               </View>
 
@@ -389,6 +421,31 @@ class TopUpScreen extends Component {
                 </View>
               )}
 
+              {selectedPayment.fixedFee && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    paddingVertical: 5,
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.icons,
+                      fontSize: 18,
+                    }}>
+                    Payment gateway charge
+                  </Text>
+
+                  <Text
+                    style={{
+                      color: colors.icons,
+                      fontSize: 18,
+                    }}>
+                    ₱{paymentGatewayCharge.toFixed(2)}
+                  </Text>
+                </View>
+              )}
+
               <View
                 style={{
                   flexDirection: 'row',
@@ -411,7 +468,7 @@ class TopUpScreen extends Component {
                     fontFamily: 'ProductSans-Bold',
                     fontSize: 20,
                   }}>
-                  ₱{amount}
+                  ₱{totalAmount}
                 </Text>
               </View>
             </View>
@@ -424,9 +481,9 @@ class TopUpScreen extends Component {
             onPress={() => this.setState({confirmTopUpModal: true})}
             disabled={
               !selectedPaymentMethod ||
-              Object.values(selectedPaymentMethod)[0].minAmount > amount ||
+              Object.values(selectedPaymentMethod)[0].minAmount > topUpAmount ||
               !emailCheck ||
-              !amount
+              !topUpAmount
             }
             buttonStyle={{
               backgroundColor: colors.accent,
