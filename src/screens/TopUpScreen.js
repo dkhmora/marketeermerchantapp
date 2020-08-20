@@ -431,7 +431,7 @@ class TopUpScreen extends Component {
                 </View>
               )}
 
-              {selectedPayment.fixedFee && (
+              {selectedPayment && (
                 <View
                   style={{
                     flexDirection: 'row',
@@ -451,7 +451,8 @@ class TopUpScreen extends Component {
                       color: colors.icons,
                       fontSize: 18,
                     }}>
-                    ₱{paymentGatewayCharge.toFixed(2)}
+                    ₱
+                    {paymentGatewayCharge ? paymentGatewayCharge.toFixed(2) : 0}
                   </Text>
                 </View>
               )}

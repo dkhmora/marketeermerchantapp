@@ -86,23 +86,23 @@ class MainDrawer extends Component {
         this.props.navigation.navigate('Home');
         break;
       case 'https://marketeer.ph/merchant/payment/unknown':
-        Toast({text: 'Payment status unknown'});
+        Toast({text: 'Payment status unknown', type: 'info'});
         this.props.navigation.navigate('Home');
         break;
       case 'https://marketeer.ph/merchant/payment/refund':
-        Toast({text: 'Payment refunded'});
+        Toast({text: 'Payment refunded', type: 'info'});
         this.props.navigation.navigate('Home');
         break;
       case 'https://marketeer.ph/merchant/payment/chargeback':
-        Toast({text: 'Payment chargedback'});
+        Toast({text: 'Payment chargedback', type: 'info'});
         this.props.navigation.navigate('Home');
         break;
       case 'https://marketeer.ph/merchant/payment/void':
-        Toast({text: 'Payment voided'});
+        Toast({text: 'Payment voided', type: 'info'});
         this.props.navigation.navigate('Home');
         break;
       case 'https://marketeer.ph/merchant/payment/authorized':
-        Toast({text: 'Payment authorized'});
+        Toast({text: 'Payment authorized', type: 'info'});
         this.props.navigation.navigate('Home');
         break;
     }
