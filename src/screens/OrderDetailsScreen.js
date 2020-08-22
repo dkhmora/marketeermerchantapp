@@ -29,16 +29,6 @@ class OrderDetailsScreen extends Component {
 
   componentDidMount() {
     this.getOrderItems();
-
-    this.props.navigation
-      .dangerouslyGetParent()
-      .setOptions({gestureEnabled: false});
-  }
-
-  componentWillUnmount() {
-    this.props.navigation
-      .dangerouslyGetParent()
-      .setOptions({gestureEnabled: true});
   }
 
   onMapReady() {

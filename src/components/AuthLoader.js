@@ -6,6 +6,7 @@ import {View} from 'native-base';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import {when} from 'mobx';
+import messaging from '@react-native-firebase/messaging';
 
 @inject('authStore')
 @inject('ordersStore')
@@ -15,11 +16,12 @@ import {when} from 'mobx';
 class AuthLoader extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {user: null};
+    this.state = {user: null, initialRoute: 'Home', initialData: {reset: true}};
   }
 
   async onAuthStateChanged(user) {
     const {navigation} = this.props;
+    const {initialRoute, initialData} = this.state;
 
     if (user) {
       await auth()
@@ -59,7 +61,7 @@ class AuthLoader extends React.Component {
 
             this.authStateSubscriber && this.authStateSubscriber();
 
-            navigation.navigate('Home', {reset: true});
+            navigation.navigate(initialRoute, initialData);
           }
         });
     } else {
@@ -69,16 +71,29 @@ class AuthLoader extends React.Component {
       this.props.itemsStore.unsubscribeSetStoreItems &&
         this.props.itemsStore.unsubscribeSetStoreItems();
 
-      navigation.replace('Login', {reset: true});
+      navigation.replace('Login', initialData);
     }
 
     this.setState({user});
   }
 
   componentDidMount() {
-    this.authStateSubscriber = auth().onAuthStateChanged(
-      this.onAuthStateChanged.bind(this),
-    );
+    messaging()
+      .getInitialNotification()
+      .then((notification) => {
+        if (notification) {
+          if (notification.data.type === 'order_message') {
+            this.setState({
+              initialRoute: 'Order Chat',
+              initialData: {orderId: notification.data.orderId},
+            });
+          }
+        }
+
+        this.authStateSubscriber = auth().onAuthStateChanged(
+          this.onAuthStateChanged.bind(this),
+        );
+      });
   }
 
   render() {

@@ -70,14 +70,13 @@ class OrdersTab extends Component {
   }
 
   render() {
-    const {name} = this.props.route;
     const {navigation} = this.props;
     const {optionsLabel} = this;
 
     return (
       <Container>
         <BaseHeader
-          title={name}
+          title="Orders"
           options={[optionsLabel]}
           actions={[this.handleNotificationSubscription]}
           destructiveIndex={1}

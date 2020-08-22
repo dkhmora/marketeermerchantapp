@@ -2,11 +2,11 @@ import React, {Component} from 'react';
 import {View} from 'react-native';
 import {Container} from 'native-base';
 import BaseHeader from '../components/BaseHeader';
-import {GiftedChat, Bubble, Send, Composer} from 'react-native-gifted-chat';
+import {GiftedChat, Bubble, Send} from 'react-native-gifted-chat';
 import {inject, observer} from 'mobx-react';
 import {Avatar, Icon, Button, Text} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
-import {observable} from 'mobx';
+import {observable, computed} from 'mobx';
 import {colors} from '../../assets/colors';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -25,6 +25,7 @@ class OrderChatScreen extends Component {
         name: this.props.detailsStore.storeDetails.storeName,
       },
       confirmImageModal: false,
+      loading: true,
     };
 
     this.renderComposer.bind(this);
@@ -32,27 +33,44 @@ class OrderChatScreen extends Component {
 
   @observable imagePath = '';
 
+  @computed get orderStatus() {
+    const {selectedOrder} = this.props.ordersStore;
+
+    if (selectedOrder) {
+      const statusLabel = Object.entries(selectedOrder.orderStatus).map(
+        ([key, value]) => {
+          if (value.status) {
+            return key.toUpperCase();
+          }
+
+          return;
+        },
+      );
+
+      return statusLabel.filter((item) => item != null);
+    }
+
+    return 'Unknown';
+  }
+
   componentDidMount() {
-    this.props.navigation
-      .dangerouslyGetParent()
-      .setOptions({gestureEnabled: false});
+    this.props.navigation.setOptions({gestureEnabled: false});
 
-    const {order} = this.props.route.params;
+    const {orderId} = this.props.route.params;
 
-    this.props.ordersStore.getMessages(order.orderId);
+    this.props.ordersStore.getMessages(orderId);
   }
 
   componentWillUnmount() {
-    this.props.navigation
-      .dangerouslyGetParent()
-      .setOptions({gestureEnabled: true});
+    this.props.navigation.setOptions({gestureEnabled: true});
 
     this.props.ordersStore.unsubscribeGetMessages();
   }
 
   onSend(messages = []) {
-    const {order} = this.props.route.params;
-    this.props.ordersStore.sendMessage(order.orderId, messages[0]);
+    const {orderId} = this.props.route.params;
+
+    this.props.ordersStore.sendMessage(orderId, messages[0]);
   }
 
   handleTakePhoto() {
@@ -157,79 +175,85 @@ class OrderChatScreen extends Component {
   }
 
   render() {
+    const {orderMessages, selectedOrder} = this.props.ordersStore;
     const {navigation} = this.props;
-    const {order, orderStatus} = this.props.route.params;
+    const {orderStatus} = this;
 
-    const headerTitle = `Order # ${order.merchantOrderNumber} | ${order.userName}`;
+    if (selectedOrder && orderMessages) {
+      const headerTitle = `Order # ${selectedOrder.merchantOrderNumber} | ${selectedOrder.userName}`;
 
-    const {orderMessages} = this.props.ordersStore;
+      const dataSource = orderMessages.slice();
 
-    const dataSource = orderMessages.slice();
+      return (
+        <Container style={{flex: 1}}>
+          <BaseHeader title={headerTitle} backButton navigation={navigation} />
 
-    return (
-      <Container style={{flex: 1}}>
-        <BaseHeader title={headerTitle} backButton navigation={navigation} />
-
-        <ConfirmationModal
-          isVisible={this.imagePath !== ''}
-          title="Send Image?"
-          image={this.imagePath}
-          onConfirm={() => {
-            this.props.ordersStore.sendImage(
-              order.orderId,
-              order.userId,
-              order.merchantId,
-              this.state.user,
-              this.imagePath,
-            );
-            this.imagePath = '';
-          }}
-          closeModal={() => (this.imagePath = '')}
-        />
-
-        <View style={{flex: 1}}>
-          <GiftedChat
-            textStyle={{color: colors.primary}}
-            renderAvatar={this.renderAvatar}
-            renderBubble={this.renderBubble}
-            renderActions={
-              !(
-                orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
-              )
-                ? this.renderActions.bind(this)
-                : null
-            }
-            renderSend={
-              !(
-                orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
-              )
-                ? this.renderSend
-                : null
-            }
-            renderComposer={
-              orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
-                ? this.renderComposer.bind(this)
-                : null
-            }
-            textInputStyle={{
-              fontFamily: 'ProductSans-Light',
-              borderBottomWidth: 1,
-              borderBottomColor: colors.primary,
+          <ConfirmationModal
+            isVisible={this.imagePath !== ''}
+            title="Send Image?"
+            image={this.imagePath}
+            onConfirm={() => {
+              this.props.ordersStore.sendImage(
+                selectedOrder.orderId,
+                selectedOrder.userId,
+                selectedOrder.merchantId,
+                this.state.user,
+                this.imagePath,
+              );
+              this.imagePath = '';
             }}
-            listViewProps={{marginBottom: 20}}
-            alwaysShowSend={
-              !(
-                orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
-              )
-            }
-            showAvatarForEveryMessage
-            messages={dataSource}
-            onSend={(messages) => this.onSend(messages)}
-            user={this.state.user}
+            closeModal={() => (this.imagePath = '')}
           />
-        </View>
-      </Container>
-    );
+
+          <View style={{flex: 1}}>
+            <GiftedChat
+              textStyle={{color: colors.primary}}
+              renderAvatar={this.renderAvatar}
+              renderBubble={this.renderBubble}
+              renderActions={
+                !(
+                  orderStatus[0] === 'CANCELLED' ||
+                  orderStatus[0] === 'COMPLETED'
+                )
+                  ? this.renderActions.bind(this)
+                  : null
+              }
+              renderSend={
+                !(
+                  orderStatus[0] === 'CANCELLED' ||
+                  orderStatus[0] === 'COMPLETED'
+                )
+                  ? this.renderSend
+                  : null
+              }
+              renderComposer={
+                orderStatus[0] === 'CANCELLED' || orderStatus[0] === 'COMPLETED'
+                  ? this.renderComposer.bind(this)
+                  : null
+              }
+              textInputStyle={{
+                fontFamily: 'ProductSans-Light',
+                borderBottomWidth: 1,
+                borderBottomColor: colors.primary,
+              }}
+              listViewProps={{marginBottom: 20}}
+              alwaysShowSend={
+                !(
+                  orderStatus[0] === 'CANCELLED' ||
+                  orderStatus[0] === 'COMPLETED'
+                )
+              }
+              showAvatarForEveryMessage
+              messages={dataSource}
+              onSend={(messages) => this.onSend(messages)}
+              user={this.state.user}
+            />
+          </View>
+        </Container>
+      );
+    }
+
+    return null;
   }
 }
 

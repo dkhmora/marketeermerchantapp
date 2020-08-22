@@ -1,0 +1,31 @@
+import {useEffect} from 'react';
+import PushNotification from 'react-native-push-notification';
+
+const RemotePushController = (props) => {
+  useEffect(() => {
+    PushNotification.configure({
+      // (required) Called when a remote or local notification is opened or received
+      onNotification: function (notification) {
+        // process the notification here
+        if (notification.type === 'order_message') {
+          const {orderId} = notification;
+
+          props.navigation.navigate('Order Chat', {
+            orderId,
+          });
+        }
+      },
+      // Android only: GCM or FCM Sender ID
+      senderID: '1549607298',
+      popInitialNotification: true,
+      requestPermissions: true,
+      vibrate: true,
+      vibration: 300,
+      playSound: true,
+      sound: 'default',
+    });
+  }, []);
+  return null;
+};
+
+export default RemotePushController;

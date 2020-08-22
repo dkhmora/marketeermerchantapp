@@ -19,6 +19,8 @@ import AccountScreen from '../screens/AccountScreen';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
+import messaging from '@react-native-firebase/messaging';
+import RemotePushController from '../services/RemotePushController';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -31,6 +33,7 @@ class MainDrawer extends Component {
 
     this.state = {
       signOutConfirmModal: false,
+      initialRoute: 'Dashboard',
     };
   }
 
@@ -45,6 +48,28 @@ class MainDrawer extends Component {
         });
       }
     }
+  }
+
+  initializeForegroundNotificationHandlers() {
+    messaging().onNotificationOpenedApp((remoteMessage) => {
+      console.log(
+        'Notification caused app to open from background state:',
+        remoteMessage.notification,
+      );
+      this.props.navigation.navigate(remoteMessage.data.type);
+    });
+
+    messaging()
+      .getInitialNotification()
+      .then((remoteMessage) => {
+        if (remoteMessage) {
+          console.log(
+            'Notification caused app to open from quit state:',
+            remoteMessage.notification,
+          );
+          this.setState({initialRoute: remoteMessage.data.type});
+        }
+      });
   }
 
   async openLink(url) {
@@ -120,6 +145,8 @@ class MainDrawer extends Component {
 
   render() {
     const Drawer = createDrawerNavigator();
+    const {initialRoute} = this.state;
+    const {navigation} = this.props;
 
     return (
       <View style={{flex: 1}}>
@@ -136,7 +163,7 @@ class MainDrawer extends Component {
         />
 
         <Drawer.Navigator
-          initialRouteName="Dashboard"
+          initialRouteName={initialRoute}
           drawerStyle={{backgroundColor: '#eee', width: 240}}
           drawerContent={(props) => {
             return (
@@ -236,6 +263,8 @@ class MainDrawer extends Component {
 
           <Drawer.Screen name="Account Settings" component={AccountScreen} />
         </Drawer.Navigator>
+
+        <RemotePushController navigation={navigation} />
       </View>
     );
   }

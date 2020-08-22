@@ -91,6 +91,7 @@ class OrdersStore {
 
   @action getMessages(orderId) {
     this.orderMessages = [];
+    this.selectedOrder = null;
 
     if (orderId) {
       this.unsubscribeGetMessages = firestore()
@@ -102,6 +103,8 @@ class OrdersStore {
               if (documentSnapshot.data().merchantUnreadCount !== 0) {
                 this.markMessagesAsRead(orderId);
               }
+
+              this.selectedOrder = documentSnapshot.data();
 
               if (
                 documentSnapshot.data().messages.length <= 0 &&
