@@ -38,36 +38,26 @@ class MainDrawer extends Component {
   }
 
   componentDidMount() {
-    if (this.props.route.params) {
-      const {reset} = this.props.route.params;
-
-      if (reset) {
-        this.props.navigation.reset({
-          index: 0,
-          routes: [{name: 'Home'}],
-        });
-      }
-    }
+    console.log('mount');
+    this.initializeForegroundNotificationHandlers();
   }
 
   initializeForegroundNotificationHandlers() {
-    messaging().onNotificationOpenedApp((remoteMessage) => {
-      console.log(
-        'Notification caused app to open from background state:',
-        remoteMessage.notification,
-      );
-      this.props.navigation.navigate(remoteMessage.data.type);
-    });
-
     messaging()
       .getInitialNotification()
-      .then((remoteMessage) => {
-        if (remoteMessage) {
-          console.log(
-            'Notification caused app to open from quit state:',
-            remoteMessage.notification,
-          );
-          this.setState({initialRoute: remoteMessage.data.type});
+      .then((notification) => {
+        if (notification) {
+          if (notification.data.type === 'order_message') {
+            this.props.navigation.navigate('Order Chat', {
+              orderId: notification.data.orderId,
+            });
+          }
+
+          if (notification.data.type === 'new_order') {
+            this.props.navigation.navigate('Order Details', {
+              orderId: notification.data.orderId,
+            });
+          }
         }
       });
   }

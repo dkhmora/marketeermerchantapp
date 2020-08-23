@@ -56,15 +56,22 @@ class OrderChatScreen extends Component {
   componentDidMount() {
     this.props.navigation.setOptions({gestureEnabled: false});
 
-    const {orderId} = this.props.route.params;
+    const {orderId, data} = this.props.route.params;
 
-    this.props.ordersStore.getMessages(orderId);
+    if (!data) {
+      this.props.ordersStore.getOrder(orderId);
+    }
   }
 
   componentWillUnmount() {
+    const {data} = this.props.route.params;
+
     this.props.navigation.setOptions({gestureEnabled: true});
 
-    this.props.ordersStore.unsubscribeGetMessages();
+    if (!data) {
+      this.props.ordersStore.unsubscribeGetOrder &&
+        this.props.ordersStore.unsubscribeGetOrder();
+    }
   }
 
   onSend(messages = []) {

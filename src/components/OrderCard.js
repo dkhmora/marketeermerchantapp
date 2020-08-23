@@ -65,8 +65,7 @@ class OrderCard extends PureComponent {
     const {navigation, order} = this.props;
 
     navigation.navigate('Order Details', {
-      order,
-      orderStatus: this.orderStatus,
+      orderId: order.orderId,
     });
   }
 

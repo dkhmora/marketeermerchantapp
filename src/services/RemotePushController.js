@@ -14,6 +14,15 @@ const RemotePushController = (props) => {
             orderId,
           });
         }
+
+        if (notification.type === 'new_order') {
+          const {orderId} = notification;
+
+          props.navigation.navigate('Order Details', {
+            orderId,
+            notification: true,
+          });
+        }
       },
       // Android only: GCM or FCM Sender ID
       senderID: '1549607298',
@@ -24,7 +33,8 @@ const RemotePushController = (props) => {
       playSound: true,
       sound: 'default',
     });
-  }, []);
+  }, [props.navigation]);
+
   return null;
 };
 

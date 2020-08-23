@@ -1,12 +1,11 @@
 import React from 'react';
-import {ActivityIndicator} from 'react-native';
+import {ActivityIndicator, StatusBar} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {inject, observer} from 'mobx-react';
 import {View} from 'native-base';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import {when} from 'mobx';
-import messaging from '@react-native-firebase/messaging';
 
 @inject('authStore')
 @inject('ordersStore')
@@ -16,13 +15,10 @@ import messaging from '@react-native-firebase/messaging';
 class AuthLoader extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {user: null, initialRoute: 'Home', initialData: {reset: true}};
+    this.state = {user: null, route: null};
   }
 
   async onAuthStateChanged(user) {
-    const {navigation} = this.props;
-    const {initialRoute, initialData} = this.state;
-
     if (user) {
       await auth()
         .currentUser.getIdTokenResult(true)
@@ -61,7 +57,14 @@ class AuthLoader extends React.Component {
 
             this.authStateSubscriber && this.authStateSubscriber();
 
-            navigation.navigate(initialRoute, initialData);
+            if (this.state.route !== 'Home') {
+              this.setState({route: 'Home'});
+
+              this.props.navigation.reset({
+                index: 0,
+                routes: [{name: 'Home'}],
+              });
+            }
           }
         });
     } else {
@@ -71,29 +74,25 @@ class AuthLoader extends React.Component {
       this.props.itemsStore.unsubscribeSetStoreItems &&
         this.props.itemsStore.unsubscribeSetStoreItems();
 
-      navigation.replace('Login', initialData);
+      if (this.state.route !== 'Login') {
+        this.setState({route: 'Login'});
+
+        this.props.navigation.reset({
+          index: 0,
+          routes: [{name: 'Login'}],
+        });
+      }
     }
 
     this.setState({user});
   }
 
   componentDidMount() {
-    messaging()
-      .getInitialNotification()
-      .then((notification) => {
-        if (notification) {
-          if (notification.data.type === 'order_message') {
-            this.setState({
-              initialRoute: 'Order Chat',
-              initialData: {orderId: notification.data.orderId},
-            });
-          }
-        }
-
-        this.authStateSubscriber = auth().onAuthStateChanged(
-          this.onAuthStateChanged.bind(this),
-        );
-      });
+    this.setState({user: null, route: null}, () => {
+      this.authStateSubscriber = auth().onAuthStateChanged(
+        this.onAuthStateChanged.bind(this),
+      );
+    });
   }
 
   render() {
@@ -105,6 +104,7 @@ class AuthLoader extends React.Component {
           justifyContent: 'center',
           backgroundColor: colors.primary,
         }}>
+        <StatusBar backgroundColor={colors.primary} />
         <ActivityIndicator size="large" color={colors.icons} />
       </View>
     );
