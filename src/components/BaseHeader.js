@@ -87,8 +87,10 @@ class BaseHeader extends Component {
     const {centerComponent, title} = this.props;
 
     if (centerComponent) {
+      console.log('center');
       return centerComponent;
     }
+    console.log('notcenter', title);
 
     return (
       <Text
