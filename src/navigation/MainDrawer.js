@@ -38,7 +38,6 @@ class MainDrawer extends Component {
   }
 
   componentDidMount() {
-    console.log('mount');
     this.initializeForegroundNotificationHandlers();
   }
 

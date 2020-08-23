@@ -37,8 +37,6 @@ class CancelOrderModal extends Component {
   handleConfirm() {
     this.setState({loading: true});
 
-    console.log(this.props.ordersStore.selectedCancelOrder.orderId);
-
     this.props.ordersStore
       .cancelOrder(
         this.props.ordersStore.selectedCancelOrder.orderId,
@@ -64,7 +62,6 @@ class CancelOrderModal extends Component {
             duration: 3500,
           });
         } else {
-          console.log(this.props.ordersStore.selectedOrder);
           if (this.props.ordersStore.selectedOrder) {
             this.props.navigation.goBack();
           }

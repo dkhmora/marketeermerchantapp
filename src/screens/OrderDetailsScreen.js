@@ -51,8 +51,6 @@ class OrderDetailsScreen extends Component {
   componentDidMount() {
     const {orderId} = this.props.route.params;
 
-    console.log('huh', orderId);
-
     if (orderId) {
       this.getOrderItems();
       this.props.ordersStore.getOrder(orderId);
@@ -62,7 +60,6 @@ class OrderDetailsScreen extends Component {
   componentWillUnmount() {
     this.props.ordersStore.unsubscribeGetOrder &&
       this.props.ordersStore.unsubscribeGetOrder();
-    console.log('unmount');
 
     this.props.ordersStore.selectedOrder = null;
     this.props.ordersStore.orderMessages = null;
@@ -77,8 +74,6 @@ class OrderDetailsScreen extends Component {
   fitMarkers() {
     const {selectedOrder} = this.props.ordersStore;
     const {storeDetails} = this.props.detailsStore;
-
-    console.log(this.props.route.params);
 
     this.map.fitToCoordinates(
       [
