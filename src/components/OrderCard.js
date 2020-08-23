@@ -207,7 +207,7 @@ class OrderCard extends PureComponent {
                   actions={[
                     () => {
                       this.props.ordersStore.cancelOrderModal = true;
-                      this.props.ordersStore.selectedOrder = order;
+                      this.props.ordersStore.selectedCancelOrder = order;
                     },
                   ]}
                 />

@@ -181,6 +181,7 @@ class OrderDetailsScreen extends Component {
           actions={[
             () => {
               this.props.ordersStore.cancelOrderModal = true;
+              this.props.ordersStore.selectedCancelOrder = selectedOrder;
             },
           ]}
           navigation={navigation}

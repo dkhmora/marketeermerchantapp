@@ -19,6 +19,7 @@ class OrdersStore {
   @observable unsubscribeSetOrders = null;
   @observable cancelOrderModal = false;
   @observable selectedOrder = null;
+  @observable selectedCancelOrder = null;
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
@@ -106,7 +107,7 @@ class OrdersStore {
                 this.markMessagesAsRead(orderId);
               }
 
-              this.selectedOrder = documentSnapshot.data();
+              this.selectedOrder = {...documentSnapshot.data(), orderId};
 
               if (
                 documentSnapshot.data().messages.length <= 0 &&
@@ -197,9 +198,9 @@ class OrdersStore {
       });
   }
 
-  @action async cancelOrder(orderId, merchantId, cancelReason) {
+  @action async cancelOrder(orderId, cancelReason) {
     return await functions
-      .httpsCallable('cancelOrder')({orderId, merchantId, cancelReason})
+      .httpsCallable('cancelOrder')({orderId, cancelReason})
       .then((response) => {
         return response;
       })

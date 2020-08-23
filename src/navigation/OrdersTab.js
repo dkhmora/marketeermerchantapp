@@ -82,7 +82,7 @@ class OrdersTab extends Component {
           destructiveIndex={1}
           navigation={navigation}
         />
-        <CancelOrderModal />
+        <CancelOrderModal navigation={navigation} />
 
         <TabOrders.Navigator
           lazy
