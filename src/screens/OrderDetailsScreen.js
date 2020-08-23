@@ -121,9 +121,6 @@ class OrderDetailsScreen extends Component {
     this.props.ordersStore
       .setOrderStatus(orderId, selectedOrder.merchantId)
       .then(() => {
-        this.props.navigation.goBack();
-      })
-      .then(() => {
         this.props.authStore.appReady = true;
 
         Toast({

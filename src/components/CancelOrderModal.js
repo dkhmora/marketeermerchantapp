@@ -167,6 +167,7 @@ class CancelOrderModal extends Component {
               type="clear"
               disabled={!cancelReasonCheck}
               loading={this.state.loading}
+              loadingProps={{size: 'small', color: colors.primary}}
               containerStyle={{
                 alignSelf: 'flex-end',
                 borderRadius: 30,
