@@ -10,6 +10,7 @@ const functions = firebase.app().functions('asia-northeast1');
 class PaymentsStore {
   @observable payments = [];
   @observable paymentMethods = {
+    /* Dev Mode
     BOG: {
       name: 'Bogus Bank',
       description:
@@ -24,6 +25,7 @@ class PaymentsStore {
         'Deposit your payment over-the-counter at any Bogus Bank branch worldwide (TEST ONLY).',
       devOnly: true,
     },
+    */
     BDO: {
       name: 'BDO Internet Banking',
       description:
@@ -312,6 +314,7 @@ class PaymentsStore {
       minAmount: 1000,
       maxAmount: 100000.0,
     },
+    /* Disabled at the moment
     GCSH: {
       name: 'GCash',
       description:
@@ -327,8 +330,8 @@ class PaymentsStore {
         'Pay at any 7-11 convenience store in the Philippines nationwide 24x7.',
       minAmount: 1000.0,
       maxAmount: 10000.0,
-      percentageFee: 4,
     },
+    */
     BDOA: {
       name: 'Banco De Oro ATM',
       description:
@@ -364,7 +367,7 @@ class PaymentsStore {
 
   @action async getPaymentLink({totalAmount, topUpAmount, email, processId}) {
     return await functions
-      .httpsCallable('getMerchantPaymentLinkTest')({
+      .httpsCallable('getMerchantPaymentLink')({
         amount: totalAmount,
         topUpAmount,
         email,
