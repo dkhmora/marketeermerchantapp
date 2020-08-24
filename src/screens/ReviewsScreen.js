@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
-import {ActivityIndicator, View, RefreshControl} from 'react-native';
+import {View, RefreshControl} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import {Text, Avatar} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {Rating} from 'react-native-rating-element';
-import moment, {ISO_8601} from 'moment';
+import moment from 'moment';
 import BaseHeader from '../components/BaseHeader';
 
 @inject('detailsStore')

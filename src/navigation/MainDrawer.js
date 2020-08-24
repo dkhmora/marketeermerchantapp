@@ -22,6 +22,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import messaging from '@react-native-firebase/messaging';
 import RemotePushController from '../services/RemotePushController';
+import TopUpHistoryScreen from '../screens/TopUpHistoryScreen';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -38,10 +39,9 @@ class MainDrawer extends Component {
     };
   }
 
-
   async componentDidMount() {
     this.initializeForegroundNotificationHandlers();
-  
+
     this.unsubscribe = dynamicLinks().onLink((link) =>
       this.handleDynamicLink(link),
     );
@@ -82,13 +82,14 @@ class MainDrawer extends Component {
   handleDynamicLink = (link) => {
     switch (link.url) {
       case 'https://marketeer.ph/merchant/payment/success':
-        Toast({text: 'Payment successful!'});
+        Toast({text: 'Payment successful!', duration: 5000});
         this.props.navigation.navigate('Home');
         break;
       case 'https://marketeer.ph/merchant/payment/failure':
         Toast({
           text: 'Error: Payment failure. Please try again later.',
           type: 'danger',
+          duration: 5000,
         });
         this.props.navigation.navigate('Home');
         break;
@@ -97,6 +98,7 @@ class MainDrawer extends Component {
           text:
             'Payment pending. Please check your email for payment instructions.',
           type: 'info',
+          duration: 8000,
         });
         this.props.navigation.navigate('Home');
         break;
@@ -313,6 +315,8 @@ class MainDrawer extends Component {
           <Drawer.Screen name="Delivery Area" component={DeliveryAreaScreen} />
 
           <Drawer.Screen name="Account Settings" component={AccountScreen} />
+
+          <Drawer.Screen name="Top Up History" component={TopUpHistoryScreen} />
         </Drawer.Navigator>
 
         <RemotePushController navigation={navigation} />
