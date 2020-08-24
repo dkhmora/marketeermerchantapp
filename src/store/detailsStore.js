@@ -164,8 +164,8 @@ class DetailsStore {
         freeDelivery,
         freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
         vacationMode,
-        paymentMethods,
-        deliveryMethods,
+        paymentMethods: paymentMethods.slice().sort(),
+        deliveryMethods: deliveryMethods.slice().sort(),
         deliveryType,
         ownDeliveryServiceFee: ownDeliveryServiceFee
           ? ownDeliveryServiceFee
