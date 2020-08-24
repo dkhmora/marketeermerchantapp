@@ -20,6 +20,8 @@ import InAppBrowser from 'react-native-inappbrowser-reborn';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
+import messaging from '@react-native-firebase/messaging';
+import RemotePushController from '../services/RemotePushController';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -32,21 +34,14 @@ class MainDrawer extends Component {
 
     this.state = {
       signOutConfirmModal: false,
+      initialRoute: 'Dashboard',
     };
   }
 
+
   async componentDidMount() {
-    if (this.props.route.params) {
-      const {reset} = this.props.route.params;
-
-      if (reset) {
-        this.props.navigation.reset({
-          index: 0,
-          routes: [{name: 'Home'}],
-        });
-      }
-    }
-
+    this.initializeForegroundNotificationHandlers();
+  
     this.unsubscribe = dynamicLinks().onLink((link) =>
       this.handleDynamicLink(link),
     );
@@ -58,6 +53,26 @@ class MainDrawer extends Component {
         this.handleDynamicLink(initialLink);
       }
     } catch (error) {}
+  }
+
+  initializeForegroundNotificationHandlers() {
+    messaging()
+      .getInitialNotification()
+      .then((notification) => {
+        if (notification) {
+          if (notification.data.type === 'order_message') {
+            this.props.navigation.navigate('Order Chat', {
+              orderId: notification.data.orderId,
+            });
+          }
+
+          if (notification.data.type === 'new_order') {
+            this.props.navigation.navigate('Order Details', {
+              orderId: notification.data.orderId,
+            });
+          }
+        }
+      });
   }
 
   componentWillUnmount() {
@@ -181,6 +196,8 @@ class MainDrawer extends Component {
 
   render() {
     const Drawer = createDrawerNavigator();
+    const {initialRoute} = this.state;
+    const {navigation} = this.props;
 
     return (
       <View style={{flex: 1}}>
@@ -197,7 +214,7 @@ class MainDrawer extends Component {
         />
 
         <Drawer.Navigator
-          initialRouteName="Dashboard"
+          initialRouteName={initialRoute}
           drawerStyle={{backgroundColor: '#eee', width: 240}}
           drawerContent={(props) => {
             return (
@@ -297,6 +314,8 @@ class MainDrawer extends Component {
 
           <Drawer.Screen name="Account Settings" component={AccountScreen} />
         </Drawer.Navigator>
+
+        <RemotePushController navigation={navigation} />
       </View>
     );
   }

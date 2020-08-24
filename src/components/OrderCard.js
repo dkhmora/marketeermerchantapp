@@ -64,9 +64,8 @@ class OrderCard extends PureComponent {
   handleViewOrderItems() {
     const {navigation, order} = this.props;
 
-    navigation.dangerouslyGetParent().navigate('Order Details', {
-      order,
-      orderStatus: this.orderStatus,
+    navigation.navigate('Order Details', {
+      orderId: order.orderId,
     });
   }
 
@@ -92,8 +91,7 @@ class OrderCard extends PureComponent {
           button
           onPress={() =>
             navigation.navigate('Order Chat', {
-              order,
-              orderStatus: this.orderStatus,
+              orderId: order.orderId,
             })
           }
           style={{backgroundColor: colors.primary}}>
@@ -209,7 +207,7 @@ class OrderCard extends PureComponent {
                   actions={[
                     () => {
                       this.props.ordersStore.cancelOrderModal = true;
-                      this.props.ordersStore.selectedOrder = order;
+                      this.props.ordersStore.selectedCancelOrder = order;
                     },
                   ]}
                 />
