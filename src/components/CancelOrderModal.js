@@ -91,6 +91,7 @@ class CancelOrderModal extends Component {
         isVisible={this.props.ordersStore.cancelOrderModal}
         onBackdropPress={() => Keyboard.dismiss()}
         statusBarTranslucent
+        animationType="fade"
         width="80%"
         height="auto"
         overlayStyle={{borderRadius: 10, padding: 15, width: '80%'}}>

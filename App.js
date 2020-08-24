@@ -22,6 +22,7 @@ import OrdersStore from './src/store/ordersStore';
 import AuthStore from './src/store/authStore';
 import DetailsStore from './src/store/detailsStore';
 import ItemsStore from './src/store/itemsStore';
+import PaymentsStore from './src/store/paymentsStore';
 import {create} from 'mobx-persist';
 import VersionCheck from 'react-native-version-check';
 import AlertModal from './src/components/AlertModal';
@@ -31,6 +32,7 @@ const ordersStore = (window.store = new OrdersStore());
 const authStore = (window.store = new AuthStore());
 const detailsStore = (window.store = new DetailsStore());
 const itemsStore = (window.store = new ItemsStore());
+const paymentsStore = (window.store = new PaymentsStore());
 
 hydrate('list', ordersStore);
 hydrate('list', itemsStore);
@@ -82,7 +84,8 @@ export default class App extends React.Component {
         ordersStore={ordersStore}
         authStore={authStore}
         detailsStore={detailsStore}
-        itemsStore={itemsStore}>
+        itemsStore={itemsStore}
+        paymentsStore={paymentsStore}>
         <AlertModal
           isVisible={this.state.appUpdateModal}
           onConfirm={() => {

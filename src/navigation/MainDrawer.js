@@ -19,6 +19,7 @@ import AccountScreen from '../screens/AccountScreen';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
+import dynamicLinks from '@react-native-firebase/dynamic-links';
 import messaging from '@react-native-firebase/messaging';
 import RemotePushController from '../services/RemotePushController';
 
@@ -37,8 +38,21 @@ class MainDrawer extends Component {
     };
   }
 
-  componentDidMount() {
+
+  async componentDidMount() {
     this.initializeForegroundNotificationHandlers();
+  
+    this.unsubscribe = dynamicLinks().onLink((link) =>
+      this.handleDynamicLink(link),
+    );
+
+    try {
+      const initialLink = await dynamicLinks().getInitialLink();
+
+      if (initialLink.url !== null) {
+        this.handleDynamicLink(initialLink);
+      }
+    } catch (error) {}
   }
 
   initializeForegroundNotificationHandlers() {
@@ -60,6 +74,54 @@ class MainDrawer extends Component {
         }
       });
   }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  handleDynamicLink = (link) => {
+    switch (link.url) {
+      case 'https://marketeer.ph/merchant/payment/success':
+        Toast({text: 'Payment successful!'});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/failure':
+        Toast({
+          text: 'Error: Payment failure. Please try again later.',
+          type: 'danger',
+        });
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/pending':
+        Toast({
+          text:
+            'Payment pending. Please check your email for payment instructions.',
+          type: 'info',
+        });
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/unknown':
+        Toast({text: 'Payment status unknown', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/refund':
+        Toast({text: 'Payment refunded', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/chargeback':
+        Toast({text: 'Payment chargedback', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/void':
+        Toast({text: 'Payment voided', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/authorized':
+        Toast({text: 'Payment authorized', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+    }
+  };
 
   async openLink(url) {
     try {

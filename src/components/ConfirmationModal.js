@@ -20,13 +20,13 @@ class ConfirmationModal extends PureComponent {
         onBackdropPress={() => {
           closeModal();
         }}
-        statusBarTranslucent
         width="80%"
         height="auto"
+        animationType="fade"
+        statusBarTranslucent
         overlayStyle={{
           borderRadius: 10,
           padding: 15,
-          width: '80%',
         }}>
         <View style={{flexDirection: 'column'}}>
           <Text
@@ -38,14 +38,18 @@ class ConfirmationModal extends PureComponent {
             {title}
           </Text>
 
-          {body && (
-            <Text
-              style={{
-                fontSize: 20,
-              }}>
-              {body}
-            </Text>
-          )}
+          <View>
+            {typeof body === 'string' ? (
+              <Text
+                style={{
+                  fontSize: 20,
+                }}>
+                {body}
+              </Text>
+            ) : (
+              body
+            )}
+          </View>
 
           {image && (
             <View
