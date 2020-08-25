@@ -104,15 +104,7 @@ class StoreCard extends Component {
             elevation: 2,
             overflow: 'hidden',
           }}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={() =>
-              navigation.navigate('Store', {
-                store,
-                displayImageUrl,
-                coverImageUrl,
-              })
-            }>
+          <TouchableOpacity activeOpacity={0.85}>
             <View style={{height: 200}}>
               {coverImageUrl && ready ? (
                 <FastImage
