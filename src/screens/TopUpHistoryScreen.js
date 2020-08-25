@@ -56,11 +56,6 @@ class TopUpHistoryScreen extends Component {
   }
 
   retrieveMorePayments() {
-    console.log(
-      'hi',
-      !this.state.onEndReachedCalledDuringMomentum,
-      this.lastPaymentCreatedAt >= 1,
-    );
     if (
       !this.state.onEndReachedCalledDuringMomentum &&
       this.lastPaymentCreatedAt >= 1
@@ -113,7 +108,9 @@ class TopUpHistoryScreen extends Component {
         : item.status === 'A'
         ? 'Authorized'
         : 'Undefined';
-    const paymentMethod = paymentMethods[item.processId].name;
+    const paymentMethod = paymentMethods[item.processId]
+      ? paymentMethods[item.processId].name
+      : 'Unknown Payment Method';
 
     return (
       <View
