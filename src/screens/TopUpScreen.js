@@ -171,6 +171,7 @@ class TopUpScreen extends Component {
 
         <PaymentOptionsModal
           isVisible={paymentOptionsModal}
+          selectedPaymentMethod={selectedPaymentMethod}
           closeModal={() => this.setState({paymentOptionsModal: false})}
           onConfirm={(paymentMethod) => {
             this.setState({

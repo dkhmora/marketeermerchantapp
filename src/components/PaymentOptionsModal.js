@@ -27,18 +27,15 @@ class PaymentOptionsModal extends Component {
 
     this.state = {
       selectedPaymentMethod: null,
-      availablePaymentMethods: {},
     };
   }
 
   async componentDidMount() {
-    this.getAvailablePaymentProviders();
+    this.getAvailablePaymentMethods();
   }
 
-  async getAvailablePaymentProviders() {
-    this.setState({
-      availablePaymentMethods: await this.props.paymentsStore.getAvailablePaymentProviders(),
-    });
+  async getAvailablePaymentMethods() {
+    this.props.paymentsStore.getAvailablePaymentMethods();
   }
 
   async openLink(url) {
@@ -76,8 +73,15 @@ class PaymentOptionsModal extends Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.isVisible !== this.props.isVisible && this.props.isVisible) {
+      this.setState({selectedPaymentMethod: this.props.selectedPaymentMethod});
+    }
+  }
+
   render() {
-    const {selectedPaymentMethod, availablePaymentMethods} = this.state;
+    const {selectedPaymentMethod} = this.state;
+    const {availablePaymentMethods} = this.props.paymentsStore;
     const {isVisible, closeModal, onConfirm} = this.props;
 
     return (

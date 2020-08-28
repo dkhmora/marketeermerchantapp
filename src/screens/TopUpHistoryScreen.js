@@ -23,7 +23,8 @@ class TopUpHistoryScreen extends Component {
       paymentsLoading: true,
       retrieveLimit: 10,
       onEndReachedCalledDuringMomentum: false,
-      refreshing: false,
+      refreshing: true,
+      endReached: false,
     };
   }
 
@@ -39,6 +40,18 @@ class TopUpHistoryScreen extends Component {
     this.getInitialPayments();
   }
 
+  getAvailablePaymentMethods() {
+    if (
+      Object.keys(this.props.paymentsStore.availablePaymentMethods).length === 0
+    ) {
+      this.props.paymentsStore.getAvailablePaymentMethods().then(() => {
+        this.setState({refreshing: false, paymentsLoading: false});
+      });
+    } else {
+      this.setState({refreshing: false, paymentsLoading: false});
+    }
+  }
+
   getInitialPayments() {
     const {retrieveLimit} = this.state;
     const {merchantId} = this.props.detailsStore.storeDetails;
@@ -50,7 +63,7 @@ class TopUpHistoryScreen extends Component {
           retrieveLimit,
         })
         .then(() => {
-          this.setState({refreshing: false, paymentsLoading: false});
+          this.getAvailablePaymentMethods();
         });
     });
   }
@@ -58,7 +71,8 @@ class TopUpHistoryScreen extends Component {
   retrieveMorePayments() {
     if (
       !this.state.onEndReachedCalledDuringMomentum &&
-      this.lastPaymentCreatedAt >= 1
+      this.lastPaymentCreatedAt >= 1 &&
+      !this.state.endReached
     ) {
       const {retrieveLimit} = this.state;
       const {merchantId} = this.props.detailsStore.storeDetails;
@@ -72,11 +86,12 @@ class TopUpHistoryScreen extends Component {
               lastVisible: this.lastPaymentCreatedAt,
               retrieveLimit,
             })
-            .then(() => {
+            .then((empty) => {
               this.setState({
                 refreshing: false,
                 paymentsLoading: false,
                 onEndReachedCalledDuringMomentum: false,
+                endReached: empty,
               });
             });
         },
@@ -109,7 +124,7 @@ class TopUpHistoryScreen extends Component {
         ? 'Authorized'
         : 'Undefined';
     const paymentMethod = paymentMethods[item.processId]
-      ? paymentMethods[item.processId].name
+      ? paymentMethods[item.processId].longName
       : 'Unknown Payment Method';
 
     return (
@@ -201,9 +216,10 @@ class TopUpHistoryScreen extends Component {
 
   render() {
     const {refreshing} = this.state;
-    const {payments, paymentMethods} = this.props.paymentsStore;
+    const {payments, availablePaymentMethods} = this.props.paymentsStore;
     const {navigation} = this.props;
 
+    console.log(availablePaymentMethods);
     return (
       <View style={{flex: 1}}>
         <BaseHeader
@@ -219,7 +235,7 @@ class TopUpHistoryScreen extends Component {
             <this.PaymentListItem
               item={item}
               key={index}
-              paymentMethods={paymentMethods}
+              paymentMethods={availablePaymentMethods}
             />
           )}
           refreshControl={
