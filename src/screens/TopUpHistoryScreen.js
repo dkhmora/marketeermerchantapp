@@ -219,7 +219,6 @@ class TopUpHistoryScreen extends Component {
     const {payments, availablePaymentMethods} = this.props.paymentsStore;
     const {navigation} = this.props;
 
-    console.log(availablePaymentMethods);
     return (
       <View style={{flex: 1}}>
         <BaseHeader
