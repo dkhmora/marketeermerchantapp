@@ -25,6 +25,7 @@ class ConfirmationModal extends PureComponent {
         animationType="fade"
         statusBarTranslucent
         overlayStyle={{
+          width: '80%',
           borderRadius: 10,
           padding: 15,
         }}>

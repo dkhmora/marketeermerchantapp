@@ -6,26 +6,77 @@ import {
   StatusBar,
   Platform,
   ScrollView,
+  Linking,
 } from 'react-native';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
+import FastImage from 'react-native-fast-image';
+import Hyperlink from 'react-native-hyperlink';
+import stripHtml from 'string-strip-html';
+import Toast from './Toast';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
 
 @inject('detailsStore')
 @inject('itemsStore')
 @inject('paymentsStore')
 @observer
-class EditItemModal extends Component {
+class PaymentOptionsModal extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       selectedPaymentMethod: null,
+      availablePaymentMethods: [],
     };
   }
 
+  async componentDidMount() {
+    this.getAvailablePaymentProviders();
+  }
+
+  async getAvailablePaymentProviders() {
+    this.setState({
+      availablePaymentMethods: await this.props.paymentsStore.getAvailablePaymentProviders(),
+    });
+  }
+
+  async openLink(url) {
+    try {
+      if (await InAppBrowser.isAvailable()) {
+        await InAppBrowser.open(url, {
+          dismissButtonStyle: 'close',
+          preferredBarTintColor: colors.primary,
+          preferredControlTintColor: 'white',
+          readerMode: false,
+          animated: true,
+          modalPresentationStyle: 'pageSheet',
+          modalTransitionStyle: 'coverVertical',
+          modalEnabled: true,
+          enableBarCollapsing: false,
+          // Android Properties
+          showTitle: true,
+          toolbarColor: colors.primary,
+          secondaryToolbarColor: 'black',
+          enableUrlBarHiding: true,
+          enableDefaultShare: true,
+          forceCloseOnRedirection: false,
+          animations: {
+            startEnter: 'slide_in_right',
+            startExit: 'slide_out_left',
+            endEnter: 'slide_in_left',
+            endExit: 'slide_out_right',
+          },
+        });
+      } else {
+        Linking.openURL(url);
+      }
+    } catch (err) {
+      Toast({text: err.message, type: 'danger'});
+    }
+  }
+
   render() {
-    const {paymentMethods} = this.props.paymentsStore;
-    const {selectedPaymentMethod} = this.state;
+    const {selectedPaymentMethod, availablePaymentMethods} = this.state;
     const {isVisible, closeModal, onConfirm} = this.props;
 
     return (
@@ -78,19 +129,44 @@ class EditItemModal extends Component {
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentInsetAdjustmentBehavior="automatic">
-            {Object.entries(paymentMethods)
-              .sort((a, b) => a[1].name > b[1].name)
+            {Object.entries(availablePaymentMethods)
+              .sort((a, b) => a[1].longName > b[1].longName)
               .map(([key, value]) => {
                 const paymentMethod = {[key]: value};
 
                 return (
                   <ListItem
-                    title={value.name}
-                    subtitle={value.description}
+                    title={value.longName}
+                    subtitle={
+                      <Hyperlink
+                        linkStyle={{color: colors.accent}}
+                        onPress={(url, text) => this.openLink(url)}>
+                        <Text style={{color: colors.text_secondary}}>
+                          {
+                            stripHtml(value.remarks, {
+                              dumpLinkHrefsNearby: {
+                                enabled: true,
+                                putOnNewLine: false,
+                                wrapHeads: '[',
+                                wrapTails: ']',
+                              },
+                            }).result
+                          }
+                        </Text>
+                      </Hyperlink>
+                    }
                     bottomDivider={
-                      key !== Object.keys(paymentMethods).slice(-1)[0]
+                      key !== Object.keys(availablePaymentMethods).slice(0)[0]
+                    }
+                    leftElement={
+                      <FastImage
+                        source={{uri: value.logo}}
+                        style={{width: '20%', height: 50}}
+                        resizeMode={FastImage.resizeMode.contain}
+                      />
                     }
                     chevron
+                    disabled={value.status !== 'A'}
                     key={key}
                     rightIcon={
                       selectedPaymentMethod &&
@@ -136,4 +212,4 @@ class EditItemModal extends Component {
   }
 }
 
-export default EditItemModal;
+export default PaymentOptionsModal;

@@ -381,6 +381,16 @@ class PaymentsStore {
       });
   }
 
+  @action async getAvailablePaymentProviders() {
+    return await firestore()
+      .collection('application')
+      .doc('client_config')
+      .get()
+      .then((document) => {
+        return document.data().availablePaymentMethods;
+      });
+  }
+
   @action async getPayments({merchantId, lastVisible, retrieveLimit}) {
     if (lastVisible) {
       return await firestore()
