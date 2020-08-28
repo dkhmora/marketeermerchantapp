@@ -29,6 +29,7 @@ class TopUpScreen extends Component {
       email: this.props.authStore.userEmail,
       emailCheck: false,
       selectedPaymentMethod: null,
+      minTopUpAmount: 1000,
     };
   }
 

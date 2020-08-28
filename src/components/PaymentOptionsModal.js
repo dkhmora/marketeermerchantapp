@@ -7,6 +7,7 @@ import {
   Platform,
   ScrollView,
   Linking,
+  ActivityIndicator,
 } from 'react-native';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
@@ -26,7 +27,7 @@ class PaymentOptionsModal extends Component {
 
     this.state = {
       selectedPaymentMethod: null,
-      availablePaymentMethods: [],
+      availablePaymentMethods: {},
     };
   }
 
@@ -126,61 +127,73 @@ class PaymentOptionsModal extends Component {
             />
           </View>
 
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentInsetAdjustmentBehavior="automatic">
-            {Object.entries(availablePaymentMethods)
-              .sort((a, b) => a[1].longName > b[1].longName)
-              .map(([key, value]) => {
-                const paymentMethod = {[key]: value};
+          {Object.keys(availablePaymentMethods).length > 0 ? (
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentInsetAdjustmentBehavior="automatic">
+              {Object.entries(availablePaymentMethods)
+                .sort((a, b) => a[1].longName > b[1].longName)
+                .map(([key, value]) => {
+                  const paymentMethod = {[key]: value};
 
-                return (
-                  <ListItem
-                    title={value.longName}
-                    subtitle={
-                      <Hyperlink
-                        linkStyle={{color: colors.accent}}
-                        onPress={(url, text) => this.openLink(url)}>
-                        <Text style={{color: colors.text_secondary}}>
-                          {
-                            stripHtml(value.remarks, {
-                              dumpLinkHrefsNearby: {
-                                enabled: true,
-                                putOnNewLine: false,
-                                wrapHeads: '[',
-                                wrapTails: ']',
-                              },
-                            }).result
-                          }
-                        </Text>
-                      </Hyperlink>
-                    }
-                    bottomDivider={
-                      key !== Object.keys(availablePaymentMethods).slice(0)[0]
-                    }
-                    leftElement={
-                      <FastImage
-                        source={{uri: value.logo}}
-                        style={{width: '20%', height: 50}}
-                        resizeMode={FastImage.resizeMode.contain}
-                      />
-                    }
-                    chevron
-                    disabled={value.status !== 'A'}
-                    key={key}
-                    rightIcon={
-                      selectedPaymentMethod &&
-                      selectedPaymentMethod[key] === paymentMethod[key] ? (
-                        <Icon name="check" color={colors.primary} />
-                      ) : null
-                    }
-                    onPress={() =>
-                      this.setState({selectedPaymentMethod: paymentMethod})
-                    }
-                  />
-                );
-              })}
-          </ScrollView>
+                  return (
+                    <ListItem
+                      title={value.longName}
+                      subtitle={
+                        <Hyperlink
+                          linkStyle={{color: colors.accent}}
+                          onPress={(url, text) => this.openLink(url)}>
+                          <Text style={{color: colors.text_secondary}}>
+                            {
+                              stripHtml(value.remarks, {
+                                dumpLinkHrefsNearby: {
+                                  enabled: true,
+                                  putOnNewLine: false,
+                                  wrapHeads: '[',
+                                  wrapTails: ']',
+                                },
+                              }).result
+                            }
+                          </Text>
+                        </Hyperlink>
+                      }
+                      bottomDivider={
+                        key !== Object.keys(availablePaymentMethods).slice(0)[0]
+                      }
+                      leftElement={
+                        <FastImage
+                          source={{uri: value.logo}}
+                          style={{width: '20%', height: 50}}
+                          resizeMode={FastImage.resizeMode.contain}
+                        />
+                      }
+                      chevron
+                      disabled={value.status !== 'A'}
+                      key={key}
+                      rightIcon={
+                        selectedPaymentMethod &&
+                        selectedPaymentMethod[key] === paymentMethod[key] ? (
+                          <Icon name="check" color={colors.primary} />
+                        ) : null
+                      }
+                      onPress={() =>
+                        this.setState({selectedPaymentMethod: paymentMethod})
+                      }
+                    />
+                  );
+                })}
+            </ScrollView>
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.icons,
+              }}>
+              <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+          )}
 
           <SafeAreaView
             style={{
