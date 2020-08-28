@@ -47,31 +47,17 @@ class TopUpScreen extends Component {
     return selectedPaymentMethod ? Object.keys(selectedPaymentMethod)[0] : null;
   }
 
-  @computed get paymentGatewayCharge() {
-    if (this.state.topUpAmount) {
-      return this.totalAmount - this.state.topUpAmount;
-    }
-
-    return this.totalAmount;
-  }
-
   @computed get totalAmount() {
     const {selectedPayment} = this;
 
     if (selectedPayment) {
-      const percentageFee = selectedPayment.percentageFee
-        ? 1 - selectedPayment.percentageFee * 0.01
-        : 1;
-
-      const fixedFee = selectedPayment.fixedFee ? selectedPayment.fixedFee : 0;
-
       if (this.state.topUpAmount) {
-        const amount = this.state.topUpAmount / percentageFee + fixedFee;
+        const amount = this.state.topUpAmount + selectedPayment.surcharge;
 
         return Math.round((amount + Number.EPSILON) * 100) / 100;
       }
 
-      return selectedPayment.fixedFee;
+      return selectedPayment.surcharge;
     }
 
     return 0;
@@ -168,9 +154,10 @@ class TopUpScreen extends Component {
       confirmTopUpModal,
       email,
       emailCheck,
+      minTopUpAmount,
     } = this.state;
 
-    const {selectedPayment, paymentGatewayCharge, totalAmount} = this;
+    const {selectedPayment, totalAmount} = this;
 
     const {storeDetails} = this.props.detailsStore;
 
@@ -303,12 +290,12 @@ class TopUpScreen extends Component {
               title="Payment Method"
               onPress={() => this.setState({paymentOptionsModal: true})}
               subtitle={
-                selectedPaymentMethod
-                  ? `${selectedPayment.name} ${
-                      selectedPayment.minAmount
-                        ? `(₱${selectedPayment.minAmount} - ₱${selectedPayment.maxAmount})`
-                        : ''
-                    }`
+                selectedPayment
+                  ? `${selectedPayment.longName} (₱${
+                      selectedPayment.minAmount < minTopUpAmount
+                        ? minTopUpAmount
+                        : selectedPayment.minAmount
+                    } - ₱${selectedPayment.maxAmount})`
                   : 'Please select a payment method'
               }
               subtitleStyle={{fontSize: 16, color: colors.primary}}
@@ -393,70 +380,42 @@ class TopUpScreen extends Component {
                     fontFamily: 'ProductSans-Regular',
                     fontSize: 18,
                   }}>
-                  ₱{topUpAmount ? topUpAmount.toFixed(2) : 0}
+                  ₱{topUpAmount ? topUpAmount.toFixed(2) : '0.00'}
                 </Text>
               </View>
 
-              {selectedPayment.additionalCharge && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    paddingVertical: 5,
-                  }}>
-                  <View>
-                    <Text
-                      style={{
-                        color: colors.icons,
-                        fontSize: 18,
-                      }}>
-                      Payment provider charge
-                    </Text>
-
-                    <Text
-                      style={{
-                        color: colors.icons,
-                        fontSize: 12,
-                      }}>
-                      (Paid in payment portal)
-                    </Text>
-                  </View>
-
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  paddingVertical: 5,
+                }}>
+                <View>
                   <Text
                     style={{
                       color: colors.icons,
                       fontSize: 18,
                     }}>
-                    ₱{selectedPayment.additionalCharge}
+                    Surcharge
+                  </Text>
+
+                  <Text
+                    style={{
+                      color: colors.icons,
+                      fontSize: 12,
+                    }}>
+                    (Paid in payment portal)
                   </Text>
                 </View>
-              )}
 
-              {selectedPayment && (
-                <View
+                <Text
                   style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    paddingVertical: 5,
+                    color: colors.icons,
+                    fontSize: 18,
                   }}>
-                  <Text
-                    style={{
-                      color: colors.icons,
-                      fontSize: 18,
-                    }}>
-                    Payment gateway charge
-                  </Text>
-
-                  <Text
-                    style={{
-                      color: colors.icons,
-                      fontSize: 18,
-                    }}>
-                    ₱
-                    {paymentGatewayCharge ? paymentGatewayCharge.toFixed(2) : 0}
-                  </Text>
-                </View>
-              )}
+                  ₱{selectedPayment.surcharge.toFixed(2)}
+                </Text>
+              </View>
 
               <View
                 style={{
@@ -480,7 +439,7 @@ class TopUpScreen extends Component {
                     fontFamily: 'ProductSans-Bold',
                     fontSize: 20,
                   }}>
-                  ₱{totalAmount}
+                  ₱{totalAmount ? totalAmount.toFixed(2) : '0.00'}
                 </Text>
               </View>
             </View>
@@ -492,7 +451,8 @@ class TopUpScreen extends Component {
             onPress={() => this.setState({confirmTopUpModal: true})}
             disabled={
               !selectedPaymentMethod ||
-              Object.values(selectedPaymentMethod)[0].minAmount > topUpAmount ||
+              minTopUpAmount > topUpAmount ||
+              selectedPayment.minAmount > topUpAmount ||
               !emailCheck ||
               !topUpAmount
             }
