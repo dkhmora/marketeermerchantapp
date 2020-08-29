@@ -39,7 +39,15 @@ class OrderCard extends PureComponent {
   }
 
   @computed get timeStamp() {
-    return moment(this.props.order.updatedAt, 'x').fromNow();
+    if (this.orderStatus) {
+      return moment(
+        this.props.order.orderStatus[this.orderStatus[0].toLowerCase()]
+          .updatedAt,
+        'x',
+      ).fromNow();
+    }
+
+    return null;
   }
 
   handleChangeOrderStatus() {
@@ -224,7 +232,8 @@ class OrderCard extends PureComponent {
       return (
         <CardItem footer bordered>
           <Left>
-            <Text note>{this.timeStamp}</Text>
+            <Text style={{color: colors.primary}}>{this.orderStatus}</Text>
+            <Text> - {this.timeStamp}</Text>
           </Left>
           <Right>
             {footerStatus && !buttonText ? (

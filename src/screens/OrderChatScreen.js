@@ -62,10 +62,11 @@ class OrderChatScreen extends Component {
     if (selectedOrder) {
       if (
         orderStatus[0] === 'CANCELLED' ||
-        firestore.Timestamp.now().toMillis() >=
-          moment(selectedOrder.orderStatus.completed.updatedAt, 'x')
-            .add(4, 'days')
-            .format('x')
+        (orderStatus[0] === 'COMPLETED' &&
+          firestore.Timestamp.now().toMillis() >=
+            moment(selectedOrder.orderStatus.completed.updatedAt, 'x')
+              .add(7, 'days')
+              .format('x'))
       ) {
         return true;
       }
@@ -157,7 +158,7 @@ class OrderChatScreen extends Component {
           Chat is disabled since order is{' '}
           {orderStatus[0] === 'CANCELLED'
             ? orderStatus[0]
-            : 'COMPLETED and has surpassed 4 days'}
+            : 'COMPLETED and has surpassed 7 days'}
         </Text>
       </View>
     );
