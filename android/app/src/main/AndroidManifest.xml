@@ -25,7 +25,8 @@
                   android:resource="@drawable/ic_notification" />
 
       <meta-data  android:name="com.dieam.reactnativepushnotification.notification_channel_name"
-                android:value="YOUR NOTIFICATION CHANNEL NAME"/>
+                  android:value="YOUR NOTIFICATION CHANNEL NAME"/>
+
       <meta-data  android:name="com.dieam.reactnativepushnotification.notification_channel_description"
                   android:value="YOUR NOTIFICATION CHANNEL DESCRIPTION"/>
 

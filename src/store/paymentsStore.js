@@ -11,10 +11,9 @@ class PaymentsStore {
   @observable payments = [];
   @observable availablePaymentMethods = {};
 
-  @action async getPaymentLink({totalAmount, topUpAmount, email, processId}) {
+  @action async getPaymentLink({topUpAmount, email, processId}) {
     return await functions
       .httpsCallable('getMerchantPaymentLink')({
-        amount: totalAmount,
         topUpAmount,
         email,
         processId,

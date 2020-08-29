@@ -91,13 +91,12 @@ class TopUpScreen extends Component {
 
   handleTopUp() {
     const {email, topUpAmount} = this.state;
-    const {selectedPaymentProcId, totalAmount} = this;
+    const {selectedPaymentProcId} = this;
 
     this.props.authStore.appReady = false;
 
     this.props.paymentsStore
       .getPaymentLink({
-        totalAmount,
         topUpAmount,
         email,
         processId: selectedPaymentProcId,
