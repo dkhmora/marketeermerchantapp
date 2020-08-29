@@ -4,7 +4,6 @@ import {
   View,
   SafeAreaView,
   StatusBar,
-  Platform,
   ScrollView,
   Linking,
   ActivityIndicator,
@@ -143,7 +142,11 @@ class PaymentOptionsModal extends Component {
                         <Hyperlink
                           linkStyle={{color: colors.accent}}
                           onPress={(url, text) => this.openLink(url)}>
-                          <Text style={{color: colors.text_secondary}}>
+                          <Text
+                            style={{
+                              color: colors.text_secondary,
+                              paddingBottom: 15,
+                            }}>
                             {
                               stripHtml(value.remarks, {
                                 dumpLinkHrefsNearby: {
@@ -167,7 +170,6 @@ class PaymentOptionsModal extends Component {
                           resizeMode={FastImage.resizeMode.contain}
                         />
                       }
-                      chevron
                       disabled={value.status !== 'A'}
                       key={key}
                       containerStyle={{
