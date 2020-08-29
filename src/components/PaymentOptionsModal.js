@@ -7,6 +7,7 @@ import {
   ScrollView,
   Linking,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
@@ -93,7 +94,12 @@ class PaymentOptionsModal extends Component {
         animationType="fade"
         width="auto"
         height="auto"
-        overlayStyle={{flex: 1, padding: 0, backgroundColor: colors.primary}}>
+        overlayStyle={{
+          flex: 1,
+          padding: 0,
+          backgroundColor:
+            Platform.OS === 'ios' ? colors.primary : colors.icons,
+        }}>
         <SafeAreaView style={{flex: 1}}>
           <StatusBar barStyle="light-content" />
 
@@ -145,7 +151,6 @@ class PaymentOptionsModal extends Component {
                           <Text
                             style={{
                               color: colors.text_secondary,
-                              paddingBottom: 15,
                             }}>
                             {
                               stripHtml(value.remarks, {
@@ -160,9 +165,7 @@ class PaymentOptionsModal extends Component {
                           </Text>
                         </Hyperlink>
                       }
-                      bottomDivider={
-                        key !== Object.keys(availablePaymentMethods).slice(0)[0]
-                      }
+                      topDivider
                       leftElement={
                         <FastImage
                           source={{uri: value.logo}}
@@ -176,8 +179,8 @@ class PaymentOptionsModal extends Component {
                         paddingBottom:
                           index ===
                           Object.keys(availablePaymentMethods).length - 1
-                            ? 30
-                            : 0,
+                            ? 45
+                            : 15,
                       }}
                       rightIcon={
                         selectedPaymentMethod &&
@@ -225,7 +228,7 @@ class PaymentOptionsModal extends Component {
                 alignSelf: 'flex-end',
                 borderRadius: 30,
                 flex: 1,
-                margin: 10,
+                margin: Platform.OS === 'ios' ? 10 : 0,
               }}
               onPress={() => onConfirm(selectedPaymentMethod)}
             />
