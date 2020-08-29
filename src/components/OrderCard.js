@@ -227,8 +227,6 @@ class OrderCard extends PureComponent {
     };
 
     const CardFooter = () => {
-      const footerStatus = `Order ${tabName}`;
-
       return (
         <CardItem footer bordered>
           <Left>
@@ -236,9 +234,7 @@ class OrderCard extends PureComponent {
             <Text> - {this.timeStamp}</Text>
           </Left>
           <Right>
-            {footerStatus && !buttonText ? (
-              <Text style={{textAlign: 'right'}}>{footerStatus}</Text>
-            ) : (
+            {buttonText && (
               <Button
                 title={buttonText}
                 titleStyle={{color: colors.icons}}
