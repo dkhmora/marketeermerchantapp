@@ -32,6 +32,19 @@ class ItemsList extends Component {
     return data;
   }
 
+  componentDidMount() {
+    this.unsubscribeTabPress = this.props.navigation.addListener(
+      'tabPress',
+      (e) => {
+        this.flatList.scrollToOffset({animated: true, offset: 0});
+      },
+    );
+  }
+
+  componentWillUnmount() {
+    this.unsubscribeTabPress && this.unsubscribeTabPress();
+  }
+
   render() {
     const {category} = this.props.route.params;
     const {navigation} = this.props;
@@ -53,6 +66,7 @@ class ItemsList extends Component {
         <View style={{paddingHorizontal: 10, flex: 1}}>
           {this.props.itemsStore.loaded ? (
             <FlatList
+              ref={(flatList) => (this.flatList = flatList)}
               data={this.formatData(dataSource, numColumns)}
               numColumns={numColumns}
               contentContainerStyle={{flexGrow: 1}}
