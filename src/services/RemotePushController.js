@@ -1,5 +1,6 @@
 import {useEffect} from 'react';
 import PushNotification from 'react-native-push-notification';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
 
 const RemotePushController = (props) => {
   useEffect(() => {
@@ -23,6 +24,8 @@ const RemotePushController = (props) => {
             notification: true,
           });
         }
+
+        notification.finish(PushNotificationIOS.FetchResult.NoData);
       },
       // Android only: GCM or FCM Sender ID
       senderID: '1549607298',

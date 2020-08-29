@@ -213,15 +213,14 @@ class TopUpScreen extends Component {
                   adjustsFontSizeToFit
                   numberOfLines={2}
                   style={{
+                    flex: 1,
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
                   }}>
-                  Current Markee Credits:
+                  Current Markee Credits:{' '}
                 </Text>
 
                 <Text
-                  adjustsFontSizeToFit
-                  numberOfLines={2}
                   style={{
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
@@ -236,10 +235,11 @@ class TopUpScreen extends Component {
                   adjustsFontSizeToFit
                   numberOfLines={2}
                   style={{
+                    flex: 1,
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
                   }}>
-                  New Markee Credits:
+                  New Markee Credits:{' '}
                 </Text>
 
                 <Text
