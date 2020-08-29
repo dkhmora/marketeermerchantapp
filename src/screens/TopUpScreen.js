@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PaymentOptionsModal from '../components/PaymentOptionsModal';
-import {View, Linking, TextInput, Dimensions} from 'react-native';
+import {View, Linking, TextInput, Dimensions, Platform} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Text, ListItem, Button, Icon} from 'react-native-elements';
 import BaseHeader from '../components/BaseHeader';
@@ -13,8 +13,11 @@ import InAppBrowser from 'react-native-inappbrowser-reborn';
 import {CardItem, Card} from 'native-base';
 import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
+import {initialWindowMetrics} from 'react-native-safe-area-context';
 
 const SCREEN_HEIGHT = Dimensions.get('screen').height;
+const inset = initialWindowMetrics && initialWindowMetrics.insets;
+const bottomPadding = Platform.OS === 'ios' ? inset.bottom : 0;
 @inject('paymentsStore')
 @inject('authStore')
 @inject('detailsStore')
@@ -464,6 +467,7 @@ class TopUpScreen extends Component {
               alignSelf: 'flex-end',
               borderRadius: 30,
               width: '100%',
+              marginBottom: bottomPadding,
             }}
           />
         </View>

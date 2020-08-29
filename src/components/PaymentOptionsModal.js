@@ -94,13 +94,9 @@ class PaymentOptionsModal extends Component {
         animationType="fade"
         width="auto"
         height="auto"
-        overlayStyle={{flex: 1, padding: 0}}>
+        overlayStyle={{flex: 1, padding: 0, backgroundColor: colors.primary}}>
         <SafeAreaView style={{flex: 1}}>
-          <StatusBar
-            barStyle={
-              Platform.OS === 'android' ? 'light-content' : 'dark-content'
-            }
-          />
+          <StatusBar barStyle="light-content" />
 
           <View
             style={{
@@ -137,7 +133,7 @@ class PaymentOptionsModal extends Component {
               contentInsetAdjustmentBehavior="automatic">
               {Object.entries(availablePaymentMethods)
                 .sort((a, b) => a[1].longName > b[1].longName)
-                .map(([key, value]) => {
+                .map(([key, value], index) => {
                   const paymentMethod = {[key]: value};
 
                   return (
@@ -174,6 +170,13 @@ class PaymentOptionsModal extends Component {
                       chevron
                       disabled={value.status !== 'A'}
                       key={key}
+                      containerStyle={{
+                        paddingBottom:
+                          index ===
+                          Object.keys(availablePaymentMethods).length - 1
+                            ? 30
+                            : 0,
+                      }}
                       rightIcon={
                         selectedPaymentMethod &&
                         selectedPaymentMethod[key] === paymentMethod[key] ? (
@@ -204,6 +207,7 @@ class PaymentOptionsModal extends Component {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
+              marginTop: -24,
               padding: 10,
               elevation: 10,
               backgroundColor: colors.primary,
@@ -219,6 +223,7 @@ class PaymentOptionsModal extends Component {
                 alignSelf: 'flex-end',
                 borderRadius: 30,
                 flex: 1,
+                margin: 10,
               }}
               onPress={() => onConfirm(selectedPaymentMethod)}
             />

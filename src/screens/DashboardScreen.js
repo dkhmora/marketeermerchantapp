@@ -478,6 +478,8 @@ class StoreDetailsScreen extends Component {
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                       height: 55,
+                      paddingBottom: 0,
+                      paddingTop: 0,
                     }}>
                     <Text style={{color: colors.icons, fontSize: 20}}>
                       Markee Credits
@@ -616,18 +618,15 @@ class StoreDetailsScreen extends Component {
                     header
                     bordered
                     style={{
-                      flex: 1,
                       flexDirection: 'row',
-                      alignItems: 'center',
                       justifyContent: 'space-between',
-                      backgroundColor: this.editModeHeaderColor,
                       height: 55,
+                      backgroundColor: this.editModeHeaderColor,
                     }}>
                     <Text
                       style={{
                         color: colors.icons,
                         fontSize: 20,
-                        paddingVertical: 16,
                       }}>
                       Store Details
                     </Text>
