@@ -3,7 +3,7 @@ import {Overlay, Text, Button, Icon, Input} from 'react-native-elements';
 import {View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {inject, observer} from 'mobx-react';
-import { colors } from '../../assets/colors';
+import {colors} from '../../assets/colors';
 
 @inject('authStore')
 @observer
@@ -109,6 +109,7 @@ class ChangePasswordModal extends Component {
           closeModal();
         }}
         statusBarTranslucent
+        animationType="fade"
         width="80%"
         height="auto"
         overlayStyle={{borderRadius: 10, padding: 15, width: '80%'}}>

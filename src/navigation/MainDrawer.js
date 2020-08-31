@@ -19,6 +19,10 @@ import AccountScreen from '../screens/AccountScreen';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
+import dynamicLinks from '@react-native-firebase/dynamic-links';
+import messaging from '@react-native-firebase/messaging';
+import RemotePushController from '../services/RemotePushController';
+import TopUpHistoryScreen from '../screens/TopUpHistoryScreen';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -31,21 +35,95 @@ class MainDrawer extends Component {
 
     this.state = {
       signOutConfirmModal: false,
+      initialRoute: 'Dashboard',
     };
   }
 
-  componentDidMount() {
-    if (this.props.route.params) {
-      const {reset} = this.props.route.params;
+  async componentDidMount() {
+    this.initializeForegroundNotificationHandlers();
 
-      if (reset) {
-        this.props.navigation.reset({
-          index: 0,
-          routes: [{name: 'Home'}],
-        });
+    this.unsubscribe = dynamicLinks().onLink((link) =>
+      this.handleDynamicLink(link),
+    );
+
+    try {
+      const initialLink = await dynamicLinks().getInitialLink();
+
+      if (initialLink.url !== null) {
+        this.handleDynamicLink(initialLink);
       }
-    }
+    } catch (error) {}
   }
+
+  initializeForegroundNotificationHandlers() {
+    messaging()
+      .getInitialNotification()
+      .then((notification) => {
+        if (notification) {
+          if (notification.data.type === 'order_message') {
+            this.props.navigation.navigate('Order Chat', {
+              orderId: notification.data.orderId,
+            });
+          }
+
+          if (notification.data.type === 'new_order') {
+            this.props.navigation.navigate('Order Details', {
+              orderId: notification.data.orderId,
+            });
+          }
+        }
+      });
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  handleDynamicLink = (link) => {
+    switch (link.url) {
+      case 'https://marketeer.ph/merchant/payment/success':
+        Toast({text: 'Payment successful!', duration: 5000});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/failure':
+        Toast({
+          text: 'Error: Payment failure. Please try again later.',
+          type: 'danger',
+          duration: 5000,
+        });
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/pending':
+        Toast({
+          text:
+            'Payment pending. Please check your email for payment instructions.',
+          type: 'info',
+          duration: 8000,
+        });
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/unknown':
+        Toast({text: 'Payment status unknown', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/refund':
+        Toast({text: 'Payment refunded', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/chargeback':
+        Toast({text: 'Payment chargedback', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/void':
+        Toast({text: 'Payment voided', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+      case 'https://marketeer.ph/merchant/payment/authorized':
+        Toast({text: 'Payment authorized', type: 'info'});
+        this.props.navigation.navigate('Home');
+        break;
+    }
+  };
 
   async openLink(url) {
     try {
@@ -120,6 +198,8 @@ class MainDrawer extends Component {
 
   render() {
     const Drawer = createDrawerNavigator();
+    const {initialRoute} = this.state;
+    const {navigation} = this.props;
 
     return (
       <View style={{flex: 1}}>
@@ -136,7 +216,7 @@ class MainDrawer extends Component {
         />
 
         <Drawer.Navigator
-          initialRouteName="Dashboard"
+          initialRouteName={initialRoute}
           drawerStyle={{backgroundColor: '#eee', width: 240}}
           drawerContent={(props) => {
             return (
@@ -235,7 +315,11 @@ class MainDrawer extends Component {
           <Drawer.Screen name="Delivery Area" component={DeliveryAreaScreen} />
 
           <Drawer.Screen name="Account Settings" component={AccountScreen} />
+
+          <Drawer.Screen name="Top Up History" component={TopUpHistoryScreen} />
         </Drawer.Navigator>
+
+        <RemotePushController navigation={navigation} />
       </View>
     );
   }

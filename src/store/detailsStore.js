@@ -95,19 +95,12 @@ class DetailsStore {
 
     const token = await messaging().getToken();
 
-    if (
-      !this.storeDetails.fcmTokens.includes(token) &&
-      !this.subscribedToNotifications
-    ) {
+    if (!this.storeDetails.fcmTokens.includes(token)) {
       if (authorizationStatus) {
-        return await messaging()
-          .getToken()
-          .then((token) => {
-            this.merchantRef
-              .update('fcmTokens', firestore.FieldValue.arrayUnion(token))
-              .then(() => {
-                this.subscribedToNotifications = true;
-              });
+        return await this.merchantRef
+          .update('fcmTokens', firestore.FieldValue.arrayUnion(token))
+          .then(() => {
+            this.subscribedToNotifications = true;
           })
           .catch((err) => Toast({text: err.message, type: 'danger'}));
       }
@@ -171,8 +164,8 @@ class DetailsStore {
         freeDelivery,
         freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
         vacationMode,
-        paymentMethods,
-        deliveryMethods,
+        paymentMethods: paymentMethods.slice().sort(),
+        deliveryMethods: deliveryMethods.slice().sort(),
         deliveryType,
         ownDeliveryServiceFee: ownDeliveryServiceFee
           ? ownDeliveryServiceFee

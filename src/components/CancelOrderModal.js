@@ -5,6 +5,7 @@ import * as Animatable from 'react-native-animatable';
 import {inject, observer} from 'mobx-react';
 import Toast from './Toast';
 import {colors} from '../../assets/colors';
+import {Keyboard} from 'react-native';
 
 @inject('ordersStore')
 @observer
@@ -38,8 +39,7 @@ class CancelOrderModal extends Component {
 
     this.props.ordersStore
       .cancelOrder(
-        this.props.ordersStore.selectedOrder.orderId,
-        this.props.ordersStore.selectedOrder.merchantId,
+        this.props.ordersStore.selectedCancelOrder.orderId,
         this.state.cancelReason,
       )
       .then((response) => {
@@ -53,11 +53,18 @@ class CancelOrderModal extends Component {
 
         if (response.data.s !== 500 && response.data.s !== 400) {
           Toast({
-            text: `Order # ${this.props.ordersStore.selectedOrder.merchantOrderNumber} successfully cancelled!`,
+            text: `Order # ${
+              this.props.ordersStore.selectedCancelOrder
+                ? this.props.ordersStore.selectedCancelOrder.merchantOrderNumber
+                : ''
+            } successfully cancelled!`,
             type: 'success',
             duration: 3500,
           });
         } else {
+          if (this.props.ordersStore.selectedOrder) {
+            this.props.navigation.goBack();
+          }
           Toast({
             text: response.data.m,
             type: 'danger',
@@ -65,13 +72,14 @@ class CancelOrderModal extends Component {
           });
         }
 
-        this.props.ordersStore.selectedOrder = null;
+        this.props.ordersStore.selectedCancelOrder = null;
       });
   }
 
   closeModal() {
     if (!this.state.loading) {
       this.props.ordersStore.cancelOrderModal = false;
+      this.props.ordersStore.selectedCancelOrder = null;
     }
   }
 
@@ -81,20 +89,23 @@ class CancelOrderModal extends Component {
     return (
       <Overlay
         isVisible={this.props.ordersStore.cancelOrderModal}
+        onBackdropPress={() => Keyboard.dismiss()}
         statusBarTranslucent
+        animationType="fade"
         width="80%"
         height="auto"
         overlayStyle={{borderRadius: 10, padding: 15, width: '80%'}}>
         <View>
           <Text
+            onPress={() => Keyboard.dismiss()}
             style={{
               fontSize: 24,
               fontFamily: 'ProductSans-Regular',
               paddingBottom: 20,
             }}>
             Are you sure you want to cancel Order #{' '}
-            {this.props.ordersStore.selectedOrder &&
-              this.props.ordersStore.selectedOrder.merchantOrderNumber}
+            {this.props.ordersStore.selectedCancelOrder &&
+              this.props.ordersStore.selectedCancelOrder.merchantOrderNumber}
             ?
           </Text>
 
@@ -102,6 +113,7 @@ class CancelOrderModal extends Component {
             numberOfLines={8}
             multiline
             maxLength={600}
+            disabled={this.state.loading}
             placeholder="Reason for Cancellation"
             placeholderTextColor={colors.text_secondary}
             value={this.state.cancelReason}
@@ -153,6 +165,7 @@ class CancelOrderModal extends Component {
               type="clear"
               disabled={!cancelReasonCheck}
               loading={this.state.loading}
+              loadingProps={{size: 'small', color: colors.primary}}
               containerStyle={{
                 alignSelf: 'flex-end',
                 borderRadius: 30,

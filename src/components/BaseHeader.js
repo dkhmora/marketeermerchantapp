@@ -29,12 +29,14 @@ class BaseHeader extends Component {
   };
 
   backButton = () => {
-    const {navigation} = this.props;
+    const {navigation, backButtonAction} = this.props;
 
     if (navigation) {
       return (
         <Button
-          onPress={() => navigation.goBack()}
+          onPress={
+            backButtonAction ? backButtonAction : () => navigation.goBack()
+          }
           type="clear"
           color={colors.icons}
           titleStyle={{color: colors.icons}}

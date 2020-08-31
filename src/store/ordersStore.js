@@ -14,11 +14,12 @@ const ordersCollection = firestore().collection('orders');
 class OrdersStore {
   @persist('list') @observable orders = [];
   @persist @observable maxOrderUpdatedAt = 0;
-  @observable orderMessages = [];
-  @observable unsubscribeGetMessages = null;
+  @observable orderMessages = null;
+  @observable unsubscribeGetOrder = null;
   @observable unsubscribeSetOrders = null;
   @observable cancelOrderModal = false;
   @observable selectedOrder = null;
+  @observable selectedCancelOrder = null;
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
@@ -89,19 +90,24 @@ class OrdersStore {
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
-  @action getMessages(orderId) {
-    this.orderMessages = [];
+  @action getOrder(orderId) {
+    this.orderMessages = null;
+    this.selectedOrder = null;
 
     if (orderId) {
-      this.unsubscribeGetMessages = firestore()
+      this.unsubscribeGetOrder = firestore()
         .collection('orders')
         .doc(orderId)
         .onSnapshot((documentSnapshot) => {
           if (documentSnapshot) {
             if (documentSnapshot.exists) {
+              this.orderMessages = [];
+
               if (documentSnapshot.data().merchantUnreadCount !== 0) {
                 this.markMessagesAsRead(orderId);
               }
+
+              this.selectedOrder = {...documentSnapshot.data(), orderId};
 
               if (
                 documentSnapshot.data().messages.length <= 0 &&
@@ -192,9 +198,9 @@ class OrdersStore {
       });
   }
 
-  @action async cancelOrder(orderId, merchantId, cancelReason) {
+  @action async cancelOrder(orderId, cancelReason) {
     return await functions
-      .httpsCallable('cancelOrder')({orderId, merchantId, cancelReason})
+      .httpsCallable('cancelOrder')({orderId, cancelReason})
       .then((response) => {
         return response;
       })

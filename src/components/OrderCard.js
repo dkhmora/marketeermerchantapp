@@ -39,7 +39,15 @@ class OrderCard extends PureComponent {
   }
 
   @computed get timeStamp() {
-    return moment(this.props.order.updatedAt, 'x').fromNow();
+    if (this.orderStatus) {
+      return moment(
+        this.props.order.orderStatus[this.orderStatus[0].toLowerCase()]
+          .updatedAt,
+        'x',
+      ).fromNow();
+    }
+
+    return null;
   }
 
   handleChangeOrderStatus() {
@@ -64,9 +72,8 @@ class OrderCard extends PureComponent {
   handleViewOrderItems() {
     const {navigation, order} = this.props;
 
-    navigation.dangerouslyGetParent().navigate('Order Details', {
-      order,
-      orderStatus: this.orderStatus,
+    navigation.navigate('Order Details', {
+      orderId: order.orderId,
     });
   }
 
@@ -92,8 +99,7 @@ class OrderCard extends PureComponent {
           button
           onPress={() =>
             navigation.navigate('Order Chat', {
-              order,
-              orderStatus: this.orderStatus,
+              orderId: order.orderId,
             })
           }
           style={{backgroundColor: colors.primary}}>
@@ -209,7 +215,7 @@ class OrderCard extends PureComponent {
                   actions={[
                     () => {
                       this.props.ordersStore.cancelOrderModal = true;
-                      this.props.ordersStore.selectedOrder = order;
+                      this.props.ordersStore.selectedCancelOrder = order;
                     },
                   ]}
                 />
@@ -221,17 +227,14 @@ class OrderCard extends PureComponent {
     };
 
     const CardFooter = () => {
-      const footerStatus = `Order ${tabName}`;
-
       return (
         <CardItem footer bordered>
           <Left>
-            <Text note>{this.timeStamp}</Text>
+            <Text style={{color: colors.primary}}>{this.orderStatus}</Text>
+            <Text> - {this.timeStamp}</Text>
           </Left>
           <Right>
-            {footerStatus && !buttonText ? (
-              <Text style={{textAlign: 'right'}}>{footerStatus}</Text>
-            ) : (
+            {buttonText && (
               <Button
                 title={buttonText}
                 titleStyle={{color: colors.icons}}

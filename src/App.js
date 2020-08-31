@@ -1,11 +1,13 @@
 import React from 'react';
-import {Root} from 'native-base';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
 import MainDrawer from './navigation/MainDrawer';
 import AuthLoader from './components/AuthLoader';
 import LoginScreen from './screens/LoginScreen';
 import {RootSiblingParent} from 'react-native-root-siblings';
+import TopUpScreen from './screens/TopUpScreen';
+import OrderDetailsScreen from './screens/OrderDetailsScreen';
+import OrderChatScreen from './screens/OrderChatScreen';
 
 const StackMain = createStackNavigator();
 
@@ -27,6 +29,9 @@ export default () => (
         <StackMain.Screen name="Loader" component={AuthLoader} />
         <StackMain.Screen name="Login" component={LoginScreen} />
         <StackMain.Screen name="Home" component={MainDrawer} />
+        <StackMain.Screen name="Top Up" component={TopUpScreen} />
+        <StackMain.Screen name="Order Details" component={OrderDetailsScreen} />
+        <StackMain.Screen name="Order Chat" component={OrderChatScreen} />
       </StackMain.Navigator>
     </NavigationContainer>
   </RootSiblingParent>

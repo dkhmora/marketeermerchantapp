@@ -6,8 +6,8 @@ import {View, TouchableOpacity} from 'react-native';
 import {Card, CardItem} from 'native-base';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
-import StoreCardLoader from './StoreCardLoader';
 import {Rating} from 'react-native-rating-element';
+import {PlaceholderMedia, Placeholder, Fade} from 'rn-placeholder';
 
 class StoreCard extends Component {
   constructor(props) {
@@ -56,7 +56,7 @@ class StoreCard extends Component {
       paymentMethods.map((method, index) => {
         pills.push(
           <View
-            key={index}
+            key={`${method}${index}`}
             style={{
               borderRadius: 20,
               backgroundColor: colors.accent,
@@ -84,22 +84,33 @@ class StoreCard extends Component {
     const {displayImageUrl, coverImageUrl, ready} = this.state;
 
     return (
-      <Card
+      <View
         style={{
-          padding: 0,
-          margin: 0,
-          borderRadius: 8,
-          elevation: 2,
-          height: 266,
-          width: '100%',
+          flex: 1,
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 1,
+          },
+          shadowOpacity: 0.2,
+          shadowRadius: 1.41,
+          paddingHorizontal: 5,
         }}>
-        {ready ? (
+        <Card
+          style={{
+            padding: 0,
+            margin: 0,
+            borderRadius: 8,
+            elevation: 2,
+            overflow: 'hidden',
+          }}>
           <TouchableOpacity activeOpacity={0.85}>
-            {{coverImageUrl} && (
-              <View style={{height: 200}}>
+            <View style={{height: 200}}>
+              {coverImageUrl && ready ? (
                 <FastImage
                   source={{uri: coverImageUrl}}
                   style={{
+                    backgroundColor: colors.primary,
                     position: 'absolute',
                     top: 0,
                     left: 0,
@@ -110,101 +121,123 @@ class StoreCard extends Component {
                   }}
                   resizeMode={FastImage.resizeMode.cover}
                 />
+              ) : (
+                <Placeholder Animation={Fade}>
+                  <PlaceholderMedia
+                    style={{
+                      backgroundColor: colors.primary,
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      width: '100%',
+                      height: 150,
+                      borderTopLeftRadius: 8,
+                      borderTopRightRadius: 8,
+                    }}
+                  />
+                </Placeholder>
+              )}
 
-                <View
-                  style={{
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'absolute',
-                    borderTopLeftRadius: 8,
-                    borderBottomLeftRadius: 8,
-                    borderColor: 'rgba(0,0,0,0.3)',
-                    borderWidth: 1,
-                    right: -1,
-                    padding: 7,
-                    marginTop: 20,
-                    backgroundColor: colors.icons,
-                  }}>
-                  <Text style={{color: colors.text_primary}}>
-                    {store.deliveryType}
+              <View
+                style={{
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'absolute',
+                  borderTopLeftRadius: 8,
+                  borderBottomLeftRadius: 8,
+                  borderColor: 'rgba(0,0,0,0.3)',
+                  borderWidth: 1,
+                  right: -1,
+                  padding: 7,
+                  marginTop: 20,
+                  backgroundColor: colors.icons,
+                }}>
+                <Text style={{color: colors.text_primary}}>
+                  {store.deliveryType}
+                </Text>
+
+                {store.freeDelivery && (
+                  <Text
+                    style={{
+                      color: colors.text_primary,
+                      fontFamily: 'ProductSans-Black',
+                    }}>
+                    Free Delivery (₱
+                    {store.freeDeliveryMinimum
+                      ? store.freeDeliveryMinimum
+                      : 0}{' '}
+                    Min.)
                   </Text>
+                )}
+              </View>
 
-                  {store.freeDelivery && (
-                    <Text
-                      style={{
-                        color: colors.text_primary,
-                        fontFamily: 'ProductSans-Black',
-                      }}>
-                      Free Delivery (₱{store.freeDeliveryMinimum} Min.)
-                    </Text>
-                  )}
-                </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'absolute',
+                  borderTopLeftRadius: 8,
+                  borderBottomRightRadius: 8,
+                  top: 0,
+                  left: 0,
+                  elevation: 10,
+                  padding: 7,
+                  backgroundColor: colors.primary,
+                }}>
+                <Text style={{color: colors.icons, fontSize: 17}}>
+                  {store.storeCategory}
+                </Text>
+              </View>
 
+              {store.ratingAverage && (
                 <View
                   style={{
+                    overflow: 'hidden',
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
                     position: 'absolute',
                     borderTopLeftRadius: 8,
-                    borderBottomRightRadius: 8,
-                    top: 0,
-                    left: 0,
-                    padding: 7,
+                    borderBottomLeftRadius: 8,
+                    bottom: 60,
+                    right: 0,
+                    padding: 5,
                     backgroundColor: colors.primary,
                   }}>
-                  <Text style={{color: colors.icons, fontSize: 17}}>
-                    {store.storeCategory}
-                  </Text>
+                  <Rating
+                    type="custom"
+                    direction="row"
+                    rated={store.ratingAverage}
+                    selectedIconImage={require('../../assets/images/feather_filled.png')}
+                    emptyIconImage={require('../../assets/images/feather_unfilled.png')}
+                    size={23}
+                    tintColor={colors.primary}
+                    ratingColor={colors.accent}
+                    ratingBackgroundColor="#455A64"
+                    readonly
+                  />
                 </View>
-
-                {store.ratingAverage && (
-                  <View
-                    style={{
-                      overflow: 'hidden',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      position: 'absolute',
-                      borderTopLeftRadius: 8,
-                      borderBottomLeftRadius: 8,
-                      bottom: 60,
-                      right: 0,
-                      padding: 5,
-                      backgroundColor: colors.primary,
-                    }}>
-                    <Rating
-                      type="custom"
-                      direction="row"
-                      rated={store.ratingAverage}
-                      selectedIconImage={require('../../assets/images/feather_filled.png')}
-                      emptyIconImage={require('../../assets/images/feather_unfilled.png')}
-                      size={23}
-                      tintColor={colors.primary}
-                      ratingColor={colors.accent}
-                      ratingBackgroundColor="#455A64"
-                      readonly
-                    />
-                  </View>
-                )}
-              </View>
-            )}
+              )}
+            </View>
 
             <CardItem
               style={{
                 flexDirection: 'column',
                 width: '100%',
-                height: 65,
+                marginTop: -55,
                 borderRadius: 8,
-                paddingBottom: 20,
-                position: 'relative',
-                bottom: 40,
+                paddingLeft: 10,
+                paddingRight: 10,
+                paddingBottom: 10,
               }}>
               <View
                 style={{
                   width: '100%',
                   flexDirection: 'column',
+                  paddingTop: 5,
                 }}>
                 <Text
                   numberOfLines={1}
@@ -214,6 +247,7 @@ class StoreCard extends Component {
                       fontFamily: 'ProductSans-Regular',
                       textAlign: 'left',
                       alignSelf: 'flex-start',
+                      flexWrap: 'wrap',
                     },
                   ]}>
                   {store.storeName}
@@ -225,9 +259,8 @@ class StoreCard extends Component {
                     styles.text_subtext,
                     {
                       fontFamily: 'ProductSans-light',
-                      textAlign: 'left',
-                      alignSelf: 'flex-start',
-                      height: 32,
+                      flexWrap: 'wrap',
+                      minHeight: 28,
                     },
                   ]}>
                   {store.storeDescription}
@@ -236,21 +269,36 @@ class StoreCard extends Component {
                 <View
                   style={{
                     flexDirection: 'row',
-                    justifyContent: 'flex-start',
+                    justifyContent: 'space-between',
                     alignItems: 'flex-end',
-                    marginTop: 5,
+                    paddingTop: 5,
                   }}>
-                  <this.PaymentMethods />
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                    }}>
+                    <this.PaymentMethods />
+                  </View>
+
+                  <Text style={{color: colors.text_secondary}}>
+                    {store.distance
+                      ? store.distance > 1000
+                        ? `${(store.distance / 1000).toFixed(2)} km`
+                        : `${store.distance} meters`
+                      : ''}
+                  </Text>
                 </View>
               </View>
             </CardItem>
 
-            {{displayImageUrl} && (
+            {displayImageUrl && ready ? (
               <FastImage
                 source={{uri: displayImageUrl}}
                 style={{
+                  backgroundColor: colors.primary,
                   position: 'absolute',
-                  bottom: 95,
+                  top: 80,
                   left: 20,
                   width: 80,
                   height: 80,
@@ -260,14 +308,26 @@ class StoreCard extends Component {
                 }}
                 resizeMode={FastImage.resizeMode.cover}
               />
+            ) : (
+              <Placeholder Animation={Fade}>
+                <PlaceholderMedia
+                  style={{
+                    backgroundColor: colors.primary,
+                    position: 'absolute',
+                    bottom: 95,
+                    left: 20,
+                    width: 80,
+                    height: 80,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: colors.primary,
+                  }}
+                />
+              </Placeholder>
             )}
           </TouchableOpacity>
-        ) : (
-          <View style={{height: 266, width: '100%'}}>
-            <StoreCardLoader />
-          </View>
-        )}
-      </Card>
+        </Card>
+      </View>
     );
   }
 }
