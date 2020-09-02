@@ -156,11 +156,12 @@ class StoreDetailsScreen extends Component {
   };
 
   handleTakePhoto(type) {
-    const width = type === 'display' ? 1080 : 1620;
+    const height = type === 'display' ? 600 : 1080;
+    const width = type === 'display' ? 600 : 720;
 
     ImagePicker.openCamera({
       width,
-      height: 1080,
+      height,
       cropping: true,
       mediaType: 'photo',
       forceJpg: true,
@@ -177,11 +178,12 @@ class StoreDetailsScreen extends Component {
   }
 
   handleSelectImage(type) {
-    const width = type === 'display' ? 1080 : 1620;
+    const height = type === 'display' ? 600 : 1080;
+    const width = type === 'display' ? 600 : 720;
 
     ImagePicker.openPicker({
       width,
-      height: 1080,
+      height,
       cropping: true,
       mediaType: 'photo',
       forceJpg: true,
