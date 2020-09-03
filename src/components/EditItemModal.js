@@ -227,7 +227,7 @@ class EditItemModal extends Component {
   }
 
   handleEditItem() {
-    const {merchantId, itemCategories} = this.props.detailsStore.storeDetails;
+    const {storeId, itemCategories} = this.props.detailsStore.storeDetails;
     const {
       newName,
       newDescription,
@@ -257,9 +257,9 @@ class EditItemModal extends Component {
       this.props.itemsStore.unsubscribeSetStoreItems();
 
     this.props.itemsStore
-      .editItem(merchantId, newItem, Number(Math.trunc(newStock)))
+      .editItem(storeId, newItem, Number(Math.trunc(newStock)))
       .then(() => {
-        this.props.itemsStore.setStoreItems(merchantId, itemCategories);
+        this.props.itemsStore.setStoreItems(storeId, itemCategories);
 
         Toast({
           text: `Item ${this.props.itemsStore.selectedItem.name} successfully edited!`,

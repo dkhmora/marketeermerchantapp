@@ -110,7 +110,7 @@ class AddItemScreen extends Component {
     };
 
     await this.props.itemsStore.addStoreItem(
-      this.props.detailsStore.storeDetails.merchantId,
+      this.props.detailsStore.storeDetails.storeId,
       item,
       this.imagePath,
     );

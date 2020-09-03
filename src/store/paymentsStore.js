@@ -38,11 +38,11 @@ class PaymentsStore {
       });
   }
 
-  @action async getPayments({merchantId, lastVisible, retrieveLimit}) {
+  @action async getPayments({storeId, lastVisible, retrieveLimit}) {
     if (lastVisible) {
       return await firestore()
         .collection('merchant_payments')
-        .where('merchantId', '==', merchantId)
+        .where('storeId', '==', storeId)
         .orderBy('createdAt', 'desc')
         .startAfter(lastVisible)
         .limit(retrieveLimit)
@@ -64,7 +64,7 @@ class PaymentsStore {
 
     return await firestore()
       .collection('merchant_payments')
-      .where('merchantId', '==', merchantId)
+      .where('storeId', '==', storeId)
       .orderBy('createdAt', 'desc')
       .limit(retrieveLimit)
       .get()

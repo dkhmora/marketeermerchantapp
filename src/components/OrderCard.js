@@ -56,10 +56,10 @@ class OrderCard extends PureComponent {
     this.setState({loading: true});
 
     this.props.ordersStore
-      .setOrderStatus(order.orderId, order.merchantId)
+      .setOrderStatus(order.orderId, order.storeId)
       .then(() => {
         Toast({
-          text: `Successfully changed Order # ${order.merchantOrderNumber} status!`,
+          text: `Successfully changed Order # ${order.storeOrderNumber} status!`,
           type: 'success',
           duration: 3500,
         });
@@ -118,10 +118,10 @@ class OrderCard extends PureComponent {
                 }}>
                 <Icon name="message-square" color={colors.icons} />
 
-                {order.merchantUnreadCount !== null &&
-                  order.merchantUnreadCount > 0 && (
+                {order.storeUnreadCount !== null &&
+                  order.storeUnreadCount > 0 && (
                     <Badge
-                      value={order.merchantUnreadCount}
+                      value={order.storeUnreadCount}
                       badgeStyle={{backgroundColor: colors.accent}}
                       containerStyle={{position: 'absolute', top: 0, right: 0}}
                     />
@@ -142,7 +142,7 @@ class OrderCard extends PureComponent {
               </Text>
 
               <Text style={{color: '#eee'}}>
-                Order # {order.merchantOrderNumber}
+                Order # {order.storeOrderNumber}
               </Text>
 
               <View
@@ -268,8 +268,8 @@ class OrderCard extends PureComponent {
         }}>
         <ConfirmationModal
           isVisible={this.state.changeOrderStatusModal}
-          title={`${buttonText} Order # ${order.merchantOrderNumber}?`}
-          body={`Are you sure you want to ${buttonText} Order # ${order.merchantOrderNumber}?`}
+          title={`${buttonText} Order # ${order.storeOrderNumber}?`}
+          body={`Are you sure you want to ${buttonText} Order # ${order.storeOrderNumber}?`}
           onConfirm={() => {
             this.setState({changeOrderStatusModal: false}, () => {
               this.handleChangeOrderStatus();

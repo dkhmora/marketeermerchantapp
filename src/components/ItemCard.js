@@ -43,10 +43,10 @@ class ItemCard extends PureComponent {
   };
 
   handleDelete() {
-    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {storeId} = this.props.detailsStore.storeDetails;
     const {item} = this.props;
 
-    this.props.itemsStore.deleteStoreItem(merchantId, item).then(() => {
+    this.props.itemsStore.deleteStoreItem(storeId, item).then(() => {
       Toast({text: `${item.name} successfully deleted`});
     });
   }

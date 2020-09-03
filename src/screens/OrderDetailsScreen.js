@@ -114,12 +114,12 @@ class OrderDetailsScreen extends Component {
     this.props.authStore.appReady = false;
 
     this.props.ordersStore
-      .setOrderStatus(orderId, selectedOrder.merchantId)
+      .setOrderStatus(orderId, selectedOrder.storeId)
       .then(() => {
         this.props.authStore.appReady = true;
 
         Toast({
-          text: `Successfully changed Order # ${selectedOrder.merchantOrderNumber} status!`,
+          text: `Successfully changed Order # ${selectedOrder.storeOrderNumber} status!`,
           type: 'success',
           duration: 3500,
         });
@@ -164,7 +164,7 @@ class OrderDetailsScreen extends Component {
                 adjustsFontSizeToFit
                 numberOfLines={1}
                 style={{fontSize: 20, color: colors.icons}}>
-                {`Order # ${selectedOrder.merchantOrderNumber} | ${orderStatus}`}
+                {`Order # ${selectedOrder.storeOrderNumber} | ${orderStatus}`}
               </Text>
             )
           }
@@ -183,8 +183,8 @@ class OrderDetailsScreen extends Component {
           <View style={{flex: 1}}>
             <ConfirmationModal
               isVisible={this.state.changeOrderStatusModal}
-              title={`${buttonText} Order # ${selectedOrder.merchantOrderNumber}?`}
-              body={`Are you sure you want to ${buttonText} Order # ${selectedOrder.merchantOrderNumber}?`}
+              title={`${buttonText} Order # ${selectedOrder.storeOrderNumber}?`}
+              body={`Are you sure you want to ${buttonText} Order # ${selectedOrder.storeOrderNumber}?`}
               onConfirm={() => {
                 this.setState({changeOrderStatusModal: false}, () => {
                   this.handleChangeOrderStatus();

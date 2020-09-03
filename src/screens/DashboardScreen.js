@@ -25,7 +25,7 @@ class StoreDetailsScreen extends Component {
     super(props);
 
     this.props.detailsStore.setStoreDetails(
-      this.props.detailsStore.storeDetails.merchantId,
+      this.props.detailsStore.storeDetails.storeId,
     );
 
     this.state = {
