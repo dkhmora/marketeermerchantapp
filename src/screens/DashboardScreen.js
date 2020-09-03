@@ -487,7 +487,7 @@ class StoreDetailsScreen extends Component {
                       Markee Credits
                     </Text>
 
-                    <Button
+                    {/* <Button
                       icon={<Icon name="plus" color={colors.icons} size={20} />}
                       iconRight
                       onPress={() => navigation.navigate('Top Up')}
@@ -496,7 +496,7 @@ class StoreDetailsScreen extends Component {
                       buttonStyle={{
                         backgroundColor: colors.accent,
                       }}
-                    />
+                    />*/}
                   </CardItem>
 
                   <CardItem bordered>
