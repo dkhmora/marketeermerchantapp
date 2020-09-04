@@ -59,9 +59,9 @@ class OrdersTab extends Component {
   };
 
   componentDidMount() {
-    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {storeId} = this.props.detailsStore.storeDetails;
 
-    this.props.ordersStore.setOrders(merchantId);
+    this.props.ordersStore.setOrders(storeId);
   }
 
   componentWillUnmount() {

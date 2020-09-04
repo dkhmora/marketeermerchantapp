@@ -28,13 +28,7 @@ class OrdersStore {
     return link;
   }
 
-  @action async sendImage(
-    orderId,
-    customerUserId,
-    merchantId,
-    user,
-    imagePath,
-  ) {
+  @action async sendImage(orderId, customerUserId, storeId, user, imagePath) {
     const messageId = uuidv4();
     const imageRef = `/images/orders/${orderId}/order_chat/${messageId}`;
     const storageRef = storage().ref(imageRef);
@@ -43,7 +37,7 @@ class OrdersStore {
       .putFile(imagePath, {
         customMetadata: {
           customerUserId,
-          merchantId,
+          storeId,
         },
       })
       .then(() => {
@@ -103,7 +97,7 @@ class OrdersStore {
             if (documentSnapshot.exists) {
               this.orderMessages = [];
 
-              if (documentSnapshot.data().merchantUnreadCount !== 0) {
+              if (documentSnapshot.data().storeUnreadCount !== 0) {
                 this.markMessagesAsRead(orderId);
               }
 
@@ -132,7 +126,7 @@ class OrdersStore {
 
     this.markMessagesAsReadTimeout = setTimeout(() => {
       firestore().collection('orders').doc(orderId).update({
-        merchantUnreadCount: 0,
+        storeUnreadCount: 0,
         updatedAt: firestore.Timestamp.now().toMillis(),
       });
     }, 100);
@@ -147,7 +141,7 @@ class OrdersStore {
         if (documentReference.exists) {
           return documentReference.data().items;
         } else {
-          return null;
+          return [];
         }
       })
       .catch((err) => {
@@ -155,9 +149,9 @@ class OrdersStore {
       });
   }
 
-  @action async setOrders(merchantId) {
+  @action async setOrders(storeId) {
     this.unsubscribeSetOrders = ordersCollection
-      .where('merchantId', '==', merchantId)
+      .where('storeId', '==', storeId)
       .where('updatedAt', '>', this.maxOrderUpdatedAt)
       .orderBy('updatedAt', 'desc')
       .onSnapshot(async (querySnapshot) => {
@@ -187,9 +181,9 @@ class OrdersStore {
       });
   }
 
-  @action async setOrderStatus(orderId, merchantId) {
+  @action async setOrderStatus(orderId, storeId) {
     return await functions
-      .httpsCallable('changeOrderStatus')({orderId, merchantId})
+      .httpsCallable('changeOrderStatus')({orderId, storeId})
       .then((response) => {
         return response.data;
       })

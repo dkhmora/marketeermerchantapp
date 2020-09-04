@@ -23,7 +23,7 @@ class OrderChatScreen extends Component {
 
     this.state = {
       user: {
-        _id: this.props.detailsStore.storeDetails.merchantId,
+        _id: this.props.detailsStore.storeDetails.storeId,
         name: this.props.detailsStore.storeDetails.storeName,
       },
       confirmImageModal: false,
@@ -214,7 +214,7 @@ class OrderChatScreen extends Component {
     const {chatDisabled} = this;
 
     if (selectedOrder && orderMessages) {
-      const headerTitle = `Order # ${selectedOrder.merchantOrderNumber} | ${selectedOrder.userName}`;
+      const headerTitle = `Order # ${selectedOrder.storeOrderNumber} | ${selectedOrder.userName}`;
 
       const dataSource = orderMessages.slice();
 
@@ -230,7 +230,7 @@ class OrderChatScreen extends Component {
               this.props.ordersStore.sendImage(
                 selectedOrder.orderId,
                 selectedOrder.userId,
-                selectedOrder.merchantId,
+                selectedOrder.storeId,
                 this.state.user,
                 this.imagePath,
               );

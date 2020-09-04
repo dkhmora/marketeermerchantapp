@@ -9,24 +9,24 @@ import {Platform} from 'react-native';
 import {persist} from 'mobx-persist';
 
 const functions = firebase.app().functions('asia-northeast1');
-const merchantsCollection = firestore().collection('merchants');
+const storesCollection = firestore().collection('stores');
 class DetailsStore {
   @observable storeDetails = {};
   @observable unsubscribeSetStoreDetails = null;
   @persist @observable subscribedToNotifications = false;
   @persist @observable firstLoad = true;
 
-  @computed get merchantRef() {
-    const {merchantId} = this.storeDetails;
+  @computed get storeRef() {
+    const {storeId} = this.storeDetails;
 
-    return merchantsCollection.doc(merchantId);
+    return storesCollection.doc(storeId);
   }
 
   @action async getStoreReviews() {
-    const {merchantId} = this.storeDetails;
+    const {storeId} = this.storeDetails;
     const storeOrderReviewsRef = firestore()
-      .collection('merchants')
-      .doc(merchantId)
+      .collection('stores')
+      .doc(storeId)
       .collection('order_reviews');
 
     return await storeOrderReviewsRef
@@ -59,7 +59,7 @@ class DetailsStore {
   }
 
   @action updateCoordinates(lowerRange, upperRange, boundingBox) {
-    return this.merchantRef.update({
+    return this.storeRef.update({
       deliveryCoordinates: {
         lowerRange,
         upperRange,
@@ -69,15 +69,16 @@ class DetailsStore {
     });
   }
 
-  @action async setStoreDetails(merchantId) {
-    if (merchantId && !this.unsubscribeSetStoreDetails) {
-      this.unsubscribeSetStoreDetails = merchantsCollection
-        .doc(merchantId)
+  @action async setStoreDetails(storeId) {
+    if (storeId && !this.unsubscribeSetStoreDetails) {
+      this.unsubscribeSetStoreDetails = firestore()
+        .collection('stores')
+        .doc(storeId)
         .onSnapshot(async (documentSnapshot) => {
           if (!documentSnapshot.empty) {
             this.storeDetails = {
               ...documentSnapshot.data(),
-              merchantId,
+              storeId,
             };
           }
         });
@@ -97,7 +98,7 @@ class DetailsStore {
 
     if (!this.storeDetails.fcmTokens.includes(token)) {
       if (authorizationStatus) {
-        return await this.merchantRef
+        return await this.storeRef
           .update('fcmTokens', firestore.FieldValue.arrayUnion(token))
           .then(() => {
             this.subscribedToNotifications = true;
@@ -112,7 +113,7 @@ class DetailsStore {
       await messaging()
         .getToken()
         .then((token) =>
-          this.merchantRef
+          this.storeRef
             .update('fcmTokens', firestore.FieldValue.arrayRemove(token))
             .then(() => {
               this.subscribedToNotifications = false;
@@ -132,15 +133,15 @@ class DetailsStore {
   }
 
   @action async uploadImage(imagePath, type) {
-    const {merchantId} = this.storeDetails;
+    const {storeId} = this.storeDetails;
     const fileExtension = imagePath.split('.').pop();
-    const imageRef = `/images/merchants/${merchantId}/${type}.${fileExtension}`;
+    const imageRef = `/images/stores/${storeId}/${type}.${fileExtension}`;
 
     return await storage()
       .ref(imageRef)
       .putFile(imagePath)
       .then(() =>
-        this.merchantRef.update({
+        this.storeRef.update({
           [`${type}Image`]: imageRef,
           updatedAt: firestore.Timestamp.now().toMillis(),
         }),
@@ -158,7 +159,7 @@ class DetailsStore {
     ownDeliveryServiceFee,
     freeDeliveryMinimum,
   ) {
-    await this.merchantRef
+    await this.storeRef
       .update({
         storeDescription,
         freeDelivery,

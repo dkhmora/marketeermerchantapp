@@ -59,12 +59,12 @@ class OrdersList extends Component {
   }
 
   async retrieveOrders() {
-    const {merchantId} = this.props.detailsStore.storeDetails;
+    const {storeId} = this.props.detailsStore.storeDetails;
 
     this.props.ordersStore.unsubscribeSetStoreDetails &&
       this.props.ordersStore.unsubscribeSetStoreDetails();
 
-    return this.props.ordersStore.setOrders(merchantId);
+    return this.props.ordersStore.setOrders(storeId);
   }
 
   onRefresh() {

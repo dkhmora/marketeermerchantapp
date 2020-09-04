@@ -25,7 +25,7 @@ class StoreDetailsScreen extends Component {
     super(props);
 
     this.props.detailsStore.setStoreDetails(
-      this.props.detailsStore.storeDetails.merchantId,
+      this.props.detailsStore.storeDetails.storeId,
     );
 
     this.state = {
@@ -156,11 +156,12 @@ class StoreDetailsScreen extends Component {
   };
 
   handleTakePhoto(type) {
-    const width = type === 'display' ? 1080 : 1620;
+    const height = type === 'display' ? 600 : 1080;
+    const width = type === 'display' ? 600 : 720;
 
     ImagePicker.openCamera({
       width,
-      height: 1080,
+      height,
       cropping: true,
       mediaType: 'photo',
       forceJpg: true,
@@ -177,11 +178,12 @@ class StoreDetailsScreen extends Component {
   }
 
   handleSelectImage(type) {
-    const width = type === 'display' ? 1080 : 1620;
+    const height = type === 'display' ? 600 : 1080;
+    const width = type === 'display' ? 600 : 720;
 
     ImagePicker.openPicker({
       width,
-      height: 1080,
+      height,
       cropping: true,
       mediaType: 'photo',
       forceJpg: true,
@@ -485,7 +487,7 @@ class StoreDetailsScreen extends Component {
                       Markee Credits
                     </Text>
 
-                    <Button
+                    {/* <Button
                       icon={<Icon name="plus" color={colors.icons} size={20} />}
                       iconRight
                       onPress={() => navigation.navigate('Top Up')}
@@ -494,7 +496,7 @@ class StoreDetailsScreen extends Component {
                       buttonStyle={{
                         backgroundColor: colors.accent,
                       }}
-                    />
+                    />*/}
                   </CardItem>
 
                   <CardItem bordered>

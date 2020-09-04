@@ -110,7 +110,7 @@ class AddItemScreen extends Component {
     };
 
     await this.props.itemsStore.addStoreItem(
-      this.props.detailsStore.storeDetails.merchantId,
+      this.props.detailsStore.storeDetails.storeId,
       item,
       this.imagePath,
     );
@@ -226,8 +226,8 @@ class AddItemScreen extends Component {
 
   handleTakePhoto() {
     ImagePicker.openCamera({
-      width: 400,
-      height: 400,
+      width: 720,
+      height: 720,
       cropping: true,
       mediaType: 'photo',
       forceJpg: true,
@@ -242,8 +242,8 @@ class AddItemScreen extends Component {
 
   handleSelectImage() {
     ImagePicker.openPicker({
-      width: 400,
-      height: 400,
+      width: 720,
+      height: 720,
       cropping: true,
       mediaType: 'photo',
       forceJpg: true,

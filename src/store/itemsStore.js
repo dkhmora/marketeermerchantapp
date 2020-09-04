@@ -17,18 +17,18 @@ class ItemsStore {
   @observable selectedItem = null;
   @observable loaded = false;
 
-  @action async editItem(merchantId, newItem, additionalStock) {
+  @action async editItem(storeId, newItem, additionalStock) {
     const item = this.selectedItem;
-    const merchantItemsRef = firestore()
-      .collection('merchants')
-      .doc(merchantId)
+    const storeItemsRef = firestore()
+      .collection('stores')
+      .doc(storeId)
       .collection('items')
       .doc(item.doc);
     const timeStamp = firestore.Timestamp.now().toMillis();
 
     const fileExtension = newItem.image ? newItem.image.split('.').pop() : null;
     const imageRef = newItem.image
-      ? `/images/merchants/${merchantId}/items/${item.itemId}_${timeStamp}.${fileExtension}`
+      ? `/images/stores/${storeId}/items/${item.itemId}_${timeStamp}.${fileExtension}`
       : null;
 
     if (newItem.image) {
@@ -36,10 +36,10 @@ class ItemsStore {
     }
 
     return firestore().runTransaction(async (transaction) => {
-      const merchantItemsDocument = await transaction.get(merchantItemsRef);
+      const storeItemsDocument = await transaction.get(storeItemsRef);
 
-      if (merchantItemsDocument.exists) {
-        let dbItems = [...merchantItemsDocument.data().items];
+      if (storeItemsDocument.exists) {
+        let dbItems = [...storeItemsDocument.data().items];
 
         const dbItemIndex = dbItems.findIndex(
           (dbItem) => item.itemId === dbItem.itemId,
@@ -61,7 +61,7 @@ class ItemsStore {
 
           await dbItems.sort((a, b) => a.name > b.name);
 
-          transaction.update(merchantItemsRef, {
+          transaction.update(storeItemsRef, {
             items: dbItems,
             updatedAt: timeStamp,
           });
@@ -82,22 +82,20 @@ class ItemsStore {
     this.categoryItems.set(category, items);
   }
 
-  @action async deleteItemCategory(merchantId, category) {
-    const merchantItemsRef = firestore()
-      .collection('merchants')
-      .doc(merchantId);
+  @action async deleteItemCategory(storeId, category) {
+    const storeItemsRef = firestore().collection('stores').doc(storeId);
 
-    await merchantItemsRef
+    await storeItemsRef
       .update('itemCategories', firestore.FieldValue.arrayRemove(category))
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
-  @action async addItemCategory(merchantId, newCategory) {
+  @action async addItemCategory(storeId, newCategory) {
     const formattedCategory = _.capitalize(newCategory);
 
     await firestore()
-      .collection('merchants')
-      .doc(merchantId)
+      .collection('stores')
+      .doc(storeId)
       .get()
       .then((documentSnapshot) => {
         if (
@@ -118,10 +116,10 @@ class ItemsStore {
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
-  @action setStoreItems(merchantId, itemCategories) {
+  @action setStoreItems(storeId, itemCategories) {
     this.unsubscribeSetStoreItems = firestore()
-      .collection('merchants')
-      .doc(merchantId)
+      .collection('stores')
+      .doc(storeId)
       .collection('items')
       .where('updatedAt', '>', this.maxItemsUpdatedAt)
       .orderBy('updatedAt', 'desc')
@@ -167,13 +165,13 @@ class ItemsStore {
     }
   }
 
-  @action async addStoreItem(merchantId, item, imagePath) {
+  @action async addStoreItem(storeId, item, imagePath) {
     const itemId = uuidv4();
     const timeStamp = firestore.Timestamp.now().toMillis();
 
     const fileExtension = imagePath ? imagePath.split('.').pop() : null;
     const imageRef = imagePath
-      ? `/images/merchants/${merchantId}/items/${itemId}_${timeStamp}.${fileExtension}`
+      ? `/images/stores/${storeId}/items/${itemId}_${timeStamp}.${fileExtension}`
       : null;
     const itemExists = this.storeItems
       .slice()
@@ -190,7 +188,10 @@ class ItemsStore {
     if (itemExists === -1) {
       return await this.uploadImage(imageRef, imagePath).then(async () => {
         return await functions
-          .httpsCallable('addStoreItem')({item: JSON.stringify(newItem)})
+          .httpsCallable('addStoreItem')({
+            item: JSON.stringify(newItem),
+            storeId,
+          })
           .then((response) => {
             if (response.data.s === 200) {
               Toast({
@@ -224,23 +225,22 @@ class ItemsStore {
     await storage().ref(image).delete();
   }
 
-  @action async deleteStoreItem(merchantId, item) {
-    const merchantItemsRef = firestore()
-      .collection('merchants')
-      .doc(merchantId)
+  @action async deleteStoreItem(storeId, item) {
+    const storeItemsRef = firestore()
+      .collection('stores')
+      .doc(storeId)
       .collection('items')
       .doc(item.doc);
 
     return await firestore().runTransaction(async (transaction) => {
       const timeStamp = firestore.Timestamp.now().toMillis();
-      const merchantItems = (await transaction.get(merchantItemsRef)).data()
-        .items;
+      const storeItems = (await transaction.get(storeItemsRef)).data().items;
 
-      const itemSnapshot = await merchantItems.find(
-        (merchantItem) => merchantItem.itemId === item.itemId,
+      const itemSnapshot = await storeItems.find(
+        (storeItem) => storeItem.itemId === item.itemId,
       );
 
-      transaction.update(merchantItemsRef, {
+      transaction.update(storeItemsRef, {
         items: firestore.FieldValue.arrayRemove(itemSnapshot),
         itemNumber: firestore.FieldValue.increment(-1),
         updatedAt: timeStamp,

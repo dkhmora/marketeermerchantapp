@@ -55,7 +55,7 @@ class CancelOrderModal extends Component {
           Toast({
             text: `Order # ${
               this.props.ordersStore.selectedCancelOrder
-                ? this.props.ordersStore.selectedCancelOrder.merchantOrderNumber
+                ? this.props.ordersStore.selectedCancelOrder.storeOrderNumber
                 : ''
             } successfully cancelled!`,
             type: 'success',
@@ -105,7 +105,7 @@ class CancelOrderModal extends Component {
             }}>
             Are you sure you want to cancel Order #{' '}
             {this.props.ordersStore.selectedCancelOrder &&
-              this.props.ordersStore.selectedCancelOrder.merchantOrderNumber}
+              this.props.ordersStore.selectedCancelOrder.storeOrderNumber}
             ?
           </Text>
 
