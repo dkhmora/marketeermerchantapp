@@ -11,6 +11,7 @@ import Toast from './Toast';
 import ConfirmationModal from './ConfirmationModal';
 
 @inject('ordersStore')
+@inject('detailsStore')
 @observer
 class OrderCard extends PureComponent {
   constructor(props) {
@@ -51,16 +52,25 @@ class OrderCard extends PureComponent {
   }
 
   handleChangeOrderStatus() {
+    const {storeDetails} = this.props.detailsStore;
     const {order} = this.props;
 
     this.setState({loading: true});
 
     this.props.ordersStore
-      .setOrderStatus(order.orderId, order.storeId)
-      .then(() => {
-        Toast({
-          text: `Successfully changed Order # ${order.storeOrderNumber} status!`,
-          type: 'success',
+      .setOrderStatus(order.orderId, order.storeId, storeDetails.merchantId)
+      .then((response) => {
+        if (response.data.s === 200) {
+          return Toast({
+            text: response.data.m,
+            type: 'success',
+            duration: 3500,
+          });
+        }
+
+        return Toast({
+          text: response.data.m,
+          type: 'danger',
           duration: 3500,
         });
       })

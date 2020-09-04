@@ -181,11 +181,11 @@ class OrdersStore {
       });
   }
 
-  @action async setOrderStatus(orderId, storeId) {
+  @action async setOrderStatus(orderId, storeId, merchantId) {
     return await functions
-      .httpsCallable('changeOrderStatus')({orderId, storeId})
+      .httpsCallable('changeOrderStatus')({orderId, storeId, merchantId})
       .then((response) => {
-        return response.data;
+        return response;
       })
       .catch((err) => {
         Toast({text: err.message, type: 'danger'});

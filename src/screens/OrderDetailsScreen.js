@@ -110,17 +110,26 @@ class OrderDetailsScreen extends Component {
   handleChangeOrderStatus() {
     const {selectedOrder} = this.props.ordersStore;
     const {orderId} = this.props.route.params;
+    const {storeDetails} = this.props.detailsStore;
 
     this.props.authStore.appReady = false;
 
     this.props.ordersStore
-      .setOrderStatus(orderId, selectedOrder.storeId)
-      .then(() => {
+      .setOrderStatus(orderId, selectedOrder.storeId, storeDetails.merchantId)
+      .then((response) => {
         this.props.authStore.appReady = true;
 
-        Toast({
-          text: `Successfully changed Order # ${selectedOrder.storeOrderNumber} status!`,
-          type: 'success',
+        if (response.data.s === 200) {
+          return Toast({
+            text: response.data.m,
+            type: 'success',
+            duration: 3500,
+          });
+        }
+
+        return Toast({
+          text: response.data.m,
+          type: 'danger',
           duration: 3500,
         });
       });
