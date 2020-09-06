@@ -67,10 +67,17 @@ class TopUpHistoryScreen extends Component {
   }
 
   retrieveMorePayments() {
+    const {
+      refreshing,
+      endReached,
+      onEndReachedCalledDuringMomentum,
+    } = this.state;
+
     if (
-      !this.state.onEndReachedCalledDuringMomentum &&
+      !onEndReachedCalledDuringMomentum &&
       this.lastPaymentCreatedAt >= 1 &&
-      !this.state.endReached
+      !endReached &&
+      !refreshing
     ) {
       const {retrieveLimit} = this.state;
       const {merchantId} = this.props.detailsStore.merchantDetails;
@@ -184,10 +191,16 @@ class TopUpHistoryScreen extends Component {
   }
 
   renderFooter = () => {
+    const {paymentsLoading, onEndReachedCalledDuringMomentum} = this.state;
+
     return (
-      <View style={{bottom: 50, width: '100%'}}>
+      <View
+        style={{
+          bottom: 0,
+          height: 60,
+        }}>
         <View style={{height: bottomPadding}} />
-        {this.state.onEndReachedCalledDuringMomentum && (
+        {onEndReachedCalledDuringMomentum && !paymentsLoading && (
           <Animatable.View
             animation="slideInUp"
             duration={400}
@@ -229,6 +242,8 @@ class TopUpHistoryScreen extends Component {
           style={{flex: 1}}
           data={payments}
           initialNumToRender={30}
+          contentContainerStyle={{flexGrow: 1}}
+          ListFooterComponentStyle={{flexGrow: 1, justifyContent: 'flex-end'}}
           renderItem={({item, index}) => (
             <this.PaymentListItem
               item={item}

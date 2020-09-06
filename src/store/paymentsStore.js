@@ -80,10 +80,9 @@ class PaymentsStore {
             querySnapshot.forEach((documentSnapshot, index) => {
               this.payments.push(documentSnapshot.data());
             });
-
-            if (querySnapshot.size < retrieveLimit) {
-              return true;
-            }
+          }
+          if (querySnapshot.size < retrieveLimit) {
+            return true;
           }
 
           return false;
@@ -97,13 +96,21 @@ class PaymentsStore {
       .limit(retrieveLimit)
       .get()
       .then(async (querySnapshot) => {
-        const list = [];
+        if (!querySnapshot.empty) {
+          const list = [];
 
-        await querySnapshot.forEach((documentSnapshot, index) => {
-          list.push(documentSnapshot.data());
-        });
+          await querySnapshot.forEach((documentSnapshot, index) => {
+            list.push(documentSnapshot.data());
+          });
 
-        this.payments = list;
+          this.payments = list;
+        }
+
+        if (querySnapshot.size < retrieveLimit) {
+          return true;
+        }
+
+        return false;
       });
   }
 }
