@@ -236,24 +236,47 @@ class MainDrawer extends Component {
                 }}>
                 <View style={{justifyContent: 'flex-start'}}>
                   {merchantDetails && (
-                    <DrawerItem
-                      onPress={() =>
-                        this.props.navigation.navigate('Merchant Dashboard')
-                      }
-                      label="Merchant Dashboard"
-                      labelStyle={{
-                        fontFamily: 'ProductSans-Light',
-                        fontSize: 18,
-                        padding: 10,
-                        color: colors.icons,
-                      }}
-                      style={{
-                        marginHorizontal: 0,
-                        marginVertical: 0,
-                        borderRadius: 0,
-                        backgroundColor: colors.primary,
-                      }}
-                    />
+                    <View>
+                      <DrawerItem
+                        onPress={() =>
+                          this.props.navigation.navigate('Merchant Dashboard')
+                        }
+                        label="Merchant Dashboard"
+                        labelStyle={{
+                          fontFamily: 'ProductSans-Light',
+                          fontSize: 18,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          color: colors.icons,
+                        }}
+                        style={{
+                          marginHorizontal: 0,
+                          marginVertical: 0,
+                          borderRadius: 0,
+                          backgroundColor: colors.primary,
+                        }}
+                      />
+
+                      <DrawerItem
+                        onPress={() =>
+                          this.props.navigation.navigate('Top Up History')
+                        }
+                        label="Top Ups"
+                        labelStyle={{
+                          fontFamily: 'ProductSans-Light',
+                          fontSize: 18,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          color: colors.icons,
+                        }}
+                        style={{
+                          marginHorizontal: 0,
+                          marginVertical: 0,
+                          borderRadius: 0,
+                          backgroundColor: colors.primary,
+                        }}
+                      />
+                    </View>
                   )}
 
                   <DrawerItemList
@@ -343,13 +366,6 @@ class MainDrawer extends Component {
           <Drawer.Screen name="Delivery Area" component={DeliveryAreaScreen} />
 
           <Drawer.Screen name="Account Settings" component={AccountScreen} />
-
-          {merchantDetails && (
-            <Drawer.Screen
-              name="Top Up History"
-              component={TopUpHistoryScreen}
-            />
-          )}
         </Drawer.Navigator>
 
         <RemotePushController navigation={navigation} />

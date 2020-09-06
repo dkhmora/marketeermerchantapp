@@ -224,6 +224,7 @@ class TopUpHistoryScreen extends Component {
         <BaseHeader
           title="Markee Credits Top Up History"
           navigation={navigation}
+          backButton
         />
 
         <FlatList

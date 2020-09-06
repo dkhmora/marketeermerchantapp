@@ -9,6 +9,7 @@ import TopUpScreen from './screens/TopUpScreen';
 import OrderDetailsScreen from './screens/OrderDetailsScreen';
 import OrderChatScreen from './screens/OrderChatScreen';
 import MerchantDashboardScreen from './screens/MerchantDashboardScreen';
+import TopUpHistoryScreen from './screens/TopUpHistoryScreen';
 
 const StackMain = createStackNavigator();
 
@@ -33,6 +34,10 @@ export default () => (
         <StackMain.Screen
           name="Merchant Dashboard"
           component={MerchantDashboardScreen}
+        />
+        <StackMain.Screen
+          name="Top Up History"
+          component={TopUpHistoryScreen}
         />
         <StackMain.Screen name="Top Up" component={TopUpScreen} />
         <StackMain.Screen name="Order Details" component={OrderDetailsScreen} />
