@@ -5,7 +5,7 @@ import {Card, CardItem} from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 // Mobx
 import {inject, observer} from 'mobx-react';
-import {Text} from 'react-native-elements';
+import {Text, Icon, Button} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
@@ -78,16 +78,16 @@ class StoreDetailsScreen extends Component {
                       Markee Credits
                     </Text>
 
-                    {/* <Button
+                    <Button
                       icon={<Icon name="plus" color={colors.icons} size={20} />}
                       iconRight
-                      onPress={() => navigation.navigate('Top Up')}
+                      onPress={() => this.props.navigation.navigate('Top Up')}
                       title="Top Up"
                       titleStyle={{color: colors.icons}}
                       buttonStyle={{
                         backgroundColor: colors.accent,
                       }}
-                    />*/}
+                    />
                   </CardItem>
 
                   <CardItem bordered>

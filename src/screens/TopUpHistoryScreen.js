@@ -54,17 +54,15 @@ class TopUpHistoryScreen extends Component {
 
   getInitialPayments() {
     const {retrieveLimit} = this.state;
-    const {storeId} = this.props.detailsStore.storeDetails;
+    const {merchantId} = this.props.detailsStore.merchantDetails;
 
     this.setState({refreshing: true}, () => {
-      this.props.paymentsStore
-        .getPayments({
-          storeId,
-          retrieveLimit,
-        })
-        .then(() => {
-          this.getAvailablePaymentMethods();
-        });
+      this.props.paymentsStore.getMerchantTopups({
+        merchantId,
+        retrieveLimit,
+      });
+
+      this.getAvailablePaymentMethods();
     });
   }
 
@@ -75,14 +73,14 @@ class TopUpHistoryScreen extends Component {
       !this.state.endReached
     ) {
       const {retrieveLimit} = this.state;
-      const {storeId} = this.props.detailsStore.storeDetails;
+      const {merchantId} = this.props.detailsStore.merchantDetails;
 
       this.setState(
         {refreshing: true, onEndReachedCalledDuringMomentum: true},
         () => {
           this.props.paymentsStore
-            .getPayments({
-              storeId,
+            .getMerchantTopups({
+              merchantId,
               lastVisible: this.lastPaymentCreatedAt,
               retrieveLimit,
             })

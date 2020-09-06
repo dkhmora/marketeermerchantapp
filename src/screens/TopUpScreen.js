@@ -99,7 +99,7 @@ class TopUpScreen extends Component {
     this.props.authStore.appReady = false;
 
     this.props.paymentsStore
-      .getPaymentLink({
+      .getTopUpPaymentLink({
         topUpAmount,
         email,
         processId: selectedPaymentProcId,
@@ -161,7 +161,7 @@ class TopUpScreen extends Component {
 
     const {selectedPayment, totalAmount} = this;
 
-    const {storeDetails} = this.props.detailsStore;
+    const {merchantDetails} = this.props.detailsStore;
 
     return (
       <View style={{flex: 1}}>
@@ -226,7 +226,7 @@ class TopUpScreen extends Component {
                     fontFamily: 'ProductSans-Bold',
                     color: colors.primary,
                   }}>
-                  ₱{storeDetails.creditData.credits.toFixed(2)}
+                  ₱{merchantDetails.creditData.credits.toFixed(2)}
                 </Text>
               </CardItem>
 
@@ -250,7 +250,10 @@ class TopUpScreen extends Component {
                     fontFamily: 'ProductSans-Bold',
                     color: colors.primary,
                   }}>
-                  ₱{(storeDetails.creditData.credits + topUpAmount).toFixed(2)}
+                  ₱
+                  {(merchantDetails.creditData.credits + topUpAmount).toFixed(
+                    2,
+                  )}
                 </Text>
               </CardItem>
             </Card>
