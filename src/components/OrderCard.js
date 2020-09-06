@@ -199,7 +199,9 @@ class OrderCard extends PureComponent {
                   fontSize: 16,
                   textAlign: 'center',
                 }}>
-                ₱{(order.subTotal * 0.05).toPrecision(3)}
+                {order.transactionFee
+                  ? `₱${order.transactionFee.toPrecision(3)}`
+                  : 'Unknown'}
               </Text>
 
               <Text

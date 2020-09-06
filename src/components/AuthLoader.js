@@ -23,9 +23,9 @@ class AuthLoader extends React.Component {
       await auth()
         .currentUser.getIdTokenResult(true)
         .then(async (idToken) => {
-          const storeIds = idToken.claims.storeIds;
+          const {storeIds, role} = idToken.claims;
 
-          if (!storeIds) {
+          if (!storeIds || !role || (role && role !== 'merchant')) {
             await auth()
               .signOut()
               .then(() => {
@@ -38,7 +38,14 @@ class AuthLoader extends React.Component {
               .catch((err) =>
                 Toast({text: err.message, type: 'danger', duration: 5000}),
               );
-          } else {
+          }
+
+          if (role) {
+            !this.props.detailsStore.unsubscribeSetMerchantDetails &&
+              this.props.detailsStore.setMerchantDetails(user.uid);
+          }
+
+          if (storeIds) {
             const storeId = Object.keys(storeIds)[0];
 
             !this.props.detailsStore.unsubscribeSetStoreDetails &&

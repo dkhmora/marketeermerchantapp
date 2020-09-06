@@ -71,6 +71,12 @@ class MainDrawer extends Component {
               orderId: notification.data.orderId,
             });
           }
+
+          if (notification.data.type === 'order_update') {
+            this.props.navigation.navigate('Order Details', {
+              orderId: notification.data.orderId,
+            });
+          }
         }
       });
   }
@@ -200,6 +206,7 @@ class MainDrawer extends Component {
     const Drawer = createDrawerNavigator();
     const {initialRoute} = this.state;
     const {navigation} = this.props;
+    const {merchantDetails} = this.props.detailsStore;
 
     return (
       <View style={{flex: 1}}>
@@ -228,6 +235,27 @@ class MainDrawer extends Component {
                   justifyContent: 'space-between',
                 }}>
                 <View style={{justifyContent: 'flex-start'}}>
+                  {merchantDetails && (
+                    <DrawerItem
+                      onPress={() =>
+                        this.props.navigation.navigate('Merchant Dashboard')
+                      }
+                      label="Merchant Dashboard"
+                      labelStyle={{
+                        fontFamily: 'ProductSans-Light',
+                        fontSize: 18,
+                        padding: 10,
+                        color: colors.icons,
+                      }}
+                      style={{
+                        marginHorizontal: 0,
+                        marginVertical: 0,
+                        borderRadius: 0,
+                        backgroundColor: colors.primary,
+                      }}
+                    />
+                  )}
+
                   <DrawerItemList
                     {...props}
                     labelStyle={{
@@ -316,7 +344,12 @@ class MainDrawer extends Component {
 
           <Drawer.Screen name="Account Settings" component={AccountScreen} />
 
-          <Drawer.Screen name="Top Up History" component={TopUpHistoryScreen} />
+          {merchantDetails && (
+            <Drawer.Screen
+              name="Top Up History"
+              component={TopUpHistoryScreen}
+            />
+          )}
         </Drawer.Navigator>
 
         <RemotePushController navigation={navigation} />

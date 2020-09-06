@@ -12,7 +12,9 @@ const functions = firebase.app().functions('asia-northeast1');
 const storesCollection = firestore().collection('stores');
 class DetailsStore {
   @observable storeDetails = {};
+  @observable merchantDetails = {};
   @observable unsubscribeSetStoreDetails = null;
+  @observable unsubscribeSetMerchantDetails = null;
   @persist @observable subscribedToNotifications = false;
   @persist @observable firstLoad = true;
 
@@ -20,6 +22,23 @@ class DetailsStore {
     const {storeId} = this.storeDetails;
 
     return storesCollection.doc(storeId);
+  }
+
+  @action async setMerchantDetails(merchantId) {
+    if (merchantId && !this.unsubscribeSetMerchantDetails) {
+      this.unsubscribeSetMerchantDetails = firestore()
+        .collection('merchants')
+        .doc(merchantId)
+        .onSnapshot(async (documentSnapshot) => {
+          if (!documentSnapshot.empty) {
+            console.log(documentSnapshot.data());
+            this.merchantDetails = {
+              ...documentSnapshot.data(),
+              merchantId,
+            };
+          }
+        });
+    }
   }
 
   @action async getStoreReviews() {
