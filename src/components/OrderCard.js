@@ -333,6 +333,8 @@ class OrderCard extends PureComponent {
               <Button
                 title="View Full Order"
                 onPress={this.handleViewOrderItems.bind(this)}
+                loading={this.state.loading}
+                loadingProps={{size: 'small', color: colors.accent}}
                 titleStyle={{color: colors.accent}}
                 buttonStyle={{backgroundColor: colors.icons}}
                 containerStyle={{

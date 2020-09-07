@@ -51,16 +51,13 @@ class AuthLoader extends React.Component {
             !this.props.detailsStore.unsubscribeSetStoreDetails &&
               this.props.detailsStore.setStoreDetails(storeId);
 
-            if (this.props.detailsStore.firstLoad) {
-              when(
-                () =>
-                  Object.keys(this.props.detailsStore.storeDetails).length > 0,
-                () =>
-                  this.props.detailsStore
-                    .subscribeToNotifications()
-                    .then(() => (this.props.detailsStore.firstLoad = false)),
-              );
-            }
+            when(
+              () =>
+                Object.keys(this.props.detailsStore.storeDetails).length > 0,
+              () => {
+                this.props.detailsStore.subscribeToNotifications();
+              },
+            );
 
             this.authStateSubscriber && this.authStateSubscriber();
 

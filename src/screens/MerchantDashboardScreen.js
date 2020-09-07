@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import {ActivityIndicator, View, SafeAreaView} from 'react-native';
+import {
+  ActivityIndicator,
+  View,
+  SafeAreaView,
+  FlatList,
+  RefreshControl,
+} from 'react-native';
 import {Card, CardItem} from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
@@ -8,6 +14,7 @@ import {inject, observer} from 'mobx-react';
 import {Text, Icon, Button} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import moment from 'moment';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -16,11 +23,150 @@ class StoreDetailsScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {refreshing: false};
+  }
+
+  componentDidMount() {
+    this.getDisbursementPeriods();
+  }
+
+  async getDisbursementPeriods() {
+    this.setState(
+      {
+        refreshing: true,
+      },
+      async () => {
+        await this.props.detailsStore.setDisbursementPeriods().then(() => {
+          this.setState({refreshing: false});
+        });
+      },
+    );
+  }
+
+  onRefresh() {
+    this.getDisbursementPeriods();
+  }
+
+  DisbursementPeriod({item}) {
+    const timeStamp = moment(item.updatedAt, 'x').fromNow();
+    const startDate = moment(item.startDate, 'MM-DD-YYYY').format(
+      'MMM DD, YYYY',
+    );
+    const endDate = moment(item.endDate, 'MM-DD-YYYY').format('MMM DD, YYYY');
+
+    return (
+      <View
+        style={{
+          flex: 1,
+          borderBottomColor: colors.divider,
+          borderBottomWidth: 1,
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+            <Text
+              style={{
+                fontSize: 17,
+                color: colors.icons,
+                borderBottomRightRadius: 10,
+                padding: 5,
+                backgroundColor: colors.primary,
+                elevation: 3,
+              }}>
+              {startDate} to {endDate}
+            </Text>
+
+            <View
+              style={{
+                paddingHorizontal: 10,
+                paddingVertical: 10,
+                flexDirection: 'column',
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontFamily: 'ProductSans-Bold',
+                    color: colors.text_primary,
+                    textAlign: 'justify',
+                  }}>
+                  Payment Gateway Fee:{' '}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontFamily: 'ProductSans-Regular',
+                    color: colors.text_primary,
+                    textAlign: 'justify',
+                  }}>
+                  -₱{item.totalPaymentGatewayFees}
+                </Text>
+              </View>
+
+              <Text
+                style={{
+                  fontSize: 16,
+                }}>
+                {item.successfulTransactionCount}{' '}
+                {item.successfulTransactionCount < 2
+                  ? 'transaction'
+                  : 'transactions'}
+              </Text>
+
+              <View style={{paddingTop: 8}}>
+                <Text style={{color: colors.text_secondary}}>
+                  Updated {timeStamp}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 10,
+              borderColor: colors.primary,
+              borderWidth: 1,
+              elevation: 3,
+              backgroundColor: colors.icons,
+              padding: 5,
+              marginRight: 10,
+            }}>
+            <Text
+              style={{
+                fontSize: 18,
+                paddingBottom: 10,
+                fontFamily: 'ProductSans-Bold',
+                color: colors.primary,
+                textAlign: 'justify',
+              }}>
+              ₱{item.totalAmount}
+            </Text>
+
+            <Text style={{color: colors.primary, fontSize: 17}}>
+              {item.status}
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
   }
 
   render() {
-    const {creditData} = this.props.detailsStore.merchantDetails;
+    const {refreshing} = this.state;
+    const {disbursementPeriods, merchantDetails} = this.props.detailsStore;
+    const {creditData} = merchantDetails;
+
+    const dataSource = disbursementPeriods.slice();
 
     return (
       <View style={{flex: 1}}>
@@ -158,6 +304,70 @@ class StoreDetailsScreen extends Component {
                         )}
                       </View>
                     </View>
+                  </CardItem>
+                </Card>
+              </View>
+
+              <View
+                style={{
+                  shadowColor: '#000',
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 1.41,
+                }}>
+                <Card
+                  style={{
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                  }}>
+                  <CardItem
+                    header
+                    bordered
+                    style={{
+                      backgroundColor: colors.primary,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      height: 55,
+                      paddingBottom: 0,
+                      paddingTop: 0,
+                    }}>
+                    <Text style={{color: colors.icons, fontSize: 20}}>
+                      Disbursement Invoices
+                    </Text>
+                  </CardItem>
+
+                  <CardItem
+                    style={{
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                      paddingTop: 0,
+                      paddingLeft: 0,
+                    }}>
+                    <FlatList
+                      style={{flex: 1, height: 500}}
+                      data={dataSource}
+                      initialNumToRender={10}
+                      renderItem={({item, index}) => (
+                        <this.DisbursementPeriod
+                          item={item}
+                          key={`${item.startDate}-${item.endDate}`}
+                        />
+                      )}
+                      refreshControl={
+                        <RefreshControl
+                          colors={[colors.primary, colors.dark]}
+                          refreshing={refreshing}
+                          onRefresh={this.onRefresh.bind(this)}
+                        />
+                      }
+                      keyExtractor={(item) =>
+                        `${item.startDate}-${item.endDate}`
+                      }
+                      showsVerticalScrollIndicator={false}
+                    />
                   </CardItem>
                 </Card>
               </View>

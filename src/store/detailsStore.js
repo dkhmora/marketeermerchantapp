@@ -13,6 +13,8 @@ const storesCollection = firestore().collection('stores');
 class DetailsStore {
   @observable storeDetails = {};
   @observable merchantDetails = {};
+  @persist('list') @observable disbursementPeriods = [];
+  @persist @observable lastDisbursementPeriodUpdatedAt = 0;
   @observable unsubscribeSetStoreDetails = null;
   @observable unsubscribeSetMerchantDetails = null;
   @persist @observable subscribedToNotifications = false;
@@ -22,6 +24,42 @@ class DetailsStore {
     const {storeId} = this.storeDetails;
 
     return storesCollection.doc(storeId);
+  }
+
+  @action async setDisbursementPeriods() {
+    const {merchantId} = this.merchantDetails;
+
+    return await firestore()
+      .collection('merchants')
+      .doc(merchantId)
+      .collection('disbursement_periods')
+      .where('updatedAt', '>', this.lastDisbursementPeriodUpdatedAt)
+      .orderBy('updatedAt', 'desc')
+      .get()
+      .then((querySnapshot) => {
+        return querySnapshot.forEach((doc, index) => {
+          const disbursementData = doc.data();
+          const disbursementIndex = this.disbursementPeriods.findIndex(
+            (disbursement) =>
+              disbursement.startDate === disbursementData.startDate,
+          );
+
+          if (disbursementIndex >= 0) {
+            this.disbursementPeriods[disbursementIndex] = disbursementData;
+          } else {
+            this.disbursementPeriods.push(disbursementData);
+          }
+
+          if (
+            this.lastDisbursementPeriodUpdatedAt < disbursementData.updatedAt
+          ) {
+            this.lastDisbursementPeriodUpdatedAt = disbursementData.updatedAt;
+          }
+        });
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+      });
   }
 
   @action async setMerchantDetails(merchantId) {

@@ -36,7 +36,7 @@ const paymentsStore = (window.store = new PaymentsStore());
 
 hydrate('list', ordersStore);
 hydrate('list', itemsStore);
-hydrate('firstLoad', detailsStore);
+hydrate('list', detailsStore);
 hydrate('subscribedToNotifications', detailsStore);
 
 YellowBox.ignoreWarnings([

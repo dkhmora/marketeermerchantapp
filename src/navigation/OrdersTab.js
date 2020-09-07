@@ -21,43 +21,6 @@ class OrdersTab extends Component {
     super(props);
   }
 
-  @computed get notificationSubscriptionStatus() {
-    return this.props.detailsStore.subscribedToNotifications
-      ? 'Unsubscribed'
-      : 'Subscribed';
-  }
-
-  @computed get optionsLabel() {
-    return this.props.detailsStore.subscribedToNotifications
-      ? 'Unsubscribe to Order Notifications'
-      : 'Subscribe to Order Notifications';
-  }
-
-  handleNotificationSubscription = () => {
-    const {notificationSubscriptionStatus} = this;
-
-    this.subscribeToNotificationsTimeout &&
-      clearTimeout(this.subscribeToNotificationsTimeout);
-
-    this.props.authStore.appReady = false;
-
-    this.subscribeToNotificationsTimeout = setTimeout(() => {
-      (this.props.detailsStore.subscribedToNotifications
-        ? this.props.detailsStore.unsubscribeToNotifications()
-        : this.props.detailsStore.subscribeToNotifications()
-      ).then(() => {
-        this.props.authStore.appReady = true;
-
-        Toast({
-          text: `Successfully ${notificationSubscriptionStatus} to Order Notifications!`,
-          type: 'success',
-          duration: 3500,
-          style: {margin: 20, borderRadius: 16},
-        });
-      });
-    }, 500);
-  };
-
   componentDidMount() {
     const {storeId} = this.props.detailsStore.storeDetails;
 
@@ -71,14 +34,11 @@ class OrdersTab extends Component {
 
   render() {
     const {navigation} = this.props;
-    const {optionsLabel} = this;
 
     return (
       <Container>
         <BaseHeader
           title="Orders"
-          options={[optionsLabel]}
-          actions={[this.handleNotificationSubscription]}
           destructiveIndex={1}
           navigation={navigation}
         />
