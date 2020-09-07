@@ -57,7 +57,7 @@ class PaymentsStore {
             });
 
           this.availablePaymentMethods = {
-            ...this.additionalPaymentMethods,
+            // ...this.additionalPaymentMethods,
             ...sortedAvailablePaymentMethods,
           };
 

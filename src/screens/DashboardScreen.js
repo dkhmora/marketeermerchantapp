@@ -798,12 +798,12 @@ class StoreDetailsScreen extends Component {
                               onPress={() => this.handlePaymentMethods('COD')}
                             />
                             <CheckBox
-                              title="Online Payment"
+                              title="Online Banking"
                               checked={newPaymentMethods.includes(
-                                'Online Payment',
+                                'Online Banking',
                               )}
                               onPress={() =>
-                                this.handlePaymentMethods('Online Payment')
+                                this.handlePaymentMethods('Online Banking')
                               }
                             />
                           </View>

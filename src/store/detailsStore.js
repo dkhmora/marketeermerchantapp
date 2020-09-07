@@ -69,7 +69,6 @@ class DetailsStore {
         .doc(merchantId)
         .onSnapshot(async (documentSnapshot) => {
           if (!documentSnapshot.empty) {
-            console.log(documentSnapshot.data());
             this.merchantDetails = {
               ...documentSnapshot.data(),
               merchantId,
