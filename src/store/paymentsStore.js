@@ -24,7 +24,7 @@ class PaymentsStore {
 
   @action async getTopUpPaymentLink({topUpAmount, email, processId}) {
     return await functions
-      .httpsCallable('getMerchantTopUpPaymentLinkTest')({
+      .httpsCallable('getMerchantTopUpPaymentLink')({
         topUpAmount,
         email,
         processId,
