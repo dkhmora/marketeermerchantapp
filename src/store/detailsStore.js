@@ -26,6 +26,37 @@ class DetailsStore {
     return storesCollection.doc(storeId);
   }
 
+  @action async setStoreDeliveryArea({distance, midPoint}) {
+    const {storeId} = this.storeDetails;
+
+    return await functions
+      .httpsCallable('setStoreDeliveryArea')({
+        distance,
+        midPoint,
+        storeId,
+      })
+      .then((response) => {
+        if (response.data.s === 200) {
+          Toast({
+            text: response.data.m,
+          });
+        } else {
+          Toast({
+            text: response.data.m,
+            type: 'danger',
+          });
+        }
+
+        return response.data;
+      })
+      .catch((err) => {
+        Toast({
+          text: `Error: ${err}!`,
+          type: 'danger',
+        });
+      });
+  }
+
   @action async setDisbursementPeriods() {
     const {merchantId} = this.merchantDetails;
 
@@ -97,17 +128,6 @@ class DetailsStore {
         });
 
         return data;
-      })
-      .catch((err) => {
-        Toast({text: err.message, type: 'danger'});
-      });
-  }
-
-  @action async getAddressFromCoordinates({latitude, longitude}) {
-    return await functions
-      .httpsCallable('getAddressFromCoordinates')({latitude, longitude})
-      .then((response) => {
-        return response.data.locationDetails;
       })
       .catch((err) => {
         Toast({text: err.message, type: 'danger'});

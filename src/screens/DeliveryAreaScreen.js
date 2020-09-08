@@ -24,15 +24,15 @@ class DeliveryAreaScreen extends Component {
       updating: false,
       distance: 0,
       newDistance: 0,
+      bboxCenter: null,
     };
   }
 
   @computed get boundingBox() {
-    const {storeLocation} = this.props.detailsStore.storeDetails;
-    const {newDistance, editMode} = this.state;
+    const {bboxCenter, newDistance, editMode} = this.state;
 
-    if (storeLocation && editMode) {
-      const bounds = this.getBoundsOfDistance({...storeLocation}, newDistance);
+    if (bboxCenter && editMode) {
+      const bounds = this.getBoundsOfDistance(bboxCenter, newDistance);
 
       const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
 
@@ -50,6 +50,22 @@ class DeliveryAreaScreen extends Component {
     }
 
     return null;
+  }
+
+  @computed get isStoreLocationInBBox() {
+    const {editMode} = this.state;
+    const {storeLocation} = this.props.detailsStore.storeDetails;
+
+    if (
+      this.boundingBox &&
+      storeLocation &&
+      editMode &&
+      geolib.isPointInPolygon(storeLocation, this.boundingBox)
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   componentDidMount() {
@@ -131,32 +147,25 @@ class DeliveryAreaScreen extends Component {
     });
   }
 
-  async handleSetStoreLocation() {
-    const {storeLocation} = this.props.detailsStore.storeDetails;
-    const {newDistance} = this.state;
-    const {boundingBox} = this;
+  handleSetStoreLocation() {
+    const {newDistance, bboxCenter} = this.state;
 
     this.props.authStore.appReady = false;
 
-    const range = await this.getGeohashRange(
-      storeLocation.latitude,
-      storeLocation.longitude,
-      newDistance,
-    );
-
     this.props.detailsStore
-      .updateCoordinates(range.lower, range.upper, boundingBox)
+      .setStoreDeliveryArea({distance: newDistance, midPoint: bboxCenter})
       .then(() => {
-        Toast({text: 'Delivery Area successfully set!'});
-
-        this.props.authStore.appReady = true;
-
-        this.setState({
-          editMode: false,
-          distance: newDistance,
-        });
-      })
-      .catch((err) => Toast({text: err.message, type: 'danger'}));
+        this.setState(
+          {
+            editMode: false,
+            distance: newDistance,
+            bboxCenter: null,
+          },
+          () => {
+            this.props.authStore.appReady = true;
+          },
+        );
+      });
   }
 
   panMapToLocation(position) {
@@ -165,17 +174,22 @@ class DeliveryAreaScreen extends Component {
         center: position,
         pitch: 2,
         heading: 1,
-        altitude: 200,
-        zoom: 18,
+        altitude: 1500,
+        zoom: 13,
       },
-      150,
+      30,
     );
   }
 
   handleEditDeliveryArea() {
+    const initialBboxCenter = geolib.getCenterOfBounds(this.currentBoundingBox);
+
+    this.panMapToLocation(initialBboxCenter);
+
     this.setState({
       newDistance: this.state.distance,
       editMode: true,
+      bboxCenter: initialBboxCenter,
     });
   }
 
@@ -183,10 +197,22 @@ class DeliveryAreaScreen extends Component {
     const {distance} = this.state;
 
     this.setState({
+      bboxCenter: null,
       newDistance: distance,
       editMode: false,
     });
   }
+
+  handleRegionChange = (mapData) => {
+    const {editMode} = this.state;
+
+    if (editMode) {
+      const {latitude, longitude} = mapData;
+      this.setState({
+        bboxCenter: {latitude, longitude},
+      });
+    }
+  };
 
   render() {
     const {navigation} = this.props;
@@ -205,6 +231,7 @@ class DeliveryAreaScreen extends Component {
             ref={(map) => {
               this.map = map;
             }}
+            onRegionChangeComplete={this.handleRegionChange}
             initialRegion={{
               latitude: storeLocation.latitude,
               longitude: storeLocation.longitude,
@@ -258,16 +285,22 @@ class DeliveryAreaScreen extends Component {
                 backgroundColor: 'rgba(255,255,255, 0.6)',
               }}>
               <CardItem style={{flexDirection: 'column'}}>
-                <Text style={{alignSelf: 'flex-start', marginBottom: 5}}>
+                <Text
+                  style={{
+                    alignSelf: 'flex-start',
+                    fontSize: 18,
+                    fontFamily: 'ProductSans-Regular',
+                  }}>
                   Delivery distance
                 </Text>
                 <View
                   style={{
                     width: '100%',
+                    paddingVertical: 10,
                   }}>
                   <Slider
                     step={1}
-                    minimumValue={0}
+                    minimumValue={1}
                     maximumValue={100}
                     value={newDistance}
                     thumbTintColor={colors.accent}
@@ -275,8 +308,34 @@ class DeliveryAreaScreen extends Component {
                       this.setState({newDistance: value})
                     }
                   />
-                  <Text style={{alignSelf: 'center'}}>{newDistance} KM</Text>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignSelf: 'center',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        color: colors.primary,
+                        fontFamily: 'ProductSans-Black',
+                        textAlignVertical: 'bottom',
+                      }}>
+                      {newDistance}{' '}
+                    </Text>
+                    <Text
+                      style={{
+                        textAlignVertical: 'bottom',
+                      }}>
+                      KM
+                    </Text>
+                  </View>
                 </View>
+                <Text style={{alignSelf: 'center'}}>
+                  Store location is not inside delivery area! Please move the
+                  delivery box to where your store location overlaps.
+                </Text>
               </CardItem>
               <CardItem>
                 <View
@@ -308,6 +367,7 @@ class DeliveryAreaScreen extends Component {
                     }}
                     icon={<Icon name="save" color={colors.icons} />}
                     iconRight
+                    disabled={!this.isStoreLocationInBBox || newDistance < 1}
                     buttonStyle={{backgroundColor: colors.accent}}
                     onPress={() => this.handleSetStoreLocation()}
                   />
