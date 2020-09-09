@@ -481,7 +481,16 @@ class StoreDetailsScreen extends Component {
                       Store Card Preview
                     </Text>
                   </CardItem>
-                  <CardItem bordered style={{flex: 1}}>
+
+                  <CardItem
+                    bordered
+                    style={{
+                      flex: 1,
+                      paddingLeft: 0,
+                      paddingRight: 0,
+                      paddingBottom: 0,
+                      paddingTop: 0,
+                    }}>
                     <StoreCard store={this.props.detailsStore.storeDetails} />
                   </CardItem>
                 </Card>
