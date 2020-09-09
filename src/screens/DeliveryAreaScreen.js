@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import MapView, {Marker, Polygon} from 'react-native-maps';
-import {View, StatusBar, StyleSheet} from 'react-native';
+import {View, StatusBar, StyleSheet, Platform, Dimensions} from 'react-native';
 import {Card, CardItem} from 'native-base';
 import {Slider, Button, Icon, Text} from 'react-native-elements';
 import {observer, inject} from 'mobx-react';
@@ -25,6 +25,7 @@ class DeliveryAreaScreen extends Component {
       distance: 0,
       newDistance: 0,
       bboxCenter: null,
+      centerOfScreen: Dimensions.get('window').height / 2,
     };
   }
 
@@ -52,7 +53,7 @@ class DeliveryAreaScreen extends Component {
     return null;
   }
 
-  @computed get isStoreLocationInBBox() {
+  @computed get storeLocationIsInBBox() {
     const {editMode} = this.state;
     const {storeLocation} = this.props.detailsStore.storeDetails;
 
@@ -216,7 +217,7 @@ class DeliveryAreaScreen extends Component {
 
   render() {
     const {navigation} = this.props;
-    const {editMode, newDistance} = this.state;
+    const {editMode, newDistance, centerOfScreen} = this.state;
     const {storeLocation} = toJS(this.props.detailsStore.storeDetails);
     const {boundingBox} = this;
 
@@ -248,6 +249,7 @@ class DeliveryAreaScreen extends Component {
                 <Icon color={colors.primary} name="map-pin" />
               </View>
             </Marker>
+
             {this.currentBoundingBox && (
               <Polygon
                 coordinates={this.currentBoundingBox}
@@ -256,6 +258,7 @@ class DeliveryAreaScreen extends Component {
                 strokeWidth={1}
               />
             )}
+
             {editMode && (
               <Polygon
                 coordinates={boundingBox}
@@ -293,6 +296,7 @@ class DeliveryAreaScreen extends Component {
                   }}>
                   Delivery distance
                 </Text>
+
                 <View
                   style={{
                     width: '100%',
@@ -324,6 +328,7 @@ class DeliveryAreaScreen extends Component {
                       }}>
                       {newDistance}{' '}
                     </Text>
+
                     <Text
                       style={{
                         textAlignVertical: 'bottom',
@@ -332,11 +337,20 @@ class DeliveryAreaScreen extends Component {
                     </Text>
                   </View>
                 </View>
-                <Text style={{alignSelf: 'center'}}>
-                  Store location is not inside delivery area! Please move the
-                  delivery box to where your store location overlaps.
-                </Text>
+
+                {!this.storeLocationIsInBBox && (
+                  <Text
+                    style={{
+                      alignSelf: 'center',
+                      color: colors.danger,
+                      textAlign: 'center',
+                    }}>
+                    Store location is not within delivery area! Please move the
+                    delivery box within your store location.
+                  </Text>
+                )}
               </CardItem>
+
               <CardItem>
                 <View
                   style={{
@@ -358,6 +372,7 @@ class DeliveryAreaScreen extends Component {
                     buttonStyle={{backgroundColor: colors.primary}}
                     containerStyle={{marginRight: 20}}
                   />
+
                   <Button
                     title="Save Changes"
                     titleStyle={{
@@ -367,7 +382,7 @@ class DeliveryAreaScreen extends Component {
                     }}
                     icon={<Icon name="save" color={colors.icons} />}
                     iconRight
-                    disabled={!this.isStoreLocationInBBox || newDistance < 1}
+                    disabled={!this.storeLocationIsInBBox || newDistance < 1}
                     buttonStyle={{backgroundColor: colors.accent}}
                     onPress={() => this.handleSetStoreLocation()}
                   />
@@ -391,6 +406,43 @@ class DeliveryAreaScreen extends Component {
             }}
           />
         )}
+
+        {editMode && (
+          <View
+            style={{
+              left: 0,
+              right: 0,
+              marginLeft: 0,
+              marginTop: 0,
+              position: 'absolute',
+              top: centerOfScreen,
+              alignItems: 'center',
+            }}>
+            <Icon color={colors.accent} name="crosshair" />
+          </View>
+        )}
+
+        <View
+          style={{
+            position: 'absolute',
+            top: 120,
+            right: 20,
+          }}>
+          <Button
+            onPress={() => this.panMapToLocation(storeLocation)}
+            disabled={!storeLocation}
+            icon={<Icon name="map-pin" color={colors.icons} size={35} />}
+            titleStyle={{color: colors.icons}}
+            buttonStyle={{
+              backgroundColor: colors.primary,
+              borderRadius: 35,
+              paddingBottom: Platform.OS === 'ios' ? 5 : null,
+            }}
+            containerStyle={{
+              overflow: 'hidden',
+            }}
+          />
+        </View>
 
         <BaseHeader backButton navigation={navigation} title="Delivery Area" />
       </View>
