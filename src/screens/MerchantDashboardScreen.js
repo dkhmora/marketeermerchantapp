@@ -316,34 +316,6 @@ class StoreDetailsScreen extends Component {
                       </View>
                     </View>
                   </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        paddingHorizontal: 8,
-                      }}>
-                      <View style={{flex: 2, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Download
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        <Button
-                          title="Download"
-                          onPress={() => this.downloadPdf()}
-                        />
-                      </View>
-                    </View>
-                  </CardItem>
                 </Card>
               </View>
 
