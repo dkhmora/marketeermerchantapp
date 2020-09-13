@@ -131,6 +131,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     justifyContent: 'space-around',
     zIndex: 100,
+    elevation: 1,
   },
   buttonContainer: {
     borderRadius: 24,
