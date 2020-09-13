@@ -12,7 +12,7 @@
     "iphonese": "react-native run-ios --simulator='iPhone SE (2nd generation)'",
     "ipadpro4": "react-native run-ios --simulator='iPad Pro (12.9-inch) (4th generation)'",
     "ipadpro2": "react-native run-ios --simulator='iPad Pro (12.9-inch) (2nd generation)'",
-    "start": "react-native start",
+    "start": "react-native start --port 8082",
     "test": "jest",
     "lint": "eslint .",
     "postinstall": "patch-package && npx jetify",

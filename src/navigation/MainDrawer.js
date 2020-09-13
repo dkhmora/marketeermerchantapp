@@ -187,6 +187,8 @@ class MainDrawer extends Component {
       this.props.detailsStore.unsubscribeSetStoreDetails &&
         this.props.detailsStore.unsubscribeSetStoreDetails();
       this.props.detailsStore.unsubscribeSetStoreDetails = null;
+      this.props.detailsStore.disbursementPeriods = [];
+      this.props.detailsStore.lastDisbursementPeriodUpdatedAt = 0;
       this.props.itemsStore.unsubscribeSetStoreItems &&
         this.props.itemsStore.unsubscribeSetStoreItems();
       this.props.itemsStore.unsubscribeSetStoreItems = null;

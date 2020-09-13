@@ -61,7 +61,13 @@ class OrdersTab extends Component {
           backBehavior="initialRoute">
           <TabOrders.Screen name="Pending" component={OrdersList} />
           <TabOrders.Screen name="Unpaid" component={OrdersList} />
-          <TabOrders.Screen name="Paid" component={OrdersList} />
+          <TabOrders.Screen
+            name="Paid"
+            component={OrdersList}
+            options={{
+              tabBarLabel: 'Paid (To Ship)',
+            }}
+          />
           <TabOrders.Screen name="Shipped" component={OrdersList} />
           <TabOrders.Screen name="Completed" component={OrdersList} />
           <TabOrders.Screen name="Cancelled" component={OrdersList} />

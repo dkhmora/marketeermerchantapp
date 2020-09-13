@@ -5,6 +5,7 @@ import {
   SafeAreaView,
   FlatList,
   RefreshControl,
+  Linking,
 } from 'react-native';
 import {Card, CardItem} from 'native-base';
 // Custom Components
@@ -15,7 +16,7 @@ import {Text, Icon, Button} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import moment from 'moment';
-
+import storage from '@react-native-firebase/storage';
 @inject('detailsStore')
 @inject('itemsStore')
 @observer
@@ -23,7 +24,7 @@ class StoreDetailsScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {refreshing: false};
+    this.state = {refreshing: false, allowDragging: true};
   }
 
   componentDidMount() {
@@ -41,6 +42,15 @@ class StoreDetailsScreen extends Component {
         });
       },
     );
+  }
+
+  async downloadPdf() {
+    const ref = storage().ref(
+      'Fresh Market Solutions Inc - FMSI-ChKK5i1-0905202009112020-DI.pdf',
+    );
+    const link = await ref.getDownloadURL();
+
+    Linking.openURL(link);
   }
 
   onRefresh() {
@@ -162,7 +172,7 @@ class StoreDetailsScreen extends Component {
   }
 
   render() {
-    const {refreshing} = this.state;
+    const {refreshing, allowDragging} = this.state;
     const {disbursementPeriods, merchantDetails} = this.props.detailsStore;
     const {creditData} = merchantDetails;
 
@@ -192,7 +202,8 @@ class StoreDetailsScreen extends Component {
             showsVerticalScrollIndicator={false}
             contentInsetAdjustmentBehavior="automatic"
             keyboardOpeningTime={20}
-            extraScrollHeight={20}>
+            extraScrollHeight={20}
+            scrollEnabled={allowDragging}>
             <SafeAreaView>
               <View
                 style={{
@@ -305,6 +316,34 @@ class StoreDetailsScreen extends Component {
                       </View>
                     </View>
                   </CardItem>
+
+                  <CardItem bordered>
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        paddingHorizontal: 8,
+                      }}>
+                      <View style={{flex: 2, paddingright: 10}}>
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            fontFamily: 'ProductSans-Bold',
+                          }}>
+                          Download
+                        </Text>
+                      </View>
+
+                      <View style={{flex: 3, alignItems: 'flex-end'}}>
+                        <Button
+                          title="Download"
+                          onPress={() => this.downloadPdf()}
+                        />
+                      </View>
+                    </View>
+                  </CardItem>
                 </Card>
               </View>
 
@@ -333,6 +372,7 @@ class StoreDetailsScreen extends Component {
                       height: 55,
                       paddingBottom: 0,
                       paddingTop: 0,
+                      elevation: 1,
                     }}>
                     <Text style={{color: colors.icons, fontSize: 20}}>
                       Disbursement Invoices
@@ -349,6 +389,18 @@ class StoreDetailsScreen extends Component {
                     <FlatList
                       style={{flex: 1, height: 500}}
                       data={dataSource}
+                      nestedScrollEnabled={true}
+                      onTouchStart={() => {
+                        this.setState({allowDragging: false});
+                      }}
+                      onTouchEnd={() => this.setState({allowDragging: true})}
+                      onTouchCancel={() => this.setState({allowDragging: true})}
+                      onMomentumScrollEnd={() => {
+                        this.setState({allowDragging: true});
+                      }}
+                      onScrollEndDrag={() => {
+                        this.setState({allowDragging: true});
+                      }}
                       initialNumToRender={10}
                       renderItem={({item, index}) => (
                         <this.DisbursementPeriod

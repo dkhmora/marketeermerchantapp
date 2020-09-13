@@ -25,7 +25,7 @@ class DeliveryAreaScreen extends Component {
       distance: 0,
       newDistance: 0,
       bboxCenter: null,
-      centerOfScreen: Dimensions.get('window').height / 2,
+      centerOfScreen: (Dimensions.get('window').height + 10) / 2,
     };
   }
 
@@ -40,7 +40,7 @@ class DeliveryAreaScreen extends Component {
       return boundingBox;
     }
 
-    return [];
+    return null;
   }
 
   @computed get currentBoundingBox() {
@@ -183,7 +183,11 @@ class DeliveryAreaScreen extends Component {
   }
 
   handleEditDeliveryArea() {
-    const initialBboxCenter = geolib.getCenterOfBounds(this.currentBoundingBox);
+    const {storeLocation} = toJS(this.props.detailsStore.storeDetails);
+
+    const initialBboxCenter = this.currentBoundingBox
+      ? geolib.getCenterOfBounds(this.currentBoundingBox)
+      : storeLocation;
 
     this.panMapToLocation(initialBboxCenter);
 
@@ -259,7 +263,7 @@ class DeliveryAreaScreen extends Component {
               />
             )}
 
-            {editMode && (
+            {editMode && boundingBox && (
               <Polygon
                 coordinates={boundingBox}
                 fillColor="rgba(68, 138, 255, 0.3)"
