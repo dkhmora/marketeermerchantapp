@@ -17,6 +17,7 @@ import {styles} from '../../assets/styles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from '../components/Toast';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
+import ForgotPasswordModal from '../components/ForgotPasswordModal';
 
 @inject('authStore')
 @observer
@@ -29,6 +30,7 @@ class LoginScreen extends Component {
       password: '',
       emailCheck: false,
       secureTextEntry: true,
+      forgotPasswordModal: false,
     };
   }
 
@@ -147,6 +149,11 @@ class LoginScreen extends Component {
       <View style={[styles.container, {paddingTop: 0}]}>
         <StatusBar animated translucent backgroundColor={colors.statusBar} />
 
+        <ForgotPasswordModal
+          isVisible={this.state.forgotPasswordModal}
+          closeModal={() => this.setState({forgotPasswordModal: false})}
+        />
+
         <Animatable.View
           duration={800}
           useNativeDriver
@@ -230,6 +237,11 @@ class LoginScreen extends Component {
                   )}
                 </TouchableOpacity>
               </View>
+
+              <TouchableOpacity
+                onPress={() => this.setState({forgotPasswordModal: true})}>
+                <Text style={styles.touchable_text}>Forgot Password?</Text>
+              </TouchableOpacity>
 
               <View
                 style={{

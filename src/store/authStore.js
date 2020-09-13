@@ -2,7 +2,9 @@ import {observable, action, computed} from 'mobx';
 import auth from '@react-native-firebase/auth';
 import messaging from '@react-native-firebase/messaging';
 import Toast from '../components/Toast';
+import firebase from '@react-native-firebase/app';
 
+const functions = firebase.app().functions('asia-northeast1');
 class AuthStore {
   @observable appReady = true;
 
@@ -23,6 +25,21 @@ class AuthStore {
       .deleteToken()
       .then(() => {
         return auth().signOut();
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger', duration: 5000});
+      });
+  }
+
+  @action async resetPassword(email) {
+    return await functions
+      .httpsCallable('sendPasswordResetLinkToStoreUser')({email})
+      .then((response) => {
+        if (response.data.s === 200) {
+          return Toast({text: response.data.m, duration: 5000});
+        }
+
+        return Toast({text: response.data.m, type: 'danger', duration: 5000});
       })
       .catch((err) => {
         Toast({text: err.message, type: 'danger', duration: 5000});
