@@ -1,19 +1,10 @@
 import React, {Component} from 'react';
-import {
-  Container,
-  View,
-  Card,
-  CardItem,
-  Input,
-  Item,
-  Picker,
-} from 'native-base';
-import {Text, Button, Icon} from 'react-native-elements';
+import {Container, View, CardItem, Input, Item, Picker} from 'native-base';
+import {Text, Button, Icon, Overlay} from 'react-native-elements';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import ItemsList from '../components/ItemsList';
 import BaseHeader from '../components/BaseHeader';
 import {observer, inject} from 'mobx-react';
-import Modal from 'react-native-modal';
 import {observable, action, computed} from 'mobx';
 import {colors} from '../../assets/colors';
 import EditItemModal from '../components/EditItemModal';
@@ -167,124 +158,128 @@ class StoreItemsTab extends Component {
         />
 
         <View>
-          <Modal
+          <Overlay
             isVisible={this.addCategoryModal}
             onBackdropPress={() => (this.addCategoryModal = false)}
-            transparent={true}
-            style={{alignItems: 'center'}}>
-            <Card
-              style={{
-                borderRadius: 10,
-                overflow: 'hidden',
-              }}>
-              <CardItem header>
-                <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
-                  Add Category
-                </Text>
-              </CardItem>
+            statusBarTranslucent
+            animationType="fade"
+            width="auto"
+            height="auto"
+            overlayStyle={{
+              padding: 0,
+              width: '80%',
+              borderRadius: 10,
+              overflow: 'hidden',
+            }}>
+            <CardItem header>
+              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
+                Add Category
+              </Text>
+            </CardItem>
 
-              <CardItem>
-                <Item rounded>
-                  <Input
-                    placeholder="Category Name"
-                    value={this.newCategory}
-                    onChangeText={(value) => (this.newCategory = value)}
-                  />
-                </Item>
-              </CardItem>
+            <CardItem>
+              <Item rounded>
+                <Input
+                  placeholder="Category Name"
+                  value={this.newCategory}
+                  onChangeText={(value) => (this.newCategory = value)}
+                />
+              </Item>
+            </CardItem>
 
-              <CardItem footer>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'flex-end',
-                    justifyContent: 'flex-end',
-                  }}>
-                  <Button
-                    title="Cancel"
-                    type="clear"
-                    onPress={() => this.closeAddCategoryModal()}
-                    containerStyle={{marginRight: 10}}
-                  />
+            <CardItem footer>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  justifyContent: 'flex-end',
+                }}>
+                <Button
+                  title="Cancel"
+                  type="clear"
+                  onPress={() => this.closeAddCategoryModal()}
+                  containerStyle={{marginRight: 10}}
+                />
 
-                  <Button
-                    title="Add"
-                    type="clear"
-                    onPress={this.handleAddCategory.bind(this)}
-                  />
-                </View>
-              </CardItem>
-            </Card>
-          </Modal>
+                <Button
+                  title="Add"
+                  type="clear"
+                  onPress={this.handleAddCategory.bind(this)}
+                />
+              </View>
+            </CardItem>
+          </Overlay>
         </View>
 
         <View>
-          <Modal
+          <Overlay
             isVisible={this.deleteCategoryModal}
-            transparent={true}
             onBackdropPress={() => (this.deleteCategoryModal = false)}
-            style={{alignItems: 'center'}}>
-            <Card
-              style={{
-                borderRadius: 10,
-                overflow: 'hidden',
-              }}>
-              <CardItem header>
-                <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
-                  Delete Category
-                </Text>
-              </CardItem>
+            statusBarTranslucent
+            animationType="fade"
+            width="auto"
+            height="auto"
+            overlayStyle={{
+              padding: 0,
+              width: '80%',
+              borderRadius: 10,
+              overflow: 'hidden',
+            }}>
+            <CardItem header>
+              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
+                Delete Category
+              </Text>
+            </CardItem>
 
-              <CardItem>
-                <Item
-                  rounded
-                  style={{
-                    flexDirection: 'column',
-                    alignItems: 'stretch',
-                    width: '100%',
-                  }}>
-                  <Picker
-                    note={false}
-                    placeholder="Select Item Category"
-                    mode="dropdown"
-                    selectedValue={this.selectedCategory}
-                    iosIcon={<Icon name="arrow-down" />}
-                    onValueChange={(value) => this.onValueChange(value)}>
-                    {itemCategories &&
-                      itemCategories.map((cat, index) => {
-                        return (
-                          <Picker.Item key={index} label={cat} value={cat} />
-                        );
-                      })}
-                  </Picker>
-                </Item>
-              </CardItem>
+            <CardItem>
+              <Item
+                rounded
+                style={{
+                  flexDirection: 'column',
+                  alignItems: 'stretch',
+                  width: '100%',
+                }}>
+                <Picker
+                  note={false}
+                  placeholder="Select Item Category"
+                  mode="dropdown"
+                  selectedValue={this.selectedCategory}
+                  iosIcon={<Icon name="arrow-down" />}
+                  onValueChange={(value) => this.onValueChange(value)}>
+                  {itemCategories &&
+                    itemCategories.map((cat, index) => {
+                      return (
+                        <Picker.Item key={index} label={cat} value={cat} />
+                      );
+                    })}
+                </Picker>
+              </Item>
+            </CardItem>
 
-              <CardItem footer>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'flex-end',
-                    justifyContent: 'flex-end',
-                  }}>
-                  <Button
-                    title="Cancel"
-                    type="clear"
-                    onPress={() => this.closeDeleteCategoryModal()}
-                    containerStyle={{marginRight: 10}}
-                  />
+            <CardItem footer>
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  justifyContent: 'flex-end',
+                }}>
+                <Button
+                  title="Cancel"
+                  type="clear"
+                  onPress={() => this.closeDeleteCategoryModal()}
+                  containerStyle={{marginRight: 10}}
+                />
 
-                  <Button
-                    title="Delete"
-                    type="clear"
-                    onPress={this.handleDeleteCategory.bind(this)}
-                  />
-                </View>
-              </CardItem>
-            </Card>
-          </Modal>
+                <Button
+                  title="Delete"
+                  type="clear"
+                  onPress={this.handleDeleteCategory.bind(this)}
+                />
+              </View>
+            </CardItem>
+          </Overlay>
         </View>
 
         <EditItemModal isVisible={this.props.itemsStore.editItemModal} />

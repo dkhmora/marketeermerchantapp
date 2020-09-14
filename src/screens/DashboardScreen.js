@@ -156,8 +156,8 @@ class StoreDetailsScreen extends Component {
   };
 
   handleTakePhoto(type) {
-    const height = type === 'display' ? 600 : 1080;
-    const width = type === 'display' ? 600 : 720;
+    const height = type === 'display' ? 600 : 720;
+    const width = type === 'display' ? 600 : 1080;
 
     ImagePicker.openCamera({
       width,
@@ -178,8 +178,8 @@ class StoreDetailsScreen extends Component {
   }
 
   handleSelectImage(type) {
-    const height = type === 'display' ? 600 : 1080;
-    const width = type === 'display' ? 600 : 720;
+    const height = type === 'display' ? 600 : 720;
+    const width = type === 'display' ? 600 : 1080;
 
     ImagePicker.openPicker({
       width,
