@@ -39,7 +39,7 @@ class StoreItemsTab extends Component {
     const {itemCategories} = this.props.detailsStore.storeDetails;
 
     if (itemCategories) {
-      return itemCategories.length > 5
+      return itemCategories.length > 2
         ? 'auto'
         : SCREEN_WIDTH / (itemCategories.length + 1);
     }
@@ -288,13 +288,37 @@ class StoreItemsTab extends Component {
           lazy
           lazyPreloadDistance={1}
           tabBarOptions={{
+            allowFontScaling: false,
             scrollEnabled: true,
-            style: {backgroundColor: colors.icons},
-            tabStyle: {width: this.tabWidth},
             activeTintColor: colors.primary,
-            inactiveTintcolor: '#eee',
+            tabStyle: {
+              width: this.tabWidth,
+              paddingTop: 0,
+            },
+            labelStyle: {marginTop: 0},
             indicatorStyle: {
               backgroundColor: colors.primary,
+              elevation: 7,
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.2,
+              shadowRadius: 1.41,
+            },
+            style: {
+              backgroundColor: colors.icons,
+              height: 30,
+              paddingTop: 0,
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.2,
+              shadowRadius: 1.41,
+              elevation: 5,
             },
           }}>
           <TabBase.Screen

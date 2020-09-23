@@ -48,13 +48,37 @@ class OrdersTab extends Component {
           lazy
           lazyPreloadDistance={1}
           tabBarOptions={{
+            allowFontScaling: false,
             scrollEnabled: true,
-            style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
-            inactiveTintcolor: '#eee',
-            tabStyle: {width: 'auto'},
+            tabStyle: {
+              width: 'auto',
+              paddingTop: 0,
+            },
+            labelStyle: {marginTop: 0},
             indicatorStyle: {
               backgroundColor: colors.primary,
+              elevation: 7,
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.2,
+              shadowRadius: 1.41,
+            },
+            style: {
+              backgroundColor: colors.icons,
+              height: 30,
+              paddingTop: 0,
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.2,
+              shadowRadius: 1.41,
+              elevation: 5,
             },
           }}
           headerMode="none"
