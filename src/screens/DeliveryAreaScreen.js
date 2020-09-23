@@ -185,17 +185,26 @@ class DeliveryAreaScreen extends Component {
   handleEditDeliveryArea() {
     const {storeLocation} = toJS(this.props.detailsStore.storeDetails);
 
-    const initialBboxCenter = this.currentBoundingBox
-      ? geolib.getCenterOfBounds(this.currentBoundingBox)
-      : storeLocation;
+    if (storeLocation) {
+      const initialBboxCenter = this.currentBoundingBox
+        ? geolib.getCenterOfBounds(this.currentBoundingBox)
+        : storeLocation;
 
-    this.panMapToLocation(initialBboxCenter);
+      this.panMapToLocation(initialBboxCenter);
 
-    this.setState({
-      newDistance: this.state.distance,
-      editMode: true,
-      bboxCenter: initialBboxCenter,
-    });
+      this.setState({
+        newDistance: this.state.distance,
+        editMode: true,
+        bboxCenter: initialBboxCenter,
+      });
+    } else {
+      Toast({
+        text:
+          'Error: Your store location is not set. Please contact Marketeer Support and provide them with your location details. Thank you',
+        type: 'danger',
+        duration: 10000,
+      });
+    }
   }
 
   handleCancelChanges() {
