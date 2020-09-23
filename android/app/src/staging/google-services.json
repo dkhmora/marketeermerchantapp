@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "665160952517",
+    "firebase_url": "https://marketeerph-staging.firebaseio.com",
+    "project_id": "marketeerph-staging",
+    "storage_bucket": "marketeerph-staging.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665160952517:android:70a75a5d36c236f1c1deac",
+        "android_client_info": {
+          "package_name": "com.marketeerph.marketeermerchantapp.android.staging"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "665160952517-5clkmdktj1qp0ece4t29slmtuio58ctl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.marketeerph.marketeermerchantapp.android.staging",
+            "certificate_hash": "e5e53ea2194a8c3cccc14bc261cd257e3134aceb"
+          }
+        },
+        {
+          "client_id": "665160952517-jue7dkjf4ojv0fbcr9alh1uvefgo562u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-7PoPRAHeUfJxgju7dnFUNqPbM_7qzXg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "665160952517-jue7dkjf4ojv0fbcr9alh1uvefgo562u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

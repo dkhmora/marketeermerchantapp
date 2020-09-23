@@ -186,6 +186,9 @@ class MainDrawer extends Component {
       this.props.detailsStore.subscribedToNotifications = false;
       this.props.detailsStore.unsubscribeSetStoreDetails &&
         this.props.detailsStore.unsubscribeSetStoreDetails();
+      this.props.detailsStore.unsubscribeSetMerchantDetails &&
+        this.props.detailsStore.unsubscribeSetMerchantDetails();
+      this.props.detailsStore.merchantDetails = {};
       this.props.detailsStore.unsubscribeSetStoreDetails = null;
       this.props.detailsStore.disbursementPeriods = [];
       this.props.detailsStore.lastDisbursementPeriodUpdatedAt = 0;
@@ -237,7 +240,7 @@ class MainDrawer extends Component {
                   justifyContent: 'space-between',
                 }}>
                 <View style={{justifyContent: 'flex-start'}}>
-                  {merchantDetails && (
+                  {Object.keys(merchantDetails).length > 0 && (
                     <View>
                       <DrawerItem
                         onPress={() =>

@@ -6,7 +6,6 @@ import {View, TouchableOpacity} from 'react-native';
 import {Card, CardItem} from 'native-base';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
-import {Rating} from 'react-native-rating-element';
 import {PlaceholderMedia, Placeholder, Fade} from 'rn-placeholder';
 
 class StoreCard extends Component {
@@ -60,13 +59,13 @@ class StoreCard extends Component {
             style={{
               borderRadius: 20,
               backgroundColor: colors.accent,
-              padding: 3,
-              paddingHorizontal: 10,
+              padding: 2,
+              paddingHorizontal: 5,
               marginRight: 2,
             }}>
             <Text
               style={{
-                fontSize: 13,
+                fontSize: 12,
                 fontFamily: 'ProductSans-Regular',
                 color: colors.icons,
               }}>
@@ -150,7 +149,7 @@ class StoreCard extends Component {
                   borderColor: 'rgba(0,0,0,0.2)',
                   borderWidth: 1,
                   right: -1,
-                  padding: 7,
+                  padding: 4,
                   marginTop: 20,
                   backgroundColor: colors.icons,
                   shadowColor: '#000',
@@ -191,7 +190,7 @@ class StoreCard extends Component {
                   borderBottomRightRadius: 8,
                   top: 0,
                   left: 0,
-                  padding: 7,
+                  padding: 4,
                   backgroundColor: colors.primary,
                   shadowColor: '#000',
                   shadowOffset: {
@@ -202,48 +201,8 @@ class StoreCard extends Component {
                   shadowRadius: 6.27,
                   elevation: 10,
                 }}>
-                <Text style={{color: colors.icons, fontSize: 17}}>
-                  {store.storeCategory}
-                </Text>
+                <Text style={{color: colors.icons}}>{store.storeCategory}</Text>
               </View>
-
-              {store.ratingAverage && (
-                <View
-                  style={{
-                    overflow: 'hidden',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'absolute',
-                    borderTopLeftRadius: 8,
-                    borderBottomLeftRadius: 8,
-                    bottom: 60,
-                    right: 0,
-                    padding: 5,
-                    backgroundColor: colors.primary,
-                    shadowColor: '#000',
-                    shadowOffset: {
-                      width: 0,
-                      height: 5,
-                    },
-                    shadowOpacity: 0.34,
-                    shadowRadius: 6.27,
-                    elevation: 10,
-                  }}>
-                  <Rating
-                    type="custom"
-                    direction="row"
-                    rated={store.ratingAverage}
-                    selectedIconImage={require('../../assets/images/feather_filled.png')}
-                    emptyIconImage={require('../../assets/images/feather_unfilled.png')}
-                    size={23}
-                    tintColor={colors.primary}
-                    ratingColor={colors.accent}
-                    ratingBackgroundColor="#455A64"
-                    readonly
-                  />
-                </View>
-              )}
             </View>
 
             <CardItem
@@ -268,27 +227,59 @@ class StoreCard extends Component {
                 style={{
                   width: '100%',
                   flexDirection: 'column',
-                  paddingTop: 5,
                 }}>
-                <Text
-                  numberOfLines={1}
-                  style={[
-                    styles.text_footer,
-                    {
-                      fontFamily: 'ProductSans-Regular',
-                      textAlign: 'left',
-                      alignSelf: 'flex-start',
-                      flexWrap: 'wrap',
-                    },
-                  ]}>
-                  {store.storeName}
-                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.text_footer,
+                      {
+                        fontFamily: 'ProductSans-Regular',
+                        textAlign: 'left',
+                        alignSelf: 'flex-start',
+                        flexWrap: 'wrap',
+                        flex: 1,
+                      },
+                    ]}>
+                    {store.storeName}
+                  </Text>
+
+                  {store.ratingAverage && (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <Text style={{color: colors.text_primary}}>
+                        {store.ratingAverage.toFixed(1)}
+                      </Text>
+
+                      <FastImage
+                        source={require('../../assets/images/feather_filled.png')}
+                        style={{
+                          backgroundColor: colors.icons,
+                          width: 17,
+                          height: 17,
+                          marginLeft: 5,
+                        }}
+                        resizeMode={FastImage.resizeMode.cover}
+                      />
+                    </View>
+                  )}
+                </View>
 
                 <Text
                   numberOfLines={2}
                   style={[
                     styles.text_subtext,
                     {
+                      fontSize: 12,
                       fontFamily: 'ProductSans-light',
                       flexWrap: 'wrap',
                       minHeight: 28,
@@ -312,7 +303,7 @@ class StoreCard extends Component {
                     <this.PaymentMethods />
                   </View>
 
-                  <Text style={{color: colors.text_secondary}}>
+                  <Text style={{color: colors.text_secondary, fontSize: 12}}>
                     {store.distance
                       ? store.distance > 1000
                         ? `${(store.distance / 1000).toFixed(2)} km`
@@ -326,7 +317,7 @@ class StoreCard extends Component {
             <View
               style={{
                 position: 'absolute',
-                top: 80,
+                top: 75,
                 left: 20,
                 shadowColor: '#000',
                 shadowOffset: {
@@ -335,11 +326,10 @@ class StoreCard extends Component {
                 },
                 shadowOpacity: 0.25,
                 shadowRadius: 3.84,
-                elevation: 5,
-                backgroundColor: colors.primary,
+                elevation: 6,
                 borderRadius: 8,
-                borderWidth: 1,
-                borderColor: colors.primary,
+                borderWidth: 0.7,
+                borderColor: 'rgba(0,0,0,0.3)',
                 overflow: 'hidden',
                 width: 80,
                 height: 80,

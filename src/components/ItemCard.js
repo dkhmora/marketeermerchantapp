@@ -125,13 +125,13 @@ class ItemCard extends PureComponent {
               backgroundColor: colors.primary,
               justifyContent: 'space-between',
             }}>
-            <View style={{flexDirection: 'column'}}>
+            <View style={{flexDirection: 'column', flex: 1}}>
               <Text
                 style={{
                   color: colors.icons,
                   fontFamily: 'ProductSans-Regular',
                 }}>
-                {item.name}
+                {item.name}asdadasdasdaasdadasdasdas
               </Text>
 
               <Text
@@ -183,9 +183,11 @@ class ItemCard extends PureComponent {
                 flexGrow: 1,
                 flexShrink: 1,
               }}>
-              <ScrollView style={{flex: 1}}>
-                <Text>
+              <ScrollView>
+                <Text style={{paddingBottom: 10}}>
                   {item.description ? item.description : 'No description'}
+                  asdadasdasdas asdasd as asd asd as dasd asdas as as as das das
+                  das dsa sa das as das asd asdasdasdasdas asd asd asdsadasd
                 </Text>
               </ScrollView>
             </Body>
