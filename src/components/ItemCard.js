@@ -131,7 +131,7 @@ class ItemCard extends PureComponent {
                   color: colors.icons,
                   fontFamily: 'ProductSans-Regular',
                 }}>
-                {item.name}asdadasdasdaasdadasdasdas
+                {item.name}
               </Text>
 
               <Text
@@ -186,8 +186,6 @@ class ItemCard extends PureComponent {
               <ScrollView>
                 <Text style={{paddingBottom: 10}}>
                   {item.description ? item.description : 'No description'}
-                  asdadasdasdas asdasd as asd asd as dasd asdas as as as das das
-                  das dsa sa das as das asd asdasdasdasdas asd asd asdsadasd
                 </Text>
               </ScrollView>
             </Body>
@@ -208,6 +206,8 @@ class ItemCard extends PureComponent {
                 backgroundColor: colors.primary,
                 elevation: 3,
                 flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}>
               {item.discountedPrice && (
                 <Text
