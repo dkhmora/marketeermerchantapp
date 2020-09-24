@@ -5,7 +5,6 @@ import {
   SafeAreaView,
   FlatList,
   RefreshControl,
-  Linking,
 } from 'react-native';
 import {Card, CardItem} from 'native-base';
 // Custom Components
@@ -16,7 +15,7 @@ import {Text, Icon, Button} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import moment from 'moment';
-import storage from '@react-native-firebase/storage';
+import crashlytics from '@react-native-firebase/crashlytics';
 @inject('detailsStore')
 @inject('itemsStore')
 @observer
@@ -29,6 +28,8 @@ class StoreDetailsScreen extends Component {
 
   componentDidMount() {
     this.getDisbursementPeriods();
+
+    crashlytics().log('StoreDetailsScreen');
   }
 
   async getDisbursementPeriods() {
@@ -42,15 +43,6 @@ class StoreDetailsScreen extends Component {
         });
       },
     );
-  }
-
-  async downloadPdf() {
-    const ref = storage().ref(
-      'Fresh Market Solutions Inc - FMSI-ChKK5i1-0905202009112020-DI.pdf',
-    );
-    const link = await ref.getDownloadURL();
-
-    Linking.openURL(link);
   }
 
   onRefresh() {
@@ -94,47 +86,43 @@ class StoreDetailsScreen extends Component {
               style={{
                 paddingHorizontal: 10,
                 paddingVertical: 10,
-                flexDirection: 'column',
+                flexDirection: 'row',
+                flex: 1,
               }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontFamily: 'ProductSans-Bold',
-                    color: colors.text_primary,
-                    textAlign: 'justify',
-                  }}>
-                  Payment Gateway Fee:{' '}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontFamily: 'ProductSans-Regular',
-                    color: colors.text_primary,
-                    textAlign: 'justify',
-                  }}>
-                  -₱{item.totalPaymentGatewayFees}
-                </Text>
-              </View>
-
               <Text
                 style={{
-                  fontSize: 16,
+                  fontSize: 18,
+                  fontFamily: 'ProductSans-Bold',
+                  color: colors.text_primary,
+                  textAlign: 'justify',
                 }}>
-                {item.successfulTransactionCount}{' '}
-                {item.successfulTransactionCount < 2
-                  ? 'transaction'
-                  : 'transactions'}
+                Payment Gateway Fee:{' '}
               </Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontFamily: 'ProductSans-Regular',
+                  color: colors.text_primary,
+                  textAlign: 'justify',
+                }}>
+                -₱{item.totalPaymentGatewayFees}
+              </Text>
+            </View>
 
-              <View style={{paddingTop: 8}}>
-                <Text style={{color: colors.text_secondary}}>
-                  Updated {timeStamp}
-                </Text>
-              </View>
+            <Text
+              style={{
+                fontSize: 16,
+              }}>
+              {item.successfulTransactionCount}{' '}
+              {item.successfulTransactionCount < 2
+                ? 'transaction'
+                : 'transactions'}
+            </Text>
+
+            <View style={{paddingTop: 8}}>
+              <Text style={{color: colors.text_secondary}}>
+                Updated {timeStamp}
+              </Text>
             </View>
           </View>
 

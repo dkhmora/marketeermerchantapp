@@ -7,6 +7,7 @@ import {colors} from '../../assets/colors';
 import {Rating} from 'react-native-rating-element';
 import moment from 'moment';
 import BaseHeader from '../components/BaseHeader';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('detailsStore')
 @observer
@@ -18,6 +19,8 @@ class ReviewsScreen extends Component {
 
   componentDidMount() {
     this.getReviews();
+
+    crashlytics().log('ReviewsScreen');
   }
 
   async getReviews() {

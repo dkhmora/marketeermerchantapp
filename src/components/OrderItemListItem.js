@@ -18,9 +18,10 @@ class OrderItemCard extends PureComponent {
 
   getImage = async () => {
     const ref = storage().ref(this.props.item.image);
-    const link = await ref
-      .getDownloadURL()
-      .catch((err) => Toast({text: err.message, type: 'danger'}));
+    const link = await ref.getDownloadURL().catch((err) => {
+      Toast({text: err.message, type: 'danger'});
+      return null;
+    });
 
     if (link) {
       this.setState({url: {uri: link}});

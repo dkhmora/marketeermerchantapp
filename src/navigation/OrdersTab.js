@@ -6,9 +6,8 @@ import OrdersList from '../components/OrdersList';
 import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import {computed} from 'mobx';
 import CancelOrderModal from '../components/CancelOrderModal';
-import Toast from '../components/Toast';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const TabOrders = createMaterialTopTabNavigator();
 
@@ -25,6 +24,8 @@ class OrdersTab extends Component {
     const {storeId} = this.props.detailsStore.storeDetails;
 
     this.props.ordersStore.setOrders(storeId);
+
+    crashlytics().log('OrdersTab');
   }
 
   componentWillUnmount() {

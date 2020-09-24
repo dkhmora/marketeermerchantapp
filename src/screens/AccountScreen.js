@@ -3,11 +3,10 @@ import BaseHeader from '../components/BaseHeader';
 import {View} from 'react-native';
 import {inject, observer} from 'mobx-react';
 import {Card, CardItem} from 'native-base';
-import {Text, Button, Icon, Input, Overlay} from 'react-native-elements';
+import {Text} from 'react-native-elements';
 import {colors} from '../../assets/colors';
-import Toast from '../components/Toast';
-import {styles} from '../../assets/styles';
 import ChangePasswordModal from '../components/ChangePasswordModal';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @observer
@@ -18,6 +17,10 @@ class AccountScreen extends Component {
     this.state = {
       changePasswordModal: false,
     };
+  }
+
+  componentDidMount() {
+    crashlytics().log('AccountScreen');
   }
 
   handleChangePassword() {

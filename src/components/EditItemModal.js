@@ -7,7 +7,7 @@ import {inject, observer} from 'mobx-react';
 import Toast from './Toast';
 import {computed} from 'mobx';
 import ImagePicker from 'react-native-image-crop-picker';
-import {Card, CardItem, Picker, Item, Label} from 'native-base';
+import {Card, CardItem, Picker, Item} from 'native-base';
 import storage from '@react-native-firebase/storage';
 import FastImage from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -78,11 +78,16 @@ class EditItemModal extends Component {
 
   getImage = async () => {
     const ref = storage().ref(this.props.itemsStore.selectedItem.image);
-    const link = await ref
-      .getDownloadURL()
-      .catch((err) => Toast({text: err.message, type: 'danger'}));
+    const link = await ref.getDownloadURL().catch((err) => {
+      Toast({text: err.message, type: 'danger'});
+      return null;
+    });
 
-    this.setState({imageDisplay: {uri: link}, imageLoading: false});
+    if (link) {
+      this.setState({imageDisplay: {uri: link}});
+    }
+
+    this.setState({imageLoading: false});
   };
 
   handleStock(stock) {

@@ -7,6 +7,7 @@ import {Card, CardItem} from 'native-base';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
 import {PlaceholderMedia, Placeholder, Fade} from 'rn-placeholder';
+import Toast from './Toast';
 
 class StoreCard extends Component {
   constructor(props) {
@@ -24,16 +25,34 @@ class StoreCard extends Component {
 
     if (displayImage) {
       const displayImageRef = storage().ref(displayImage);
-      const displayImageUrl = await displayImageRef.getDownloadURL();
+      const displayImageUrl = await displayImageRef
+        .getDownloadURL()
+        .catch((err) => {
+          Toast({text: err.message, type: 'danger'});
+          return null;
+        });
 
-      this.setState({displayImageUrl, ready: true});
+      if (displayImageUrl) {
+        this.setState({displayImageUrl, ready: true});
+      }
+
+      this.setState({ready: true});
     }
 
     if (coverImage) {
       const coverImageRef = storage().ref(coverImage);
-      const coverImageUrl = await coverImageRef.getDownloadURL();
+      const coverImageUrl = await coverImageRef
+        .getDownloadURL()
+        .catch((err) => {
+          Toast({text: err.message, type: 'danger'});
+          return null;
+        });
 
-      this.setState({coverImageUrl, ready: true});
+      if (coverImageUrl) {
+        this.setState({coverImageUrl});
+      }
+
+      this.setState({ready: true});
     }
   };
 

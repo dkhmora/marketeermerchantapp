@@ -22,7 +22,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import messaging from '@react-native-firebase/messaging';
 import RemotePushController from '../services/RemotePushController';
-import TopUpHistoryScreen from '../screens/TopUpHistoryScreen';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -52,7 +52,11 @@ class MainDrawer extends Component {
       if (initialLink.url !== null) {
         this.handleDynamicLink(initialLink);
       }
-    } catch (error) {}
+    } catch (error) {
+      crashlytics().recordError(error);
+    }
+
+    crashlytics().log('MainDrawer');
   }
 
   initializeForegroundNotificationHandlers() {

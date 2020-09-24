@@ -9,6 +9,7 @@ import BaseHeader from '../components/BaseHeader';
 import {computed} from 'mobx';
 import * as Animatable from 'react-native-animatable';
 import {initialWindowMetrics} from 'react-native-safe-area-context';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const inset = initialWindowMetrics && initialWindowMetrics.insets;
 const bottomPadding = Platform.OS === 'ios' ? inset.bottom : 0;
@@ -38,6 +39,8 @@ class TopUpHistoryScreen extends Component {
 
   componentDidMount() {
     this.getInitialPayments();
+
+    crashlytics().log('TopUpHistoryScreen');
   }
 
   getAvailablePaymentMethods() {

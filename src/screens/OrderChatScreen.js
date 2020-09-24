@@ -12,7 +12,7 @@ import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
-
+import crashlytics from '@react-native-firebase/crashlytics';
 @inject('ordersStore')
 @inject('detailsStore')
 @inject('authStore')
@@ -83,6 +83,8 @@ class OrderChatScreen extends Component {
     if (!data) {
       this.props.ordersStore.getOrder(orderId);
     }
+
+    crashlytics().log('OrderChatScreen');
   }
 
   componentWillUnmount() {

@@ -16,11 +16,12 @@ import StoreCard from '../components/StoreCard';
 import FastImage from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from '../components/Toast';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('detailsStore')
 @inject('itemsStore')
 @observer
-class StoreDetailsScreen extends Component {
+class DashboardScreen extends Component {
   constructor(props) {
     super(props);
 
@@ -63,6 +64,8 @@ class StoreDetailsScreen extends Component {
     if (!displayImageUrl || !coverImageUrl) {
       this.getImage();
     }
+
+    crashlytics().log('DashboardScreen');
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -140,18 +143,28 @@ class StoreDetailsScreen extends Component {
       const displayRef = storage().ref(
         this.props.detailsStore.storeDetails.displayImage,
       );
-      const displayLink = await displayRef.getDownloadURL();
+      const displayLink = await displayRef.getDownloadURL().catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+        return null;
+      });
 
-      this.setState({displayImageUrl: {uri: displayLink}});
+      if (displayLink) {
+        this.setState({displayImageUrl: {uri: displayLink}});
+      }
     }
 
     if (this.props.detailsStore.storeDetails.coverImage) {
       const coverRef = storage().ref(
         this.props.detailsStore.storeDetails.coverImage,
       );
-      const coverLink = await coverRef.getDownloadURL();
+      const coverLink = await coverRef.getDownloadURL().catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+        return null;
+      });
 
-      this.setState({coverImageUrl: {uri: coverLink}});
+      if (coverLink) {
+        this.setState({coverImageUrl: {uri: coverLink}});
+      }
     }
   };
 
@@ -1261,4 +1274,4 @@ class StoreDetailsScreen extends Component {
   }
 }
 
-export default StoreDetailsScreen;
+export default DashboardScreen;

@@ -18,6 +18,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from '../components/Toast';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @observer
@@ -47,6 +48,8 @@ class LoginScreen extends Component {
         });
       }
     }
+
+    crashlytics().log('LoginScreen');
   }
 
   handleEmailChange = (email) => {

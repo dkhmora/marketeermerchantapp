@@ -23,7 +23,10 @@ class OrdersStore {
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
-    const link = await ref.getDownloadURL();
+    const link = await ref.getDownloadURL().catch((err) => {
+      Toast({text: err.message, type: 'danger'});
+      return null;
+    });
 
     return link;
   }
@@ -43,8 +46,10 @@ class OrdersStore {
       .then(() => {
         return this.getImageUrl(imageRef);
       })
-      .then((imageLink) =>
-        this.createImageMessage(orderId, messageId, user, imageLink),
+      .then(
+        (imageLink) =>
+          imageLink &&
+          this.createImageMessage(orderId, messageId, user, imageLink),
       )
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }

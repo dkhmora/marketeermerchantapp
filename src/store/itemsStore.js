@@ -6,6 +6,7 @@ import storage from '@react-native-firebase/storage';
 import Toast from '../components/Toast';
 import {v4 as uuidv4} from 'uuid';
 import {persist} from 'mobx-persist';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const functions = firebase.app().functions('asia-northeast1');
 class ItemsStore {
@@ -35,51 +36,59 @@ class ItemsStore {
       await this.uploadImage(imageRef, newItem.image);
     }
 
-    return firestore().runTransaction(async (transaction) => {
-      const storeItemsDocument = await transaction.get(storeItemsRef);
+    return firestore()
+      .runTransaction(async (transaction) => {
+        const storeItemsDocument = await transaction.get(storeItemsRef);
 
-      if (storeItemsDocument.exists) {
-        let dbItems = [...storeItemsDocument.data().items];
+        if (storeItemsDocument.exists) {
+          let dbItems = [...storeItemsDocument.data().items];
 
-        const dbItemIndex = dbItems.findIndex(
-          (dbItem) => item.itemId === dbItem.itemId,
-        );
+          const dbItemIndex = dbItems.findIndex(
+            (dbItem) => item.itemId === dbItem.itemId,
+          );
 
-        if (dbItemIndex >= 0) {
-          dbItems[dbItemIndex].stock += additionalStock;
-          dbItems[dbItemIndex].name = newItem.name;
-          dbItems[dbItemIndex].description = newItem.description;
-          dbItems[dbItemIndex].price = newItem.price;
-          dbItems[dbItemIndex].discountedPrice = newItem.discountedPrice;
-          dbItems[dbItemIndex].category = newItem.category;
-          dbItems[dbItemIndex].unit = newItem.unit;
-          dbItems[dbItemIndex].updatedAt = timeStamp;
+          if (dbItemIndex >= 0) {
+            dbItems[dbItemIndex].stock += additionalStock;
+            dbItems[dbItemIndex].name = newItem.name;
+            dbItems[dbItemIndex].description = newItem.description;
+            dbItems[dbItemIndex].price = newItem.price;
+            dbItems[dbItemIndex].discountedPrice = newItem.discountedPrice;
+            dbItems[dbItemIndex].category = newItem.category;
+            dbItems[dbItemIndex].unit = newItem.unit;
+            dbItems[dbItemIndex].updatedAt = timeStamp;
 
-          if (newItem.image) {
-            dbItems[dbItemIndex].image = imageRef;
+            if (newItem.image) {
+              dbItems[dbItemIndex].image = imageRef;
+            }
+
+            await dbItems.sort((a, b) => a.name > b.name);
+
+            transaction.update(storeItemsRef, {
+              items: dbItems,
+              updatedAt: timeStamp,
+            });
+          } else {
+            Toast({
+              text: 'Error: Item was not found.',
+              type: 'danger',
+              duration: 10000,
+            });
           }
-
-          await dbItems.sort((a, b) => a.name > b.name);
-
-          transaction.update(storeItemsRef, {
-            items: dbItems,
-            updatedAt: timeStamp,
-          });
-        } else {
-          Toast({
-            text: 'Error: Item was not found.',
-            type: 'danger',
-            duration: 10000,
-          });
         }
-      }
-    });
+      })
+      .catch((err) => {
+        crashlytics().recordError(err);
+        Toast({text: err.message, type: 'danger'});
+      });
   }
 
   @action setCategoryItems(category) {
     const items = this.storeItems.filter((item) => item.category === category);
 
-    this.categoryItems.set(category, items);
+    this.categoryItems.set(category, items).catch((err) => {
+      crashlytics().recordError(err);
+      Toast({text: err.message, type: 'danger'});
+    });
   }
 
   @action async deleteItemCategory(storeId, category) {
@@ -113,7 +122,10 @@ class ItemsStore {
           Toast({text: `${formattedCategory} already exists`, type: 'danger'});
         }
       })
-      .catch((err) => Toast({text: err.message, type: 'danger'}));
+      .catch((err) => {
+        crashlytics().recordError(err);
+        Toast({text: err.message, type: 'danger'});
+      });
   }
 
   @action setStoreItems(storeId, itemCategories) {
@@ -161,7 +173,10 @@ class ItemsStore {
       return await storage()
         .ref(imageRef)
         .putFile(imagePath)
-        .catch((err) => Toast({text: err.message, type: 'danger'}));
+        .catch((err) => {
+          crashlytics().recordError(err);
+          Toast({text: err.message, type: 'danger'});
+        });
     }
   }
 
@@ -173,9 +188,6 @@ class ItemsStore {
     const imageRef = imagePath
       ? `/images/stores/${storeId}/items/${itemId}_${timeStamp}.${fileExtension}`
       : null;
-    const itemExists = this.storeItems
-      .slice()
-      .findIndex((existingItem) => existingItem.name === item.name);
 
     const newItem = {
       ...item,
@@ -185,44 +197,41 @@ class ItemsStore {
       updatedAt: timeStamp,
     };
 
-    if (itemExists === -1) {
-      return await this.uploadImage(imageRef, imagePath).then(async () => {
-        return await functions
-          .httpsCallable('addStoreItem')({
-            item: JSON.stringify(newItem),
-            storeId,
-          })
-          .then((response) => {
-            if (response.data.s === 200) {
-              Toast({
-                text: `"${newItem.name}" successfully added to Item List!`,
-              });
-            } else {
-              Toast({
-                text: `Error: ${response.data.m} (${response.data.s})!`,
-                type: 'danger',
-              });
-            }
-
-            return response.data;
-          })
-          .catch((err) => {
+    return await this.uploadImage(imageRef, imagePath).then(async () => {
+      return await functions
+        .httpsCallable('addStoreItem')({
+          item: JSON.stringify(newItem),
+          storeId,
+        })
+        .then((response) => {
+          if (response.data.s === 200) {
             Toast({
-              text: `Error: ${err}!`,
+              text: `"${newItem.name}" successfully added to Item List!`,
+            });
+          } else {
+            Toast({
+              text: `Error: ${response.data.m} (${response.data.s})!`,
               type: 'danger',
             });
-          });
-      });
-    } else {
-      return Toast({
-        text: `Error: You already have an item named "${newItem.name}"!`,
-        type: 'danger',
-      });
-    }
+          }
+
+          return response.data;
+        })
+        .catch((err) => {
+          crashlytics().recordError(err);
+          Toast({text: err.message, type: 'danger'});
+        });
+    });
   }
 
   @action async deleteImage(image) {
-    await storage().ref(image).delete();
+    await storage()
+      .ref(image)
+      .delete()
+      .catch((err) => {
+        crashlytics().recordError(err);
+        Toast({text: err.message, type: 'danger'});
+      });
   }
 
   @action async deleteStoreItem(storeId, item) {
@@ -232,20 +241,25 @@ class ItemsStore {
       .collection('items')
       .doc(item.doc);
 
-    return await firestore().runTransaction(async (transaction) => {
-      const timeStamp = firestore.Timestamp.now().toMillis();
-      const storeItems = (await transaction.get(storeItemsRef)).data().items;
+    return await firestore()
+      .runTransaction(async (transaction) => {
+        const timeStamp = firestore.Timestamp.now().toMillis();
+        const storeItems = (await transaction.get(storeItemsRef)).data().items;
 
-      const itemSnapshot = await storeItems.find(
-        (storeItem) => storeItem.itemId === item.itemId,
-      );
+        const itemSnapshot = await storeItems.find(
+          (storeItem) => storeItem.itemId === item.itemId,
+        );
 
-      transaction.update(storeItemsRef, {
-        items: firestore.FieldValue.arrayRemove(itemSnapshot),
-        itemNumber: firestore.FieldValue.increment(-1),
-        updatedAt: timeStamp,
+        transaction.update(storeItemsRef, {
+          items: firestore.FieldValue.arrayRemove(itemSnapshot),
+          itemNumber: firestore.FieldValue.increment(-1),
+          updatedAt: timeStamp,
+        });
+      })
+      .catch((err) => {
+        crashlytics().recordError(err);
+        Toast({text: err.message, type: 'danger'});
       });
-    });
   }
 }
 

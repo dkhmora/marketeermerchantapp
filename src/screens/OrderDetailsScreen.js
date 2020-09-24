@@ -11,6 +11,7 @@ import MapView, {Marker} from 'react-native-maps';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
 import {computed} from 'mobx';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -55,6 +56,8 @@ class OrderDetailsScreen extends Component {
       this.getOrderItems();
       this.props.ordersStore.getOrder(orderId);
     }
+
+    crashlytics().log('OrderDetailsScreen');
   }
 
   componentWillUnmount() {

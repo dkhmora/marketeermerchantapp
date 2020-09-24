@@ -20,6 +20,7 @@ import Toast from '../components/Toast';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import ConfirmationModal from '../components/ConfirmationModal';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -91,6 +92,8 @@ class AddItemScreen extends Component {
         duration: 0,
       });
     }
+
+    crashlytics().log('AddItemScreen');
   }
 
   async handleAddItem() {

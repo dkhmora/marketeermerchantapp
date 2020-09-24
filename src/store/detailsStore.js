@@ -7,6 +7,7 @@ import '@react-native-firebase/functions';
 import Toast from '../components/Toast';
 import {Platform} from 'react-native';
 import {persist} from 'mobx-persist';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const functions = firebase.app().functions('asia-northeast1');
 const storesCollection = firestore().collection('stores');
@@ -50,6 +51,8 @@ class DetailsStore {
         return response.data;
       })
       .catch((err) => {
+        crashlytics().recordError(err);
+
         Toast({
           text: `Error: ${err}!`,
           type: 'danger',
@@ -89,6 +92,8 @@ class DetailsStore {
         });
       })
       .catch((err) => {
+        crashlytics().recordError(err);
+
         Toast({text: err.message, type: 'danger'});
       });
   }
@@ -130,19 +135,27 @@ class DetailsStore {
         return data;
       })
       .catch((err) => {
+        crashlytics().recordError(err);
+
         Toast({text: err.message, type: 'danger'});
       });
   }
 
   @action updateCoordinates(lowerRange, upperRange, boundingBox) {
-    return this.storeRef.update({
-      deliveryCoordinates: {
-        lowerRange,
-        upperRange,
-        boundingBox,
-      },
-      updatedAt: firestore.Timestamp.now().toMillis(),
-    });
+    return this.storeRef
+      .update({
+        deliveryCoordinates: {
+          lowerRange,
+          upperRange,
+          boundingBox,
+        },
+        updatedAt: firestore.Timestamp.now().toMillis(),
+      })
+      .catch((err) => {
+        crashlytics().recordError(err);
+
+        Toast({text: err.message, type: 'danger'});
+      });
   }
 
   @action async setStoreDetails(storeId) {
@@ -179,7 +192,10 @@ class DetailsStore {
           .then(() => {
             this.subscribedToNotifications = true;
           })
-          .catch((err) => Toast({text: err.message, type: 'danger'}));
+          .catch((err) => {
+            crashlytics().recordError(err);
+            Toast({text: err.message, type: 'danger'});
+          });
       }
     }
   }
@@ -195,7 +211,10 @@ class DetailsStore {
               this.subscribedToNotifications = false;
             }),
         )
-        .catch((err) => Toast({text: err.message, type: 'danger'}));
+        .catch((err) => {
+          crashlytics().recordError(err);
+          Toast({text: err.message, type: 'danger'});
+        });
     }
   }
 
@@ -222,7 +241,10 @@ class DetailsStore {
           updatedAt: firestore.Timestamp.now().toMillis(),
         }),
       )
-      .catch((err) => Toast({text: err.message, type: 'danger'}));
+      .catch((err) => {
+        crashlytics().recordError(err);
+        Toast({text: err.message, type: 'danger'});
+      });
   }
 
   @action async updateStoreDetails(
@@ -250,6 +272,7 @@ class DetailsStore {
         updatedAt: firestore.Timestamp.now().toMillis(),
       })
       .catch((err) => {
+        crashlytics().recordError(err);
         Toast({text: `Something went wrong. Error: ${err}`, type: 'danger'});
       });
   }

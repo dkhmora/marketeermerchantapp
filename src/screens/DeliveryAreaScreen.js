@@ -11,6 +11,7 @@ import BaseHeader from '../components/BaseHeader';
 import * as turf from '@turf/turf';
 import {computed, toJS} from 'mobx';
 import Toast from '../components/Toast';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @inject('detailsStore')
@@ -75,6 +76,8 @@ class DeliveryAreaScreen extends Component {
     if (deliveryCoordinates) {
       this.decodeGeohash();
     }
+
+    crashlytics().log('DeliveryAreaScreen');
   }
 
   getBoundsOfDistance({latitude, longitude}, distance) {

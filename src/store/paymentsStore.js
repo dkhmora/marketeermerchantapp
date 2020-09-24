@@ -4,6 +4,7 @@ import firestore from '@react-native-firebase/firestore';
 import '@react-native-firebase/functions';
 import 'react-native-get-random-values';
 import Toast from '../components/Toast';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const functions = firebase.app().functions('asia-northeast1');
 
@@ -33,6 +34,7 @@ class PaymentsStore {
         return response.data;
       })
       .catch((err) => {
+        crashlytics().recordError(err);
         Toast({text: err.message, type: 'danger'});
       });
   }
@@ -63,6 +65,10 @@ class PaymentsStore {
 
           return this.availablePaymentMethods;
         }
+      })
+      .catch((err) => {
+        crashlytics().recordError(err);
+        Toast({text: err.message, type: 'danger'});
       });
   }
 
@@ -86,6 +92,10 @@ class PaymentsStore {
           }
 
           return false;
+        })
+        .catch((err) => {
+          crashlytics().recordError(err);
+          Toast({text: err.message, type: 'danger'});
         });
     }
 
@@ -111,6 +121,10 @@ class PaymentsStore {
         }
 
         return false;
+      })
+      .catch((err) => {
+        crashlytics().recordError(err);
+        Toast({text: err.message, type: 'danger'});
       });
   }
 }

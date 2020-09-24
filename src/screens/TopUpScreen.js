@@ -14,6 +14,7 @@ import {CardItem, Card} from 'native-base';
 import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
 import {initialWindowMetrics} from 'react-native-safe-area-context';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const SCREEN_HEIGHT = Dimensions.get('screen').height;
 const inset = initialWindowMetrics && initialWindowMetrics.insets;
@@ -68,6 +69,8 @@ class TopUpScreen extends Component {
 
   componentDidMount() {
     this.checkEmail(this.state.email);
+
+    crashlytics().log('StoreItemsScreen');
   }
 
   handleEmailChange = (email) => {

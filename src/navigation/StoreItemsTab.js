@@ -10,6 +10,7 @@ import {colors} from '../../assets/colors';
 import EditItemModal from '../components/EditItemModal';
 import Toast from '../components/Toast';
 import {Dimensions} from 'react-native';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const TabBase = createMaterialTopTabNavigator();
 
@@ -71,6 +72,10 @@ class StoreItemsTab extends Component {
 
   @action closeDeleteCategoryModal() {
     this.deleteCategoryModal = false;
+  }
+
+  componentDidMount() {
+    crashlytics().log('StoreItemsTab');
   }
 
   onValueChange(value) {
