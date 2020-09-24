@@ -62,53 +62,61 @@ class StoreDetailsScreen extends Component {
           flex: 1,
           borderBottomColor: colors.divider,
           borderBottomWidth: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}>
         <View
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
           }}>
-          <View style={{flexDirection: 'column', alignItems: 'flex-start'}}>
+          <Text
+            style={{
+              fontSize: 17,
+              color: colors.icons,
+              borderBottomRightRadius: 10,
+              padding: 5,
+              backgroundColor: colors.primary,
+              elevation: 3,
+            }}>
+            {startDate} to {endDate}
+          </Text>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              flex: 1,
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+            }}>
             <Text
               style={{
-                fontSize: 17,
-                color: colors.icons,
-                borderBottomRightRadius: 10,
-                padding: 5,
-                backgroundColor: colors.primary,
-                elevation: 3,
+                fontSize: 18,
+                fontFamily: 'ProductSans-Bold',
+                color: colors.text_primary,
+                textAlign: 'justify',
               }}>
-              {startDate} to {endDate}
+              Payment Gateway Fee:{' '}
             </Text>
-
-            <View
+            <Text
               style={{
-                paddingHorizontal: 10,
-                paddingVertical: 10,
-                flexDirection: 'row',
-                flex: 1,
+                fontSize: 18,
+                fontFamily: 'ProductSans-Regular',
+                color: colors.text_primary,
+                textAlign: 'justify',
               }}>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontFamily: 'ProductSans-Bold',
-                  color: colors.text_primary,
-                  textAlign: 'justify',
-                }}>
-                Payment Gateway Fee:{' '}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontFamily: 'ProductSans-Regular',
-                  color: colors.text_primary,
-                  textAlign: 'justify',
-                }}>
-                -₱{item.totalPaymentGatewayFees}
-              </Text>
-            </View>
+              -₱{item.totalPaymentGatewayFees}
+            </Text>
+          </View>
 
+          <View
+            style={{
+              paddingHorizontal: 10,
+              paddingBottom: 5,
+              flexDirection: 'column',
+              flex: 1,
+            }}>
             <Text
               style={{
                 fontSize: 16,
@@ -119,41 +127,39 @@ class StoreDetailsScreen extends Component {
                 : 'transactions'}
             </Text>
 
-            <View style={{paddingTop: 8}}>
-              <Text style={{color: colors.text_secondary}}>
-                Updated {timeStamp}
-              </Text>
-            </View>
+            <Text style={{color: colors.text_secondary, paddingTop: 8}}>
+              Updated {timeStamp}
+            </Text>
           </View>
+        </View>
 
-          <View
+        <View
+          style={{
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 10,
+            borderColor: colors.primary,
+            borderWidth: 1,
+            elevation: 3,
+            backgroundColor: colors.icons,
+            padding: 5,
+            marginRight: 10,
+          }}>
+          <Text
             style={{
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 10,
-              borderColor: colors.primary,
-              borderWidth: 1,
-              elevation: 3,
-              backgroundColor: colors.icons,
-              padding: 5,
-              marginRight: 10,
+              fontSize: 18,
+              paddingBottom: 10,
+              fontFamily: 'ProductSans-Bold',
+              color: colors.primary,
+              textAlign: 'justify',
             }}>
-            <Text
-              style={{
-                fontSize: 18,
-                paddingBottom: 10,
-                fontFamily: 'ProductSans-Bold',
-                color: colors.primary,
-                textAlign: 'justify',
-              }}>
-              ₱{item.totalAmount}
-            </Text>
+            ₱{item.totalAmount}
+          </Text>
 
-            <Text style={{color: colors.primary, fontSize: 17}}>
-              {item.status}
-            </Text>
-          </View>
+          <Text style={{color: colors.primary, fontSize: 17}}>
+            {item.status}
+          </Text>
         </View>
       </View>
     );
