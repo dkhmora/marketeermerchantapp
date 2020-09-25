@@ -176,44 +176,46 @@ class StoreItemsTab extends Component {
               borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem header>
-              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
-                Add Category
-              </Text>
-            </CardItem>
+            <View>
+              <CardItem header>
+                <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
+                  Add Category
+                </Text>
+              </CardItem>
 
-            <CardItem>
-              <Item rounded>
-                <Input
-                  placeholder="Category Name"
-                  value={this.newCategory}
-                  onChangeText={(value) => (this.newCategory = value)}
-                />
-              </Item>
-            </CardItem>
+              <CardItem>
+                <Item rounded>
+                  <Input
+                    placeholder="Category Name"
+                    value={this.newCategory}
+                    onChangeText={(value) => (this.newCategory = value)}
+                  />
+                </Item>
+              </CardItem>
 
-            <CardItem footer>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  alignItems: 'flex-end',
-                  justifyContent: 'flex-end',
-                }}>
-                <Button
-                  title="Cancel"
-                  type="clear"
-                  onPress={() => this.closeAddCategoryModal()}
-                  containerStyle={{marginRight: 10}}
-                />
+              <CardItem footer>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    justifyContent: 'flex-end',
+                  }}>
+                  <Button
+                    title="Cancel"
+                    type="clear"
+                    onPress={() => this.closeAddCategoryModal()}
+                    containerStyle={{marginRight: 10}}
+                  />
 
-                <Button
-                  title="Add"
-                  type="clear"
-                  onPress={this.handleAddCategory.bind(this)}
-                />
-              </View>
-            </CardItem>
+                  <Button
+                    title="Add"
+                    type="clear"
+                    onPress={this.handleAddCategory.bind(this)}
+                  />
+                </View>
+              </CardItem>
+            </View>
           </Overlay>
         </View>
 
@@ -231,59 +233,61 @@ class StoreItemsTab extends Component {
               borderRadius: 10,
               overflow: 'hidden',
             }}>
-            <CardItem header>
-              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
-                Delete Category
-              </Text>
-            </CardItem>
+            <View>
+              <CardItem header>
+                <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 20}}>
+                  Delete Category
+                </Text>
+              </CardItem>
 
-            <CardItem>
-              <Item
-                rounded
-                style={{
-                  flexDirection: 'column',
-                  alignItems: 'stretch',
-                  width: '100%',
-                }}>
-                <Picker
-                  note={false}
-                  placeholder="Select Item Category"
-                  mode="dropdown"
-                  selectedValue={this.selectedCategory}
-                  iosIcon={<Icon name="arrow-down" />}
-                  onValueChange={(value) => this.onValueChange(value)}>
-                  {itemCategories &&
-                    itemCategories.map((cat, index) => {
-                      return (
-                        <Picker.Item key={index} label={cat} value={cat} />
-                      );
-                    })}
-                </Picker>
-              </Item>
-            </CardItem>
+              <CardItem>
+                <Item
+                  rounded
+                  style={{
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                    width: '100%',
+                  }}>
+                  <Picker
+                    note={false}
+                    placeholder="Select Item Category"
+                    mode="dropdown"
+                    selectedValue={this.selectedCategory}
+                    iosIcon={<Icon name="arrow-down" />}
+                    onValueChange={(value) => this.onValueChange(value)}>
+                    {itemCategories &&
+                      itemCategories.map((cat, index) => {
+                        return (
+                          <Picker.Item key={index} label={cat} value={cat} />
+                        );
+                      })}
+                  </Picker>
+                </Item>
+              </CardItem>
 
-            <CardItem footer>
-              <View
-                style={{
-                  flex: 1,
-                  flexDirection: 'row',
-                  alignItems: 'flex-end',
-                  justifyContent: 'flex-end',
-                }}>
-                <Button
-                  title="Cancel"
-                  type="clear"
-                  onPress={() => this.closeDeleteCategoryModal()}
-                  containerStyle={{marginRight: 10}}
-                />
+              <CardItem footer>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    justifyContent: 'flex-end',
+                  }}>
+                  <Button
+                    title="Cancel"
+                    type="clear"
+                    onPress={() => this.closeDeleteCategoryModal()}
+                    containerStyle={{marginRight: 10}}
+                  />
 
-                <Button
-                  title="Delete"
-                  type="clear"
-                  onPress={this.handleDeleteCategory.bind(this)}
-                />
-              </View>
-            </CardItem>
+                  <Button
+                    title="Delete"
+                    type="clear"
+                    onPress={this.handleDeleteCategory.bind(this)}
+                  />
+                </View>
+              </CardItem>
+            </View>
           </Overlay>
         </View>
 
