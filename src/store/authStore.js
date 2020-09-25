@@ -17,13 +17,26 @@ class AuthStore {
     return await auth()
       .signInWithEmailAndPassword(email, password)
       .then(async (userCred) => {
+        const claims = (await userCred.user.getIdTokenResult(true)).claims;
+        const role = claims ? claims.role : null;
+        let storeIds = null;
+
+        if (claims.storeIds) {
+          Object.entries(claims.storeIds).map(([storeId, roles]) => {
+            storeIds = `${
+              storeIds ? `${storeIds}, ` : null
+            }${storeId}: ${roles.toString()}`;
+          });
+        }
+
         crashlytics().log(`${userCred.user.email} signed in.`);
 
         return await Promise.all([
           crashlytics().setUserId(userCred.user.uid),
           crashlytics().setAttributes({
             email: userCred.user.email,
-            claims: userCred.user.getIdTokenResult(true).claims,
+            role,
+            storeIds,
           }),
         ]);
       })
