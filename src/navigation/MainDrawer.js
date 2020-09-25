@@ -203,7 +203,6 @@ class MainDrawer extends Component {
       this.props.ordersStore.maxOrderUpdatedAt = 0;
       this.props.itemsStore.categoryItems = new Map();
       this.props.itemsStore.storeItems = [];
-      this.props.itemsStore.maxItemsUpdatedAt = 0;
 
       this.props.navigation.navigate('Loader');
 

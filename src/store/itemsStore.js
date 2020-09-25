@@ -11,7 +11,6 @@ import crashlytics from '@react-native-firebase/crashlytics';
 const functions = firebase.app().functions('asia-northeast1');
 class ItemsStore {
   @persist('list') @observable storeItems = [];
-  @persist @observable maxItemsUpdatedAt = 0;
   @observable categoryItems = new Map();
   @observable unsubscribeSetStoreItems = null;
   @observable editItemModal = false;
@@ -85,10 +84,7 @@ class ItemsStore {
   @action setCategoryItems(category) {
     const items = this.storeItems.filter((item) => item.category === category);
 
-    this.categoryItems.set(category, items).catch((err) => {
-      crashlytics().recordError(err);
-      Toast({text: err.message, type: 'danger'});
-    });
+    this.categoryItems.set(category, items);
   }
 
   @action async deleteItemCategory(storeId, category) {
@@ -133,38 +129,44 @@ class ItemsStore {
       .collection('stores')
       .doc(storeId)
       .collection('items')
-      .where('updatedAt', '>', this.maxItemsUpdatedAt)
       .orderBy('updatedAt', 'desc')
       .onSnapshot(async (querySnapshot) => {
         if (querySnapshot && !querySnapshot.empty) {
-          await querySnapshot.docChanges().forEach(async (change, index) => {
-            const newItems = change.doc.data().items;
+          await new Promise((res, rej) => {
+            querySnapshot.docChanges().forEach(async (change, index) => {
+              const newItems = change.doc.data().items;
 
-            await new Promise((resolve, reject) => {
-              this.storeItems = this.storeItems.filter(
-                (storeItem) => storeItem.doc !== change.doc.id,
-              );
+              await new Promise((resolve, reject) => {
+                this.storeItems = this.storeItems.filter(
+                  (storeItem) => storeItem.doc !== change.doc.id,
+                );
 
-              resolve();
-            }).then(() => {
-              this.storeItems.push(...newItems);
-
-              if (change.doc.data().updatedAt > this.maxItemsUpdatedAt) {
-                this.maxItemsUpdatedAt = change.doc.data().updatedAt;
-              }
+                resolve();
+              })
+                .then(() => {
+                  this.storeItems.push(...newItems);
+                })
+                .then(() => {
+                  res();
+                });
             });
-          });
-
-          this.storeItems = await this.storeItems
-            .slice()
-            .sort((a, b) => a.name > b.name);
-
-          itemCategories &&
-            itemCategories.map((category) => {
-              this.setCategoryItems(category);
+          })
+            .then(async () => {
+              this.storeItems = await this.storeItems
+                .slice()
+                .sort((a, b) => a.name > b.name);
+            })
+            .then(async () => {
+              await itemCategories.map((category) => {
+                this.setCategoryItems(category);
+              });
+            })
+            .then(() => {
+              this.loaded = true;
             });
+        } else {
+          this.loaded = true;
         }
-        this.loaded = true;
       });
   }
 
