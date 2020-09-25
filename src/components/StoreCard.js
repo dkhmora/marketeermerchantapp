@@ -81,6 +81,14 @@ class StoreCard extends Component {
               padding: 2,
               paddingHorizontal: 5,
               marginRight: 2,
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.2,
+              shadowRadius: 1.41,
+              elevation: 2,
             }}>
             <Text
               style={{
@@ -128,7 +136,6 @@ class StoreCard extends Component {
                 <FastImage
                   source={{uri: coverImageUrl}}
                   style={{
-                    backgroundColor: colors.primary,
                     position: 'absolute',
                     top: 0,
                     left: 0,
@@ -357,7 +364,6 @@ class StoreCard extends Component {
                 <FastImage
                   source={{uri: displayImageUrl}}
                   style={{
-                    backgroundColor: colors.primary,
                     width: 80,
                     height: 80,
                   }}
