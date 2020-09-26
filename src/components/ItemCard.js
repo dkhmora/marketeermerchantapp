@@ -214,7 +214,7 @@ class ItemCard extends PureComponent {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              {item.discountedPrice && (
+              {item.discountedPrice ? (
                 <Text
                   style={{
                     textDecorationLine: 'line-through',
@@ -222,16 +222,16 @@ class ItemCard extends PureComponent {
                     color: colors.icons,
                     marginRight: 5,
                   }}>
-                  ₱ {item.price}
+                  ₱{item.price}
                 </Text>
-              )}
+              ) : null}
 
               <Text
                 style={{
                   fontFamily: 'ProductSans-Black',
                   color: colors.icons,
                 }}>
-                ₱ {item.discountedPrice ? item.discountedPrice : item.price}
+                ₱{item.discountedPrice ? item.discountedPrice : item.price}
                 {item.unit ? `/${item.unit}` : ''}
               </Text>
             </View>
