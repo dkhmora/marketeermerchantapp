@@ -46,6 +46,16 @@ class ItemsList extends Component {
     this.unsubscribeTabPress && this.unsubscribeTabPress();
   }
 
+  renderItem = ({item, index}) =>
+    item.empty ? (
+      <View style={{flex: 1, backgroundColor: 'transparent'}} key={index} />
+    ) : (
+      <ItemCard
+        item={item}
+        key={`${item.name}${this.props.route.params.category}`}
+      />
+    );
+
   render() {
     const {category} = this.props.route.params;
     const {navigation} = this.props;
@@ -72,16 +82,7 @@ class ItemsList extends Component {
               numColumns={numColumns}
               contentContainerStyle={{flexGrow: 1}}
               initialNumToRender={4}
-              renderItem={({item, index}) =>
-                item.empty ? (
-                  <View
-                    style={{flex: 1, backgroundColor: 'transparent'}}
-                    key={index}
-                  />
-                ) : (
-                  <ItemCard item={item} key={`${item.name}${category}`} />
-                )
-              }
+              renderItem={this.renderItem}
               ListEmptyComponent={
                 <View
                   style={{
