@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {Overlay, Text, Button, Icon, Input} from 'react-native-elements';
+import {
+  Overlay,
+  Text,
+  Button,
+  Icon,
+  Input,
+  ButtonGroup,
+} from 'react-native-elements';
 import {View, SafeAreaView, StatusBar, Platform} from 'react-native';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
@@ -12,6 +19,7 @@ import storage from '@react-native-firebase/storage';
 import FastImage from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import ConfirmationModal from './ConfirmationModal';
+import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -24,6 +32,7 @@ class EditItemModal extends Component {
       loading: false,
       newImagePath: null,
       imageDisplay: require('../../assets/placeholder.jpg'),
+      imageLoading: true,
       newName: '',
       newCategory: '',
       newDescription: '',
@@ -37,6 +46,7 @@ class EditItemModal extends Component {
       newPriceError: null,
       newDiscountedPriceError: null,
       editItemConfirmModal: false,
+      selectedIndex: 1,
     };
   }
 
@@ -71,7 +81,7 @@ class EditItemModal extends Component {
       });
 
       if (this.props.itemsStore.selectedItem.image) {
-        this.getImage();
+        this.setState({imageLoading: true}, () => this.getImage());
       }
     }
   }
@@ -84,20 +94,20 @@ class EditItemModal extends Component {
     });
 
     if (link) {
-      this.setState({imageDisplay: {uri: link}});
+      this.setState({imageDisplay: {uri: link}}, () =>
+        this.setState({imageLoading: false}),
+      );
     }
-
-    this.setState({imageLoading: false});
   };
 
   handleStock(stock) {
-    const numberRegexp = /^-?[0-9]+$/;
+    const numberRegexp = /^[1-9]+[0-9]*$/;
 
     this.setState({newStock: stock});
 
-    if (!numberRegexp.test(Number(stock))) {
+    if (!numberRegexp.test(stock) && stock !== '') {
       this.setState({
-        stockError: 'Additional Stock can only consist of (+/-) numbers',
+        newStockError: 'Stock can only consist of numbers',
       });
     } else {
       this.setState({newStockError: null});
@@ -137,7 +147,7 @@ class EditItemModal extends Component {
   }
 
   handlePrice(price) {
-    const numberRegexp = /^[0-9]+$/;
+    const numberRegexp = /^\d+(\.\d+)?$/;
 
     this.setState({newPrice: price});
 
@@ -145,7 +155,7 @@ class EditItemModal extends Component {
       this.setState({
         newPriceError: 'Price must not be empty',
       });
-    } else if (!numberRegexp.test(Number(price))) {
+    } else if (!numberRegexp.test(price)) {
       this.setState({
         newPriceError: 'Price can only consist of numbers',
       });
@@ -242,6 +252,7 @@ class EditItemModal extends Component {
       newDiscountedPrice,
       newStock,
       newImagePath,
+      selectedIndex,
     } = this.state;
 
     this.setState({loading: true});
@@ -258,11 +269,13 @@ class EditItemModal extends Component {
       image: newImagePath,
     };
 
+    const sign = selectedIndex === 0 ? '-' : '';
+
     this.props.itemsStore.unsubscribeSetStoreItems &&
       this.props.itemsStore.unsubscribeSetStoreItems();
 
     this.props.itemsStore
-      .editItem(storeId, newItem, Number(Math.trunc(newStock)))
+      .editItem(storeId, newItem, Math.trunc(Number(`${sign}${newStock}`)))
       .then(() => {
         this.props.itemsStore.setStoreItems(storeId, itemCategories);
 
@@ -318,6 +331,8 @@ class EditItemModal extends Component {
       newDescriptionError,
       newPriceError,
       newDiscountedPriceError,
+      selectedIndex,
+      imageLoading,
     } = this.state;
     const {isVisible} = this.props;
 
@@ -396,7 +411,10 @@ class EditItemModal extends Component {
             contentInsetAdjustmentBehavior="automatic"
             keyboardOpeningTime={20}
             extraScrollHeight={20}
-            style={{paddingHorizontal: 15, paddingTop: 15}}>
+            style={{
+              paddingHorizontal: 15,
+              paddingTop: 15,
+            }}>
             <View
               style={{
                 flex: 1,
@@ -404,17 +422,35 @@ class EditItemModal extends Component {
                 justifyContent: 'space-between',
                 paddingBottom: 10,
               }}>
-              <FastImage
-                source={imageDisplay}
-                style={{
-                  alignSelf: 'flex-start',
-                  borderColor: '#BDBDBD',
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  height: 150,
-                  width: 150,
-                }}
-              />
+              <View style={{flex: 1}}>
+                {imageLoading ? (
+                  <Placeholder Animation={Fade}>
+                    <PlaceholderMedia
+                      style={{
+                        alignSelf: 'flex-start',
+                        backgroundColor: colors.primary,
+                        borderColor: '#BDBDBD',
+                        borderRadius: 10,
+                        borderWidth: 1,
+                        height: 150,
+                        width: 150,
+                      }}
+                    />
+                  </Placeholder>
+                ) : (
+                  <FastImage
+                    source={imageDisplay}
+                    style={{
+                      alignSelf: 'flex-start',
+                      borderColor: '#BDBDBD',
+                      borderRadius: 10,
+                      borderWidth: 1,
+                      height: 150,
+                      width: 150,
+                    }}
+                  />
+                )}
+              </View>
 
               <View
                 style={{
@@ -575,21 +611,52 @@ class EditItemModal extends Component {
               onChangeText={(value) => this.handleDiscountedPrice(value)}
             />
 
-            <Input
-              placeholder={`Increase/Decrease ${
-                this.props.itemsStore.selectedItem &&
-                this.props.itemsStore.selectedItem.name
-              } Stock (+/- values)`}
-              placeholderStyle={{color: colors.primary}}
-              leftIcon={<Icon name="hash" color={colors.primary} size={20} />}
-              maxLength={10}
-              errorMessage={newDescriptionError && newDescriptionError}
-              keyboardType="numeric"
-              style={styles.textInput}
-              autoCapitalize="none"
-              value={newStock}
-              onChangeText={(value) => this.handleStock(value)}
-            />
+            <View
+              style={{
+                flexDirection: 'row',
+              }}>
+              <ButtonGroup
+                onPress={(index) => this.setState({selectedIndex: index})}
+                selectedIndex={selectedIndex}
+                buttons={['-', '+']}
+                activeOpacity={0.7}
+                containerStyle={{
+                  height: 40,
+                  width: 80,
+                  borderRadius: 8,
+                  elevation: 2,
+                  shadowColor: '#000',
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 1.41,
+                  borderWidth: 0.7,
+                  borderColor: 'rgba(0,0,0,0.4)',
+                }}
+                selectedButtonStyle={{backgroundColor: colors.primary}}
+              />
+
+              <Input
+                placeholder={`${
+                  selectedIndex === 0 ? 'Decrease' : 'Increase'
+                } ${
+                  this.props.itemsStore.selectedItem &&
+                  this.props.itemsStore.selectedItem.name
+                } Stock`}
+                placeholderStyle={{color: colors.primary}}
+                leftIcon={<Icon name="hash" color={colors.primary} size={20} />}
+                maxLength={10}
+                errorMessage={newStockError && newStockError}
+                keyboardType="numeric"
+                style={styles.textInput}
+                containerStyle={{flex: 1}}
+                autoCapitalize="none"
+                value={newStock}
+                onChangeText={(value) => this.handleStock(value)}
+              />
+            </View>
 
             <SafeAreaView
               style={{
