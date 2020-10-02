@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View} from 'react-native';
+import {KeyboardAvoidingView, Platform, View} from 'react-native';
 import {Container} from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import {GiftedChat, Bubble, Send} from 'react-native-gifted-chat';
@@ -244,7 +244,9 @@ class OrderChatScreen extends Component {
             closeModal={() => (this.imagePath = '')}
           />
 
-          <View style={{flex: 1}}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={{flex: 1}}>
             <GiftedChat
               textStyle={{color: colors.primary}}
               renderAvatar={this.renderAvatar}
@@ -261,6 +263,7 @@ class OrderChatScreen extends Component {
                 borderBottomWidth: 1,
                 borderBottomColor: colors.primary,
               }}
+              isKeyboardInternallyHandled={false}
               listViewProps={{marginBottom: 20}}
               alwaysShowSend={!chatDisabled}
               showAvatarForEveryMessage
@@ -268,7 +271,7 @@ class OrderChatScreen extends Component {
               onSend={(messages) => this.onSend(messages)}
               user={user}
             />
-          </View>
+          </KeyboardAvoidingView>
         </Container>
       );
     }
