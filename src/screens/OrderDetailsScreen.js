@@ -1,7 +1,13 @@
 import React, {Component} from 'react';
 import {Card, CardItem, Left, Right, Body} from 'native-base';
 import {Text, Icon, Button} from 'react-native-elements';
-import {View, ActivityIndicator, SafeAreaView} from 'react-native';
+import {
+  View,
+  ActivityIndicator,
+  SafeAreaView,
+  Dimensions,
+  Image,
+} from 'react-native';
 import BaseHeader from '../components/BaseHeader';
 import {ScrollView} from 'react-native-gesture-handler';
 import OrderItemListItem from '../components/OrderItemListItem';
@@ -12,6 +18,9 @@ import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
 import {computed} from 'mobx';
 import crashlytics from '@react-native-firebase/crashlytics';
+import BottomSheet from 'reanimated-bottom-sheet';
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -115,27 +124,31 @@ class OrderDetailsScreen extends Component {
     const {orderId} = this.props.route.params;
     const {storeDetails} = this.props.detailsStore;
 
-    this.props.authStore.appReady = false;
+    if (selectedOrder.deliveryMethod !== 'Mr. Speedy') {
+      this.props.authStore.appReady = false;
 
-    this.props.ordersStore
-      .setOrderStatus(orderId, selectedOrder.storeId, storeDetails.merchantId)
-      .then((response) => {
-        this.props.authStore.appReady = true;
+      this.props.ordersStore
+        .setOrderStatus(orderId, selectedOrder.storeId, storeDetails.merchantId)
+        .then((response) => {
+          this.props.authStore.appReady = true;
 
-        if (response.data.s === 200) {
+          if (response.data.s === 200) {
+            return Toast({
+              text: response.data.m,
+              type: 'success',
+              duration: 3500,
+            });
+          }
+
           return Toast({
             text: response.data.m,
-            type: 'success',
+            type: 'danger',
             duration: 3500,
           });
-        }
-
-        return Toast({
-          text: response.data.m,
-          type: 'danger',
-          duration: 3500,
         });
-      });
+    } else {
+      this.sheetRef.snapTo(1);
+    }
   }
 
   OrderItemsList(orderItems) {
@@ -614,6 +627,36 @@ class OrderDetailsScreen extends Component {
                 )}
               </SafeAreaView>
             </ScrollView>
+
+            <BottomSheet
+              ref={(sheetRef) => (this.sheetRef = sheetRef)}
+              snapPoints={[0, SCREEN_HEIGHT * 0.5]}
+              borderRadius={30}
+              initialSnap={0}
+              renderContent={() => (
+                <View
+                  style={{
+                    backgroundColor: colors.icons,
+                    borderTopWidth: 0.7,
+                    borderRightWidth: 0.7,
+                    borderLeftWidth: 0.7,
+                    borderTopLeftRadius: 30,
+                    borderTopRightRadius: 30,
+                    borderTopColor: colors.text_secondary,
+                    height: SCREEN_HEIGHT * 0.95,
+                    alignItems: 'center',
+                  }}>
+                  <Image
+                    source={require('../../assets/images/mrspeedy_logo.png')}
+                    style={{
+                      height: 50,
+                      width: 100,
+                      resizeMode: 'contain',
+                    }}
+                  />
+                </View>
+              )}
+            />
           </View>
         ) : (
           <View
