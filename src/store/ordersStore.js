@@ -1,4 +1,4 @@
-import {observable, action} from 'mobx';
+import {observable, action, toJS} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/functions';
@@ -21,12 +21,53 @@ class OrdersStore {
   @observable selectedOrder = null;
   @observable selectedCancelOrder = null;
 
+  @action async getMrspeedyOrderPriceEstimate({
+    subTotal,
+    deliveryLatitude,
+    deliveryLongitude,
+    storeLatitude,
+    storeLongitude,
+    deliveryAddress,
+    vehicleType,
+    orderWeight,
+    storeAddress,
+  }) {
+    const storeLocation = {
+      latitude: storeLatitude,
+      longitude: storeLongitude,
+    };
+
+    const deliveryLocation = {
+      latitude: deliveryLatitude,
+      longitude: deliveryLongitude,
+    };
+
+    return await functions
+      .httpsCallable('getMerchantMrSpeedyDeliveryPriceEstimate')({
+        subTotal,
+        deliveryLocation,
+        deliveryAddress,
+        storeLocation,
+        vehicleType,
+        orderWeight,
+        storeAddress,
+      })
+      .then((response) => {
+        return response;
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+      });
+  }
+
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
     const link = await ref.getDownloadURL().catch((err) => {
       Toast({text: err.message, type: 'danger'});
       return null;
     });
+
+    console.log(link);
 
     return link;
   }

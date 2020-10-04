@@ -32,6 +32,8 @@ class OrderDetailsScreen extends Component {
 
     this.state = {
       orderItems: [],
+      mrspeedyOrderPrice: 0,
+      mrspeedyEstimateLoading: false,
       loading: true,
       allowDragging: true,
       changeOrderStatusModal: false,
@@ -69,7 +71,7 @@ class OrderDetailsScreen extends Component {
         'Less than 1 Kg',
         'Less than 5 Kg',
         'Less than 10 Kg',
-        'Less than 20 Kg',
+        'Less than 15 Kg',
         'Less than 20 Kg',
       ];
     }
@@ -94,6 +96,23 @@ class OrderDetailsScreen extends Component {
 
     this.props.ordersStore.selectedOrder = null;
     this.props.ordersStore.orderMessages = null;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const {selectedVehicleIndex, selectedWeightIndex, motobox} = this.state;
+
+    if (
+      prevState !== this.state &&
+      (prevState.selectedVehicleIndex !== selectedVehicleIndex ||
+        (selectedVehicleIndex === 1 &&
+          prevState.selectedWeightIndex !== selectedWeightIndex))
+    ) {
+      /* this.props.ordersStore.getImageUrl(
+        '/images/stores/Rm019DP4BFCOIuAceQwQ/cover.jpg',
+      ); */
+
+      this.getMrspeedyOrderPriceEstimate();
+    }
   }
 
   onMapReady() {
@@ -138,36 +157,109 @@ class OrderDetailsScreen extends Component {
     );
   }
 
+  getMrspeedyOrderPriceEstimate() {
+    this.setState({mrspeedyEstimateLoading: true}, () => {
+      const {selectedOrder} = this.props.ordersStore;
+      const {subTotal, deliveryCoordinates, deliveryAddress} = selectedOrder;
+      const {storeLocation, address} = this.props.detailsStore.storeDetails;
+      const {selectedVehicleIndex, selectedWeightIndex} = this.state;
+      const vehicleType = selectedVehicleIndex === 0 ? 8 : 7;
+      let orderWeight = 0;
+      if (selectedVehicleIndex === 0) {
+        orderWeight =
+          selectedWeightIndex === 0
+            ? 1
+            : selectedWeightIndex === 1
+            ? 4
+            : selectedWeightIndex === 2
+            ? 9
+            : selectedWeightIndex === 3
+            ? 14
+            : 19;
+      }
+
+      if (selectedVehicleIndex === 1) {
+        orderWeight =
+          selectedWeightIndex === 0
+            ? 299
+            : selectedWeightIndex === 1
+            ? 499
+            : 699;
+      }
+
+      this.props.ordersStore
+        .getMrspeedyOrderPriceEstimate({
+          subTotal,
+          deliveryLatitude: deliveryCoordinates.latitude,
+          deliveryLongitude: deliveryCoordinates.longitude,
+          deliveryAddress,
+          storeLatitude: storeLocation.latitude,
+          storeLongitude: storeLocation.longitude,
+          vehicleType,
+          orderWeight,
+          storeAddress: address,
+        })
+        .then((response) => {
+          if (response.data.s === 200) {
+            this.setState({mrspeedyOrderPrice: response.data.d});
+          }
+
+          this.setState({mrspeedyEstimateLoading: false});
+          console.log(response);
+        });
+    });
+  }
+
   handleChangeOrderStatus() {
     const {selectedOrder} = this.props.ordersStore;
     const {orderId} = this.props.route.params;
     const {storeDetails} = this.props.detailsStore;
+    const {selectedVehicleIndex, selectedWeightIndex, motobox} = this.state;
+    const vehicleType = selectedVehicleIndex === 0 ? 8 : 7;
+    let orderWeight =
+      selectedWeightIndex === 0 ? 299 : selectedWeightIndex === 1 ? 499 : 699;
+    if (selectedVehicleIndex === 0) {
+      orderWeight =
+        selectedWeightIndex === 0
+          ? 1
+          : selectedWeightIndex === 1
+          ? 4
+          : selectedWeightIndex === 2
+          ? 9
+          : selectedWeightIndex === 3
+          ? 14
+          : 19;
+    }
+    const mrspeedyBookingData = {
+      vehicleType,
+      motobox,
+      orderWeight,
+    };
 
-    if (selectedOrder.deliveryMethod !== 'Mr. Speedy') {
-      this.props.authStore.appReady = false;
+    this.props.ordersStore
+      .setOrderStatus(
+        orderId,
+        selectedOrder.storeId,
+        storeDetails.merchantId,
+        mrspeedyBookingData,
+      )
+      .then((response) => {
+        this.props.authStore.appReady = true;
 
-      this.props.ordersStore
-        .setOrderStatus(orderId, selectedOrder.storeId, storeDetails.merchantId)
-        .then((response) => {
-          this.props.authStore.appReady = true;
-
-          if (response.data.s === 200) {
-            return Toast({
-              text: response.data.m,
-              type: 'success',
-              duration: 3500,
-            });
-          }
-
+        if (response.data.s === 200) {
           return Toast({
             text: response.data.m,
-            type: 'danger',
+            type: 'success',
             duration: 3500,
           });
+        }
+
+        return Toast({
+          text: response.data.m,
+          type: 'danger',
+          duration: 3500,
         });
-    } else {
-      this.sheetRef.snapTo(1);
-    }
+      });
   }
 
   OrderItemsList(orderItems) {
@@ -183,7 +275,6 @@ class OrderDetailsScreen extends Component {
   render() {
     const {selectedOrder} = this.props.ordersStore;
     const {orderId} = this.props.route.params;
-
     const {orderStatus} = this;
     const {navigation} = this.props;
     const {
@@ -192,6 +283,8 @@ class OrderDetailsScreen extends Component {
       selectedWeightIndex,
       selectedVehicleIndex,
       motobox,
+      mrspeedyOrderPrice,
+      mrspeedyEstimateLoading,
     } = this.state;
     const {storeDetails} = this.props.detailsStore;
     const buttonText =
@@ -613,9 +706,15 @@ class OrderDetailsScreen extends Component {
 
                 {buttonText && (
                   <Button
-                    onPress={() =>
-                      this.setState({changeOrderStatusModal: true})
-                    }
+                    onPress={() => {
+                      if (selectedOrder.deliveryMethod !== 'Mr. Speedy') {
+                        this.setState({changeOrderStatusModal: true});
+                      } else {
+                        this.sheetRef && this.sheetRef.snapTo(1);
+
+                        this.getMrspeedyOrderPriceEstimate();
+                      }
+                    }}
                     title={buttonText}
                     titleStyle={{color: colors.icons}}
                     containerStyle={{
@@ -769,7 +868,16 @@ class OrderDetailsScreen extends Component {
                   />
 
                   <ListItem
-                    title="P60"
+                    title={
+                      mrspeedyEstimateLoading ? (
+                        <ActivityIndicator
+                          color={colors.primary}
+                          size="small"
+                        />
+                      ) : (
+                        `₱${mrspeedyOrderPrice}`
+                      )
+                    }
                     titleStyle={{
                       fontSize: 26,
                       fontFamily: 'ProductSans-Black',
