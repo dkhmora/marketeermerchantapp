@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, CardItem, Left, Right, Body} from 'native-base';
-import {Text, Icon, Button} from 'react-native-elements';
+import {Text, Icon, Button, ButtonGroup, ListItem} from 'react-native-elements';
 import {
   View,
   ActivityIndicator,
@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 import BaseHeader from '../components/BaseHeader';
-import {ScrollView} from 'react-native-gesture-handler';
+import {ScrollView, Switch} from 'react-native-gesture-handler';
 import OrderItemListItem from '../components/OrderItemListItem';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
@@ -20,7 +20,7 @@ import {computed} from 'mobx';
 import crashlytics from '@react-native-firebase/crashlytics';
 import BottomSheet from 'reanimated-bottom-sheet';
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -35,6 +35,9 @@ class OrderDetailsScreen extends Component {
       loading: true,
       allowDragging: true,
       changeOrderStatusModal: false,
+      selectedVehicleIndex: 0,
+      selectedWeightIndex: 0,
+      motobox: false,
     };
   }
 
@@ -56,6 +59,22 @@ class OrderDetailsScreen extends Component {
     }
 
     return 'Unknown';
+  }
+
+  @computed get weightButtonLabels() {
+    const {selectedVehicleIndex} = this.state;
+
+    if (selectedVehicleIndex === 0) {
+      return [
+        'Less than 1 Kg',
+        'Less than 5 Kg',
+        'Less than 10 Kg',
+        'Less than 20 Kg',
+        'Less than 20 Kg',
+      ];
+    }
+
+    return ['Less than 300 Kg', 'Less than 500 Kg', 'Less than 750 Kg'];
   }
 
   componentDidMount() {
@@ -167,7 +186,13 @@ class OrderDetailsScreen extends Component {
 
     const {orderStatus} = this;
     const {navigation} = this.props;
-    const {orderItems, loading} = this.state;
+    const {
+      orderItems,
+      loading,
+      selectedWeightIndex,
+      selectedVehicleIndex,
+      motobox,
+    } = this.state;
     const {storeDetails} = this.props.detailsStore;
     const buttonText =
       orderStatus[0] === 'PAID'
@@ -630,21 +655,22 @@ class OrderDetailsScreen extends Component {
 
             <BottomSheet
               ref={(sheetRef) => (this.sheetRef = sheetRef)}
-              snapPoints={[0, SCREEN_HEIGHT * 0.5]}
+              snapPoints={[0, 300]}
               borderRadius={30}
               initialSnap={0}
               renderContent={() => (
                 <View
                   style={{
+                    alignItems: 'center',
                     backgroundColor: colors.icons,
                     borderTopWidth: 0.7,
                     borderRightWidth: 0.7,
                     borderLeftWidth: 0.7,
                     borderTopLeftRadius: 30,
                     borderTopRightRadius: 30,
-                    borderTopColor: colors.text_secondary,
-                    height: SCREEN_HEIGHT * 0.95,
-                    alignItems: 'center',
+                    borderColor: 'rgba(0,0,0,0.4)',
+                    height: 300,
+                    paddingVertical: 5,
                   }}>
                   <Image
                     source={require('../../assets/images/mrspeedy_logo.png')}
@@ -653,6 +679,118 @@ class OrderDetailsScreen extends Component {
                       width: 100,
                       resizeMode: 'contain',
                     }}
+                  />
+                  <View style={{flex: 1, paddingHorizontal: 10}}>
+                    <ButtonGroup
+                      onPress={(index) => {
+                        if (index !== selectedVehicleIndex) {
+                          this.setState({selectedWeightIndex: 0});
+                        }
+                        this.setState({selectedVehicleIndex: index});
+                      }}
+                      selectedIndex={selectedVehicleIndex}
+                      buttons={['Motorbike', 'Car']}
+                      activeOpacity={0.7}
+                      containerStyle={{
+                        height: 30,
+                        width: '80%',
+                        borderRadius: 15,
+                        elevation: 5,
+                        shadowColor: '#000',
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        borderColor: 'rgba(0,0,0,0.7)',
+                      }}
+                      selectedButtonStyle={{backgroundColor: colors.primary}}
+                    />
+                  </View>
+
+                  <ScrollView
+                    horizontal
+                    style={{flexGrow: 0}}
+                    showsHorizontalScrollIndicator={false}>
+                    <ButtonGroup
+                      onPress={(index) =>
+                        this.setState({selectedWeightIndex: index})
+                      }
+                      selectedIndex={selectedWeightIndex}
+                      buttons={this.weightButtonLabels}
+                      activeOpacity={0.7}
+                      containerStyle={{
+                        minWidth: SCREEN_WIDTH - 25,
+                        height: 50,
+                        borderRadius: 8,
+                        elevation: 5,
+                        shadowColor: '#000',
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 3.84,
+                        borderWidth: 0.7,
+                        borderColor: 'rgba(0,0,0,0.7)',
+                      }}
+                      buttonStyle={{
+                        alignItems: 'center',
+                        paddingHorizontal: 5,
+                      }}
+                      textStyle={{textAlign: 'center'}}
+                      selectedButtonStyle={{
+                        backgroundColor: colors.primary,
+                        elevation: 5,
+                      }}
+                    />
+                  </ScrollView>
+
+                  <ListItem
+                    title="Require Motobox"
+                    titleStyle={{
+                      fontSize: 20,
+                      color: colors.text_primary,
+                    }}
+                    containerStyle={{width: '100%'}}
+                    rightElement={
+                      <Switch
+                        trackColor={{
+                          false: '#767577',
+                          true: colors.primary,
+                        }}
+                        thumbColor={'#f4f3f4'}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={() => this.setState({motobox: !motobox})}
+                        value={motobox}
+                      />
+                    }
+                  />
+
+                  <ListItem
+                    title="P60"
+                    titleStyle={{
+                      fontSize: 26,
+                      fontFamily: 'ProductSans-Black',
+                      color: colors.primary,
+                    }}
+                    containerStyle={{width: '100%'}}
+                    rightElement={
+                      <Button
+                        onPress={() => {}}
+                        title="Place Order"
+                        titleStyle={{color: colors.icons}}
+                        containerStyle={{
+                          borderRadius: 24,
+                          marginTop: 0,
+                          marginBottom: 0,
+                        }}
+                        buttonStyle={{
+                          backgroundColor: colors.accent,
+                        }}
+                      />
+                    }
                   />
                 </View>
               )}
