@@ -31,6 +31,7 @@ class OrdersStore {
     vehicleType,
     orderWeight,
     storeAddress,
+    paymentMethod,
   }) {
     const storeLocation = {
       latitude: storeLatitude,
@@ -51,6 +52,7 @@ class OrdersStore {
         vehicleType,
         orderWeight,
         storeAddress,
+        paymentMethod,
       })
       .then((response) => {
         return response;
@@ -66,8 +68,6 @@ class OrdersStore {
       Toast({text: err.message, type: 'danger'});
       return null;
     });
-
-    console.log(link);
 
     return link;
   }
@@ -227,9 +227,19 @@ class OrdersStore {
       });
   }
 
-  @action async setOrderStatus(orderId, storeId, merchantId) {
+  @action async setOrderStatus(
+    orderId,
+    storeId,
+    merchantId,
+    mrspeedyBookingData,
+  ) {
     return await functions
-      .httpsCallable('changeOrderStatus')({orderId, storeId, merchantId})
+      .httpsCallable('changeOrderStatus')({
+        orderId,
+        storeId,
+        merchantId,
+        mrspeedyBookingData,
+      })
       .then((response) => {
         return response;
       })
