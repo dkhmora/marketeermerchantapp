@@ -149,6 +149,8 @@ class OrdersStore {
 
               this.selectedOrder = {...documentSnapshot.data(), orderId};
 
+              console.log(this.selectedOrder.mrspeedyBookingData.order);
+
               if (
                 documentSnapshot.data().messages.length <= 0 &&
                 this.orderMessages.length > 0

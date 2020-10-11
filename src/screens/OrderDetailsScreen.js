@@ -24,6 +24,7 @@ import {computed} from 'mobx';
 import crashlytics from '@react-native-firebase/crashlytics';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import MapCardItem from '../components/MapCardItem';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -50,6 +51,42 @@ class OrderDetailsScreen extends Component {
       motobox: false,
       bottomSheetPadding: 0,
     };
+  }
+
+  @computed get mrspeedyOrderStatus() {
+    const {selectedOrder} = this.props.ordersStore;
+
+    if (selectedOrder.mrspeedyBookingData) {
+      const {status} = selectedOrder.mrspeedyBookingData.order;
+
+      switch (status) {
+        case 'new':
+          return 'Awaiting Verification';
+
+        case 'available':
+          return 'Available for Couriers';
+
+        case 'reactivated':
+          return 'yes';
+
+        default:
+          return status.toUpperCase();
+      }
+    }
+
+    return null;
+  }
+
+  @computed get mrspeedyVehicleType() {
+    const {selectedOrder} = this.props.ordersStore;
+
+    if (selectedOrder.mrspeedyBookingData) {
+      return selectedOrder.mrspeedyBookingData.order.vehicle_type_id === 8
+        ? 'Motorbike'
+        : 'Car';
+    }
+
+    return null;
   }
 
   @computed get orderStatus() {
@@ -140,34 +177,6 @@ class OrderDetailsScreen extends Component {
         storePhoneNumberError: null,
       });
     }
-  }
-
-  onMapReady() {
-    this.fitMarkers();
-
-    this.customerMarker.showCallout();
-  }
-
-  fitMarkers() {
-    const {selectedOrder} = this.props.ordersStore;
-    const {storeDetails} = this.props.detailsStore;
-
-    this.map.fitToCoordinates(
-      [
-        {
-          latitude: selectedOrder.deliveryCoordinates.latitude,
-          longitude: selectedOrder.deliveryCoordinates.longitude,
-        },
-        {
-          latitude: storeDetails.storeLocation.latitude,
-          longitude: storeDetails.storeLocation.longitude,
-        },
-      ],
-      {
-        edgePadding: {left: 40, right: 40, top: 100, bottom: 100},
-        animated: true,
-      },
-    );
   }
 
   async getOrderItems() {
@@ -511,73 +520,13 @@ class OrderDetailsScreen extends Component {
                   </Right>
                 </CardItem>
 
-                <CardItem
-                  style={{
-                    paddingLeft: 0,
-                    paddingRight: 0,
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                  }}>
-                  <View style={{flex: 1, borderRadius: 10, overflow: 'hidden'}}>
-                    <MapView
-                      onTouchStart={() => this.setState({allowDragging: false})}
-                      onTouchEnd={() => this.setState({allowDragging: true})}
-                      onTouchCancel={() => this.setState({allowDragging: true})}
-                      provider="google"
-                      style={{
-                        height: 300,
-                        width: '100%',
-                      }}
-                      ref={(map) => {
-                        this.map = map;
-                      }}
-                      onMapReady={() => this.onMapReady()}
-                      initialRegion={{
-                        latitude: selectedOrder.deliveryCoordinates.latitude,
-                        longitude: selectedOrder.deliveryCoordinates.longitude,
-                        latitudeDelta: 0.009,
-                        longitudeDelta: 0.009,
-                      }}>
-                      {selectedOrder.deliveryCoordinates.latitude &&
-                        selectedOrder.deliveryCoordinates.longitude && (
-                          <Marker
-                            ref={(marker) => {
-                              this.customerMarker = marker;
-                            }}
-                            title="Customer Delivery Location"
-                            tracksViewChanges={false}
-                            coordinate={{
-                              latitude:
-                                selectedOrder.deliveryCoordinates.latitude,
-                              longitude:
-                                selectedOrder.deliveryCoordinates.longitude,
-                            }}>
-                            <View>
-                              <Icon color={colors.accent} name="map-pin" />
-                            </View>
-                          </Marker>
-                        )}
-
-                      {storeDetails.storeLocation.latitude &&
-                        storeDetails.storeLocation.longitude && (
-                          <Marker
-                            ref={(marker) => {
-                              this.storeMarker = marker;
-                            }}
-                            title={`${storeDetails.storeName} Set Location`}
-                            tracksViewChanges={false}
-                            coordinate={{
-                              latitude: storeDetails.storeLocation.latitude,
-                              longitude: storeDetails.storeLocation.longitude,
-                            }}>
-                            <View>
-                              <Icon color={colors.primary} name="map-pin" />
-                            </View>
-                          </Marker>
-                        )}
-                    </MapView>
-                  </View>
-                </CardItem>
+                {!selectedOrder.mrspeedyBookingData && (
+                  <MapCardItem
+                    onTouchStart={() => this.setState({allowDragging: false})}
+                    onTouchEnd={() => this.setState({allowDragging: true})}
+                    onTouchCancel={() => this.setState({allowDragging: true})}
+                  />
+                )}
               </Card>
 
               <SafeAreaView>
@@ -664,6 +613,147 @@ class OrderDetailsScreen extends Component {
                     </Right>
                   </CardItem>
                 </Card>
+
+                {selectedOrder.mrspeedyBookingData && (
+                  <Card
+                    style={{
+                      borderRadius: 10,
+                      overflow: 'hidden',
+                    }}>
+                    <CardItem
+                      header
+                      bordered
+                      style={{
+                        backgroundColor: colors.primary,
+                        justifyContent: 'space-between',
+                      }}>
+                      <Text style={{color: colors.icons, fontSize: 20}}>
+                        Mr. Speedy
+                      </Text>
+                    </CardItem>
+
+                    <CardItem bordered>
+                      <Left>
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            fontFamily: 'ProductSans-Bold',
+                          }}>
+                          Delivery Status:
+                        </Text>
+                      </Left>
+
+                      <Right>
+                        <Text
+                          style={{
+                            color: colors.text_primary,
+                            fontSize: 16,
+                            textAlign: 'right',
+                          }}>
+                          {this.mrspeedyOrderStatus}
+                        </Text>
+                      </Right>
+                    </CardItem>
+
+                    {selectedOrder.mrspeedyBookingData.order.courier && (
+                      <View>
+                        <CardItem bordered>
+                          <Left>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Bold',
+                              }}>
+                              Courier Name:
+                            </Text>
+                          </Left>
+
+                          <Right>
+                            <Text
+                              style={{
+                                color: colors.text_primary,
+                                fontSize: 16,
+                                textAlign: 'right',
+                              }}>
+                              {`${selectedOrder.mrspeedyBookingData.order.courier.name} ${selectedOrder.mrspeedyBookingData.order.courier.surname}`}
+                            </Text>
+                          </Right>
+                        </CardItem>
+
+                        <CardItem bordered>
+                          <Left>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Bold',
+                              }}>
+                              Courier Phone Number:
+                            </Text>
+                          </Left>
+
+                          <Right>
+                            <Text
+                              style={{
+                                color: colors.text_primary,
+                                fontSize: 16,
+                                textAlign: 'right',
+                              }}>
+                              +
+                              {
+                                selectedOrder.mrspeedyBookingData.order.courier
+                                  .phone
+                              }
+                            </Text>
+                          </Right>
+                        </CardItem>
+                      </View>
+                    )}
+
+                    <CardItem bordered>
+                      <Left>
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            fontFamily: 'ProductSans-Bold',
+                          }}>
+                          Courier Vehicle:
+                        </Text>
+                      </Left>
+
+                      <Right>
+                        <Text
+                          style={{
+                            color: colors.text_primary,
+                            fontSize: 16,
+                            textAlign: 'right',
+                          }}>
+                          {this.mrspeedyVehicleType}
+                        </Text>
+                      </Right>
+                    </CardItem>
+
+                    <MapCardItem
+                      onTouchStart={() => this.setState({allowDragging: false})}
+                      onTouchEnd={() => this.setState({allowDragging: true})}
+                      onTouchCancel={() => this.setState({allowDragging: true})}
+                      riderCoordinates={
+                        selectedOrder.mrspeedyBookingData.order.courier
+                          ? {
+                              latitude: Number(
+                                selectedOrder.mrspeedyBookingData.order.courier
+                                  .latitude,
+                              ),
+                              longitude: Number(
+                                selectedOrder.mrspeedyBookingData.order.courier
+                                  .longitude,
+                              ),
+                            }
+                          : null
+                      }
+                      vehicleType={this.mrspeedyVehicleType}
+                    />
+                  </Card>
+                )}
 
                 <Card
                   style={{
