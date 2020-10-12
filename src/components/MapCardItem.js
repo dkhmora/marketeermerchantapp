@@ -1,11 +1,10 @@
 import {CardItem} from 'native-base';
 import React, {Component} from 'react';
 import MapView, {Marker} from 'react-native-maps';
-import {View, Image} from 'react-native';
+import {View} from 'react-native';
 import {inject, observer} from 'mobx-react';
 import {Icon} from 'react-native-elements';
 import {colors} from '../../assets/colors';
-import FastImage from 'react-native-fast-image';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -13,18 +12,36 @@ import FastImage from 'react-native-fast-image';
 class MapCardItem extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {riderCoordinatesUpdated: false};
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevProps.riderCoordinates !== this.props.riderCoordinates &&
+      !this.state.riderCoordinatesUpdated
+    ) {
+      console.log('yes');
+      this.setState({riderCoordinatesUpdated: true}, () => {
+        this.fitMarkers();
+        this.setState({riderCoordinatesUpdated: false});
+      });
+    }
   }
 
   onMapReady() {
     this.fitMarkers();
 
     this.customerMarker.showCallout();
+
+    if (this.props.courierCoordinates) {
+      this.courierMarker.showCallout();
+    }
   }
 
   fitMarkers() {
     const {selectedOrder} = this.props.ordersStore;
     const {storeDetails} = this.props.detailsStore;
+    const {courierCoordinates} = this.props;
 
     this.map.fitToCoordinates(
       [
@@ -35,6 +52,9 @@ class MapCardItem extends Component {
         {
           latitude: storeDetails.storeLocation.latitude,
           longitude: storeDetails.storeLocation.longitude,
+        },
+        {
+          ...courierCoordinates,
         },
       ],
       {
@@ -51,10 +71,10 @@ class MapCardItem extends Component {
       onTouchStart,
       onTouchEnd,
       onTouchCancel,
-      riderCoordinates,
+      courierCoordinates,
       vehicleType,
     } = this.props;
-    console.log(riderCoordinates);
+    const {riderCoordinatesUpdated} = this.state;
 
     return (
       <CardItem
@@ -64,14 +84,15 @@ class MapCardItem extends Component {
           paddingTop: 0,
           paddingBottom: 0,
         }}>
-        <View style={{flex: 1, borderRadius: 10, overflow: 'hidden'}}>
+        <View
+          style={{flex: 1, borderRadius: 10, overflow: 'hidden'}}
+          onTouchStart={() => onTouchStart()}
+          onTouchEnd={() => onTouchEnd()}
+          onTouchCancel={() => onTouchCancel()}>
           <MapView
-            onTouchStart={() => onTouchStart()}
-            onTouchEnd={() => onTouchEnd()}
-            onTouchCancel={() => onTouchCancel()}
             provider="google"
             style={{
-              height: 300,
+              height: 400,
               width: '100%',
             }}
             ref={(map) => {
@@ -120,20 +141,20 @@ class MapCardItem extends Component {
                 </Marker>
               )}
 
-            {riderCoordinates && (
+            {courierCoordinates && (
               <Marker
                 ref={(marker) => {
-                  this.riderMarker = marker;
+                  this.courierMarker = marker;
                 }}
                 image={
                   vehicleType === 'Motorbike'
-                    ? require('../../assets/images/motorbike.png')
-                    : require('../../assets/images/car.png')
+                    ? require('../../assets/images/mrspeedy-motorcycle-mapmarker.png')
+                    : require('../../assets/images/mrspeedy-car-mapmarker.png')
                 }
                 style={{width: 26, height: 28}}
-                title="Rider Location"
-                tracksViewChanges={false}
-                coordinate={riderCoordinates}
+                tracksViewChanges={riderCoordinatesUpdated}
+                title="Mr. Speedy Courier Location"
+                coordinate={courierCoordinates}
               />
             )}
           </MapView>

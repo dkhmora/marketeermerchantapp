@@ -736,7 +736,7 @@ class OrderDetailsScreen extends Component {
                       onTouchStart={() => this.setState({allowDragging: false})}
                       onTouchEnd={() => this.setState({allowDragging: true})}
                       onTouchCancel={() => this.setState({allowDragging: true})}
-                      riderCoordinates={
+                      courierCoordinates={
                         selectedOrder.mrspeedyBookingData.order.courier
                           ? {
                               latitude: Number(
