@@ -96,18 +96,17 @@ class CancelOrderModal extends Component {
         height="auto"
         overlayStyle={{borderRadius: 10, padding: 15, width: '80%'}}>
         <View>
-          <Text
-            onPress={() => Keyboard.dismiss()}
-            style={{
-              fontSize: 24,
-              fontFamily: 'ProductSans-Regular',
-              paddingBottom: 20,
-            }}>
-            Are you sure you want to cancel Order #{' '}
-            {this.props.ordersStore.selectedCancelOrder &&
-              this.props.ordersStore.selectedCancelOrder.storeOrderNumber}
-            ?
-          </Text>
+          {this.props.ordersStore.selectedCancelOrder && (
+            <Text
+              onPress={() => Keyboard.dismiss()}
+              style={{
+                fontSize: 24,
+                fontFamily: 'ProductSans-Regular',
+                paddingBottom: 20,
+              }}>
+              {`Are you sure you want to cancel Order #${this.props.ordersStore.selectedCancelOrder.storeOrderNumber}?`}
+            </Text>
+          )}
 
           <Input
             numberOfLines={8}

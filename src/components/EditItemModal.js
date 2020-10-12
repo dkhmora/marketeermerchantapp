@@ -388,9 +388,8 @@ class EditItemModal extends Component {
                 fontFamily: 'ProductSans-Regular',
                 color: colors.icons,
               }}>
-              Edit{' '}
               {this.props.itemsStore.selectedItem &&
-                this.props.itemsStore.selectedItem.name}
+                `Edit ${this.props.itemsStore.selectedItem.name}`}
             </Text>
 
             {!this.state.loading && (

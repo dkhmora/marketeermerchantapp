@@ -199,8 +199,8 @@ class StoreCard extends Component {
                     }}>
                     Free Delivery (₱
                     {store.freeDeliveryMinimum
-                      ? store.freeDeliveryMinimum
-                      : 0}{' '}
+                      ? `${store.freeDeliveryMinimum} `
+                      : '0 '}
                     Min.)
                   </Text>
                 )}

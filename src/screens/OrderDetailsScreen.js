@@ -810,7 +810,7 @@ class OrderDetailsScreen extends Component {
                             color: colors.text_primary,
                             fontFamily: 'ProductSans-Light',
                           }}>
-                          Subtotal:{' '}
+                          Subtotal:
                         </Text>
                         <Text
                           style={{
@@ -818,7 +818,7 @@ class OrderDetailsScreen extends Component {
                             color: colors.text_primary,
                             fontFamily: 'ProductSans-Black',
                           }}>
-                          ₱{selectedOrder.subTotal}
+                          {` ₱${selectedOrder.subTotal}`}
                         </Text>
                       </View>
 
@@ -830,7 +830,7 @@ class OrderDetailsScreen extends Component {
                             color: colors.text_primary,
                             fontFamily: 'ProductSans-Light',
                           }}>
-                          Delivery Price:{' '}
+                          Delivery Price:
                         </Text>
                         <Text
                           style={{
@@ -840,10 +840,10 @@ class OrderDetailsScreen extends Component {
                           }}>
                           {selectedOrder.deliveryPrice &&
                           selectedOrder.deliveryPrice > 0
-                            ? `₱${selectedOrder.deliveryPrice}`
+                            ? ` ₱${selectedOrder.deliveryPrice}`
                             : selectedOrder.deliveryPrice === null
-                            ? '(Contact Merchant)'
-                            : '₱0 (Free Delivery)'}
+                            ? ' (Contact Merchant)'
+                            : ' ₱0 (Free Delivery)'}
                         </Text>
                       </View>
                     </Right>
@@ -861,7 +861,7 @@ class OrderDetailsScreen extends Component {
                             color: colors.text_primary,
                             fontFamily: 'ProductSans-Light',
                           }}>
-                          Order Total:{' '}
+                          {'Order Total: '}
                         </Text>
 
                         <Text

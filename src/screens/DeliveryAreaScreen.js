@@ -342,7 +342,7 @@ class DeliveryAreaScreen extends Component {
                         fontFamily: 'ProductSans-Black',
                         textAlignVertical: 'bottom',
                       }}>
-                      {newDistance}{' '}
+                      {`${newDistance} `}
                     </Text>
 
                     <Text

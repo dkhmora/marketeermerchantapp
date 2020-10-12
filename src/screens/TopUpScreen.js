@@ -220,7 +220,7 @@ class TopUpScreen extends Component {
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
                   }}>
-                  Current Markee Credits:{' '}
+                  {'Current Markee Credits: '}
                 </Text>
 
                 <Text
@@ -242,7 +242,7 @@ class TopUpScreen extends Component {
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
                   }}>
-                  New Markee Credits:{' '}
+                  {'New Markee Credits: '}
                 </Text>
 
                 <Text

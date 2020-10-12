@@ -82,7 +82,7 @@ class AccountScreen extends Component {
                   fontSize: 16,
                   textAlignVertical: 'center',
                 }}>
-                Email address:{' '}
+                Email address:
               </Text>
 
               <Text
@@ -91,7 +91,7 @@ class AccountScreen extends Component {
                   fontSize: 16,
                   textAlignVertical: 'center',
                 }}>
-                {userEmail}
+                {` ${userEmail}`}
               </Text>
             </CardItem>
 
