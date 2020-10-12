@@ -25,6 +25,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import MapCardItem from '../components/MapCardItem';
+import CardItemHeader from '../components/CardItemHeader';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -422,34 +423,33 @@ class OrderDetailsScreen extends Component {
                   borderRadius: 10,
                   overflow: 'hidden',
                 }}>
-                <CardItem
-                  header
-                  bordered
-                  button
-                  activeOpacity={0.9}
-                  onPress={() => {
+                <CardItemHeader
+                  title={
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        flex: 1,
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Text style={{color: colors.primary, fontSize: 20}}>
+                        Customer Details
+                      </Text>
+
+                      <View>
+                        <Icon name="message-square" color={colors.primary} />
+                        <Text style={{color: colors.primary}}>Chat</Text>
+                      </View>
+                    </View>
+                  }
+                  onPress={() =>
                     navigation.navigate('Order Chat', {
                       orderId,
                       data: true,
-                    });
-                  }}
-                  style={{
-                    backgroundColor: colors.icons,
-                    justifyContent: 'space-between',
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                    height: 60,
-                    elevation: 2,
-                  }}>
-                  <Text style={{color: colors.primary, fontSize: 20}}>
-                    Customer Details
-                  </Text>
-
-                  <View>
-                    <Icon name="message-square" color={colors.primary} />
-                    <Text style={{color: colors.primary}}>Chat</Text>
-                  </View>
-                </CardItem>
+                    })
+                  }
+                  activeOpacity={0.8}
+                />
 
                 <CardItem bordered>
                   <Left>
@@ -539,21 +539,7 @@ class OrderDetailsScreen extends Component {
                     borderRadius: 10,
                     overflow: 'hidden',
                   }}>
-                  <CardItem
-                    header
-                    bordered
-                    style={{
-                      backgroundColor: colors.icons,
-                      justifyContent: 'space-between',
-                      paddingTop: 0,
-                      paddingBottom: 0,
-                      height: 60,
-                      elevation: 2,
-                    }}>
-                    <Text style={{color: colors.primary, fontSize: 20}}>
-                      Order Details
-                    </Text>
-                  </CardItem>
+                  <CardItemHeader title="Order Details" />
 
                   <CardItem bordered>
                     <Left>
@@ -631,21 +617,18 @@ class OrderDetailsScreen extends Component {
                       borderRadius: 10,
                       overflow: 'hidden',
                     }}>
-                    <CardItem
-                      header
-                      bordered
-                      style={{
-                        justifyContent: 'space-between',
-                        paddingTop: 0,
-                        paddingBottom: 0,
-                        height: 60,
-                        elevation: 2,
-                      }}>
-                      <Image
-                        source={require('../../assets/images/mrspeedy-logo.png')}
-                        style={{height: 50, width: 100, resizeMode: 'contain'}}
-                      />
-                    </CardItem>
+                    <CardItemHeader
+                      title={
+                        <Image
+                          source={require('../../assets/images/mrspeedy-logo.png')}
+                          style={{
+                            height: 50,
+                            width: 100,
+                            resizeMode: 'contain',
+                          }}
+                        />
+                      }
+                    />
 
                     <CardItem bordered>
                       <Left>
@@ -775,21 +758,7 @@ class OrderDetailsScreen extends Component {
                     borderRadius: 10,
                     overflow: 'hidden',
                   }}>
-                  <CardItem
-                    header
-                    bordered
-                    style={{
-                      backgroundColor: colors.icons,
-                      justifyContent: 'space-between',
-                      paddingTop: 0,
-                      paddingBottom: 0,
-                      height: 60,
-                      elevation: 2,
-                    }}>
-                    <Text style={{color: colors.primary, fontSize: 20}}>
-                      Order Items
-                    </Text>
-                  </CardItem>
+                  <CardItemHeader title="Order Items" />
 
                   {loading ? (
                     <ActivityIndicator color={colors.primary} size="large" />
