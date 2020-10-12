@@ -107,12 +107,20 @@ class OrderCard extends PureComponent {
           header
           bordered
           button
+          activeOpacity={0.8}
           onPress={() =>
             navigation.navigate('Order Chat', {
               orderId: order.orderId,
             })
           }
-          style={{backgroundColor: colors.primary}}>
+          style={{
+            backgroundColor: colors.icons,
+            paddingLeft: 10,
+            paddingRight: 10,
+            paddingTop: 5,
+            paddingBottom: 5,
+            elevation: 2,
+          }}>
           <View
             style={{
               flex: 2,
@@ -126,7 +134,7 @@ class OrderCard extends PureComponent {
                   paddingHorizontal: 5,
                   paddingTop: 5,
                 }}>
-                <Icon name="message-square" color={colors.icons} />
+                <Icon name="message-square" color={colors.primary} />
 
                 {order.storeUnreadCount !== null &&
                   order.storeUnreadCount > 0 && (
@@ -137,21 +145,21 @@ class OrderCard extends PureComponent {
                     />
                   )}
               </View>
-              <Text style={{color: colors.icons}}>Chat</Text>
+              <Text style={{color: colors.primary}}>Chat</Text>
             </View>
 
             <View
               style={{flex: 1, flexDirection: 'column', paddingHorizontal: 10}}>
               <Text
                 style={{
-                  color: '#fff',
+                  color: colors.primary,
                   fontFamily: 'ProductSans-Regular',
                   fontSize: 18,
                 }}>
                 {order.userName}
               </Text>
 
-              <Text style={{color: '#eee'}}>
+              <Text style={{color: colors.text_secondary}}>
                 Order # {order.storeOrderNumber}
               </Text>
 
@@ -181,10 +189,9 @@ class OrderCard extends PureComponent {
           <Card
             style={{
               flex: 1,
-              backgroundColor: '#F8BBD0',
+              backgroundColor: colors.primary,
               borderRadius: 16,
               paddingVertical: 10,
-              paddingHorizontal: 5,
             }}>
             <View
               style={{
@@ -194,7 +201,7 @@ class OrderCard extends PureComponent {
               }}>
               <Text
                 style={{
-                  color: colors.primary,
+                  color: colors.icons,
                   fontFamily: 'ProductSans-Black',
                   fontSize: 16,
                   textAlign: 'center',
@@ -207,7 +214,7 @@ class OrderCard extends PureComponent {
               <Text
                 style={{
                   fontSize: 16,
-                  color: colors.text_primary,
+                  color: colors.icons,
                   textAlign: 'center',
                 }}>
                 Transaction Fee
@@ -296,7 +303,12 @@ class OrderCard extends PureComponent {
 
         <Card {...otherProps} style={{borderRadius: 10, overflow: 'hidden'}}>
           <CardHeader />
-          <CardItem bordered>
+          <CardItem
+            bordered
+            style={{
+              paddingBottom: 5,
+              paddingTop: 5,
+            }}>
             <Left>
               <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
                 Delivery Address:
@@ -314,7 +326,12 @@ class OrderCard extends PureComponent {
               </Text>
             </Right>
           </CardItem>
-          <CardItem bordered>
+          <CardItem
+            bordered
+            style={{
+              paddingBottom: 5,
+              paddingTop: 5,
+            }}>
             <Left>
               <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
                 Total Amount:
@@ -327,7 +344,7 @@ class OrderCard extends PureComponent {
                   fontFamily: 'ProductSans-Black',
                   fontSize: 16,
                 }}>
-                ₱ {order.subTotal}
+                ₱{order.subTotal}
               </Text>
               <Text note>{order.quantity} items</Text>
             </Right>
@@ -338,14 +355,14 @@ class OrderCard extends PureComponent {
                 title="View Full Order"
                 onPress={this.handleViewOrderItems.bind(this)}
                 loading={this.state.loading}
-                loadingProps={{size: 'small', color: colors.accent}}
+                loadingProps={{size: 'small', color: colors.icons}}
                 titleStyle={{color: colors.accent}}
                 buttonStyle={{backgroundColor: colors.icons}}
                 containerStyle={{
                   borderRadius: 24,
+                  width: '100%',
                   borderWidth: 1,
                   borderColor: colors.accent,
-                  width: '100%',
                 }}
               />
             </Body>
