@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import MapView, {Marker} from 'react-native-maps';
 import {View} from 'react-native';
 import {inject, observer} from 'mobx-react';
-import {Icon} from 'react-native-elements';
+import {Button, Icon} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 
 @inject('ordersStore')
@@ -87,7 +87,12 @@ class MapCardItem extends Component {
           paddingBottom: 0,
         }}>
         <View
-          style={{flex: 1, borderRadius: 10, overflow: 'hidden'}}
+          style={{
+            flex: 1,
+            borderBottomRightRadius: 10,
+            borderBottomLeftRadius: 10,
+            overflow: 'hidden',
+          }}
           onTouchStart={() => onTouchStart()}
           onTouchEnd={() => onTouchEnd()}
           onTouchCancel={() => onTouchCancel()}>
@@ -160,6 +165,13 @@ class MapCardItem extends Component {
               />
             )}
           </MapView>
+
+          <Button
+            onPress={() => this.fitMarkers()}
+            icon={<Icon name="map" size={20} color={colors.icons} />}
+            containerStyle={{position: 'absolute', right: 5, bottom: 5}}
+            buttonStyle={{backgroundColor: colors.primary}}
+          />
         </View>
       </CardItem>
     );
