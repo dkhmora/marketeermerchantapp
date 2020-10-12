@@ -360,7 +360,6 @@ class OrderDetailsScreen extends Component {
       storePhoneNumberError,
       bottomSheetPadding,
     } = this.state;
-    const {storeDetails} = this.props.detailsStore;
     const buttonText =
       orderStatus[0] === 'PAID'
         ? 'SHIP'
@@ -646,7 +645,7 @@ class OrderDetailsScreen extends Component {
                       <Right>
                         <Text
                           style={{
-                            color: colors.text_primary,
+                            color: colors.primary,
                             fontSize: 16,
                             textAlign: 'right',
                           }}>
@@ -859,30 +858,34 @@ class OrderDetailsScreen extends Component {
                   </CardItem>
                 </Card>
 
-                {buttonText && (
-                  <Button
-                    onPress={() => {
-                      if (
-                        selectedOrder.deliveryMethod === 'Mr. Speedy' &&
-                        selectedOrder.orderStatus.paid.status
-                      ) {
-                        this.sheetRef && this.sheetRef.snapTo(1);
-                        this.checkStorePhoneNumber();
-                        this.getMrspeedyOrderPriceEstimate();
-                      } else {
-                        this.setState({changeOrderStatusModal: true});
-                      }
-                    }}
-                    title={buttonText}
-                    titleStyle={{color: colors.icons}}
-                    containerStyle={{
-                      borderRadius: 24,
-                      marginTop: 10,
-                      height: 50,
-                    }}
-                    buttonStyle={{height: 50, backgroundColor: colors.accent}}
-                  />
-                )}
+                {buttonText &&
+                  !(
+                    buttonText === 'COMPLETE' &&
+                    selectedOrder.deliveryMethod === 'Mr. Speedy'
+                  ) && (
+                    <Button
+                      onPress={() => {
+                        if (
+                          selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+                          selectedOrder.orderStatus.paid.status
+                        ) {
+                          this.sheetRef && this.sheetRef.snapTo(1);
+                          this.checkStorePhoneNumber();
+                          this.getMrspeedyOrderPriceEstimate();
+                        } else {
+                          this.setState({changeOrderStatusModal: true});
+                        }
+                      }}
+                      title={buttonText}
+                      titleStyle={{color: colors.icons}}
+                      containerStyle={{
+                        borderRadius: 24,
+                        marginTop: 10,
+                        height: 50,
+                      }}
+                      buttonStyle={{height: 50, backgroundColor: colors.accent}}
+                    />
+                  )}
 
                 {selectedOrder.orderStatus.cancelled.status && (
                   <Card

@@ -43,25 +43,27 @@ class MapCardItem extends Component {
     const {storeDetails} = this.props.detailsStore;
     const {courierCoordinates} = this.props;
 
-    this.map.fitToCoordinates(
-      [
-        {
-          latitude: selectedOrder.deliveryCoordinates.latitude,
-          longitude: selectedOrder.deliveryCoordinates.longitude,
-        },
-        {
-          latitude: storeDetails.storeLocation.latitude,
-          longitude: storeDetails.storeLocation.longitude,
-        },
-        {
-          ...courierCoordinates,
-        },
-      ],
+    const markerCoordinates = [
       {
-        edgePadding: {left: 40, right: 40, top: 100, bottom: 100},
-        animated: true,
+        latitude: selectedOrder.deliveryCoordinates.latitude,
+        longitude: selectedOrder.deliveryCoordinates.longitude,
       },
-    );
+      {
+        latitude: storeDetails.storeLocation.latitude,
+        longitude: storeDetails.storeLocation.longitude,
+      },
+    ];
+
+    if (courierCoordinates) {
+      markerCoordinates.push({
+        ...courierCoordinates,
+      });
+    }
+
+    this.map.fitToCoordinates(markerCoordinates, {
+      edgePadding: {left: 40, right: 40, top: 100, bottom: 100},
+      animated: true,
+    });
   }
 
   render() {
