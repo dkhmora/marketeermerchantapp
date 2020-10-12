@@ -17,6 +17,7 @@ import FastImage from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from '../components/Toast';
 import crashlytics from '@react-native-firebase/crashlytics';
+import CardItemHeader from '../components/CardItemHeader';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -481,19 +482,7 @@ class DashboardScreen extends Component {
                   shadowRadius: 1.41,
                 }}>
                 <Card style={{borderRadius: 10, overflow: 'hidden'}}>
-                  <CardItem
-                    header
-                    bordered
-                    style={{
-                      backgroundColor: colors.primary,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      height: 55,
-                    }}>
-                    <Text style={{color: colors.icons, fontSize: 20}}>
-                      Store Card Preview
-                    </Text>
-                  </CardItem>
+                  <CardItemHeader title="Store Card Preview" />
 
                   <CardItem
                     bordered
@@ -524,23 +513,7 @@ class DashboardScreen extends Component {
                     borderRadius: 10,
                     overflow: 'hidden',
                   }}>
-                  <CardItem
-                    header
-                    bordered
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      height: 55,
-                      backgroundColor: this.editModeHeaderColor,
-                    }}>
-                    <Text
-                      style={{
-                        color: colors.icons,
-                        fontSize: 20,
-                      }}>
-                      Store Details
-                    </Text>
-                  </CardItem>
+                  <CardItemHeader title="Store Details" />
 
                   <CardItem bordered>
                     <View
@@ -927,19 +900,7 @@ class DashboardScreen extends Component {
                     borderRadius: 10,
                     overflow: 'hidden',
                   }}>
-                  <CardItem
-                    header
-                    bordered
-                    style={{
-                      backgroundColor: this.editModeHeaderColor,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      height: 55,
-                    }}>
-                    <Text style={{color: colors.icons, fontSize: 20}}>
-                      Delivery Settings
-                    </Text>
-                  </CardItem>
+                  <CardItemHeader title="Delivery Settings" />
 
                   <CardItem bordered>
                     <View
@@ -1245,19 +1206,7 @@ class DashboardScreen extends Component {
                     borderRadius: 10,
                     overflow: 'hidden',
                   }}>
-                  <CardItem
-                    header
-                    bordered
-                    style={{
-                      backgroundColor: colors.primary,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      height: 55,
-                    }}>
-                    <Text style={{color: colors.icons, fontSize: 20}}>
-                      Sales
-                    </Text>
-                  </CardItem>
+                  <CardItemHeader title="Sales" />
 
                   <CardItem bordered>
                     <Text style={{textAlign: 'center', width: '100%'}}>
