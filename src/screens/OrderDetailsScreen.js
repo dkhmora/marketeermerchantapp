@@ -426,6 +426,7 @@ class OrderDetailsScreen extends Component {
                   header
                   bordered
                   button
+                  activeOpacity={0.9}
                   onPress={() => {
                     navigation.navigate('Order Chat', {
                       orderId,
@@ -433,16 +434,20 @@ class OrderDetailsScreen extends Component {
                     });
                   }}
                   style={{
-                    backgroundColor: colors.primary,
+                    backgroundColor: colors.icons,
                     justifyContent: 'space-between',
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                    height: 60,
+                    elevation: 2,
                   }}>
-                  <Text style={{color: colors.icons, fontSize: 20}}>
+                  <Text style={{color: colors.primary, fontSize: 20}}>
                     Customer Details
                   </Text>
 
                   <View>
-                    <Icon name="message-square" color={colors.icons} />
-                    <Text style={{color: colors.icons}}>Chat</Text>
+                    <Icon name="message-square" color={colors.primary} />
+                    <Text style={{color: colors.primary}}>Chat</Text>
                   </View>
                 </CardItem>
 
@@ -537,8 +542,15 @@ class OrderDetailsScreen extends Component {
                   <CardItem
                     header
                     bordered
-                    style={{backgroundColor: colors.primary}}>
-                    <Text style={{color: colors.icons, fontSize: 20}}>
+                    style={{
+                      backgroundColor: colors.icons,
+                      justifyContent: 'space-between',
+                      paddingTop: 0,
+                      paddingBottom: 0,
+                      height: 60,
+                      elevation: 2,
+                    }}>
+                    <Text style={{color: colors.primary, fontSize: 20}}>
                       Order Details
                     </Text>
                   </CardItem>
@@ -623,12 +635,16 @@ class OrderDetailsScreen extends Component {
                       header
                       bordered
                       style={{
-                        backgroundColor: colors.primary,
                         justifyContent: 'space-between',
+                        paddingTop: 0,
+                        paddingBottom: 0,
+                        height: 60,
+                        elevation: 2,
                       }}>
-                      <Text style={{color: colors.icons, fontSize: 20}}>
-                        Mr. Speedy
-                      </Text>
+                      <Image
+                        source={require('../../assets/images/mrspeedy-logo.png')}
+                        style={{height: 50, width: 100, resizeMode: 'contain'}}
+                      />
                     </CardItem>
 
                     <CardItem bordered>
@@ -762,8 +778,15 @@ class OrderDetailsScreen extends Component {
                   <CardItem
                     header
                     bordered
-                    style={{backgroundColor: colors.primary}}>
-                    <Text style={{color: colors.icons, fontSize: 20}}>
+                    style={{
+                      backgroundColor: colors.icons,
+                      justifyContent: 'space-between',
+                      paddingTop: 0,
+                      paddingBottom: 0,
+                      height: 60,
+                      elevation: 2,
+                    }}>
+                    <Text style={{color: colors.primary, fontSize: 20}}>
                       Order Items
                     </Text>
                   </CardItem>
@@ -795,7 +818,7 @@ class OrderDetailsScreen extends Component {
                             color: colors.text_primary,
                             fontFamily: 'ProductSans-Black',
                           }}>
-                          ₱ {selectedOrder.subTotal}
+                          ₱{selectedOrder.subTotal}
                         </Text>
                       </View>
 
@@ -934,7 +957,7 @@ class OrderDetailsScreen extends Component {
                     paddingVertical: 5,
                   }}>
                   <Image
-                    source={require('../../assets/images/mrspeedy_logo.png')}
+                    source={require('../../assets/images/mrspeedy-logo.png')}
                     style={{
                       height: 50,
                       width: 100,

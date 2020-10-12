@@ -246,22 +246,26 @@ class OrderCard extends PureComponent {
             <Text> - {this.timeStamp}</Text>
           </Left>
           <Right>
-            {buttonText && (
-              <Button
-                title={buttonText}
-                titleStyle={{color: colors.icons}}
-                loading={this.state.loading}
-                loadingProps={{size: 'small', color: colors.icons}}
-                buttonStyle={{backgroundColor: colors.accent}}
-                containerStyle={{
-                  borderRadius: 24,
-                  borderWidth: 1,
-                  borderColor: colors.accent,
-                  width: '100%',
-                }}
-                onPress={() => this.setState({changeOrderStatusModal: true})}
-              />
-            )}
+            {buttonText &&
+              !(
+                buttonText === 'Complete' &&
+                order.deliveryMethod === 'Mr. Speedy'
+              ) && (
+                <Button
+                  title={buttonText}
+                  titleStyle={{color: colors.icons}}
+                  loading={this.state.loading}
+                  loadingProps={{size: 'small', color: colors.icons}}
+                  buttonStyle={{backgroundColor: colors.accent}}
+                  containerStyle={{
+                    borderRadius: 24,
+                    borderWidth: 1,
+                    borderColor: colors.accent,
+                    width: '100%',
+                  }}
+                  onPress={() => this.setState({changeOrderStatusModal: true})}
+                />
+              )}
           </Right>
         </CardItem>
       );
