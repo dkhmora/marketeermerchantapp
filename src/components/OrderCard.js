@@ -246,6 +246,13 @@ class OrderCard extends PureComponent {
     };
 
     const CardFooter = () => {
+      const footerText =
+        buttonText === 'Complete' && order.deliveryMethod === 'Mr. Speedy'
+          ? 'Order will be completed once the courier delivers the items to the customer'
+          : tabName === 'Unpaid' && order.paymentMethod === 'Online Banking'
+          ? 'Order will be ready to ship after the customer pays'
+          : '';
+
       return (
         <CardItem footer bordered>
           <Left>
@@ -254,25 +261,28 @@ class OrderCard extends PureComponent {
           </Left>
           <Right>
             {buttonText &&
-              !(
-                buttonText === 'Complete' &&
-                order.deliveryMethod === 'Mr. Speedy'
-              ) && (
-                <Button
-                  title={buttonText}
-                  titleStyle={{color: colors.icons}}
-                  loading={this.state.loading}
-                  loadingProps={{size: 'small', color: colors.icons}}
-                  buttonStyle={{backgroundColor: colors.accent}}
-                  containerStyle={{
-                    borderRadius: 24,
-                    borderWidth: 1,
-                    borderColor: colors.accent,
-                    width: '100%',
-                  }}
-                  onPress={() => this.setState({changeOrderStatusModal: true})}
-                />
-              )}
+            !(
+              buttonText === 'Complete' && order.deliveryMethod === 'Mr. Speedy'
+            ) ? (
+              <Button
+                title={buttonText}
+                titleStyle={{color: colors.icons}}
+                loading={this.state.loading}
+                loadingProps={{size: 'small', color: colors.icons}}
+                buttonStyle={{backgroundColor: colors.accent}}
+                containerStyle={{
+                  borderRadius: 24,
+                  borderWidth: 1,
+                  borderColor: colors.accent,
+                  width: '100%',
+                }}
+                onPress={() => this.setState({changeOrderStatusModal: true})}
+              />
+            ) : (
+              <Text style={{textAlign: 'right', color: colors.text_secondary}}>
+                {footerText}
+              </Text>
+            )}
           </Right>
         </CardItem>
       );
@@ -303,16 +313,39 @@ class OrderCard extends PureComponent {
 
         <Card {...otherProps} style={{borderRadius: 10, overflow: 'hidden'}}>
           <CardHeader />
+
           <CardItem
-            bordered
             style={{
               paddingBottom: 5,
               paddingTop: 5,
+              borderColor: colors.divider,
+              borderBottomWidth: 0.65,
             }}>
             <Left>
-              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
-                Delivery Address:
+              <Text style={{fontSize: 16}}>Delivery Method:</Text>
+            </Left>
+            <Right>
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontFamily: 'ProductSans-Black',
+                  fontSize: 16,
+                  textAlign: 'right',
+                }}>
+                {order.deliveryMethod}
               </Text>
+            </Right>
+          </CardItem>
+
+          <CardItem
+            style={{
+              paddingBottom: 5,
+              paddingTop: 5,
+              borderColor: colors.divider,
+              borderBottomWidth: 0.65,
+            }}>
+            <Left>
+              <Text style={{fontSize: 16}}>Delivery Address:</Text>
             </Left>
             <Right>
               <Text
@@ -326,16 +359,16 @@ class OrderCard extends PureComponent {
               </Text>
             </Right>
           </CardItem>
+
           <CardItem
-            bordered
             style={{
               paddingBottom: 5,
               paddingTop: 5,
+              borderColor: colors.divider,
+              borderBottomWidth: 0.65,
             }}>
             <Left>
-              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
-                Total Amount:
-              </Text>
+              <Text style={{fontSize: 16}}>Total Amount:</Text>
             </Left>
             <Right>
               <Text
