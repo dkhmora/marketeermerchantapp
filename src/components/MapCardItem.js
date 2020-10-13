@@ -20,7 +20,6 @@ class MapCardItem extends Component {
       prevProps.riderCoordinates !== this.props.riderCoordinates &&
       !this.state.riderCoordinatesUpdated
     ) {
-      console.log('yes');
       this.setState({riderCoordinatesUpdated: true}, () => {
         this.fitMarkers();
         this.setState({riderCoordinatesUpdated: false});

@@ -9,6 +9,7 @@ import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import ConfirmationModal from './ConfirmationModal';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 
 @inject('ordersStore')
 @inject('detailsStore')
