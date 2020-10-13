@@ -276,7 +276,24 @@ class OrderCard extends PureComponent {
                   borderColor: colors.accent,
                   width: '100%',
                 }}
-                onPress={() => this.setState({changeOrderStatusModal: true})}
+                onPress={() => {
+                  if (
+                    order.deliveryMethod === 'Mr. Speedy' &&
+                    order.orderStatus.paid.status
+                  ) {
+                    this.props.ordersStore.selectedOrder = order;
+
+                    if (this.props.ordersStore.mrspeedyBottomSheet) {
+                      this.props.ordersStore.mrspeedyBottomSheet.getMrspeedyOrderPriceEstimate();
+                      this.props.ordersStore.mrspeedyBottomSheet.bottomSheet.snapTo(
+                        1,
+                      );
+                    }
+                  } else {
+                    this.setState({changeOrderStatusModal: true});
+                  }
+                }}
+                //onPress={() => this.setState({changeOrderStatusModal: true})}
               />
             ) : (
               <Text style={{textAlign: 'right', color: colors.text_secondary}}>

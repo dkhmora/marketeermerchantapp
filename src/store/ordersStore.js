@@ -20,6 +20,7 @@ class OrdersStore {
   @observable cancelOrderModal = false;
   @observable selectedOrder = null;
   @observable selectedCancelOrder = null;
+  @observable mrspeedyBottomSheet = null;
 
   @action async getMrspeedyOrderPriceEstimate({
     subTotal,
