@@ -71,6 +71,42 @@ class OrderDetailsScreen extends Component {
     return 'Unknown';
   }
 
+  @computed get mrspeedyVehicleType() {
+    const {selectedOrder} = this.props.ordersStore;
+
+    if (selectedOrder.mrspeedyBookingData) {
+      return selectedOrder.mrspeedyBookingData.order.vehicle_type_id === 8
+        ? 'Motorbike'
+        : 'Car';
+    }
+
+    return null;
+  }
+
+  @computed get mrspeedyOrderStatus() {
+    const {selectedOrder} = this.props.ordersStore;
+
+    if (selectedOrder.mrspeedyBookingData) {
+      const {status} = selectedOrder.mrspeedyBookingData.order;
+
+      switch (status) {
+        case 'new':
+          return 'Awaiting Verification';
+
+        case 'available':
+          return 'Available for Couriers';
+
+        case 'reactivated':
+          return 'yes';
+
+        default:
+          return status.toUpperCase();
+      }
+    }
+
+    return null;
+  }
+
   componentDidMount() {
     const {orderId} = this.props.route.params;
 
@@ -636,20 +672,21 @@ class OrderDetailsScreen extends Component {
                               color: colors.text_primary,
                               fontFamily: 'ProductSans-Light',
                             }}>
-                            Delivery Price:
+                            {'Delivery Price: '}
                           </Text>
                           <Text
                             style={{
                               fontSize: 18,
                               color: colors.text_primary,
                               fontFamily: 'ProductSans-Black',
+                              textAlign: 'right',
                             }}>
                             {selectedOrder.deliveryPrice &&
                             selectedOrder.deliveryPrice > 0
-                              ? ` ₱${selectedOrder.deliveryPrice}`
+                              ? `₱${selectedOrder.deliveryPrice}`
                               : selectedOrder.deliveryPrice === null
-                              ? ' (Contact Merchant)'
-                              : ' ₱0 (Free Delivery)'}
+                              ? '(Will be shown upon booking of Mr. Speedy delivery)'
+                              : '₱0 (Free Delivery)'}
                           </Text>
                         </View>
                       </Right>

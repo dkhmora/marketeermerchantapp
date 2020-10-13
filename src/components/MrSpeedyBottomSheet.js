@@ -48,42 +48,6 @@ class MrSpeedyBottomSheet extends Component {
     this.drawerCallbackNode = new Animated.Value(0);
   }
 
-  @computed get mrspeedyOrderStatus() {
-    const {selectedOrder} = this.props.ordersStore;
-
-    if (selectedOrder.mrspeedyBookingData) {
-      const {status} = selectedOrder.mrspeedyBookingData.order;
-
-      switch (status) {
-        case 'new':
-          return 'Awaiting Verification';
-
-        case 'available':
-          return 'Available for Couriers';
-
-        case 'reactivated':
-          return 'yes';
-
-        default:
-          return status.toUpperCase();
-      }
-    }
-
-    return null;
-  }
-
-  @computed get mrspeedyVehicleType() {
-    const {selectedOrder} = this.props.ordersStore;
-
-    if (selectedOrder.mrspeedyBookingData) {
-      return selectedOrder.mrspeedyBookingData.order.vehicle_type_id === 8
-        ? 'Motorbike'
-        : 'Car';
-    }
-
-    return null;
-  }
-
   @computed get weightButtonLabels() {
     const {selectedVehicleIndex} = this.state;
 
