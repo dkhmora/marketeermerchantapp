@@ -262,6 +262,7 @@ class MrSpeedyBottomSheet extends Component {
       storePhoneNumberError,
       mrspeedyOrderPrice,
     } = this.state;
+    const {clearSelectedOrderOnClose} = this.props;
 
     return (
       <View style={{...StyleSheet.absoluteFillObject}}>
@@ -277,6 +278,11 @@ class MrSpeedyBottomSheet extends Component {
           borderRadius={30}
           initialSnap={0}
           callbackNode={this.drawerCallbackNode}
+          onCloseStart={
+            clearSelectedOrderOnClose
+              ? () => (this.props.ordersStore.selectedOrder = null)
+              : null
+          }
           renderContent={() => (
             <View
               onTouchStart={() => Keyboard.dismiss()}
@@ -310,20 +316,22 @@ class MrSpeedyBottomSheet extends Component {
                   }}
                   selectedIndex={selectedVehicleIndex}
                   buttons={['Motorbike', 'Car']}
+                  buttonStyle={{
+                    borderRadius: 30,
+                    borderWidth: 1,
+                    borderColor: colors.primary,
+                  }}
+                  innerBorderStyle={{borderColor: 'transaprent'}}
+                  buttonContainerStyle={{
+                    borderWidth: 0,
+                    borderColor: 'transaprent',
+                  }}
                   activeOpacity={0.7}
                   containerStyle={{
                     height: 30,
                     width: '80%',
-                    borderRadius: 15,
-                    elevation: 5,
-                    shadowColor: '#000',
-                    shadowOffset: {
-                      width: 0,
-                      height: 2,
-                    },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.84,
-                    borderColor: 'rgba(0,0,0,0.7)',
+                    borderWidth: 0,
+                    borderColor: 'transaprent',
                   }}
                   selectedButtonStyle={{
                     backgroundColor: colors.primary,

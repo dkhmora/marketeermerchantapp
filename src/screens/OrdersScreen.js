@@ -36,6 +36,7 @@ class OrdersScreen extends Component {
           ref={(mrspeedyBottomSheet) =>
             (this.props.ordersStore.mrspeedyBottomSheet = mrspeedyBottomSheet)
           }
+          clearSelectedOrderOnClose
         />
       </View>
     );
