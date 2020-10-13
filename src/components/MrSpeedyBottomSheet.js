@@ -102,8 +102,8 @@ class MrSpeedyBottomSheet extends Component {
 
   checkStorePhoneNumber() {
     const {storePhoneNumber} = this.state;
-    const regexp = new RegExp(/^(\+639)\d{9}$/);
-    const formattedPhoneNubmer = `+63${storePhoneNumber}`;
+    const regexp = new RegExp(/^(639)\d{9}$/);
+    const formattedPhoneNubmer = `63${storePhoneNumber}`;
 
     if (storePhoneNumber.length === 0) {
       this.setState({
@@ -206,7 +206,7 @@ class MrSpeedyBottomSheet extends Component {
           : 19;
     }
 
-    const formattedPhoneNubmer = `+63${storePhoneNumber}`;
+    const formattedPhoneNubmer = `63${storePhoneNumber}`;
 
     const mrspeedyBookingData = {
       vehicleType,

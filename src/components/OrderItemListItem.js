@@ -39,11 +39,17 @@ class OrderItemCard extends PureComponent {
     const {url} = this.state;
 
     return (
-      <CardItem bordered>
+      <CardItem
+        bordered
+        style={{
+          paddingLeft: 10,
+          paddingRight: 10,
+          paddingBottom: 5,
+          paddingTop: 10,
+        }}>
         <View
           style={{
             flexDirection: 'row',
-            marginVertical: 8,
           }}>
           <FastImage
             key={item.name}
@@ -88,7 +94,7 @@ class OrderItemCard extends PureComponent {
                 fontSize: 16,
                 color: colors.text_primary,
               }}>
-              ₱ {item.price}
+              ₱{item.price}
             </Text>
             <Text
               style={{
@@ -98,7 +104,7 @@ class OrderItemCard extends PureComponent {
                 textAlign: 'right',
                 width: '100%',
               }}>
-              x {item.quantity}
+              x{item.quantity}
             </Text>
             <Text
               style={{
@@ -106,7 +112,7 @@ class OrderItemCard extends PureComponent {
                 fontSize: 18,
                 color: colors.text_primary,
               }}>
-              ₱ {item.price * item.quantity}
+              ₱{item.price * item.quantity}
             </Text>
           </View>
         </View>
