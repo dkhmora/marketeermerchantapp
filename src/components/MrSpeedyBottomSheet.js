@@ -93,9 +93,11 @@ class MrSpeedyBottomSheet extends Component {
         });
       });
       Keyboard.addListener('keyboardDidHide', (event) => {
-        if (this.bottomSheet) {
-          this.bottomSheet.snapTo(1);
-        }
+        this.setState({bottomSheetPadding: 0}, () => {
+          if (this.bottomSheet) {
+            this.bottomSheet.snapTo(1);
+          }
+        });
       });
     }
   }
@@ -182,7 +184,7 @@ class MrSpeedyBottomSheet extends Component {
     this.props.authStore.appReady = false;
 
     const {selectedOrder} = this.props.ordersStore;
-    const {orderId} = this.props.route.params;
+    const {orderId, storeId} = selectedOrder;
     const {storeDetails} = this.props.detailsStore;
     const {
       selectedVehicleIndex,
@@ -218,7 +220,7 @@ class MrSpeedyBottomSheet extends Component {
     this.props.ordersStore
       .setOrderStatus(
         orderId,
-        selectedOrder.storeId,
+        storeId,
         storeDetails.merchantId,
         mrspeedyBookingData,
       )
