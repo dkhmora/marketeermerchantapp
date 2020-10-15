@@ -518,7 +518,7 @@ class OrderDetailsScreen extends Component {
                               fontSize: 16,
                               fontFamily: 'ProductSans-Bold',
                             }}>
-                            Delivery Status:
+                            Status:
                           </Text>
                         </Left>
 
@@ -530,6 +530,32 @@ class OrderDetailsScreen extends Component {
                               textAlign: 'right',
                             }}>
                             {this.mrspeedyOrderStatus}
+                          </Text>
+                        </Right>
+                      </CardItem>
+
+                      <CardItem bordered>
+                        <Left>
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              fontFamily: 'ProductSans-Bold',
+                            }}>
+                            Status Description:
+                          </Text>
+                        </Left>
+
+                        <Right>
+                          <Text
+                            style={{
+                              color: colors.text_primary,
+                              fontSize: 16,
+                              textAlign: 'right',
+                            }}>
+                            {
+                              selectedOrder.mrspeedyBookingData.order
+                                .status_description
+                            }
                           </Text>
                         </Right>
                       </CardItem>
