@@ -19,7 +19,7 @@ import {
   ListItem,
   Text,
 } from 'react-native-elements';
-import Animated, {call, onChange} from 'react-native-reanimated';
+import Animated, {call, color, onChange} from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
@@ -251,6 +251,20 @@ class MrSpeedyBottomSheet extends Component {
     });
   };
 
+  resetState() {
+    this.setState({
+      bottomSheetPadding: 0,
+      selectedVehicleIndex: 0,
+      selectedWeightIndex: 0,
+      motobox: false,
+      mrspeedyEstimateLoading: false,
+      storePhoneNumber: '',
+      storePhoneNumberError: null,
+      mrspeedyOrderPrice: '0.00',
+      openRatio: 0,
+    });
+  }
+
   render() {
     const {
       bottomSheetPadding,
@@ -274,14 +288,14 @@ class MrSpeedyBottomSheet extends Component {
         />
         <BottomSheet
           ref={(sheetRef) => (this.bottomSheet = sheetRef)}
-          snapPoints={[0, 360, 360 + bottomSheetPadding]}
+          snapPoints={[0, 300, 300 + bottomSheetPadding]}
           borderRadius={30}
           initialSnap={0}
           callbackNode={this.drawerCallbackNode}
           onCloseStart={
-            clearSelectedOrderOnClose
+            (clearSelectedOrderOnClose
               ? () => (this.props.ordersStore.selectedOrder = null)
-              : null
+              : null) && (() => this.resetState())
           }
           renderContent={() => (
             <View
@@ -295,7 +309,7 @@ class MrSpeedyBottomSheet extends Component {
                 borderTopLeftRadius: 30,
                 borderTopRightRadius: 30,
                 borderColor: 'rgba(0,0,0,0.4)',
-                height: 360 + bottomSheetPadding,
+                height: 300 + bottomSheetPadding,
                 paddingVertical: 5,
               }}>
               <Image
@@ -318,23 +332,35 @@ class MrSpeedyBottomSheet extends Component {
                   buttons={['Motorbike', 'Car']}
                   buttonStyle={{
                     borderRadius: 30,
-                    borderWidth: 1,
-                    borderColor: colors.primary,
+                    paddingRight: 0,
+                    padding: 0,
                   }}
-                  innerBorderStyle={{borderColor: 'transaprent'}}
                   buttonContainerStyle={{
-                    borderWidth: 0,
-                    borderColor: 'transaprent',
+                    borderRadius: 30,
                   }}
+                  innerBorderStyle={{color: 'transparent', width: 5}}
                   activeOpacity={0.7}
                   containerStyle={{
                     height: 30,
                     width: '80%',
-                    borderWidth: 0,
-                    borderColor: 'transaprent',
+                    borderRadius: 30,
+                    paddingLeft: -5,
+                    elevation: 2,
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 1.41,
                   }}
                   selectedButtonStyle={{
-                    backgroundColor: colors.primary,
+                    backgroundColor: colors.icons,
+                    borderColor: colors.primary,
+                    borderWidth: 1,
+                  }}
+                  selectedTextStyle={{
+                    color: colors.primary,
                   }}
                 />
               </View>
@@ -351,29 +377,36 @@ class MrSpeedyBottomSheet extends Component {
                     selectedIndex={selectedWeightIndex}
                     buttons={this.weightButtonLabels}
                     activeOpacity={0.7}
+                    buttonStyle={{
+                      borderRadius: 30,
+                      paddingHorizontal: 10,
+                    }}
+                    buttonContainerStyle={{
+                      borderRadius: 30,
+                    }}
+                    innerBorderStyle={{color: 'transparent', width: 5}}
                     containerStyle={{
-                      minWidth: SCREEN_WIDTH - 22,
-                      height: 50,
-                      borderRadius: 8,
-                      elevation: 5,
+                      height: 40,
+                      width: '100%',
+                      borderRadius: 30,
+                      paddingLeft: -5,
+                      elevation: 2,
                       shadowColor: '#000',
                       shadowOffset: {
                         width: 0,
-                        height: 2,
+                        height: 1,
                       },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 3.84,
-                      borderWidth: 0.7,
-                      borderColor: 'rgba(0,0,0,0.7)',
-                    }}
-                    buttonStyle={{
-                      alignItems: 'center',
-                      paddingHorizontal: 5,
+                      shadowOpacity: 0.2,
+                      shadowRadius: 1.41,
                     }}
                     textStyle={{textAlign: 'center'}}
                     selectedButtonStyle={{
-                      backgroundColor: colors.primary,
-                      elevation: 5,
+                      backgroundColor: colors.icons,
+                      borderColor: colors.primary,
+                      borderWidth: 1,
+                    }}
+                    selectedTextStyle={{
+                      color: colors.primary,
                     }}
                   />
                 </ScrollView>
@@ -381,14 +414,14 @@ class MrSpeedyBottomSheet extends Component {
                 <ListItem
                   title="Require Motobox"
                   titleStyle={{
-                    fontSize: 18,
+                    fontSize: 16,
                     color: colors.text_primary,
                   }}
                   containerStyle={{
                     width: '100%',
-                    height: 65,
-                    paddingTop: 10,
-                    paddingBottom: 10,
+                    height: 40,
+                    paddingTop: 0,
+                    paddingBottom: 0,
                   }}
                   rightElement={
                     <Switch
@@ -407,14 +440,14 @@ class MrSpeedyBottomSheet extends Component {
                 <ListItem
                   title="Your Contact Number"
                   titleStyle={{
-                    fontSize: 18,
+                    fontSize: 16,
                     color: colors.text_primary,
                   }}
                   containerStyle={{
                     width: '100%',
-                    height: 65,
-                    paddingTop: 10,
-                    paddingBottom: 10,
+                    height: 40,
+                    paddingTop: 0,
+                    paddingBottom: 0,
                   }}
                   input={{
                     leftIcon: (
@@ -427,7 +460,7 @@ class MrSpeedyBottomSheet extends Component {
                         <Text
                           style={{
                             color: colors.text_primary,
-                            fontSize: 18,
+                            fontSize: 16,
                           }}>
                           (+63)
                         </Text>
@@ -436,7 +469,7 @@ class MrSpeedyBottomSheet extends Component {
                     inputStyle: {
                       textAlign: 'left',
                       fontFamily: 'ProductSans-Light',
-                      fontSize: 20,
+                      fontSize: 16,
                       color: colors.primary,
                       borderBottomWidth: 1,
                     },
@@ -483,7 +516,7 @@ class MrSpeedyBottomSheet extends Component {
                       disabled={
                         mrspeedyEstimateLoading ||
                         storePhoneNumber.length <= 0 ||
-                        storePhoneNumberError !== undefined
+                        storePhoneNumberError !== null
                       }
                       title="Place Order"
                       titleStyle={{color: colors.icons}}
