@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, CardItem, Left, Right, Body} from 'native-base';
-import {Text, Icon, Button, ButtonGroup, ListItem} from 'react-native-elements';
+import {Text, Icon, Button} from 'react-native-elements';
 import {
   View,
   ActivityIndicator,
@@ -8,32 +8,24 @@ import {
   Dimensions,
   Image,
   StatusBar,
-  KeyboardAvoidingView,
-  Platform,
-  Keyboard,
 } from 'react-native';
 import BaseHeader from '../components/BaseHeader';
 import {
   ScrollView,
-  Switch,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
 import OrderItemListItem from '../components/OrderItemListItem';
 import {colors} from '../../assets/colors';
 import {inject, observer} from 'mobx-react';
-import MapView, {Marker} from 'react-native-maps';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
 import {computed} from 'mobx';
 import crashlytics from '@react-native-firebase/crashlytics';
-import BottomSheet from 'reanimated-bottom-sheet';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import MapCardItem from '../components/MapCardItem';
 import CardItemHeader from '../components/CardItemHeader';
 import MrSpeedyBottomSheet from '../components/MrSpeedyBottomSheet';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const SCREEN_WIDTH = Dimensions.get('window').width;
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -105,6 +97,26 @@ class OrderDetailsScreen extends Component {
     }
 
     return null;
+  }
+
+  @computed get deliveryPriceText() {
+    const {selectedOrder} = this.props.ordersStore;
+
+    if (selectedOrder.deliveryPrice) {
+      if (selectedOrder.deliveryPrice > 0) {
+        return `₱${selectedOrder.deliveryPrice}`;
+      }
+
+      if (selectedOrder.deliveryPrice === 0) {
+        return '₱0 (Free Delivery)';
+      }
+    }
+
+    if (selectedOrder.deliveryMethod === 'Mr. Speedy') {
+      return '(Will be shown upon booking of Mr. Speedy delivery)';
+    }
+
+    return 'Unknown';
   }
 
   componentDidMount() {
@@ -652,7 +664,7 @@ class OrderDetailsScreen extends Component {
                               color: colors.text_primary,
                               fontFamily: 'ProductSans-Light',
                             }}>
-                            Subtotal:
+                            {'Subtotal: '}
                           </Text>
                           <Text
                             style={{
@@ -660,7 +672,7 @@ class OrderDetailsScreen extends Component {
                               color: colors.text_primary,
                               fontFamily: 'ProductSans-Black',
                             }}>
-                            {` ₱${selectedOrder.subTotal}`}
+                            {`₱${selectedOrder.subTotal}`}
                           </Text>
                         </View>
 
@@ -681,12 +693,7 @@ class OrderDetailsScreen extends Component {
                               fontFamily: 'ProductSans-Black',
                               textAlign: 'right',
                             }}>
-                            {selectedOrder.deliveryPrice &&
-                            selectedOrder.deliveryPrice > 0
-                              ? `₱${selectedOrder.deliveryPrice}`
-                              : selectedOrder.deliveryPrice === null
-                              ? '(Will be shown upon booking of Mr. Speedy delivery)'
-                              : '₱0 (Free Delivery)'}
+                            {this.deliveryPriceText}
                           </Text>
                         </View>
                       </Right>
