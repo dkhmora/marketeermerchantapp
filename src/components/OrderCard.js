@@ -255,7 +255,7 @@ class OrderCard extends PureComponent {
           : '';
 
       return (
-        <CardItem footer bordered>
+        <CardItem footer>
           <Left>
             <Text style={{color: colors.primary}}>{this.orderStatus}</Text>
             <Text> - {this.timeStamp}</Text>
@@ -333,91 +333,40 @@ class OrderCard extends PureComponent {
           <CardHeader />
 
           <CardItem
-            style={{
-              paddingBottom: 5,
-              paddingTop: 5,
-              borderColor: colors.divider,
-              borderBottomWidth: 0.65,
-            }}>
-            <Left>
-              <Text style={{fontSize: 16}}>Delivery Method:</Text>
-            </Left>
-            <Right>
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontFamily: 'ProductSans-Black',
-                  fontSize: 16,
-                  textAlign: 'right',
-                }}>
-                {order.deliveryMethod}
-              </Text>
-            </Right>
-          </CardItem>
-
-          <CardItem
-            style={{
-              paddingBottom: 5,
-              paddingTop: 5,
-              borderColor: colors.divider,
-              borderBottomWidth: 0.65,
-            }}>
-            <Left>
-              <Text style={{fontSize: 16}}>Delivery Address:</Text>
-            </Left>
-            <Right>
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontFamily: 'ProductSans-Black',
-                  fontSize: 16,
-                  textAlign: 'right',
-                }}>
+            button
+            style={{flexDirection: 'row'}}
+            onPress={this.handleViewOrderItems.bind(this)}>
+            <View style={{flex: 1}}>
+              <Text style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
                 {order.deliveryAddress}
               </Text>
-            </Right>
+              <Text style={{fontSize: 14}}>{order.deliveryMethod}</Text>
+            </View>
+
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+              }}>
+              <View style={{alignItems: 'center'}}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: colors.primary,
+                    fontFamily: 'ProductSans-Bold',
+                  }}>{`₱${order.subTotal}`}</Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: colors.text_secondary,
+                  }}>
+                  {`${order.quantity} Items`}
+                </Text>
+              </View>
+            </View>
           </CardItem>
 
-          <CardItem
-            style={{
-              paddingBottom: 5,
-              paddingTop: 5,
-              borderColor: colors.divider,
-              borderBottomWidth: 0.65,
-            }}>
-            <Left>
-              <Text style={{fontSize: 16}}>Total Amount:</Text>
-            </Left>
-            <Right>
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontFamily: 'ProductSans-Black',
-                  fontSize: 16,
-                }}>
-                ₱{order.subTotal}
-              </Text>
-              <Text note>{order.quantity} items</Text>
-            </Right>
-          </CardItem>
-          <CardItem>
-            <Body>
-              <Button
-                title="View Full Order"
-                onPress={this.handleViewOrderItems.bind(this)}
-                loading={this.state.loading}
-                loadingProps={{size: 'small', color: colors.icons}}
-                titleStyle={{color: colors.accent}}
-                buttonStyle={{backgroundColor: colors.icons}}
-                containerStyle={{
-                  borderRadius: 24,
-                  width: '100%',
-                  borderWidth: 1,
-                  borderColor: colors.accent,
-                }}
-              />
-            </Body>
-          </CardItem>
           <CardFooter />
         </Card>
       </View>
