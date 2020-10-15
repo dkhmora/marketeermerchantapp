@@ -8,7 +8,6 @@ import {
   ScrollView,
   Switch,
   View,
-  Dimensions,
   StyleSheet,
 } from 'react-native';
 import {
@@ -19,12 +18,11 @@ import {
   ListItem,
   Text,
 } from 'react-native-elements';
-import Animated, {call, color, onChange} from 'react-native-reanimated';
+import Animated, {call, onChange} from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {colors} from '../../assets/colors';
+import ConfirmationModal from './ConfirmationModal';
 import Toast from './Toast';
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
 
 @inject('ordersStore')
 @inject('authStore')
@@ -43,6 +41,7 @@ class MrSpeedyBottomSheet extends Component {
       storePhoneNumberError: null,
       mrspeedyOrderPrice: '0.00',
       openRatio: 0,
+      changeOrderStatusModal: false,
     };
 
     this.drawerCallbackNode = new Animated.Value(0);
@@ -271,8 +270,10 @@ class MrSpeedyBottomSheet extends Component {
       storePhoneNumber,
       storePhoneNumberError,
       mrspeedyOrderPrice,
+      changeOrderStatusModal,
     } = this.state;
     const {clearSelectedOrderOnClose} = this.props;
+    const {selectedOrder} = this.props.ordersStore;
 
     return (
       <View style={{...StyleSheet.absoluteFillObject}}>
@@ -282,6 +283,20 @@ class MrSpeedyBottomSheet extends Component {
             call([this.drawerCallbackNode], this.onCallback),
           )}
         />
+
+        {selectedOrder && (
+          <ConfirmationModal
+            isVisible={changeOrderStatusModal}
+            title={`Ship Order # ${selectedOrder.storeOrderNumber}?`}
+            body={`Are you sure you want to ship Order # ${selectedOrder.storeOrderNumber} and book a delivery via Mr. Speedy?`}
+            onConfirm={() => {
+              this.setState({changeOrderStatusModal: false}, () => {
+                this.handleChangeOrderStatus();
+              });
+            }}
+            closeModal={() => this.setState({changeOrderStatusModal: false})}
+          />
+        )}
         <BottomSheet
           ref={(sheetRef) => (this.bottomSheet = sheetRef)}
           snapPoints={[0, 320, 320 + bottomSheetPadding]}
