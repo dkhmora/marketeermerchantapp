@@ -86,11 +86,7 @@ class MrSpeedyBottomSheet extends Component {
     if (Platform.OS === 'android') {
       Keyboard.addListener('keyboardDidShow', (event) => {
         const keyboardHeight = event.endCoordinates.height;
-        this.setState({bottomSheetPadding: keyboardHeight - 20}, () => {
-          if (this.bottomSheet) {
-            this.bottomSheet.snapTo(2);
-          }
-        });
+        this.setState({bottomSheetPadding: keyboardHeight - 20});
       });
       Keyboard.addListener('keyboardDidHide', (event) => {
         this.setState({bottomSheetPadding: 0}, () => {
@@ -288,7 +284,7 @@ class MrSpeedyBottomSheet extends Component {
         />
         <BottomSheet
           ref={(sheetRef) => (this.bottomSheet = sheetRef)}
-          snapPoints={[0, 300, 300 + bottomSheetPadding]}
+          snapPoints={[0, 320, 320 + bottomSheetPadding]}
           borderRadius={30}
           initialSnap={0}
           callbackNode={this.drawerCallbackNode}
@@ -309,7 +305,7 @@ class MrSpeedyBottomSheet extends Component {
                 borderTopLeftRadius: 30,
                 borderTopRightRadius: 30,
                 borderColor: 'rgba(0,0,0,0.4)',
-                height: 300 + bottomSheetPadding,
+                height: 320 + bottomSheetPadding,
                 paddingVertical: 5,
               }}>
               <Image
@@ -414,7 +410,7 @@ class MrSpeedyBottomSheet extends Component {
                 <ListItem
                   title="Require Motobox"
                   titleStyle={{
-                    fontSize: 16,
+                    fontSize: 17,
                     color: colors.text_primary,
                   }}
                   containerStyle={{
@@ -440,12 +436,12 @@ class MrSpeedyBottomSheet extends Component {
                 <ListItem
                   title="Your Contact Number"
                   titleStyle={{
-                    fontSize: 16,
+                    fontSize: 17,
                     color: colors.text_primary,
                   }}
                   containerStyle={{
                     width: '100%',
-                    height: 40,
+                    height: 65,
                     paddingTop: 0,
                     paddingBottom: 0,
                   }}
@@ -456,11 +452,16 @@ class MrSpeedyBottomSheet extends Component {
                           flexDirection: 'row',
                           justifyContent: 'center',
                         }}>
-                        <Icon name="hash" color={colors.primary} size={16} />
+                        <Icon
+                          name="hash"
+                          color={colors.primary}
+                          size={18}
+                          style={{marginRight: 5}}
+                        />
                         <Text
                           style={{
                             color: colors.text_primary,
-                            fontSize: 16,
+                            fontSize: 18,
                           }}>
                           (+63)
                         </Text>
@@ -469,7 +470,7 @@ class MrSpeedyBottomSheet extends Component {
                     inputStyle: {
                       textAlign: 'left',
                       fontFamily: 'ProductSans-Light',
-                      fontSize: 16,
+                      fontSize: 17,
                       color: colors.primary,
                       borderBottomWidth: 1,
                     },
@@ -485,53 +486,60 @@ class MrSpeedyBottomSheet extends Component {
                         this.checkStorePhoneNumber(),
                       );
                     },
-                    errorMessage: storePhoneNumberError,
-                  }}
-                />
-
-                <ListItem
-                  title={
-                    mrspeedyEstimateLoading ? (
-                      <ActivityIndicator color={colors.primary} size="small" />
-                    ) : (
-                      `₱${mrspeedyOrderPrice}`
-                    )
-                  }
-                  titleStyle={{
-                    fontSize: 26,
-                    fontFamily: 'ProductSans-Black',
-                    color: colors.primary,
-                  }}
-                  containerStyle={{
-                    width: '100%',
-                    height: 65,
-                    paddingTop: 10,
-                    paddingBottom: 10,
-                  }}
-                  rightElement={
-                    <Button
-                      onPress={() => {
-                        this.setState({changeOrderStatusModal: true});
-                      }}
-                      disabled={
-                        mrspeedyEstimateLoading ||
-                        storePhoneNumber.length <= 0 ||
-                        storePhoneNumberError !== null
+                    onFocus: () => {
+                      if (this.bottomSheet) {
+                        this.bottomSheet.snapTo(2);
                       }
-                      title="Place Order"
-                      titleStyle={{color: colors.icons}}
-                      containerStyle={{
-                        borderRadius: 24,
-                        marginTop: 0,
-                        marginBottom: 0,
-                      }}
-                      buttonStyle={{
-                        backgroundColor: colors.accent,
-                      }}
-                    />
-                  }
+                    },
+                    errorMessage: storePhoneNumberError,
+                    errorStyle: {flexWrap: 'wrap'},
+                    errorProps: {numberOfLines: 2},
+                  }}
                 />
               </View>
+
+              <ListItem
+                title={
+                  mrspeedyEstimateLoading ? (
+                    <ActivityIndicator color={colors.primary} size="small" />
+                  ) : (
+                    `₱${mrspeedyOrderPrice}`
+                  )
+                }
+                titleStyle={{
+                  fontSize: 26,
+                  fontFamily: 'ProductSans-Black',
+                  color: colors.primary,
+                }}
+                containerStyle={{
+                  width: '100%',
+                  height: 65,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                }}
+                rightElement={
+                  <Button
+                    onPress={() => {
+                      this.setState({changeOrderStatusModal: true});
+                    }}
+                    disabled={
+                      mrspeedyEstimateLoading ||
+                      storePhoneNumber.length <= 0 ||
+                      storePhoneNumberError !== null
+                    }
+                    title="Place Order"
+                    titleStyle={{color: colors.icons}}
+                    containerStyle={{
+                      borderRadius: 24,
+                      marginTop: 0,
+                      marginBottom: 0,
+                    }}
+                    buttonStyle={{
+                      backgroundColor: colors.accent,
+                    }}
+                  />
+                }
+              />
             </View>
           )}
         />
