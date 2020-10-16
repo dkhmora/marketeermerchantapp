@@ -384,6 +384,7 @@ class MrSpeedyBottomSheet extends Component {
               <View style={{flex: 1}}>
                 <ScrollView
                   ref={(scrollref) => (this.weightScrollViewRef = scrollref)}
+                  style={{flexGrow: 0}}
                   horizontal
                   showsHorizontalScrollIndicator={false}>
                   <ButtonGroup
@@ -425,6 +426,7 @@ class MrSpeedyBottomSheet extends Component {
                     }}
                   />
                 </ScrollView>
+
                 <ListItem
                   title="Require Motobox"
                   titleStyle={{
@@ -446,10 +448,12 @@ class MrSpeedyBottomSheet extends Component {
                       thumbColor={'#f4f3f4'}
                       ios_backgroundColor="#3e3e3e"
                       onValueChange={() => this.setState({motobox: !motobox})}
-                      value={motobox}
+                      value={selectedVehicleIndex === 0 ? motobox : false}
+                      disabled={selectedVehicleIndex === 1}
                     />
                   }
                 />
+
                 <ListItem
                   title="Your Contact Number"
                   titleStyle={{
