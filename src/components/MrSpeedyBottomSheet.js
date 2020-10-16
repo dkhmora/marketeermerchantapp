@@ -5,8 +5,6 @@ import {
   ActivityIndicator,
   Keyboard,
   Platform,
-  ScrollView,
-  Switch,
   View,
   StyleSheet,
 } from 'react-native';
@@ -18,6 +16,7 @@ import {
   ListItem,
   Text,
 } from 'react-native-elements';
+import {Switch, ScrollView} from 'react-native-gesture-handler';
 import Animated, {call, onChange} from 'react-native-reanimated';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {colors} from '../../assets/colors';
@@ -303,7 +302,7 @@ class MrSpeedyBottomSheet extends Component {
           borderRadius={30}
           initialSnap={0}
           callbackNode={this.drawerCallbackNode}
-          onCloseStart={
+          onCloseEnd={
             (clearSelectedOrderOnClose
               ? () => (this.props.ordersStore.selectedOrder = null)
               : null) && (() => this.resetState())
@@ -334,6 +333,12 @@ class MrSpeedyBottomSheet extends Component {
               <View style={{paddingHorizontal: 10}}>
                 <ButtonGroup
                   onPress={(index) => {
+                    this.weightScrollViewRef &&
+                      this.weightScrollViewRef.scrollTo({
+                        animated: false,
+                        x: 0,
+                        y: 0,
+                      });
                     if (index !== selectedVehicleIndex) {
                       this.setState({selectedWeightIndex: 0});
                     }
@@ -378,8 +383,8 @@ class MrSpeedyBottomSheet extends Component {
 
               <View style={{flex: 1}}>
                 <ScrollView
+                  ref={(scrollref) => (this.weightScrollViewRef = scrollref)}
                   horizontal
-                  style={{flexGrow: 0}}
                   showsHorizontalScrollIndicator={false}>
                   <ButtonGroup
                     onPress={(index) =>
@@ -395,12 +400,11 @@ class MrSpeedyBottomSheet extends Component {
                     buttonContainerStyle={{
                       borderRadius: 30,
                     }}
-                    innerBorderStyle={{color: 'transparent', width: 5}}
+                    innerBorderStyle={{color: 'transparent', width: 10}}
                     containerStyle={{
                       height: 40,
-                      width: '100%',
+                      flex: 1,
                       borderRadius: 30,
-                      paddingLeft: -5,
                       elevation: 2,
                       shadowColor: '#000',
                       shadowOffset: {
@@ -421,7 +425,6 @@ class MrSpeedyBottomSheet extends Component {
                     }}
                   />
                 </ScrollView>
-
                 <ListItem
                   title="Require Motobox"
                   titleStyle={{
@@ -447,7 +450,6 @@ class MrSpeedyBottomSheet extends Component {
                     />
                   }
                 />
-
                 <ListItem
                   title="Your Contact Number"
                   titleStyle={{
