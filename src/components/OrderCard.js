@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
-import {Card, CardItem, Left, Body, Right} from 'native-base';
-import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
+import {Card, CardItem, Left, Right} from 'native-base';
+import {ActivityIndicator, TouchableWithoutFeedback, View} from 'react-native';
 import moment from 'moment';
 import {observer, inject} from 'mobx-react';
 import {Icon, Button, Text, Badge} from 'react-native-elements';
@@ -9,7 +9,6 @@ import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import ConfirmationModal from './ConfirmationModal';
-import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -271,7 +270,7 @@ class OrderCard extends PureComponent {
                 titleStyle={{color: colors.icons}}
                 loading={this.state.loading}
                 loadingProps={{size: 'small', color: colors.icons}}
-                buttonStyle={{backgroundColor: colors.accent}}
+                buttonStyle={{backgroundColor: colors.accent, elevation: 5}}
                 containerStyle={{
                   borderRadius: 24,
                   borderWidth: 1,
@@ -335,45 +334,47 @@ class OrderCard extends PureComponent {
 
           <TouchableWithoutFeedback
             onPress={this.handleViewOrderItems.bind(this)}>
-            <CardItem style={{flexDirection: 'row'}}>
-              <View style={{flex: 1}}>
-                <Text
-                  numberOfLines={1}
-                  style={{
-                    fontSize: 16,
-                    fontFamily: 'ProductSans-Bold',
-                    flexWrap: 'wrap',
-                  }}>
-                  {order.deliveryAddress}
-                </Text>
-                <Text style={{fontSize: 14}}>{order.deliveryMethod}</Text>
-              </View>
-
-              <View
-                style={{
-                  alignItems: 'flex-end',
-                  justifyContent: 'center',
-                  marginLeft: 10,
-                }}>
-                <View style={{alignItems: 'center'}}>
+            <View>
+              <CardItem style={{flexDirection: 'row'}}>
+                <View style={{flex: 1}}>
                   <Text
+                    numberOfLines={1}
                     style={{
                       fontSize: 16,
-                      color: colors.primary,
                       fontFamily: 'ProductSans-Bold',
-                    }}>{`₱${order.subTotal}`}</Text>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: colors.text_secondary,
+                      flexWrap: 'wrap',
                     }}>
-                    {`${order.quantity} Items`}
+                    {order.deliveryAddress}
                   </Text>
+                  <Text style={{fontSize: 14}}>{order.deliveryMethod}</Text>
                 </View>
-              </View>
-            </CardItem>
 
-            <CardFooter />
+                <View
+                  style={{
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    marginLeft: 10,
+                  }}>
+                  <View style={{alignItems: 'center'}}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: colors.primary,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>{`₱${order.subTotal}`}</Text>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: colors.text_secondary,
+                      }}>
+                      {`${order.quantity} Items`}
+                    </Text>
+                  </View>
+                </View>
+              </CardItem>
+
+              <CardFooter />
+            </View>
           </TouchableWithoutFeedback>
         </Card>
       </View>
