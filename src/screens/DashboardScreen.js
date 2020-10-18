@@ -85,17 +85,25 @@ class DashboardScreen extends Component {
   @computed get selectedPaymentMethods() {
     const {availablePaymentMethods} = this.props.detailsStore.storeDetails;
 
-    return Object.entries(availablePaymentMethods)
-      .filter(([key, value]) => value.activated)
-      .map(([key, value]) => key);
+    if (availablePaymentMethods) {
+      return Object.entries(availablePaymentMethods)
+        .filter(([key, value]) => value.activated)
+        .map(([key, value]) => key);
+    }
+
+    return [];
   }
 
   @computed get selectedDeliveryMethods() {
     const {availableDeliveryMethods} = this.props.detailsStore.storeDetails;
 
-    return Object.entries(availableDeliveryMethods)
-      .filter(([key, value]) => value.activated)
-      .map(([key, value]) => key);
+    if (availableDeliveryMethods) {
+      return Object.entries(availableDeliveryMethods)
+        .filter(([key, value]) => value.activated)
+        .map(([key, value]) => key);
+    }
+
+    return [];
   }
 
   @action cancelEditing() {
@@ -438,7 +446,7 @@ class DashboardScreen extends Component {
       <View style={{flex: 1}}>
         <BaseHeader
           title={this.props.route.name}
-          navigation={this.props.navigation}
+          navigation={navigation}
           rightComponent={
             editMode ? (
               <View
@@ -561,7 +569,7 @@ class DashboardScreen extends Component {
                           Display Image
                         </Text>
 
-                        {this.editMode && (
+                        {editMode && (
                           <View
                             style={{
                               flexDirection: 'row',
@@ -603,7 +611,7 @@ class DashboardScreen extends Component {
                             backgroundColor: '#e1e4e8',
                             borderRadius: 10,
                             borderWidth: 1,
-                            borderColor: this.editMode
+                            borderColor: editMode
                               ? this.editModeHeaderColor
                               : colors.primary,
                           }}
@@ -630,7 +638,7 @@ class DashboardScreen extends Component {
                           Cover Image
                         </Text>
 
-                        {this.editMode && (
+                        {editMode && (
                           <View style={{flexDirection: 'row'}}>
                             <Button
                               type="clear"
@@ -669,7 +677,7 @@ class DashboardScreen extends Component {
                             alignSelf: 'center',
                             borderRadius: 10,
                             borderWidth: 1,
-                            borderColor: this.editMode
+                            borderColor: editMode
                               ? this.editModeHeaderColor
                               : colors.primary,
                             resizeMode: 'cover',
@@ -732,7 +740,7 @@ class DashboardScreen extends Component {
                       </View>
 
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {this.editMode ? (
+                        {editMode ? (
                           <Input
                             multiline
                             maxLength={200}
@@ -813,7 +821,7 @@ class DashboardScreen extends Component {
                       </View>
 
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {this.editMode ? (
+                        {editMode ? (
                           <View>
                             {Object.keys(newAvailablePaymentMethods).length >
                               0 &&
@@ -898,19 +906,15 @@ class DashboardScreen extends Component {
                         <Switch
                           trackColor={{
                             false: '#767577',
-                            true: this.editMode
-                              ? colors.accent
-                              : colors.primary,
+                            true: editMode ? colors.accent : colors.primary,
                           }}
                           thumbColor={'#f4f3f4'}
                           ios_backgroundColor="#3e3e3e"
                           onValueChange={() =>
                             (this.newVacationMode = !this.newVacationMode)
                           }
-                          value={
-                            this.editMode ? this.newVacationMode : vacationMode
-                          }
-                          disabled={!this.editMode}
+                          value={editMode ? this.newVacationMode : vacationMode}
+                          disabled={!editMode}
                         />
                       </View>
                     </View>
@@ -955,7 +959,7 @@ class DashboardScreen extends Component {
                       </View>
 
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {this.editMode ? (
+                        {editMode ? (
                           <View>
                             {Object.keys(newAvailableDeliveryMethods).length >
                               0 &&
@@ -1007,10 +1011,11 @@ class DashboardScreen extends Component {
                       </View>
 
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {this.editMode ? (
+                        {editMode ? (
                           <Input
                             value={this.newOwnDeliveryServiceFee}
                             leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
+                            keyboardType="number-pad"
                             errorMessage={
                               newOwnDeliveryServiceFeeError &&
                               newOwnDeliveryServiceFeeError
@@ -1058,7 +1063,7 @@ class DashboardScreen extends Component {
                       </View>
 
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {this.editMode ? (
+                        {editMode ? (
                           <View>
                             <CheckBox
                               title="Same Day Delivery"
@@ -1132,19 +1137,15 @@ class DashboardScreen extends Component {
                         <Switch
                           trackColor={{
                             false: '#767577',
-                            true: this.editMode
-                              ? colors.accent
-                              : colors.primary,
+                            true: editMode ? colors.accent : colors.primary,
                           }}
                           thumbColor={'#f4f3f4'}
                           ios_backgroundColor="#3e3e3e"
                           onValueChange={() =>
                             (this.newFreeDelivery = !this.newFreeDelivery)
                           }
-                          value={
-                            this.editMode ? this.newFreeDelivery : freeDelivery
-                          }
-                          disabled={!this.editMode}
+                          value={editMode ? this.newFreeDelivery : freeDelivery}
+                          disabled={!editMode}
                         />
                       </View>
                     </View>
@@ -1170,10 +1171,11 @@ class DashboardScreen extends Component {
                       </View>
 
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {this.editMode ? (
+                        {editMode ? (
                           <Input
                             value={this.newFreeDeliveryMinimum}
                             leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
+                            keyboardType="number-pad"
                             errorMessage={
                               newFreeDeliveryMinimumError &&
                               newFreeDeliveryMinimumError
