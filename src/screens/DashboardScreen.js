@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {ActivityIndicator, View, SafeAreaView} from 'react-native';
+import {ActivityIndicator, View, SafeAreaView, Platform} from 'react-native';
 import {Card, CardItem} from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
 // Mobx
 import {inject, observer} from 'mobx-react';
-import {observable, action} from 'mobx';
+import {observable, action, computed} from 'mobx';
 import {Text, Input, Icon, Button, CheckBox} from 'react-native-elements';
 import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -52,8 +52,8 @@ class DashboardScreen extends Component {
   @observable newStoreDescription = '';
   @observable newFreeDelivery = null;
   @observable newVacationMode = null;
-  @observable newPaymentMethods = [];
-  @observable newDeliveryMethods = [];
+  @observable newAvailablePaymentMethods = {};
+  @observable newAvailableDeliveryMethods = {};
   @observable newDeliveryType = '';
   @observable newOwnDeliveryServiceFee = '0';
   @observable newFreeDeliveryMinimum = '0';
@@ -82,12 +82,28 @@ class DashboardScreen extends Component {
     }
   }
 
+  @computed get selectedPaymentMethods() {
+    const {availablePaymentMethods} = this.props.detailsStore.storeDetails;
+
+    return Object.entries(availablePaymentMethods)
+      .filter(([key, value]) => value.activated)
+      .map(([key, value]) => key);
+  }
+
+  @computed get selectedDeliveryMethods() {
+    const {availableDeliveryMethods} = this.props.detailsStore.storeDetails;
+
+    return Object.entries(availableDeliveryMethods)
+      .filter(([key, value]) => value.activated)
+      .map(([key, value]) => key);
+  }
+
   @action cancelEditing() {
     this.newFreeDelivery = null;
     this.newStoreDescription = '';
     this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
-    this.newPaymentMethods = [];
-    this.newDeliveryMethods = [];
+    this.newAvailablePaymentMethods = {};
+    this.newAvailableDeliveryMethods = {};
     this.newOwnDeliveryServiceFee = '0';
     this.newFreeDeliveryMinimum = '0';
     this.editModeHeaderColor = colors.primary;
@@ -106,11 +122,13 @@ class DashboardScreen extends Component {
       storeDescription,
       vacationMode,
       deliveryType,
-      paymentMethods,
-      deliveryMethods,
       ownDeliveryServiceFee,
       freeDeliveryMinimum,
+      availableDeliveryMethods,
+      availablePaymentMethods,
     } = this.props.detailsStore.storeDetails;
+
+    const {selectedDeliveryMethods, selectedPaymentMethods} = this;
 
     if (this.editMode) {
       this.cancelEditing();
@@ -120,8 +138,8 @@ class DashboardScreen extends Component {
       this.newStoreDescription = storeDescription;
       this.newVacationMode = vacationMode;
       this.newDeliveryType = deliveryType;
-      this.newPaymentMethods = paymentMethods ? [...paymentMethods] : [];
-      this.newDeliveryMethods = deliveryMethods ? [...deliveryMethods] : [];
+      this.newAvailablePaymentMethods = {...availablePaymentMethods};
+      this.newAvailableDeliveryMethods = {...availableDeliveryMethods};
       this.newOwnDeliveryServiceFee = ownDeliveryServiceFee
         ? String(ownDeliveryServiceFee)
         : '0';
@@ -214,26 +232,26 @@ class DashboardScreen extends Component {
   }
 
   handlePaymentMethods(paymentMethod) {
-    const {newPaymentMethods} = this;
+    const {newAvailablePaymentMethods} = this;
 
-    if (newPaymentMethods.includes(paymentMethod)) {
-      this.newPaymentMethods = newPaymentMethods.filter(
+    if (newAvailablePaymentMethods.includes(paymentMethod)) {
+      this.newAvailablePaymentMethods = newAvailablePaymentMethods.filter(
         (item) => item !== paymentMethod,
       );
     } else {
-      newPaymentMethods.push(paymentMethod);
+      newAvailablePaymentMethods.push(paymentMethod);
     }
   }
 
   handledeliveryMethods(deliveryMethod) {
-    const {newDeliveryMethods} = this;
+    const {newAvailableDeliveryMethods} = this;
 
-    if (newDeliveryMethods.includes(deliveryMethod)) {
-      this.newDeliveryMethods = newDeliveryMethods.filter(
+    if (newAvailableDeliveryMethods.includes(deliveryMethod)) {
+      this.newAvailableDeliveryMethods = newAvailableDeliveryMethods.filter(
         (item) => item !== deliveryMethod,
       );
     } else {
-      newDeliveryMethods.push(deliveryMethod);
+      newAvailableDeliveryMethods.push(deliveryMethod);
     }
   }
 
@@ -269,78 +287,78 @@ class DashboardScreen extends Component {
     }
   }
 
-  async handleConfirmDetails() {
-    const {
-      displayImageUrl,
-      coverImageUrl,
-      oldDisplayImageUrl,
-      oldCoverImageUrl,
-    } = this.state;
-    const {
-      freeDelivery,
-      storeDescription,
-      vacationMode,
-      paymentMethods,
-      deliveryMethods,
-      deliveryType,
-      ownDeliveryServiceFee,
-      freeDeliveryMinimum,
-    } = this.props.detailsStore.storeDetails;
+  handleConfirmDetails() {
+    this.setState({loading: true}, async () => {
+      const {
+        displayImageUrl,
+        coverImageUrl,
+        oldDisplayImageUrl,
+        oldCoverImageUrl,
+      } = this.state;
+      const {
+        freeDelivery,
+        storeDescription,
+        vacationMode,
+        deliveryType,
+        ownDeliveryServiceFee,
+        freeDeliveryMinimum,
+        availableDeliveryMethods,
+        availablePaymentMethods,
+      } = this.props.detailsStore.storeDetails;
 
-    this.setState({loading: true});
-
-    if (coverImageUrl !== oldCoverImageUrl) {
-      await this.props.detailsStore
-        .uploadImage(coverImageUrl.uri, 'cover')
-        .then(() => {
-          this.setState({oldCoverImageUrl: coverImageUrl});
-        });
-    }
-
-    if (displayImageUrl !== oldDisplayImageUrl) {
-      await this.props.detailsStore
-        .uploadImage(displayImageUrl.uri, 'display')
-        .then(() => {
-          this.setState({oldDisplayImageUrl: displayImageUrl});
-        });
-    }
-
-    if (
-      freeDelivery !== this.newFreeDelivery ||
-      storeDescription !== this.newStoreDescription ||
-      vacationMode !== this.newVacationMode ||
-      paymentMethods !== this.newPaymentMethods ||
-      deliveryMethods !== this.newDeliveryMethods ||
-      deliveryType !== this.newDeliveryType ||
-      ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee ||
-      freeDeliveryMinimum !== this.newFreeDeliveryMinimum
-    ) {
-      await this.props.detailsStore
-        .updateStoreDetails(
-          this.newStoreDescription,
-          this.newFreeDelivery,
-          this.newVacationMode,
-          this.newPaymentMethods,
-          this.newDeliveryMethods,
-          this.newDeliveryType,
-          Number(this.newOwnDeliveryServiceFee),
-          Number(this.newFreeDeliveryMinimum),
-        )
-        .then(() => {
-          Toast({
-            text: 'Store details successfully updated!',
-            type: 'success',
-            duration: 3000,
+      if (coverImageUrl !== oldCoverImageUrl) {
+        await this.props.detailsStore
+          .uploadImage(coverImageUrl.uri, 'cover')
+          .then(() => {
+            this.setState({oldCoverImageUrl: coverImageUrl});
           });
+      }
+
+      if (displayImageUrl !== oldDisplayImageUrl) {
+        await this.props.detailsStore
+          .uploadImage(displayImageUrl.uri, 'display')
+          .then(() => {
+            this.setState({oldDisplayImageUrl: displayImageUrl});
+          });
+      }
+
+      if (
+        freeDelivery !== this.newFreeDelivery ||
+        storeDescription !== this.newStoreDescription ||
+        vacationMode !== this.newVacationMode ||
+        availablePaymentMethods !== this.newAvailablePaymentMethods ||
+        availableDeliveryMethods !== this.newAvailableDeliveryMethods ||
+        deliveryType !== this.newDeliveryType ||
+        ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee ||
+        freeDeliveryMinimum !== this.newFreeDeliveryMinimum
+      ) {
+        await this.props.detailsStore
+          .updateStoreDetails(
+            this.newStoreDescription,
+            this.newFreeDelivery,
+            this.newVacationMode,
+            this.newAvailablePaymentMethods,
+            this.newAvailableDeliveryMethods,
+            this.newDeliveryType,
+            Number(this.newOwnDeliveryServiceFee),
+            Number(this.newFreeDeliveryMinimum),
+          )
+          .then(() => {
+            Toast({
+              text: 'Store details successfully updated!',
+              type: 'success',
+              duration: 3000,
+            });
+          });
+      } else {
+        Toast({
+          text: 'Store details successfully updated!',
+          type: 'success',
+          duration: 3000,
         });
-    } else {
-      Toast({
-        text: 'Store details successfully updated!',
-        type: 'success',
-        duration: 3000,
-      });
-    }
-    this.toggleEditing();
+      }
+      this.toggleEditing();
+    });
   }
 
   CategoryPills = (items) => {
@@ -384,15 +402,21 @@ class DashboardScreen extends Component {
       storeDescription,
       storeName,
       vacationMode,
-      paymentMethods,
-      deliveryMethods,
       deliveryType,
-      creditData,
       orderNumber,
       storeCategory,
       ownDeliveryServiceFee,
       freeDeliveryMinimum,
+      availableDeliveryMethods,
+      availablePaymentMethods,
     } = this.props.detailsStore.storeDetails;
+
+    const selectableDeliveryMethods = availableDeliveryMethods
+      ? Object.keys(availableDeliveryMethods)
+      : [];
+    const selectablePaymentMethods = availablePaymentMethods
+      ? Object.keys(availablePaymentMethods)
+      : [];
 
     const {
       coverImageUrl,
@@ -404,7 +428,11 @@ class DashboardScreen extends Component {
 
     const {navigation} = this.props;
 
-    const {editMode, newPaymentMethods, newDeliveryMethods} = this;
+    const {
+      editMode,
+      newAvailablePaymentMethods,
+      newAvailableDeliveryMethods,
+    } = this;
 
     return (
       <View style={{flex: 1}}>
@@ -787,23 +815,28 @@ class DashboardScreen extends Component {
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
                         {this.editMode ? (
                           <View>
-                            <CheckBox
-                              title="COD"
-                              checked={newPaymentMethods.includes('COD')}
-                              onPress={() => this.handlePaymentMethods('COD')}
-                            />
-                            <CheckBox
-                              title="Online Banking"
-                              checked={newPaymentMethods.includes(
-                                'Online Banking',
-                              )}
-                              onPress={() =>
-                                this.handlePaymentMethods('Online Banking')
-                              }
-                            />
+                            {Object.keys(newAvailablePaymentMethods).length >
+                              0 &&
+                              selectablePaymentMethods.map((paymentMethod) => (
+                                <CheckBox
+                                  title={paymentMethod}
+                                  checked={
+                                    newAvailablePaymentMethods[paymentMethod]
+                                      .activated
+                                  }
+                                  key={paymentMethod}
+                                  onPress={() =>
+                                    (newAvailablePaymentMethods[
+                                      paymentMethod
+                                    ].activated = !newAvailablePaymentMethods[
+                                      paymentMethod
+                                    ].activated)
+                                  }
+                                />
+                              ))}
                           </View>
                         ) : (
-                          this.CategoryPills(paymentMethods)
+                          this.CategoryPills(this.selectedPaymentMethods)
                         )}
                       </View>
                     </View>
@@ -924,52 +957,31 @@ class DashboardScreen extends Component {
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
                         {this.editMode ? (
                           <View>
-                            <CheckBox
-                              title="Grab Express"
-                              checked={newDeliveryMethods.includes(
-                                'Grab Express',
+                            {Object.keys(newAvailableDeliveryMethods).length >
+                              0 &&
+                              selectableDeliveryMethods.map(
+                                (deliveryMethod, index) => (
+                                  <CheckBox
+                                    title={deliveryMethod}
+                                    checked={
+                                      newAvailableDeliveryMethods[
+                                        deliveryMethod
+                                      ].activated
+                                    }
+                                    key={deliveryMethod}
+                                    onPress={() =>
+                                      (newAvailableDeliveryMethods[
+                                        deliveryMethod
+                                      ].activated = !newAvailableDeliveryMethods[
+                                        deliveryMethod
+                                      ].activated)
+                                    }
+                                  />
+                                ),
                               )}
-                              onPress={() =>
-                                this.handledeliveryMethods('Grab Express')
-                              }
-                            />
-                            <CheckBox
-                              title="Lalamove"
-                              checked={newDeliveryMethods.includes('Lalamove')}
-                              onPress={() =>
-                                this.handledeliveryMethods('Lalamove')
-                              }
-                            />
-                            <CheckBox
-                              title="Mr. Speedy"
-                              checked={newDeliveryMethods.includes(
-                                'Mr. Speedy',
-                              )}
-                              onPress={() =>
-                                this.handledeliveryMethods('Mr. Speedy')
-                              }
-                            />
-                            <CheckBox
-                              title="Angkas Padala"
-                              checked={newDeliveryMethods.includes(
-                                'Angkas Padala',
-                              )}
-                              onPress={() =>
-                                this.handledeliveryMethods('Angkas Padala')
-                              }
-                            />
-                            <CheckBox
-                              title="Own Delivery"
-                              checked={newDeliveryMethods.includes(
-                                'Own Delivery',
-                              )}
-                              onPress={() =>
-                                this.handledeliveryMethods('Own Delivery')
-                              }
-                            />
                           </View>
                         ) : (
-                          this.CategoryPills(deliveryMethods)
+                          this.CategoryPills(this.selectedDeliveryMethods)
                         )}
                       </View>
                     </View>

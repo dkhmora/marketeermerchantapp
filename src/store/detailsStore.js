@@ -251,8 +251,8 @@ class DetailsStore {
     storeDescription,
     freeDelivery,
     vacationMode,
-    paymentMethods,
-    deliveryMethods,
+    availablePaymentMethods,
+    availableDeliveryMethods,
     deliveryType,
     ownDeliveryServiceFee,
     freeDeliveryMinimum,
@@ -263,8 +263,8 @@ class DetailsStore {
         freeDelivery,
         freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
         vacationMode,
-        paymentMethods: paymentMethods.slice().sort(),
-        deliveryMethods: deliveryMethods.slice().sort(),
+        availablePaymentMethods,
+        availableDeliveryMethods,
         deliveryType,
         ownDeliveryServiceFee: ownDeliveryServiceFee
           ? ownDeliveryServiceFee
