@@ -106,6 +106,36 @@ class DashboardScreen extends Component {
     return [];
   }
 
+  @computed get saveDisabled() {
+    if (Object.keys(this.newAvailableDeliveryMethods).length > 0) {
+      if (this.newAvailableDeliveryMethods['Own Delivery']) {
+        if (
+          this.newAvailableDeliveryMethods['Own Delivery'][
+            `discountMinimumError`
+          ] ||
+          this.newAvailableDeliveryMethods['Own Delivery'][`discountError`]
+        ) {
+          console.log('1');
+          return true;
+        }
+      }
+
+      if (this.newAvailableDeliveryMethods['Mr. Speedy']) {
+        if (
+          this.newAvailableDeliveryMethods['Mr. Speedy'][
+            `discountMinimumError`
+          ] ||
+          this.newAvailableDeliveryMethods['Mr. Speedy'][`discountError`]
+        ) {
+          console.log('2');
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   @action cancelEditing() {
     this.newFreeDelivery = null;
     this.newStoreDescription = '';
@@ -146,8 +176,12 @@ class DashboardScreen extends Component {
       this.newStoreDescription = storeDescription;
       this.newVacationMode = vacationMode;
       this.newDeliveryType = deliveryType;
-      this.newAvailablePaymentMethods = {...availablePaymentMethods};
-      this.newAvailableDeliveryMethods = {...availableDeliveryMethods};
+      this.newAvailablePaymentMethods = JSON.parse(
+        JSON.stringify(availablePaymentMethods),
+      );
+      this.newAvailableDeliveryMethods = JSON.parse(
+        JSON.stringify(availableDeliveryMethods),
+      );
       this.newOwnDeliveryServiceFee = ownDeliveryServiceFee
         ? String(ownDeliveryServiceFee)
         : '0';
@@ -247,7 +281,7 @@ class DashboardScreen extends Component {
         (item) => item !== paymentMethod,
       );
     } else {
-      newAvailablePaymentMethods.push(paymentMethod);
+      this.newAvailablePaymentMethods.push(paymentMethod);
     }
   }
 
@@ -292,6 +326,22 @@ class DashboardScreen extends Component {
       });
     } else {
       this.setState({newFreeDeliveryMinimumError: null});
+    }
+  }
+
+  handleChangeDeliveryValue(deliveryMethod, key, value) {
+    const numberRegexp = /^[0-9]+$/;
+
+    this.newAvailableDeliveryMethods[deliveryMethod][key] = Number(value);
+
+    if (!numberRegexp.test(Number(value))) {
+      this.newAvailableDeliveryMethods[deliveryMethod][`${key}Error`] =
+        'Please input a valid number';
+    } else if (value.length <= 0) {
+      this.newAvailableDeliveryMethods[deliveryMethod][`${key}Error`] =
+        'Please input a valid number';
+    } else {
+      this.newAvailableDeliveryMethods[deliveryMethod][`${key}Error`] = null;
     }
   }
 
@@ -340,6 +390,17 @@ class DashboardScreen extends Component {
         ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee ||
         freeDeliveryMinimum !== this.newFreeDeliveryMinimum
       ) {
+        delete this.newAvailableDeliveryMethods['Mr. Speedy'][`discountError`];
+        delete this.newAvailableDeliveryMethods['Mr. Speedy'][
+          `discountMinimumError`
+        ];
+        delete this.newAvailableDeliveryMethods['Own Delivery'][
+          `discountError`
+        ];
+        delete this.newAvailableDeliveryMethods['Own Delivery'][
+          `discountMinimumError`
+        ];
+
         await this.props.detailsStore
           .updateStoreDetails(
             this.newStoreDescription,
@@ -436,11 +497,7 @@ class DashboardScreen extends Component {
 
     const {navigation} = this.props;
 
-    const {
-      editMode,
-      newAvailablePaymentMethods,
-      newAvailableDeliveryMethods,
-    } = this;
+    const {editMode, saveDisabled} = this;
 
     return (
       <View style={{flex: 1}}>
@@ -462,6 +519,7 @@ class DashboardScreen extends Component {
                   loading={loading}
                   loadingProps={{color: colors.icons}}
                   onPress={() => this.handleConfirmDetails()}
+                  disabled={saveDisabled}
                 />
 
                 <Button
@@ -823,22 +881,23 @@ class DashboardScreen extends Component {
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
                         {editMode ? (
                           <View>
-                            {Object.keys(newAvailablePaymentMethods).length >
-                              0 &&
+                            {Object.keys(this.newAvailablePaymentMethods)
+                              .length > 0 &&
                               selectablePaymentMethods.map((paymentMethod) => (
                                 <CheckBox
                                   title={paymentMethod}
                                   checked={
-                                    newAvailablePaymentMethods[paymentMethod]
-                                      .activated
+                                    this.newAvailablePaymentMethods[
+                                      paymentMethod
+                                    ].activated
                                   }
                                   key={paymentMethod}
                                   onPress={() =>
-                                    (newAvailablePaymentMethods[
+                                    (this.newAvailablePaymentMethods[
                                       paymentMethod
-                                    ].activated = !newAvailablePaymentMethods[
-                                      paymentMethod
-                                    ].activated)
+                                    ].activated = !this
+                                      .newAvailablePaymentMethods[paymentMethod]
+                                      .activated)
                                   }
                                 />
                               ))}
@@ -961,22 +1020,23 @@ class DashboardScreen extends Component {
                       <View style={{flex: 3, alignItems: 'flex-end'}}>
                         {editMode ? (
                           <View>
-                            {Object.keys(newAvailableDeliveryMethods).length >
-                              0 &&
+                            {Object.keys(this.newAvailableDeliveryMethods)
+                              .length > 0 &&
                               selectableDeliveryMethods.map(
                                 (deliveryMethod, index) => (
                                   <CheckBox
                                     title={deliveryMethod}
                                     checked={
-                                      newAvailableDeliveryMethods[
+                                      this.newAvailableDeliveryMethods[
                                         deliveryMethod
                                       ].activated
                                     }
                                     key={deliveryMethod}
                                     onPress={() =>
-                                      (newAvailableDeliveryMethods[
+                                      (this.newAvailableDeliveryMethods[
                                         deliveryMethod
-                                      ].activated = !newAvailableDeliveryMethods[
+                                      ].activated = !this
+                                        .newAvailableDeliveryMethods[
                                         deliveryMethod
                                       ].activated)
                                     }
@@ -990,6 +1050,472 @@ class DashboardScreen extends Component {
                       </View>
                     </View>
                   </CardItem>
+
+                  {availableDeliveryMethods['Mr. Speedy'] && (
+                    <CardItem bordered>
+                      <View style={{width: '100%'}}>
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: 10,
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              fontFamily: 'ProductSans-Bold',
+                            }}>
+                            Mr. Speedy
+                          </Text>
+
+                          <Switch
+                            trackColor={{
+                              false: '#767577',
+                              true: editMode ? colors.accent : colors.primary,
+                            }}
+                            thumbColor={'#f4f3f4'}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() =>
+                              (this.newAvailableDeliveryMethods[
+                                'Mr. Speedy'
+                              ].activated = !this.this
+                                .newAvailableDeliveryMethods['Mr. Speedy']
+                                .activated)
+                            }
+                            value={
+                              editMode &&
+                              this.newAvailableDeliveryMethods['Mr. Speedy']
+                                ? this.newAvailableDeliveryMethods['Mr. Speedy']
+                                    .activated
+                                : availableDeliveryMethods['Mr. Speedy']
+                                    .activated
+                            }
+                            disabled={!editMode}
+                          />
+                        </View>
+
+                        <Card style={{borderRadius: 10, overflow: 'hidden'}}>
+                          <CardItem bordered>
+                            <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                paddingHorizontal: 8,
+                              }}>
+                              <View style={{flex: 2, paddingright: 10}}>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                  }}>
+                                  Discount Activated
+                                </Text>
+                              </View>
+
+                              <View style={{flex: 3, alignItems: 'flex-end'}}>
+                                <Switch
+                                  trackColor={{
+                                    false: '#767577',
+                                    true: editMode
+                                      ? colors.accent
+                                      : colors.primary,
+                                  }}
+                                  thumbColor={'#f4f3f4'}
+                                  ios_backgroundColor="#3e3e3e"
+                                  onValueChange={() =>
+                                    (this.newAvailableDeliveryMethods[
+                                      'Mr. Speedy'
+                                    ].discountActivated = !this.this
+                                      .newAvailableDeliveryMethods['Mr. Speedy']
+                                      .discountActivated)
+                                  }
+                                  value={
+                                    editMode &&
+                                    this.newAvailableDeliveryMethods[
+                                      'Mr. Speedy'
+                                    ]
+                                      ? this.newAvailableDeliveryMethods[
+                                          'Mr. Speedy'
+                                        ].discountActivated
+                                      : availableDeliveryMethods['Mr. Speedy']
+                                          .discountActivated
+                                  }
+                                  disabled={!editMode}
+                                />
+                              </View>
+                            </View>
+                          </CardItem>
+
+                          <CardItem bordered>
+                            <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                paddingHorizontal: 8,
+                              }}>
+                              <View style={{flex: 2, paddingright: 10}}>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                  }}>
+                                  Delivery Fee Discount
+                                </Text>
+                              </View>
+
+                              <View style={{flex: 3, alignItems: 'flex-end'}}>
+                                {editMode &&
+                                this.newAvailableDeliveryMethods[
+                                  'Mr. Speedy'
+                                ] ? (
+                                  <Input
+                                    value={String(
+                                      this.newAvailableDeliveryMethods[
+                                        'Mr. Speedy'
+                                      ].discount,
+                                    )}
+                                    leftIcon={
+                                      <Text style={{fontSize: 18}}>₱</Text>
+                                    }
+                                    keyboardType="number-pad"
+                                    errorMessage={
+                                      this.newAvailableDeliveryMethods[
+                                        'Mr. Speedy'
+                                      ][`discountError`]
+                                    }
+                                    onChangeText={(value) =>
+                                      this.handleChangeDeliveryValue(
+                                        'Mr. Speedy',
+                                        'discount',
+                                        value,
+                                      )
+                                    }
+                                    inputStyle={{textAlign: 'right'}}
+                                    containerStyle={{
+                                      borderColor: this.editModeHeaderColor,
+                                    }}
+                                  />
+                                ) : (
+                                  <Text
+                                    style={{
+                                      color: colors.primary,
+                                      fontSize: 16,
+                                      fontFamily: 'ProductSans-Bold',
+                                      textAlign: 'right',
+                                    }}>
+                                    {`₱${availableDeliveryMethods['Mr. Speedy'].discount}`}
+                                  </Text>
+                                )}
+                              </View>
+                            </View>
+                          </CardItem>
+
+                          <CardItem bordered>
+                            <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                paddingHorizontal: 8,
+                              }}>
+                              <View style={{flex: 2, paddingright: 10}}>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                  }}>
+                                  Discount Minimum Order Amount
+                                </Text>
+                              </View>
+
+                              <View style={{flex: 3, alignItems: 'flex-end'}}>
+                                {editMode &&
+                                this.newAvailableDeliveryMethods[
+                                  'Mr. Speedy'
+                                ] ? (
+                                  <Input
+                                    value={String(
+                                      this.newAvailableDeliveryMethods[
+                                        'Mr. Speedy'
+                                      ].discountMinimum,
+                                    )}
+                                    leftIcon={
+                                      <Text style={{fontSize: 18}}>₱</Text>
+                                    }
+                                    keyboardType="number-pad"
+                                    errorMessage={
+                                      this.newAvailableDeliveryMethods[
+                                        'Mr. Speedy'
+                                      ][`discountMinimumError`]
+                                    }
+                                    onChangeText={(value) =>
+                                      this.handleChangeDeliveryValue(
+                                        'Mr. Speedy',
+                                        'discountMinimum',
+                                        value,
+                                      )
+                                    }
+                                    inputStyle={{textAlign: 'right'}}
+                                    containerStyle={{
+                                      borderColor: this.editModeHeaderColor,
+                                    }}
+                                  />
+                                ) : (
+                                  <Text
+                                    style={{
+                                      color: colors.primary,
+                                      fontSize: 16,
+                                      fontFamily: 'ProductSans-Bold',
+                                      textAlign: 'right',
+                                    }}>
+                                    {`₱${availableDeliveryMethods['Mr. Speedy'].discountMinimum}`}
+                                  </Text>
+                                )}
+                              </View>
+                            </View>
+                          </CardItem>
+                        </Card>
+                      </View>
+                    </CardItem>
+                  )}
+
+                  {availableDeliveryMethods['Own Delivery'] && (
+                    <CardItem bordered>
+                      <View style={{width: '100%'}}>
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: 10,
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 18,
+                              fontFamily: 'ProductSans-Bold',
+                            }}>
+                            Own Delivery
+                          </Text>
+
+                          <Switch
+                            trackColor={{
+                              false: '#767577',
+                              true: editMode ? colors.accent : colors.primary,
+                            }}
+                            thumbColor={'#f4f3f4'}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() =>
+                              (this.newAvailableDeliveryMethods[
+                                'Own Delivery'
+                              ].activated = !this.this
+                                .newAvailableDeliveryMethods['Own Delivery']
+                                .activated)
+                            }
+                            value={
+                              editMode &&
+                              this.newAvailableDeliveryMethods['Own Delivery']
+                                ? this.newAvailableDeliveryMethods[
+                                    'Own Delivery'
+                                  ].activated
+                                : availableDeliveryMethods['Own Delivery']
+                                    .activated
+                            }
+                            disabled={!editMode}
+                          />
+                        </View>
+
+                        <Card style={{borderRadius: 10, overflow: 'hidden'}}>
+                          <CardItem bordered>
+                            <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                paddingHorizontal: 8,
+                              }}>
+                              <View style={{flex: 2, paddingright: 10}}>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                  }}>
+                                  Discount Activated
+                                </Text>
+                              </View>
+
+                              <View style={{flex: 3, alignItems: 'flex-end'}}>
+                                <Switch
+                                  trackColor={{
+                                    false: '#767577',
+                                    true: editMode
+                                      ? colors.accent
+                                      : colors.primary,
+                                  }}
+                                  thumbColor={'#f4f3f4'}
+                                  ios_backgroundColor="#3e3e3e"
+                                  onValueChange={() =>
+                                    (this.newAvailableDeliveryMethods[
+                                      'Own Delivery'
+                                    ].discountActivated = !this.this
+                                      .newAvailableDeliveryMethods[
+                                      'Own Delivery'
+                                    ].discountActivated)
+                                  }
+                                  value={
+                                    editMode &&
+                                    this.newAvailableDeliveryMethods[
+                                      'Own Delivery'
+                                    ]
+                                      ? this.newAvailableDeliveryMethods[
+                                          'Own Delivery'
+                                        ].discountActivated
+                                      : availableDeliveryMethods['Own Delivery']
+                                          .discountActivated
+                                  }
+                                  disabled={!editMode}
+                                />
+                              </View>
+                            </View>
+                          </CardItem>
+
+                          <CardItem bordered>
+                            <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                paddingHorizontal: 8,
+                              }}>
+                              <View style={{flex: 2, paddingright: 10}}>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                  }}>
+                                  Delivery Fee Discount
+                                </Text>
+                              </View>
+
+                              <View style={{flex: 3, alignItems: 'flex-end'}}>
+                                {editMode &&
+                                this.newAvailableDeliveryMethods[
+                                  'Own Delivery'
+                                ] ? (
+                                  <Input
+                                    value={String(
+                                      this.newAvailableDeliveryMethods[
+                                        'Own Delivery'
+                                      ].discount,
+                                    )}
+                                    leftIcon={
+                                      <Text style={{fontSize: 18}}>₱</Text>
+                                    }
+                                    keyboardType="number-pad"
+                                    errorMessage={
+                                      this.newAvailableDeliveryMethods[
+                                        'Own Delivery'
+                                      ][`discountError`]
+                                    }
+                                    onChangeText={(value) =>
+                                      this.handleChangeDeliveryValue(
+                                        'Own Delivery',
+                                        'discount',
+                                        value,
+                                      )
+                                    }
+                                    inputStyle={{textAlign: 'right'}}
+                                    containerStyle={{
+                                      borderColor: this.editModeHeaderColor,
+                                    }}
+                                  />
+                                ) : (
+                                  <Text
+                                    style={{
+                                      color: colors.primary,
+                                      fontSize: 16,
+                                      fontFamily: 'ProductSans-Bold',
+                                      textAlign: 'right',
+                                    }}>
+                                    {`₱${availableDeliveryMethods['Own Delivery'].discount}`}
+                                  </Text>
+                                )}
+                              </View>
+                            </View>
+                          </CardItem>
+
+                          <CardItem bordered>
+                            <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                paddingHorizontal: 8,
+                              }}>
+                              <View style={{flex: 2, paddingright: 10}}>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                  }}>
+                                  Discount Minimum Order Amount
+                                </Text>
+                              </View>
+
+                              <View style={{flex: 3, alignItems: 'flex-end'}}>
+                                {editMode &&
+                                this.newAvailableDeliveryMethods[
+                                  'Own Delivery'
+                                ] ? (
+                                  <Input
+                                    value={String(
+                                      this.newAvailableDeliveryMethods[
+                                        'Own Delivery'
+                                      ].discountMinimum,
+                                    )}
+                                    leftIcon={
+                                      <Text style={{fontSize: 18}}>₱</Text>
+                                    }
+                                    keyboardType="number-pad"
+                                    errorMessage={
+                                      this.newAvailableDeliveryMethods[
+                                        'Own Delivery'
+                                      ][`discountMinimumError`]
+                                    }
+                                    onChangeText={(value) =>
+                                      this.handleChangeDeliveryValue(
+                                        'Own Delivery',
+                                        'discountMinimum',
+                                        value,
+                                      )
+                                    }
+                                    inputStyle={{textAlign: 'right'}}
+                                    containerStyle={{
+                                      borderColor: this.editModeHeaderColor,
+                                    }}
+                                  />
+                                ) : (
+                                  <Text
+                                    style={{
+                                      color: colors.primary,
+                                      fontSize: 16,
+                                      fontFamily: 'ProductSans-Bold',
+                                      textAlign: 'right',
+                                    }}>
+                                    {`₱${availableDeliveryMethods['Own Delivery'].discountMinimum}`}
+                                  </Text>
+                                )}
+                              </View>
+                            </View>
+                          </CardItem>
+                        </Card>
+                      </View>
+                    </CardItem>
+                  )}
 
                   <CardItem bordered>
                     <View

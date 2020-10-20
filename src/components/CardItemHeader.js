@@ -10,7 +10,7 @@ class CardItemHeader extends Component {
   }
 
   render() {
-    const {title, onPress, activeOpacity} = this.props;
+    const { title, onPress, activeOpacity } = this.props;
 
     return (
       <CardItem
