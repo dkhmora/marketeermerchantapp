@@ -400,6 +400,9 @@ class DashboardScreen extends Component {
         delete this.newAvailableDeliveryMethods['Own Delivery'][
           `discountMinimumError`
         ];
+        delete this.newAvailableDeliveryMethods['Own Delivery'][
+          `deliveryPriceError`
+        ];
 
         await this.props.detailsStore
           .updateStoreDetails(
@@ -1027,9 +1030,9 @@ class DashboardScreen extends Component {
                             onValueChange={() =>
                               (this.newAvailableDeliveryMethods[
                                 'Mr. Speedy'
-                              ].activated = !this.this
-                                .newAvailableDeliveryMethods['Mr. Speedy']
-                                .activated)
+                              ].activated = !this.newAvailableDeliveryMethods[
+                                'Mr. Speedy'
+                              ].activated)
                             }
                             value={
                               editMode &&
@@ -1075,7 +1078,7 @@ class DashboardScreen extends Component {
                                   onValueChange={() =>
                                     (this.newAvailableDeliveryMethods[
                                       'Mr. Speedy'
-                                    ].discountActivated = !this.this
+                                    ].discountActivated = !this
                                       .newAvailableDeliveryMethods['Mr. Speedy']
                                       .discountActivated)
                                   }
@@ -1120,11 +1123,17 @@ class DashboardScreen extends Component {
                                   'Mr. Speedy'
                                 ] ? (
                                   <Input
-                                    value={String(
+                                    value={
                                       this.newAvailableDeliveryMethods[
                                         'Mr. Speedy'
-                                      ].discount,
-                                    )}
+                                      ].discount
+                                        ? String(
+                                            this.newAvailableDeliveryMethods[
+                                              'Mr. Speedy'
+                                            ].discount,
+                                          )
+                                        : null
+                                    }
                                     leftIcon={
                                       <Text style={{fontSize: 18}}>₱</Text>
                                     }
@@ -1188,11 +1197,17 @@ class DashboardScreen extends Component {
                                   'Mr. Speedy'
                                 ] ? (
                                   <Input
-                                    value={String(
+                                    value={
                                       this.newAvailableDeliveryMethods[
                                         'Mr. Speedy'
-                                      ].discountMinimum,
-                                    )}
+                                      ].discountMinimum
+                                        ? String(
+                                            this.newAvailableDeliveryMethods[
+                                              'Mr. Speedy'
+                                            ].discountMinimum,
+                                          )
+                                        : null
+                                    }
                                     leftIcon={
                                       <Text style={{fontSize: 18}}>₱</Text>
                                     }
@@ -1265,9 +1280,9 @@ class DashboardScreen extends Component {
                             onValueChange={() =>
                               (this.newAvailableDeliveryMethods[
                                 'Own Delivery'
-                              ].activated = !this.this
-                                .newAvailableDeliveryMethods['Own Delivery']
-                                .activated)
+                              ].activated = !this.newAvailableDeliveryMethods[
+                                'Own Delivery'
+                              ].activated)
                             }
                             value={
                               editMode &&
@@ -1310,11 +1325,11 @@ class DashboardScreen extends Component {
                                     value={
                                       this.newAvailableDeliveryMethods[
                                         'Own Delivery'
-                                      ].deliveryFee
+                                      ].deliveryPrice
                                         ? String(
                                             this.newAvailableDeliveryMethods[
                                               'Own Delivery'
-                                            ].deliveryFee,
+                                            ].deliveryPrice,
                                           )
                                         : null
                                     }
@@ -1325,12 +1340,12 @@ class DashboardScreen extends Component {
                                     errorMessage={
                                       this.newAvailableDeliveryMethods[
                                         'Own Delivery'
-                                      ][`deliveryFeeError`]
+                                      ][`deliveryPriceError`]
                                     }
                                     onChangeText={(value) =>
                                       this.handleChangeDeliveryValue(
                                         'Own Delivery',
-                                        'deliveryFee',
+                                        'deliveryPrice',
                                         value,
                                       )
                                     }
@@ -1348,8 +1363,8 @@ class DashboardScreen extends Component {
                                       textAlign: 'right',
                                     }}>
                                     {availableDeliveryMethods['Own Delivery']
-                                      .deliveryFee
-                                      ? `₱${availableDeliveryMethods['Own Delivery'].deliveryFee}`
+                                      .deliveryPrice
+                                      ? `₱${availableDeliveryMethods['Own Delivery'].deliveryPrice}`
                                       : 'Not Set'}
                                   </Text>
                                 )}
@@ -1388,7 +1403,7 @@ class DashboardScreen extends Component {
                                   onValueChange={() =>
                                     (this.newAvailableDeliveryMethods[
                                       'Own Delivery'
-                                    ].discountActivated = !this.this
+                                    ].discountActivated = !this
                                       .newAvailableDeliveryMethods[
                                       'Own Delivery'
                                     ].discountActivated)
@@ -1434,11 +1449,17 @@ class DashboardScreen extends Component {
                                   'Own Delivery'
                                 ] ? (
                                   <Input
-                                    value={String(
+                                    value={
                                       this.newAvailableDeliveryMethods[
                                         'Own Delivery'
-                                      ].discount,
-                                    )}
+                                      ].discount
+                                        ? String(
+                                            this.newAvailableDeliveryMethods[
+                                              'Own Delivery'
+                                            ].discount,
+                                          )
+                                        : null
+                                    }
                                     leftIcon={
                                       <Text style={{fontSize: 18}}>₱</Text>
                                     }
@@ -1502,11 +1523,17 @@ class DashboardScreen extends Component {
                                   'Own Delivery'
                                 ] ? (
                                   <Input
-                                    value={String(
+                                    value={
                                       this.newAvailableDeliveryMethods[
                                         'Own Delivery'
-                                      ].discountMinimum,
-                                    )}
+                                      ].discountMinimum
+                                        ? String(
+                                            this.newAvailableDeliveryMethods[
+                                              'Own Delivery'
+                                            ].discountMinimum,
+                                          )
+                                        : null
+                                    }
                                     leftIcon={
                                       <Text style={{fontSize: 18}}>₱</Text>
                                     }
