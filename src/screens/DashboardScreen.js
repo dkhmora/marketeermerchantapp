@@ -998,59 +998,6 @@ class DashboardScreen extends Component {
                   }}>
                   <CardItemHeader title="Delivery Settings" />
 
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        paddingHorizontal: 8,
-                      }}>
-                      <View style={{flex: 2, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Delivery Methods
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {editMode ? (
-                          <View>
-                            {Object.keys(this.newAvailableDeliveryMethods)
-                              .length > 0 &&
-                              selectableDeliveryMethods.map(
-                                (deliveryMethod, index) => (
-                                  <CheckBox
-                                    title={deliveryMethod}
-                                    checked={
-                                      this.newAvailableDeliveryMethods[
-                                        deliveryMethod
-                                      ].activated
-                                    }
-                                    key={deliveryMethod}
-                                    onPress={() =>
-                                      (this.newAvailableDeliveryMethods[
-                                        deliveryMethod
-                                      ].activated = !this
-                                        .newAvailableDeliveryMethods[
-                                        deliveryMethod
-                                      ].activated)
-                                    }
-                                  />
-                                ),
-                              )}
-                          </View>
-                        ) : (
-                          this.CategoryPills(this.selectedDeliveryMethods)
-                        )}
-                      </View>
-                    </View>
-                  </CardItem>
-
                   {availableDeliveryMethods['Mr. Speedy'] && (
                     <CardItem bordered>
                       <View style={{width: '100%'}}>
@@ -1207,7 +1154,10 @@ class DashboardScreen extends Component {
                                       fontFamily: 'ProductSans-Bold',
                                       textAlign: 'right',
                                     }}>
-                                    {`₱${availableDeliveryMethods['Mr. Speedy'].discount}`}
+                                    {availableDeliveryMethods['Mr. Speedy']
+                                      .discount
+                                      ? `₱${availableDeliveryMethods['Mr. Speedy'].discount}`
+                                      : 'Not Set'}
                                   </Text>
                                 )}
                               </View>
@@ -1272,7 +1222,10 @@ class DashboardScreen extends Component {
                                       fontFamily: 'ProductSans-Bold',
                                       textAlign: 'right',
                                     }}>
-                                    {`₱${availableDeliveryMethods['Mr. Speedy'].discountMinimum}`}
+                                    {availableDeliveryMethods['Mr. Speedy']
+                                      .discountMinimum
+                                      ? `₱${availableDeliveryMethods['Mr. Speedy'].discountMinimum}`
+                                      : 'Not Set'}
                                   </Text>
                                 )}
                               </View>
@@ -1330,6 +1283,80 @@ class DashboardScreen extends Component {
                         </View>
 
                         <Card style={{borderRadius: 10, overflow: 'hidden'}}>
+                          <CardItem bordered>
+                            <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                paddingHorizontal: 8,
+                              }}>
+                              <View style={{flex: 2, paddingright: 10}}>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                  }}>
+                                  Delivery Fee
+                                </Text>
+                              </View>
+
+                              <View style={{flex: 3, alignItems: 'flex-end'}}>
+                                {editMode &&
+                                this.newAvailableDeliveryMethods[
+                                  'Own Delivery'
+                                ] ? (
+                                  <Input
+                                    value={
+                                      this.newAvailableDeliveryMethods[
+                                        'Own Delivery'
+                                      ].deliveryFee
+                                        ? String(
+                                            this.newAvailableDeliveryMethods[
+                                              'Own Delivery'
+                                            ].deliveryFee,
+                                          )
+                                        : null
+                                    }
+                                    leftIcon={
+                                      <Text style={{fontSize: 18}}>₱</Text>
+                                    }
+                                    keyboardType="number-pad"
+                                    errorMessage={
+                                      this.newAvailableDeliveryMethods[
+                                        'Own Delivery'
+                                      ][`deliveryFeeError`]
+                                    }
+                                    onChangeText={(value) =>
+                                      this.handleChangeDeliveryValue(
+                                        'Own Delivery',
+                                        'deliveryFee',
+                                        value,
+                                      )
+                                    }
+                                    inputStyle={{textAlign: 'right'}}
+                                    containerStyle={{
+                                      borderColor: this.editModeHeaderColor,
+                                    }}
+                                  />
+                                ) : (
+                                  <Text
+                                    style={{
+                                      color: colors.primary,
+                                      fontSize: 16,
+                                      fontFamily: 'ProductSans-Bold',
+                                      textAlign: 'right',
+                                    }}>
+                                    {availableDeliveryMethods['Own Delivery']
+                                      .deliveryFee
+                                      ? `₱${availableDeliveryMethods['Own Delivery'].deliveryFee}`
+                                      : 'Not Set'}
+                                  </Text>
+                                )}
+                              </View>
+                            </View>
+                          </CardItem>
+
                           <CardItem bordered>
                             <View
                               style={{
@@ -1441,7 +1468,10 @@ class DashboardScreen extends Component {
                                       fontFamily: 'ProductSans-Bold',
                                       textAlign: 'right',
                                     }}>
-                                    {`₱${availableDeliveryMethods['Own Delivery'].discount}`}
+                                    {availableDeliveryMethods['Own Delivery']
+                                      .discount
+                                      ? `₱${availableDeliveryMethods['Own Delivery'].discount}`
+                                      : 'Not Set'}
                                   </Text>
                                 )}
                               </View>
@@ -1506,7 +1536,10 @@ class DashboardScreen extends Component {
                                       fontFamily: 'ProductSans-Bold',
                                       textAlign: 'right',
                                     }}>
-                                    {`₱${availableDeliveryMethods['Own Delivery'].discountMinimum}`}
+                                    {availableDeliveryMethods['Own Delivery']
+                                      .discountMinimum
+                                      ? `₱${availableDeliveryMethods['Own Delivery'].discountMinimum}`
+                                      : 'Not Set'}
                                   </Text>
                                 )}
                               </View>
@@ -1516,58 +1549,6 @@ class DashboardScreen extends Component {
                       </View>
                     </CardItem>
                   )}
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        paddingHorizontal: 8,
-                      }}>
-                      <View style={{flex: 2, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Own Delivery Service Fee
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {editMode ? (
-                          <Input
-                            value={this.newOwnDeliveryServiceFee}
-                            leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
-                            keyboardType="number-pad"
-                            errorMessage={
-                              newOwnDeliveryServiceFeeError &&
-                              newOwnDeliveryServiceFeeError
-                            }
-                            onChangeText={(value) =>
-                              this.handleOwnDeliveryServiceFee(value)
-                            }
-                            inputStyle={{textAlign: 'right'}}
-                            containerStyle={{
-                              borderColor: this.editModeHeaderColor,
-                            }}
-                          />
-                        ) : (
-                          <Text
-                            style={{
-                              color: colors.primary,
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                              textAlign: 'right',
-                            }}>
-                            ₱{ownDeliveryServiceFee}
-                          </Text>
-                        )}
-                      </View>
-                    </View>
-                  </CardItem>
 
                   <CardItem bordered>
                     <View
@@ -1634,95 +1615,6 @@ class DashboardScreen extends Component {
                               textAlign: 'right',
                             }}>
                             {deliveryType}
-                          </Text>
-                        )}
-                      </View>
-                    </View>
-                  </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        paddingHorizontal: 8,
-                      }}>
-                      <View style={{flex: 2, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Free Delivery
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        <Switch
-                          trackColor={{
-                            false: '#767577',
-                            true: editMode ? colors.accent : colors.primary,
-                          }}
-                          thumbColor={'#f4f3f4'}
-                          ios_backgroundColor="#3e3e3e"
-                          onValueChange={() =>
-                            (this.newFreeDelivery = !this.newFreeDelivery)
-                          }
-                          value={editMode ? this.newFreeDelivery : freeDelivery}
-                          disabled={!editMode}
-                        />
-                      </View>
-                    </View>
-                  </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        paddingHorizontal: 8,
-                      }}>
-                      <View style={{flex: 2, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Free Delivery Minimum Order Amount
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {editMode ? (
-                          <Input
-                            value={this.newFreeDeliveryMinimum}
-                            leftIcon={<Text style={{fontSize: 18}}>₱</Text>}
-                            keyboardType="number-pad"
-                            errorMessage={
-                              newFreeDeliveryMinimumError &&
-                              newFreeDeliveryMinimumError
-                            }
-                            onChangeText={(value) =>
-                              this.handleFreeDeliveryMinimum(value)
-                            }
-                            inputStyle={{textAlign: 'right'}}
-                            containerStyle={{
-                              borderColor: this.editModeHeaderColor,
-                            }}
-                          />
-                        ) : (
-                          <Text
-                            style={{
-                              color: colors.primary,
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                              textAlign: 'right',
-                            }}>
-                            ₱{freeDeliveryMinimum ? freeDeliveryMinimum : 0}
                           </Text>
                         )}
                       </View>
