@@ -253,6 +253,7 @@ class DetailsStore {
     vacationMode,
     availablePaymentMethods,
     availableDeliveryMethods,
+    deliveryDiscount,
     deliveryType,
     ownDeliveryServiceFee,
     freeDeliveryMinimum,
@@ -265,6 +266,7 @@ class DetailsStore {
         vacationMode,
         availablePaymentMethods,
         availableDeliveryMethods,
+        deliveryDiscount,
         deliveryType,
         ownDeliveryServiceFee: ownDeliveryServiceFee
           ? ownDeliveryServiceFee
