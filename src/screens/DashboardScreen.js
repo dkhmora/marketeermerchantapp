@@ -472,34 +472,22 @@ class DashboardScreen extends Component {
 
   render() {
     const {
-      freeDelivery,
       storeDescription,
       storeName,
       vacationMode,
       deliveryType,
       orderNumber,
       storeCategory,
-      ownDeliveryServiceFee,
-      freeDeliveryMinimum,
       availableDeliveryMethods,
       availablePaymentMethods,
       deliveryDiscount,
     } = this.props.detailsStore.storeDetails;
 
-    const selectableDeliveryMethods = availableDeliveryMethods
-      ? Object.keys(availableDeliveryMethods)
-      : [];
     const selectablePaymentMethods = availablePaymentMethods
       ? Object.keys(availablePaymentMethods)
       : [];
 
-    const {
-      coverImageUrl,
-      displayImageUrl,
-      loading,
-      newOwnDeliveryServiceFeeError,
-      newFreeDeliveryMinimumError,
-    } = this.state;
+    const {coverImageUrl, displayImageUrl, loading} = this.state;
 
     const {navigation} = this.props;
 
@@ -622,7 +610,6 @@ class DashboardScreen extends Component {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingHorizontal: 8,
                       }}>
                       <View style={{paddingRight: 10}}>
                         <Text
@@ -691,7 +678,6 @@ class DashboardScreen extends Component {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingHorizontal: 8,
                       }}>
                       <View style={{paddingRight: 10}}>
                         <Text
@@ -758,7 +744,6 @@ class DashboardScreen extends Component {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingHorizontal: 8,
                       }}>
                       <View style={{flex: 1, paddingright: 10}}>
                         <Text
@@ -791,7 +776,6 @@ class DashboardScreen extends Component {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingHorizontal: 8,
                       }}>
                       <View style={{flex: 1, paddingright: 10}}>
                         <Text
@@ -839,7 +823,6 @@ class DashboardScreen extends Component {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingHorizontal: 8,
                       }}>
                       <View style={{flex: 1, paddingright: 10}}>
                         <Text
@@ -872,7 +855,6 @@ class DashboardScreen extends Component {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingHorizontal: 8,
                       }}>
                       <View style={{flex: 1, paddingright: 10}}>
                         <Text
@@ -922,7 +904,6 @@ class DashboardScreen extends Component {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingHorizontal: 8,
                       }}>
                       <View style={{flex: 1, paddingright: 10}}>
                         <Text
@@ -955,7 +936,6 @@ class DashboardScreen extends Component {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingHorizontal: 8,
                       }}>
                       <View style={{flex: 1, paddingright: 10}}>
                         <Text
@@ -1109,7 +1089,6 @@ class DashboardScreen extends Component {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                paddingHorizontal: 8,
                               }}>
                               <View style={{flex: 1, paddingright: 10}}>
                                 <Text
@@ -1234,7 +1213,6 @@ class DashboardScreen extends Component {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                paddingHorizontal: 8,
                               }}>
                               <View style={{flex: 1, paddingright: 10}}>
                                 <Text
@@ -1300,7 +1278,6 @@ class DashboardScreen extends Component {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                paddingHorizontal: 8,
                               }}>
                               <View style={{flex: 1, paddingright: 10}}>
                                 <Text
@@ -1372,7 +1349,6 @@ class DashboardScreen extends Component {
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        paddingHorizontal: 8,
                       }}>
                       <View style={{flex: 1, paddingright: 10}}>
                         <Text
