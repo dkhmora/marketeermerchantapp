@@ -15,7 +15,6 @@ import Toast from './Toast';
 import {computed} from 'mobx';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Card, CardItem, Picker, Item} from 'native-base';
-import storage from '@react-native-firebase/storage';
 import FastImage from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import ConfirmationModal from './ConfirmationModal';

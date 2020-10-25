@@ -1,10 +1,8 @@
 import React, {PureComponent} from 'react';
 import {CardItem, Text, View} from 'native-base';
 import {observer} from 'mobx-react';
-import storage from '@react-native-firebase/storage';
 import {colors} from '../../assets/colors';
 import FastImage from 'react-native-fast-image';
-import Toast from './Toast';
 import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 
 @observer

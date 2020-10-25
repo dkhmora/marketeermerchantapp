@@ -9,6 +9,7 @@ import {persist} from 'mobx-persist';
 import crashlytics from '@react-native-firebase/crashlytics';
 
 const functions = firebase.app().functions('asia-northeast1');
+const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 class ItemsStore {
   @persist('list') @observable storeItems = [];
   @observable categoryItems = new Map();
@@ -172,7 +173,7 @@ class ItemsStore {
 
   @action async uploadImage(imageRef, imagePath) {
     if (imageRef && imagePath) {
-      return await storage()
+      return await publicStorageBucket
         .ref(imageRef)
         .putFile(imagePath)
         .catch((err) => {
@@ -227,7 +228,7 @@ class ItemsStore {
   }
 
   @action async deleteImage(image) {
-    await storage()
+    await publicStorageBucket
       .ref(image)
       .delete()
       .catch((err) => {

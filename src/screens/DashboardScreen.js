@@ -1,5 +1,11 @@
 import React, {Component} from 'react';
-import {ActivityIndicator, View, SafeAreaView, Platform} from 'react-native';
+import {
+  ActivityIndicator,
+  View,
+  SafeAreaView,
+  Platform,
+  Image,
+} from 'react-native';
 import {Card, CardItem} from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
@@ -13,13 +19,14 @@ import BaseOptionsMenu from '../components/BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import {Switch} from 'react-native-gesture-handler';
 import StoreCard from '../components/StoreCard';
-import FastImage from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from '../components/Toast';
 import crashlytics from '@react-native-firebase/crashlytics';
 import CardItemHeader from '../components/CardItemHeader';
 import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
+import firebase from '@react-native-firebase/app';
 
+const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 @inject('detailsStore')
 @inject('itemsStore')
 @observer
@@ -79,10 +86,8 @@ class DashboardScreen extends Component {
     const {displayImageUrl, coverImageUrl} = this.state;
 
     if (
-      prevProps.detailsStore.storeDetails.coverImage !==
-        this.props.detailsStore.storeDetails.coverImage ||
-      prevProps.detailsStore.storeDetails.displayImage !==
-        this.props.detailsStore.storeDetails.displayImage ||
+      prevProps.detailsStore.storeDetails.updatedAt !==
+        this.props.detailsStore.storeDetails.updatedAt ||
       !displayImageUrl ||
       !coverImageUrl
     ) {
@@ -201,23 +206,33 @@ class DashboardScreen extends Component {
 
   getImage = async () => {
     if (this.props.detailsStore.storeDetails.displayImage) {
-      this.setState({displayImageReady: false}, () => {
-        this.setState({
-          displayImageUrl: {
-            uri: `https://cdn.marketeer.ph${this.props.detailsStore.storeDetails.displayImage}`,
-          },
-        });
+      const displayRef = publicStorageBucket.ref(
+        this.props.detailsStore.storeDetails.displayImage,
+      );
+      const displayLink = await displayRef.getDownloadURL().catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+        return null;
       });
+
+      if (displayLink) {
+        this.setState({
+          displayImageUrl: {uri: displayLink},
+        });
+      }
     }
 
     if (this.props.detailsStore.storeDetails.coverImage) {
-      this.setState({coverImageReady: false}, () => {
-        this.setState({
-          coverImageUrl: {
-            uri: `https://cdn.marketeer.ph${this.props.detailsStore.storeDetails.coverImage}`,
-          },
-        });
+      const coverRef = publicStorageBucket.ref(
+        this.props.detailsStore.storeDetails.coverImage,
+      );
+      const coverLink = await coverRef.getDownloadURL().catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+        return null;
       });
+
+      if (coverLink) {
+        this.setState({coverImageUrl: {uri: coverLink}});
+      }
     }
   };
 
@@ -493,6 +508,7 @@ class DashboardScreen extends Component {
       coverImageReady,
       displayImageWidth,
       coverImageWidth,
+      loading,
     } = this.state;
 
     const {navigation} = this.props;
@@ -666,22 +682,28 @@ class DashboardScreen extends Component {
                               displayImageWidth: event.nativeEvent.layout.width,
                             })
                           }>
-                          <FastImage
-                            source={displayImageUrl}
+                          <View
                             style={{
                               width: '70%',
-                              aspectRatio: 1,
-                              backgroundColor: '#e1e4e8',
                               borderRadius: 10,
                               borderWidth: 1,
                               borderColor: editMode
                                 ? this.editModeHeaderColor
                                 : colors.primary,
-                            }}
-                            onLoad={() =>
-                              this.setState({displayImageReady: true})
-                            }
-                          />
+                              overflow: 'hidden',
+                            }}>
+                            <Image
+                              source={displayImageUrl}
+                              style={{
+                                width: '100%',
+                                aspectRatio: 1,
+                                resizeMode: 'contain',
+                              }}
+                              onLoad={() =>
+                                this.setState({displayImageReady: true})
+                              }
+                            />
+                          </View>
 
                           {!displayImageReady && (
                             <View
@@ -764,24 +786,28 @@ class DashboardScreen extends Component {
                               coverImageWidth: event.nativeEvent.layout.width,
                             })
                           }>
-                          <FastImage
-                            source={coverImageUrl}
+                          <View
                             style={{
                               width: '100%',
-                              aspectRatio: 1620 / 1080,
-                              backgroundColor: '#e1e4e8',
-                              alignSelf: 'center',
                               borderRadius: 10,
                               borderWidth: 1,
                               borderColor: editMode
                                 ? this.editModeHeaderColor
                                 : colors.primary,
-                              resizeMode: 'cover',
-                            }}
-                            onLoad={() =>
-                              this.setState({coverImageReady: true})
-                            }
-                          />
+                              overflow: 'hidden',
+                            }}>
+                            <Image
+                              source={coverImageUrl}
+                              style={{
+                                width: '100%',
+                                aspectRatio: 1620 / 1080,
+                                resizeMode: 'contain',
+                              }}
+                              onLoad={() =>
+                                this.setState({coverImageReady: true})
+                              }
+                            />
+                          </View>
 
                           {!coverImageReady && (
                             <View

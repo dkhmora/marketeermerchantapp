@@ -3,7 +3,6 @@ import {Card, CardItem, Body} from 'native-base';
 import {View, ActivityIndicator} from 'react-native';
 import {Text} from 'react-native-elements';
 import moment from 'moment';
-import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
 import {computed} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
