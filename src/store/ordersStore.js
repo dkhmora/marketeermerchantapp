@@ -260,6 +260,17 @@ class OrdersStore {
         Toast({text: err.message, type: 'danger'});
       });
   }
+
+  @action async cancelMrspeedyBooking(orderId) {
+    return await functions
+      .httpsCallable('cancelMrSpeedyOrder')({orderId})
+      .then((response) => {
+        return response;
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+      });
+  }
 }
 
 export default OrdersStore;

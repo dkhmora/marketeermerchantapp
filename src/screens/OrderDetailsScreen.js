@@ -152,6 +152,20 @@ class OrderDetailsScreen extends Component {
     );
   }
 
+  cancelMrspeedyBooking() {
+    this.props.authStore.appReady = false;
+
+    const {orderId} = this.props.route.params;
+
+    this.props.ordersStore.cancelMrspeedyBooking(orderId).then((response) => {
+      if (response.s === 200) {
+        Toast({text: response.m});
+      }
+
+      this.props.authStore.appReady = true;
+    });
+  }
+
   handleChangeOrderStatus() {
     this.props.authStore.appReady = false;
 
@@ -500,14 +514,28 @@ class OrderDetailsScreen extends Component {
                       }}>
                       <CardItemHeader
                         title={
-                          <Image
-                            source={require('../../assets/images/mrspeedy-logo.png')}
+                          <View
                             style={{
-                              height: 50,
-                              width: 100,
-                              resizeMode: 'contain',
-                            }}
-                          />
+                              flex: 1,
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}>
+                            <Image
+                              source={require('../../assets/images/mrspeedy-logo.png')}
+                              style={{
+                                height: 50,
+                                width: 100,
+                                resizeMode: 'contain',
+                              }}
+                            />
+
+                            <Button
+                              title="Cancel Booking"
+                              type="clear"
+                              onPress={() => this.cancelMrspeedyBooking()}
+                            />
+                          </View>
                         }
                       />
 

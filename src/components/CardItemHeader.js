@@ -10,7 +10,7 @@ class CardItemHeader extends Component {
   }
 
   render() {
-    const { title, onPress, activeOpacity } = this.props;
+    const {title, onPress, activeOpacity} = this.props;
 
     return (
       <CardItem
@@ -21,7 +21,6 @@ class CardItemHeader extends Component {
         onPress={() => onPress()}
         style={{
           backgroundColor: colors.icons,
-          justifyContent: 'space-between',
           paddingTop: 0,
           paddingBottom: 0,
           height: 60,
