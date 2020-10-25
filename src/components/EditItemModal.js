@@ -31,8 +31,8 @@ class EditItemModal extends Component {
     this.state = {
       loading: false,
       newImagePath: null,
-      imageDisplay: require('../../assets/placeholder.jpg'),
-      imageLoading: true,
+      imageReady: false,
+      imageDisplay: null,
       newName: '',
       newCategory: '',
       newDescription: '',
@@ -66,6 +66,7 @@ class EditItemModal extends Component {
         unit,
         price,
         discountedPrice,
+        image,
       } = this.props.itemsStore.selectedItem;
 
       this.setState({
@@ -78,27 +79,12 @@ class EditItemModal extends Component {
         newUnit: String(unit),
         newPrice: String(price),
         newDiscountedPrice: discountedPrice ? String(discountedPrice) : '',
+        imageDisplay: image
+          ? {uri: `https://cdn.marketeer.ph${image}`}
+          : require('../../assets/placeholder.jpg'),
       });
-
-      if (this.props.itemsStore.selectedItem.image) {
-        this.setState({imageLoading: true}, () => this.getImage());
-      }
     }
   }
-
-  getImage = async () => {
-    const ref = storage().ref(this.props.itemsStore.selectedItem.image);
-    const link = await ref.getDownloadURL().catch((err) => {
-      Toast({text: err.message, type: 'danger'});
-      return null;
-    });
-
-    if (link) {
-      this.setState({imageDisplay: {uri: link}}, () =>
-        this.setState({imageLoading: false}),
-      );
-    }
-  };
 
   handleStock(stock) {
     const numberRegexp = /^[1-9]+[0-9]*$/;
@@ -298,9 +284,9 @@ class EditItemModal extends Component {
 
     this.setState({
       loading: false,
-      imageLoading: false,
+      imageReady: false,
       newImagePath: null,
-      imageDisplay: require('../../assets/placeholder.jpg'),
+      imageDisplay: null,
       newName: '',
       newCategory: '',
       newDescription: '',
@@ -332,7 +318,7 @@ class EditItemModal extends Component {
       newPriceError,
       newDiscountedPriceError,
       selectedIndex,
-      imageLoading,
+      imageReady,
     } = this.state;
     const {isVisible} = this.props;
 
@@ -422,21 +408,7 @@ class EditItemModal extends Component {
                 paddingBottom: 10,
               }}>
               <View style={{flex: 1}}>
-                {imageLoading ? (
-                  <Placeholder Animation={Fade}>
-                    <PlaceholderMedia
-                      style={{
-                        alignSelf: 'flex-start',
-                        backgroundColor: colors.primary,
-                        borderColor: '#BDBDBD',
-                        borderRadius: 10,
-                        borderWidth: 1,
-                        height: 150,
-                        width: 150,
-                      }}
-                    />
-                  </Placeholder>
-                ) : (
+                {imageDisplay && (
                   <FastImage
                     source={imageDisplay}
                     style={{
@@ -447,7 +419,26 @@ class EditItemModal extends Component {
                       height: 150,
                       width: 150,
                     }}
+                    onLoad={() => this.setState({imageReady: true})}
                   />
+                )}
+
+                {!imageReady && (
+                  <View style={{position: 'absolute'}}>
+                    <Placeholder Animation={Fade}>
+                      <PlaceholderMedia
+                        style={{
+                          alignSelf: 'flex-start',
+                          backgroundColor: colors.primary,
+                          borderColor: '#BDBDBD',
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          height: 150,
+                          width: 150,
+                        }}
+                      />
+                    </Placeholder>
+                  </View>
                 )}
               </View>
 

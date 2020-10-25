@@ -5,6 +5,7 @@ import storage from '@react-native-firebase/storage';
 import {colors} from '../../assets/colors';
 import FastImage from 'react-native-fast-image';
 import Toast from './Toast';
+import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 
 @observer
 class OrderItemCard extends PureComponent {
@@ -12,31 +13,16 @@ class OrderItemCard extends PureComponent {
     super(props);
 
     this.state = {
-      url: require('../../assets/placeholder.jpg'),
+      imageReady: false,
     };
-  }
-
-  getImage = async () => {
-    const ref = storage().ref(this.props.item.image);
-    const link = await ref.getDownloadURL().catch((err) => {
-      Toast({text: err.message, type: 'danger'});
-      return null;
-    });
-
-    if (link) {
-      this.setState({url: {uri: link}});
-    }
-  };
-
-  componentDidMount() {
-    if (this.props.item.image) {
-      this.getImage();
-    }
   }
 
   render() {
     const {item, ...otherProps} = this.props;
-    const {url} = this.state;
+    const {imageReady} = this.state;
+    const url = item.image
+      ? {uri: `https://cdn.marketeer.ph${item.image}`}
+      : require('../../assets/placeholder.jpg');
 
     return (
       <CardItem
@@ -62,7 +48,28 @@ class OrderItemCard extends PureComponent {
               borderRadius: 10,
             }}
             resizeMode={FastImage.resizeMode.cover}
+            onLoad={() => this.setState({imageReady: true})}
           />
+
+          {!imageReady && (
+            <View
+              style={{
+                position: 'absolute',
+              }}>
+              <Placeholder Animation={Fade}>
+                <PlaceholderMedia
+                  style={{
+                    backgroundColor: colors.primary,
+                    aspectRatio: 1,
+                    width: 55,
+                    height: 55,
+                    borderRadius: 10,
+                  }}
+                />
+              </Placeholder>
+            </View>
+          )}
+
           <View
             style={{
               flex: 1,
@@ -72,6 +79,7 @@ class OrderItemCard extends PureComponent {
             <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 18}}>
               {item.name}
             </Text>
+
             <Text
               numberOfLines={2}
               style={{
@@ -82,6 +90,7 @@ class OrderItemCard extends PureComponent {
               {item.description}
             </Text>
           </View>
+
           <View
             style={{
               flexDirection: 'column',
@@ -96,6 +105,7 @@ class OrderItemCard extends PureComponent {
               }}>
               ₱{item.price}
             </Text>
+
             <Text
               style={{
                 color: colors.text_secondary,
@@ -106,6 +116,7 @@ class OrderItemCard extends PureComponent {
               }}>
               x{item.quantity}
             </Text>
+
             <Text
               style={{
                 fontFamily: 'ProductSans-Black',

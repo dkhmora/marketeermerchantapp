@@ -47,7 +47,7 @@ class DeliveryAreaScreen extends Component {
   @computed get currentBoundingBox() {
     const deliveryCoordinates = toJS(this.props.detailsStore.storeDetails)
       .deliveryCoordinates;
-    if (deliveryCoordinates) {
+    if (deliveryCoordinates && deliveryCoordinates.boundingBox) {
       return deliveryCoordinates.boundingBox;
     }
 

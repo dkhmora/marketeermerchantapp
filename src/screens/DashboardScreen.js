@@ -18,6 +18,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from '../components/Toast';
 import crashlytics from '@react-native-firebase/crashlytics';
 import CardItemHeader from '../components/CardItemHeader';
+import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -45,6 +46,10 @@ class DashboardScreen extends Component {
       coverImageUrl: null,
       oldDisplayImageUrl: null,
       oldCoverImageUrl: null,
+      displayImageReady: false,
+      coverImageReady: false,
+      displayImageWidth: null,
+      coverImageWidth: null,
     };
   }
 
@@ -74,8 +79,10 @@ class DashboardScreen extends Component {
     const {displayImageUrl, coverImageUrl} = this.state;
 
     if (
-      prevProps.detailsStore.storeDetails !==
-        this.props.detailsStore.storeDetails ||
+      prevProps.detailsStore.storeDetails.coverImage !==
+        this.props.detailsStore.storeDetails.coverImage ||
+      prevProps.detailsStore.storeDetails.displayImage !==
+        this.props.detailsStore.storeDetails.displayImage ||
       !displayImageUrl ||
       !coverImageUrl
     ) {
@@ -194,31 +201,23 @@ class DashboardScreen extends Component {
 
   getImage = async () => {
     if (this.props.detailsStore.storeDetails.displayImage) {
-      const displayRef = storage().ref(
-        this.props.detailsStore.storeDetails.displayImage,
-      );
-      const displayLink = await displayRef.getDownloadURL().catch((err) => {
-        Toast({text: err.message, type: 'danger'});
-        return null;
+      this.setState({displayImageReady: false}, () => {
+        this.setState({
+          displayImageUrl: {
+            uri: `https://cdn.marketeer.ph${this.props.detailsStore.storeDetails.displayImage}`,
+          },
+        });
       });
-
-      if (displayLink) {
-        this.setState({displayImageUrl: {uri: displayLink}});
-      }
     }
 
     if (this.props.detailsStore.storeDetails.coverImage) {
-      const coverRef = storage().ref(
-        this.props.detailsStore.storeDetails.coverImage,
-      );
-      const coverLink = await coverRef.getDownloadURL().catch((err) => {
-        Toast({text: err.message, type: 'danger'});
-        return null;
+      this.setState({coverImageReady: false}, () => {
+        this.setState({
+          coverImageUrl: {
+            uri: `https://cdn.marketeer.ph${this.props.detailsStore.storeDetails.coverImage}`,
+          },
+        });
       });
-
-      if (coverLink) {
-        this.setState({coverImageUrl: {uri: coverLink}});
-      }
     }
   };
 
@@ -487,7 +486,14 @@ class DashboardScreen extends Component {
       ? Object.keys(availablePaymentMethods)
       : [];
 
-    const {coverImageUrl, displayImageUrl, loading} = this.state;
+    const {
+      coverImageUrl,
+      displayImageUrl,
+      displayImageReady,
+      coverImageReady,
+      displayImageWidth,
+      coverImageWidth,
+    } = this.state;
 
     const {navigation} = this.props;
 
@@ -654,19 +660,53 @@ class DashboardScreen extends Component {
                           alignSelf: 'flex-start',
                           alignItems: 'flex-end',
                         }}>
-                        <FastImage
-                          source={displayImageUrl}
-                          style={{
-                            width: '70%',
-                            aspectRatio: 1,
-                            backgroundColor: '#e1e4e8',
-                            borderRadius: 10,
-                            borderWidth: 1,
-                            borderColor: editMode
-                              ? this.editModeHeaderColor
-                              : colors.primary,
-                          }}
-                        />
+                        <View
+                          onLayout={(event) =>
+                            this.setState({
+                              displayImageWidth: event.nativeEvent.layout.width,
+                            })
+                          }>
+                          <FastImage
+                            source={displayImageUrl}
+                            style={{
+                              width: '70%',
+                              aspectRatio: 1,
+                              backgroundColor: '#e1e4e8',
+                              borderRadius: 10,
+                              borderWidth: 1,
+                              borderColor: editMode
+                                ? this.editModeHeaderColor
+                                : colors.primary,
+                            }}
+                            onLoad={() =>
+                              this.setState({displayImageReady: true})
+                            }
+                          />
+
+                          {!displayImageReady && (
+                            <View
+                              style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                              }}>
+                              <Placeholder Animation={Fade}>
+                                <PlaceholderMedia
+                                  style={{
+                                    backgroundColor: colors.primary,
+                                    borderRadius: 10,
+                                    width: displayImageWidth
+                                      ? displayImageWidth
+                                      : 0,
+                                    height: displayImageWidth
+                                      ? displayImageWidth
+                                      : 0,
+                                  }}
+                                />
+                              </Placeholder>
+                            </View>
+                          )}
+                        </View>
                       </View>
                     </View>
                   </CardItem>
@@ -718,21 +758,55 @@ class DashboardScreen extends Component {
                           alignSelf: 'flex-start',
                           alignItems: 'flex-end',
                         }}>
-                        <FastImage
-                          source={coverImageUrl}
-                          style={{
-                            width: '100%',
-                            aspectRatio: 1620 / 1080,
-                            backgroundColor: '#e1e4e8',
-                            alignSelf: 'center',
-                            borderRadius: 10,
-                            borderWidth: 1,
-                            borderColor: editMode
-                              ? this.editModeHeaderColor
-                              : colors.primary,
-                            resizeMode: 'cover',
-                          }}
-                        />
+                        <View
+                          onLayout={(event) =>
+                            this.setState({
+                              coverImageWidth: event.nativeEvent.layout.width,
+                            })
+                          }>
+                          <FastImage
+                            source={coverImageUrl}
+                            style={{
+                              width: '100%',
+                              aspectRatio: 1620 / 1080,
+                              backgroundColor: '#e1e4e8',
+                              alignSelf: 'center',
+                              borderRadius: 10,
+                              borderWidth: 1,
+                              borderColor: editMode
+                                ? this.editModeHeaderColor
+                                : colors.primary,
+                              resizeMode: 'cover',
+                            }}
+                            onLoad={() =>
+                              this.setState({coverImageReady: true})
+                            }
+                          />
+
+                          {!coverImageReady && (
+                            <View
+                              style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                              }}>
+                              <Placeholder Animation={Fade}>
+                                <PlaceholderMedia
+                                  style={{
+                                    backgroundColor: colors.primary,
+                                    borderRadius: 10,
+                                    width: coverImageWidth
+                                      ? coverImageWidth
+                                      : 0,
+                                    height: coverImageWidth
+                                      ? coverImageWidth
+                                      : 0,
+                                  }}
+                                />
+                              </Placeholder>
+                            </View>
+                          )}
+                        </View>
                       </View>
                     </View>
                   </CardItem>

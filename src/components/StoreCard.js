@@ -14,58 +14,9 @@ class StoreCard extends Component {
     super(props);
 
     this.state = {
-      displayImageUrl: '',
-      coverImageUrl: '',
-      ready: false,
+      coverImageReady: false,
+      displayImageReady: false,
     };
-  }
-
-  getImage = async () => {
-    const {displayImage, coverImage} = this.props.store;
-
-    if (displayImage) {
-      const displayImageRef = storage().refFromURL(
-        `gs://marketeer_test_bucket${displayImage}`,
-      );
-      const displayImageUrl = await displayImageRef
-        .getDownloadURL()
-        .catch((err) => {
-          Toast({text: err.message, type: 'danger'});
-          return null;
-        });
-
-      if (displayImageUrl) {
-        this.setState({displayImageUrl, ready: true});
-      }
-
-      this.setState({ready: true});
-    }
-
-    if (coverImage) {
-      const coverImageRef = storage().ref(coverImage);
-      const coverImageUrl = await coverImageRef
-        .getDownloadURL()
-        .catch((err) => {
-          Toast({text: err.message, type: 'danger'});
-          return null;
-        });
-
-      if (coverImageUrl) {
-        this.setState({coverImageUrl});
-      }
-
-      this.setState({ready: true});
-    }
-  };
-
-  componentDidMount() {
-    this.getImage();
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.store !== this.props.store) {
-      this.getImage();
-    }
   }
 
   PaymentMethods = () => {
@@ -108,8 +59,10 @@ class StoreCard extends Component {
   };
 
   render() {
-    const {store, navigation} = this.props;
-    const {displayImageUrl, coverImageUrl, ready} = this.state;
+    const {store} = this.props;
+    const {coverImageReady, displayImageReady} = this.state;
+    const displayImageUrl = `https://cdn.marketeer.ph${store.displayImage}`;
+    const coverImageUrl = `https://cdn.marketeer.ph${store.coverImage}`;
 
     return (
       <View
@@ -134,21 +87,23 @@ class StoreCard extends Component {
           }}>
           <TouchableOpacity activeOpacity={0.85}>
             <View style={{height: 200}}>
-              {coverImageUrl && ready ? (
-                <FastImage
-                  source={{uri: coverImageUrl}}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 150,
-                    borderTopLeftRadius: 8,
-                    borderTopRightRadius: 8,
-                  }}
-                  resizeMode={FastImage.resizeMode.cover}
-                />
-              ) : (
+              <FastImage
+                source={{uri: coverImageUrl}}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 150,
+                  borderTopLeftRadius: 8,
+                  borderTopRightRadius: 8,
+                  opacity: coverImageReady ? 1 : 0,
+                }}
+                resizeMode={FastImage.resizeMode.cover}
+                onLoad={() => this.setState({coverImageReady: true})}
+              />
+
+              {!coverImageReady && (
                 <Placeholder Animation={Fade}>
                   <PlaceholderMedia
                     style={{
@@ -383,16 +338,19 @@ class StoreCard extends Component {
                 width: 60,
                 height: 60,
               }}>
-              {displayImageUrl && ready ? (
-                <FastImage
-                  source={{uri: displayImageUrl}}
-                  style={{
-                    width: 60,
-                    height: 60,
-                  }}
-                  resizeMode={FastImage.resizeMode.cover}
-                />
-              ) : (
+              <FastImage
+                source={{uri: displayImageUrl}}
+                style={{
+                  width: 60,
+                  height: 60,
+                  opacity: displayImageReady ? 1 : 0,
+                }}
+                resizeMode={FastImage.resizeMode.cover}
+                onLoad={() => this.setState({displayImageReady: true})}
+                visibility={displayImageReady ? null : 'hidden'}
+              />
+
+              {!displayImageReady && (
                 <Placeholder Animation={Fade}>
                   <PlaceholderMedia
                     style={{
