@@ -40,6 +40,8 @@ class OrderDetailsScreen extends Component {
       loading: true,
       allowDragging: true,
       changeOrderStatusModal: false,
+      cancelMrspeedyBookingModal: false,
+      courier: null,
     };
   }
 
@@ -130,9 +132,40 @@ class OrderDetailsScreen extends Component {
     crashlytics().log('OrderDetailsScreen');
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.props.ordersStore.selectedOrder &&
+      this.props.ordersStore.selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData !== undefined
+    ) {
+      if (
+        this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
+          .status === 'active' &&
+        !this.getCourierInterval
+      ) {
+        this.getCourierInterval = setInterval(() => {
+          this.props.ordersStore
+            .getMrSpeedyCourierInfo(
+              this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
+                .order_id,
+            )
+            .then((response) => {
+              if (response.s === 200) {
+                this.setState({courier: response.d});
+              }
+            });
+        }, 5000);
+      } else {
+        clearInterval(this.getCourierInterval);
+      }
+    }
+  }
+
   componentWillUnmount() {
     this.props.ordersStore.unsubscribeGetOrder &&
       this.props.ordersStore.unsubscribeGetOrder();
+
+    this.getCourierInterval && clearInterval(this.getCourierInterval);
 
     this.props.ordersStore.selectedOrder = null;
     this.props.ordersStore.orderMessages = null;
@@ -160,6 +193,8 @@ class OrderDetailsScreen extends Component {
     this.props.ordersStore.cancelMrspeedyBooking(orderId).then((response) => {
       if (response.s === 200) {
         Toast({text: response.m});
+      } else {
+        Toast({text: response.m, type: 'danger'});
       }
 
       this.props.authStore.appReady = true;
@@ -247,7 +282,7 @@ class OrderDetailsScreen extends Component {
     const {orderId} = this.props.route.params;
     const {orderStatus} = this;
     const {navigation} = this.props;
-    const {orderItems, loading} = this.state;
+    const {orderItems, loading, courier} = this.state;
     const buttonText =
       orderStatus[0] === 'PAID'
         ? 'SHIP'
@@ -512,6 +547,23 @@ class OrderDetailsScreen extends Component {
                         borderRadius: 10,
                         overflow: 'hidden',
                       }}>
+                      <ConfirmationModal
+                        isVisible={this.state.cancelMrspeedyBookingModal}
+                        title="Are you sure?"
+                        body={`Do you want to cancel the current Mr. Speedy booking for Order #${selectedOrder.storeOrderNumber}?`}
+                        onConfirm={() => {
+                          this.setState(
+                            {cancelMrspeedyBookingModal: false},
+                            () => {
+                              this.cancelMrspeedyBooking();
+                            },
+                          );
+                        }}
+                        closeModal={() =>
+                          this.setState({cancelMrspeedyBookingModal: false})
+                        }
+                      />
+
                       <CardItemHeader
                         title={
                           <View
@@ -530,10 +582,22 @@ class OrderDetailsScreen extends Component {
                               }}
                             />
 
+                            {selectedOrder.mrspeedyBookingData.order.status ===
+                              'new' ||
+                              selectedOrder.mrspeedyBookingData.order.status ===
+                                'available' ||
+                              selectedOrder.mrspeedyBookingData.order.status ===
+                                'active' ||
+                              selectedOrder.mrspeedyBookingData.order.status ===
+                                'delayed'}
                             <Button
                               title="Cancel Booking"
                               type="clear"
-                              onPress={() => this.cancelMrspeedyBooking()}
+                              onPress={() =>
+                                this.setState({
+                                  cancelMrspeedyBookingModal: true,
+                                })
+                              }
                             />
                           </View>
                         }
@@ -674,16 +738,10 @@ class OrderDetailsScreen extends Component {
                           this.setState({allowDragging: true})
                         }
                         courierCoordinates={
-                          selectedOrder.mrspeedyBookingData.order.courier
+                          courier
                             ? {
-                                latitude: Number(
-                                  selectedOrder.mrspeedyBookingData.order
-                                    .courier.latitude,
-                                ),
-                                longitude: Number(
-                                  selectedOrder.mrspeedyBookingData.order
-                                    .courier.longitude,
-                                ),
+                                latitude: Number(courier.latitude),
+                                longitude: Number(courier.longitude),
                               }
                             : null
                         }

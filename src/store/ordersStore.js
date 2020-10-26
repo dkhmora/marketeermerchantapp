@@ -265,7 +265,18 @@ class OrdersStore {
     return await functions
       .httpsCallable('cancelMrSpeedyOrder')({orderId})
       .then((response) => {
-        return response;
+        return response.data;
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+      });
+  }
+
+  @action async getMrSpeedyCourierInfo(mrspeedyOrderId) {
+    return await functions
+      .httpsCallable('getMrSpeedyCourierInfo')({mrspeedyOrderId})
+      .then((response) => {
+        return response.data;
       })
       .catch((err) => {
         Toast({text: err.message, type: 'danger'});
