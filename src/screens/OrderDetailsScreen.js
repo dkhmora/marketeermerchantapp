@@ -123,7 +123,7 @@ class OrderDetailsScreen extends Component {
       }
 
       if (deliveryMethod === 'Mr. Speedy') {
-        if (mrspeedyBookingData.estimatedOrderPrices) {
+        if (mrspeedyBookingData && mrspeedyBookingData.estimatedOrderPrices) {
           return `₱${mrspeedyBookingData.estimatedOrderPrices.motorbike} - ₱${mrspeedyBookingData.estimatedOrderPrices.car}`;
         }
 
@@ -883,6 +883,7 @@ class OrderDetailsScreen extends Component {
                               fontSize: 18,
                               color: colors.text_primary,
                               fontFamily: 'ProductSans-Black',
+                              textAlign: 'right',
                             }}>
                             {this.orderTotalText}
                           </Text>
