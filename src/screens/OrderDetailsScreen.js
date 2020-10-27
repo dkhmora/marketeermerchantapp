@@ -80,7 +80,10 @@ class OrderDetailsScreen extends Component {
   @computed get mrspeedyOrderStatus() {
     const {selectedOrder} = this.props.ordersStore;
 
-    if (selectedOrder.mrspeedyBookingData) {
+    if (
+      selectedOrder.mrspeedyBookingData &&
+      selectedOrder.mrspeedyBookingData.order
+    ) {
       const {status} = selectedOrder.mrspeedyBookingData.order;
 
       switch (status) {
@@ -104,21 +107,66 @@ class OrderDetailsScreen extends Component {
   @computed get deliveryPriceText() {
     const {selectedOrder} = this.props.ordersStore;
 
-    if (selectedOrder.deliveryPrice) {
-      if (selectedOrder.deliveryPrice > 0) {
-        return `₱${selectedOrder.deliveryPrice}`;
+    if (selectedOrder) {
+      const {
+        deliveryPrice,
+        deliveryMethod,
+        mrspeedyBookingData,
+      } = selectedOrder;
+
+      if (deliveryPrice && deliveryPrice > 0) {
+        if (deliveryPrice > 0) {
+          return `₱${selectedOrder.deliveryPrice}`;
+        }
+
+        return '₱0';
       }
 
-      if (selectedOrder.deliveryPrice === 0) {
-        return '₱0 (Free Delivery)';
+      if (deliveryMethod === 'Mr. Speedy') {
+        if (mrspeedyBookingData.estimatedOrderPrices) {
+          return `₱${mrspeedyBookingData.estimatedOrderPrices.motorbike} - ₱${mrspeedyBookingData.estimatedOrderPrices.car}`;
+        }
+
+        return 'To be determined once order is shipped';
       }
     }
 
-    if (selectedOrder.deliveryMethod === 'Mr. Speedy') {
-      return '(Will be shown upon booking of Mr. Speedy delivery)';
+    return 'N/A';
+  }
+
+  @computed get orderTotalText() {
+    const {selectedOrder} = this.props.ordersStore;
+
+    if (selectedOrder) {
+      const {
+        deliveryPrice,
+        deliveryMethod,
+        mrspeedyBookingData,
+        subTotal,
+      } = selectedOrder;
+
+      if (deliveryPrice) {
+        if (deliveryPrice > 0) {
+          return `₱${(subTotal + deliveryPrice).toFixed(2)}`;
+        }
+      }
+
+      if (deliveryMethod === 'Mr. Speedy') {
+        if (mrspeedyBookingData) {
+          const {estimatedOrderPrices} = mrspeedyBookingData;
+
+          if (estimatedOrderPrices) {
+            return `₱${(subTotal + estimatedOrderPrices.motorbike).toFixed(
+              2,
+            )} - ₱${(subTotal + estimatedOrderPrices.car).toFixed(2)}`;
+          }
+        }
+
+        return 'To be determined once order is shipped';
+      }
     }
 
-    return 'Unknown';
+    return 'N/A';
   }
 
   componentDidMount() {
@@ -136,7 +184,8 @@ class OrderDetailsScreen extends Component {
     if (
       this.props.ordersStore.selectedOrder &&
       this.props.ordersStore.selectedOrder.deliveryMethod === 'Mr. Speedy' &&
-      this.props.ordersStore.selectedOrder.mrspeedyBookingData !== undefined
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData &&
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
     ) {
       if (
         this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
@@ -541,214 +590,217 @@ class OrderDetailsScreen extends Component {
                     </CardItem>
                   </Card>
 
-                  {selectedOrder.mrspeedyBookingData && (
-                    <Card
-                      style={{
-                        borderRadius: 10,
-                        overflow: 'hidden',
-                      }}>
-                      <ConfirmationModal
-                        isVisible={this.state.cancelMrspeedyBookingModal}
-                        title="Are you sure?"
-                        body={`Do you want to cancel the current Mr. Speedy booking for Order #${selectedOrder.storeOrderNumber}?`}
-                        onConfirm={() => {
-                          this.setState(
-                            {cancelMrspeedyBookingModal: false},
-                            () => {
-                              this.cancelMrspeedyBooking();
-                            },
-                          );
-                        }}
-                        closeModal={() =>
-                          this.setState({cancelMrspeedyBookingModal: false})
-                        }
-                      />
+                  {selectedOrder.mrspeedyBookingData &&
+                    selectedOrder.mrspeedyBookingData.order && (
+                      <Card
+                        style={{
+                          borderRadius: 10,
+                          overflow: 'hidden',
+                        }}>
+                        <ConfirmationModal
+                          isVisible={this.state.cancelMrspeedyBookingModal}
+                          title="Are you sure?"
+                          body={`Do you want to cancel the current Mr. Speedy booking for Order #${selectedOrder.storeOrderNumber}?`}
+                          onConfirm={() => {
+                            this.setState(
+                              {cancelMrspeedyBookingModal: false},
+                              () => {
+                                this.cancelMrspeedyBooking();
+                              },
+                            );
+                          }}
+                          closeModal={() =>
+                            this.setState({cancelMrspeedyBookingModal: false})
+                          }
+                        />
 
-                      <CardItemHeader
-                        title={
-                          <View
-                            style={{
-                              flex: 1,
-                              flexDirection: 'row',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                            }}>
-                            <Image
-                              source={require('../../assets/images/mrspeedy-logo.png')}
+                        <CardItemHeader
+                          title={
+                            <View
                               style={{
-                                height: 50,
-                                width: 100,
-                                resizeMode: 'contain',
-                              }}
-                            />
-
-                            {selectedOrder.mrspeedyBookingData.order.status ===
-                              'new' ||
-                              selectedOrder.mrspeedyBookingData.order.status ===
-                                'available' ||
-                              selectedOrder.mrspeedyBookingData.order.status ===
-                                'active' ||
-                              selectedOrder.mrspeedyBookingData.order.status ===
-                                'delayed'}
-                            <Button
-                              title="Cancel Booking"
-                              type="clear"
-                              onPress={() =>
-                                this.setState({
-                                  cancelMrspeedyBookingModal: true,
-                                })
-                              }
-                            />
-                          </View>
-                        }
-                      />
-
-                      <CardItem bordered>
-                        <Left>
-                          <Text
-                            style={{
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                            }}>
-                            Status:
-                          </Text>
-                        </Left>
-
-                        <Right>
-                          <Text
-                            style={{
-                              color: colors.primary,
-                              fontSize: 16,
-                              textAlign: 'right',
-                            }}>
-                            {this.mrspeedyOrderStatus}
-                          </Text>
-                        </Right>
-                      </CardItem>
-
-                      <CardItem bordered>
-                        <Left>
-                          <Text
-                            style={{
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                            }}>
-                            Status Description:
-                          </Text>
-                        </Left>
-
-                        <Right>
-                          <Text
-                            style={{
-                              color: colors.text_primary,
-                              fontSize: 16,
-                              textAlign: 'right',
-                            }}>
-                            {
-                              selectedOrder.mrspeedyBookingData.order
-                                .status_description
-                            }
-                          </Text>
-                        </Right>
-                      </CardItem>
-
-                      {selectedOrder.mrspeedyBookingData.order.courier && (
-                        <View>
-                          <CardItem bordered>
-                            <Left>
-                              <Text
+                                flex: 1,
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                              }}>
+                              <Image
+                                source={require('../../assets/images/mrspeedy-logo.png')}
                                 style={{
-                                  fontSize: 16,
-                                  fontFamily: 'ProductSans-Bold',
-                                }}>
-                                Courier Name:
-                              </Text>
-                            </Left>
+                                  height: 50,
+                                  width: 100,
+                                  resizeMode: 'contain',
+                                }}
+                              />
 
-                            <Right>
-                              <Text
-                                style={{
-                                  color: colors.text_primary,
-                                  fontSize: 16,
-                                  textAlign: 'right',
-                                }}>
-                                {`${selectedOrder.mrspeedyBookingData.order.courier.name} ${selectedOrder.mrspeedyBookingData.order.courier.surname}`}
-                              </Text>
-                            </Right>
-                          </CardItem>
-
-                          <CardItem bordered>
-                            <Left>
-                              <Text
-                                style={{
-                                  fontSize: 16,
-                                  fontFamily: 'ProductSans-Bold',
-                                }}>
-                                Courier Phone Number:
-                              </Text>
-                            </Left>
-
-                            <Right>
-                              <Text
-                                style={{
-                                  color: colors.text_primary,
-                                  fontSize: 16,
-                                  textAlign: 'right',
-                                }}>
-                                +
-                                {
-                                  selectedOrder.mrspeedyBookingData.order
-                                    .courier.phone
+                              {selectedOrder.mrspeedyBookingData.order
+                                .status === 'new' ||
+                                selectedOrder.mrspeedyBookingData.order
+                                  .status === 'available' ||
+                                selectedOrder.mrspeedyBookingData.order
+                                  .status === 'active' ||
+                                selectedOrder.mrspeedyBookingData.order
+                                  .status === 'delayed'}
+                              <Button
+                                title="Cancel Booking"
+                                type="clear"
+                                onPress={() =>
+                                  this.setState({
+                                    cancelMrspeedyBookingModal: true,
+                                  })
                                 }
-                              </Text>
-                            </Right>
-                          </CardItem>
-                        </View>
-                      )}
+                              />
+                            </View>
+                          }
+                        />
 
-                      <CardItem bordered>
-                        <Left>
-                          <Text
-                            style={{
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                            }}>
-                            Courier Vehicle:
-                          </Text>
-                        </Left>
+                        <CardItem bordered>
+                          <Left>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Bold',
+                              }}>
+                              Status:
+                            </Text>
+                          </Left>
 
-                        <Right>
-                          <Text
-                            style={{
-                              color: colors.text_primary,
-                              fontSize: 16,
-                              textAlign: 'right',
-                            }}>
-                            {this.mrspeedyVehicleType}
-                          </Text>
-                        </Right>
-                      </CardItem>
+                          <Right>
+                            <Text
+                              style={{
+                                color: colors.primary,
+                                fontSize: 16,
+                                textAlign: 'right',
+                              }}>
+                              {this.mrspeedyOrderStatus}
+                            </Text>
+                          </Right>
+                        </CardItem>
 
-                      <MapCardItem
-                        onTouchStart={() =>
-                          this.setState({allowDragging: false})
-                        }
-                        onTouchEnd={() => this.setState({allowDragging: true})}
-                        onTouchCancel={() =>
-                          this.setState({allowDragging: true})
-                        }
-                        courierCoordinates={
-                          courier
-                            ? {
-                                latitude: Number(courier.latitude),
-                                longitude: Number(courier.longitude),
+                        <CardItem bordered>
+                          <Left>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Bold',
+                              }}>
+                              Status Description:
+                            </Text>
+                          </Left>
+
+                          <Right>
+                            <Text
+                              style={{
+                                color: colors.text_primary,
+                                fontSize: 16,
+                                textAlign: 'right',
+                              }}>
+                              {
+                                selectedOrder.mrspeedyBookingData.order
+                                  .status_description
                               }
-                            : null
-                        }
-                        vehicleType={this.mrspeedyVehicleType}
-                      />
-                    </Card>
-                  )}
+                            </Text>
+                          </Right>
+                        </CardItem>
+
+                        {selectedOrder.mrspeedyBookingData.order.courier && (
+                          <View>
+                            <CardItem bordered>
+                              <Left>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                    fontFamily: 'ProductSans-Bold',
+                                  }}>
+                                  Courier Name:
+                                </Text>
+                              </Left>
+
+                              <Right>
+                                <Text
+                                  style={{
+                                    color: colors.text_primary,
+                                    fontSize: 16,
+                                    textAlign: 'right',
+                                  }}>
+                                  {`${selectedOrder.mrspeedyBookingData.order.courier.name} ${selectedOrder.mrspeedyBookingData.order.courier.surname}`}
+                                </Text>
+                              </Right>
+                            </CardItem>
+
+                            <CardItem bordered>
+                              <Left>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                    fontFamily: 'ProductSans-Bold',
+                                  }}>
+                                  Courier Phone Number:
+                                </Text>
+                              </Left>
+
+                              <Right>
+                                <Text
+                                  style={{
+                                    color: colors.text_primary,
+                                    fontSize: 16,
+                                    textAlign: 'right',
+                                  }}>
+                                  +
+                                  {
+                                    selectedOrder.mrspeedyBookingData.order
+                                      .courier.phone
+                                  }
+                                </Text>
+                              </Right>
+                            </CardItem>
+                          </View>
+                        )}
+
+                        <CardItem bordered>
+                          <Left>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Bold',
+                              }}>
+                              Courier Vehicle:
+                            </Text>
+                          </Left>
+
+                          <Right>
+                            <Text
+                              style={{
+                                color: colors.text_primary,
+                                fontSize: 16,
+                                textAlign: 'right',
+                              }}>
+                              {this.mrspeedyVehicleType}
+                            </Text>
+                          </Right>
+                        </CardItem>
+
+                        <MapCardItem
+                          onTouchStart={() =>
+                            this.setState({allowDragging: false})
+                          }
+                          onTouchEnd={() =>
+                            this.setState({allowDragging: true})
+                          }
+                          onTouchCancel={() =>
+                            this.setState({allowDragging: true})
+                          }
+                          courierCoordinates={
+                            courier
+                              ? {
+                                  latitude: Number(courier.latitude),
+                                  longitude: Number(courier.longitude),
+                                }
+                              : null
+                          }
+                          vehicleType={this.mrspeedyVehicleType}
+                        />
+                      </Card>
+                    )}
 
                   <Card
                     style={{
@@ -784,7 +836,7 @@ class OrderDetailsScreen extends Component {
                               color: colors.text_primary,
                               fontFamily: 'ProductSans-Black',
                             }}>
-                            {`₱${selectedOrder.subTotal}`}
+                            {`₱${selectedOrder.subTotal.toFixed(2)}`}
                           </Text>
                         </View>
 
@@ -832,11 +884,7 @@ class OrderDetailsScreen extends Component {
                               color: colors.text_primary,
                               fontFamily: 'ProductSans-Black',
                             }}>
-                            ₱
-                            {selectedOrder.subTotal +
-                              (selectedOrder.deliveryPrice
-                                ? selectedOrder.deliveryPrice
-                                : 0)}
+                            {this.orderTotalText}
                           </Text>
                         </View>
                       </Right>
