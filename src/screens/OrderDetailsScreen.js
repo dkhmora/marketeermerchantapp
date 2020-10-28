@@ -900,8 +900,13 @@ class OrderDetailsScreen extends Component {
                       <Button
                         onPress={() => {
                           if (
-                            selectedOrder.deliveryMethod === 'Mr. Speedy' &&
-                            selectedOrder.orderStatus.paid.status
+                            (selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+                              selectedOrder.paymentMethod === 'COD' &&
+                              selectedOrder.orderStatus.paid.status) ||
+                            (selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+                              selectedOrder.paymentMethod ===
+                                'Online Banking' &&
+                              selectedOrder.orderStatus.pending.status)
                           ) {
                             this.mrspeedyBottomSheet.bottomSheet &&
                               this.mrspeedyBottomSheet.bottomSheet.snapTo(1);

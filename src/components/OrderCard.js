@@ -279,8 +279,12 @@ class OrderCard extends PureComponent {
                 }}
                 onPress={() => {
                   if (
-                    order.deliveryMethod === 'Mr. Speedy' &&
-                    order.orderStatus.paid.status
+                    (order.deliveryMethod === 'Mr. Speedy' &&
+                      order.paymentMethod === 'COD' &&
+                      order.orderStatus.paid.status) ||
+                    (order.deliveryMethod === 'Mr. Speedy' &&
+                      order.paymentMethod === 'Online Banking' &&
+                      order.orderStatus.pending.status)
                   ) {
                     this.props.ordersStore.selectedOrder = order;
 

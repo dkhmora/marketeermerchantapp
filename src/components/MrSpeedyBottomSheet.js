@@ -273,6 +273,11 @@ class MrSpeedyBottomSheet extends Component {
     } = this.state;
     const {clearSelectedOrderOnClose} = this.props;
     const {selectedOrder} = this.props.ordersStore;
+    const preBooking =
+      selectedOrder &&
+      selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+      selectedOrder.paymentMethod === 'Online Banking' &&
+      selectedOrder.orderStatus.pending.status;
 
     return (
       <View style={{...StyleSheet.absoluteFillObject}}>
@@ -548,7 +553,7 @@ class MrSpeedyBottomSheet extends Component {
                       storePhoneNumber.length <= 0 ||
                       storePhoneNumberError !== null
                     }
-                    title="Place Order"
+                    title={preBooking ? 'Accept Order' : 'Place Order'}
                     titleStyle={{color: colors.icons}}
                     containerStyle={{
                       borderRadius: 24,
