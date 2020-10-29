@@ -420,7 +420,7 @@ class EditFoodItemModal extends Component {
                 justifyContent: 'space-between',
                 paddingBottom: 10,
               }}>
-              <View style={{flex: 1}}>
+              <View style={{flex: 1, height: 150}}>
                 {imageDisplay && (
                   <FastImage
                     source={imageDisplay}

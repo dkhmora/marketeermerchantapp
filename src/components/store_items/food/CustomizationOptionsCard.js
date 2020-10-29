@@ -10,10 +10,95 @@ class CustomizationOptionsCard extends Component {
     this.state = {};
   }
 
+  OptionsList(props) {
+    const {options, checkedIcon, uncheckedIcon} = props;
+
+    if (options) {
+      return options.map((item, index) => {
+        return (
+          <View>
+            {index !== 0 && <Divider />}
+
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <CheckBox
+                disabled
+                center
+                title={
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      paddingHorizontal: 10,
+                    }}>
+                    <Text style={{flex: 1}}>{item.title}</Text>
+
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        marginRight: -10,
+                      }}>
+                      <Text
+                        style={{
+                          fontFamily: 'ProductSans-Bold',
+                          textAlign: 'center',
+                        }}>
+                        +₱{item.price.toFixed(2)}
+                      </Text>
+
+                      <Button
+                        type="clear"
+                        icon={
+                          <Icon name="x" color={colors.primary} size={20} />
+                        }
+                      />
+                    </View>
+                  </View>
+                }
+                checkedIcon={checkedIcon}
+                uncheckedIcon={uncheckedIcon}
+                containerStyle={{
+                  flex: 1,
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  paddingBottom: 0,
+                  paddingTop: 0,
+                  borderRadius: 0,
+                  backgroundColor: colors.icons,
+                  elevation: 0,
+                  shadowColor: '#000',
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 1.41,
+                  paddingHorizontal: 5,
+                  marginRight: 0,
+                  marginLeft: 0,
+                }}
+              />
+            </View>
+          </View>
+        );
+      });
+    }
+  }
+
   render() {
     const {title, multipleSelection, options} = this.props;
     const checkedIcon = multipleSelection ? 'checked-square-o' : 'dot-circle-o';
     const uncheckedIcon = multipleSelection ? 'square-o' : 'circle-o';
+    const {OptionsList} = this;
 
     return (
       <Card
@@ -56,46 +141,11 @@ class CustomizationOptionsCard extends Component {
           />
         </View>
 
-        <View style={{paddingBottom: 10}}>
-          {options &&
-            options.map((item) => {
-              return (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
-                  <CheckBox
-                    disabled
-                    center
-                    title={item.title}
-                    checkedIcon={checkedIcon}
-                    uncheckedIcon={uncheckedIcon}
-                    containerStyle={{
-                      flex: 1,
-                      alignItems: 'flex-start',
-                      justifyContent: 'center',
-                    }}
-                    textStyle={{
-                      flex: 1,
-                    }}
-                  />
-
-                  <View
-                    style={{
-                      width: 70,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Text style={{fontFamily: 'ProductSans-Bold'}}>
-                      +₱{item.price.toFixed(2)}
-                    </Text>
-                  </View>
-                </View>
-              );
-            })}
-        </View>
+        <OptionsList
+          options={options}
+          checkedIcon={checkedIcon}
+          uncheckedIcon={uncheckedIcon}
+        />
 
         <Divider />
 
