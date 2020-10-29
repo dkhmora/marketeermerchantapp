@@ -1,4 +1,4 @@
-import {observable, action} from 'mobx';
+import {observable, action, toJS} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
 import firebase from '@react-native-firebase/app';
 import '@react-native-firebase/functions';
@@ -20,6 +20,49 @@ class OrdersStore {
   @observable cancelOrderModal = false;
   @observable selectedOrder = null;
   @observable selectedCancelOrder = null;
+  @observable mrspeedyBottomSheet = null;
+  @observable mrspeedyBottomSheetSnapIndex = null;
+
+  @action async getMrspeedyOrderPriceEstimate({
+    subTotal,
+    deliveryLatitude,
+    deliveryLongitude,
+    storeLatitude,
+    storeLongitude,
+    deliveryAddress,
+    vehicleType,
+    orderWeight,
+    storeAddress,
+    paymentMethod,
+  }) {
+    const storeLocation = {
+      latitude: storeLatitude,
+      longitude: storeLongitude,
+    };
+
+    const deliveryLocation = {
+      latitude: deliveryLatitude,
+      longitude: deliveryLongitude,
+    };
+
+    return await functions
+      .httpsCallable('getMerchantMrSpeedyDeliveryPriceEstimate')({
+        subTotal,
+        deliveryLocation,
+        deliveryAddress,
+        storeLocation,
+        vehicleType,
+        orderWeight,
+        storeAddress,
+        paymentMethod,
+      })
+      .then((response) => {
+        return response;
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+      });
+  }
 
   @action async getImageUrl(imageRef) {
     const ref = storage().ref(imageRef);
@@ -186,9 +229,19 @@ class OrdersStore {
       });
   }
 
-  @action async setOrderStatus(orderId, storeId, merchantId) {
+  @action async setOrderStatus(
+    orderId,
+    storeId,
+    merchantId,
+    mrspeedyBookingData,
+  ) {
     return await functions
-      .httpsCallable('changeOrderStatus')({orderId, storeId, merchantId})
+      .httpsCallable('changeOrderStatus')({
+        orderId,
+        storeId,
+        merchantId,
+        mrspeedyBookingData,
+      })
       .then((response) => {
         return response;
       })
@@ -202,6 +255,28 @@ class OrdersStore {
       .httpsCallable('cancelOrder')({orderId, cancelReason})
       .then((response) => {
         return response;
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+      });
+  }
+
+  @action async cancelMrspeedyBooking(orderId) {
+    return await functions
+      .httpsCallable('cancelMrSpeedyOrder')({orderId})
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+      });
+  }
+
+  @action async getMrSpeedyCourierInfo(mrspeedyOrderId) {
+    return await functions
+      .httpsCallable('getMrSpeedyCourierInfo')({mrspeedyOrderId})
+      .then((response) => {
+        return response.data;
       })
       .catch((err) => {
         Toast({text: err.message, type: 'danger'});

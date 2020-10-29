@@ -262,8 +262,7 @@ class LoginScreen extends Component {
 
                 <TouchableOpacity onPress={() => this.openTermsAndConditions()}>
                   <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
-                    {' '}
-                    Terms and Conditions{' '}
+                    {' Terms and Conditions'}
                   </Text>
                 </TouchableOpacity>
 
@@ -274,8 +273,7 @@ class LoginScreen extends Component {
 
                 <TouchableOpacity onPress={() => this.openPrivacyPolicy()}>
                   <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
-                    {' '}
-                    Privacy Policy
+                    {' Privacy Policy'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -305,7 +303,7 @@ class LoginScreen extends Component {
                     flexWrap: 'wrap',
                   }}>
                   <Text style={styles.color_textPrivate}>
-                    Are you a merchant?{' '}
+                    {'Are you a merchant? '}
                   </Text>
 
                   <TouchableOpacity

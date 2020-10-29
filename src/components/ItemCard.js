@@ -3,7 +3,6 @@ import {Card, CardItem, Body} from 'native-base';
 import {View, ActivityIndicator} from 'react-native';
 import {Text} from 'react-native-elements';
 import moment from 'moment';
-import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
 import {computed} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -12,6 +11,7 @@ import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import FastImage from 'react-native-fast-image';
 import ConfirmationModal from './ConfirmationModal';
+import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 
 @inject('itemsStore')
 @inject('authStore')
@@ -23,7 +23,8 @@ class ItemCard extends PureComponent {
 
     this.state = {
       url: require('../../assets/placeholder.jpg'),
-      loaded: false,
+      imageReady: false,
+      imageWidth: null,
       deleting: false,
       deleteItemConfirmModal: false,
     };
@@ -34,17 +35,13 @@ class ItemCard extends PureComponent {
   }
 
   getImage = async () => {
-    const ref = storage().ref(this.props.item.image);
-    const link = await ref.getDownloadURL().catch((err) => {
-      Toast({text: err.message, type: 'danger'});
-      return null;
-    });
-
-    if (link) {
-      this.setState({url: {uri: link}});
+    if (this.props.item.image) {
+      this.setState({imageReady: false}, () => {
+        this.setState({
+          url: {uri: `https://cdn.marketeer.ph${this.props.item.image}`},
+        });
+      });
     }
-
-    this.setState({loaded: true});
   };
 
   handleDelete() {
@@ -63,29 +60,20 @@ class ItemCard extends PureComponent {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.item !== this.props.item) {
-      this.setState({loaded: false});
-    }
-
-    if (!this.state.loaded && this.props.item.image) {
+    if (prevProps.item.image !== this.props.item.image) {
       this.getImage();
     }
   }
 
   componentDidMount() {
-    const {url} = this.state;
-
-    if (
-      url === require('../../assets/placeholder.jpg') &&
-      this.props.item.image
-    ) {
+    if (this.props.item.image) {
       this.getImage();
     }
   }
 
   render() {
     const {item, ...otherProps} = this.props;
-    const {url} = this.state;
+    const {url, imageReady, imageWidth} = this.state;
 
     return (
       <View
@@ -164,14 +152,39 @@ class ItemCard extends PureComponent {
           </CardItem>
 
           <CardItem cardBody>
-            <FastImage
-              source={url}
-              style={{
-                height: 150,
-                aspectRatio: 1,
-                flex: 1,
-              }}
-            />
+            <View
+              style={{flex: 1}}
+              onLayout={(event) => {
+                const {width} = event.nativeEvent.layout;
+                this.setState({imageWidth: width});
+              }}>
+              <FastImage
+                source={url}
+                style={{
+                  aspectRatio: 1,
+                  flex: 1,
+                }}
+                onLoad={() => this.setState({imageReady: true})}
+              />
+
+              {!imageReady && (
+                <View
+                  style={{
+                    position: 'absolute',
+                  }}>
+                  <Placeholder Animation={Fade}>
+                    <PlaceholderMedia
+                      style={{
+                        backgroundColor: colors.primary,
+                        aspectRatio: 1,
+                        width: imageWidth ? imageWidth : 0,
+                        height: imageWidth ? imageWidth : 0,
+                      }}
+                    />
+                  </Placeholder>
+                </View>
+              )}
+            </View>
           </CardItem>
 
           <CardItem

@@ -97,7 +97,7 @@ class StoreDetailsScreen extends Component {
                 color: colors.text_primary,
                 textAlign: 'justify',
               }}>
-              Payment Gateway Fee:{' '}
+              {'Payment Gateway Fee: '}
             </Text>
             <Text
               style={{
@@ -121,7 +121,7 @@ class StoreDetailsScreen extends Component {
               style={{
                 fontSize: 16,
               }}>
-              {item.successfulTransactionCount}{' '}
+              {`${item.successfulTransactionCount} `}
               {item.successfulTransactionCount < 2
                 ? 'transaction'
                 : 'transactions'}

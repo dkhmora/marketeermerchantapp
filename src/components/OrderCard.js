@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
-import {Card, CardItem, Left, Body, Right} from 'native-base';
-import {ActivityIndicator, View} from 'react-native';
+import {Card, CardItem, Left, Right} from 'native-base';
+import {ActivityIndicator, TouchableWithoutFeedback, View} from 'react-native';
 import moment from 'moment';
 import {observer, inject} from 'mobx-react';
 import {Icon, Button, Text, Badge} from 'react-native-elements';
@@ -107,12 +107,20 @@ class OrderCard extends PureComponent {
           header
           bordered
           button
+          activeOpacity={0.8}
           onPress={() =>
             navigation.navigate('Order Chat', {
               orderId: order.orderId,
             })
           }
-          style={{backgroundColor: colors.primary}}>
+          style={{
+            backgroundColor: colors.icons,
+            paddingLeft: 10,
+            paddingRight: 10,
+            paddingTop: 5,
+            paddingBottom: 5,
+            elevation: 1,
+          }}>
           <View
             style={{
               flex: 2,
@@ -126,7 +134,7 @@ class OrderCard extends PureComponent {
                   paddingHorizontal: 5,
                   paddingTop: 5,
                 }}>
-                <Icon name="message-square" color={colors.icons} />
+                <Icon name="message-square" color={colors.primary} />
 
                 {order.storeUnreadCount !== null &&
                   order.storeUnreadCount > 0 && (
@@ -137,21 +145,21 @@ class OrderCard extends PureComponent {
                     />
                   )}
               </View>
-              <Text style={{color: colors.icons}}>Chat</Text>
+              <Text style={{color: colors.primary}}>Chat</Text>
             </View>
 
             <View
               style={{flex: 1, flexDirection: 'column', paddingHorizontal: 10}}>
               <Text
                 style={{
-                  color: '#fff',
+                  color: colors.primary,
                   fontFamily: 'ProductSans-Regular',
                   fontSize: 18,
                 }}>
                 {order.userName}
               </Text>
 
-              <Text style={{color: '#eee'}}>
+              <Text style={{color: colors.text_secondary}}>
                 Order # {order.storeOrderNumber}
               </Text>
 
@@ -181,10 +189,9 @@ class OrderCard extends PureComponent {
           <Card
             style={{
               flex: 1,
-              backgroundColor: '#F8BBD0',
+              backgroundColor: colors.primary,
               borderRadius: 16,
               paddingVertical: 10,
-              paddingHorizontal: 5,
             }}>
             <View
               style={{
@@ -194,20 +201,20 @@ class OrderCard extends PureComponent {
               }}>
               <Text
                 style={{
-                  color: colors.primary,
+                  color: colors.icons,
                   fontFamily: 'ProductSans-Black',
                   fontSize: 16,
                   textAlign: 'center',
                 }}>
                 {order.transactionFee || order.transactionFee === 0
-                  ? `₱${order.transactionFee.toPrecision(3)}`
+                  ? `₱${order.transactionFee.toFixed(2)}`
                   : 'Unknown'}
               </Text>
 
               <Text
                 style={{
                   fontSize: 16,
-                  color: colors.text_primary,
+                  color: colors.icons,
                   textAlign: 'center',
                 }}>
                 Transaction Fee
@@ -221,7 +228,8 @@ class OrderCard extends PureComponent {
                 <ActivityIndicator size="small" color={colors.icons} />
               ) : (
                 <BaseOptionsMenu
-                  iconStyle={{color: '#fff', fontSize: 27}}
+                  iconStyle={{fontSize: 27}}
+                  iconColor={colors.primary}
                   destructiveIndex={1}
                   options={['Cancel Order']}
                   actions={[
@@ -239,28 +247,63 @@ class OrderCard extends PureComponent {
     };
 
     const CardFooter = () => {
+      const footerText =
+        buttonText === 'Complete' && order.deliveryMethod === 'Mr. Speedy'
+          ? 'Order will be completed once the courier delivers the items to the customer'
+          : tabName === 'Unpaid' && order.paymentMethod === 'Online Banking'
+          ? 'Order will be ready to ship after the customer pays'
+          : '';
+
       return (
-        <CardItem footer bordered>
+        <CardItem footer style={{paddingTop: 0, paddingBottom: 10}}>
           <Left>
             <Text style={{color: colors.primary}}>{this.orderStatus}</Text>
             <Text> - {this.timeStamp}</Text>
           </Left>
           <Right>
-            {buttonText && (
+            {buttonText &&
+            !(
+              buttonText === 'Complete' && order.deliveryMethod === 'Mr. Speedy'
+            ) ? (
               <Button
                 title={buttonText}
                 titleStyle={{color: colors.icons}}
                 loading={this.state.loading}
                 loadingProps={{size: 'small', color: colors.icons}}
-                buttonStyle={{backgroundColor: colors.accent}}
+                buttonStyle={{backgroundColor: colors.accent, elevation: 5}}
                 containerStyle={{
                   borderRadius: 24,
                   borderWidth: 1,
                   borderColor: colors.accent,
                   width: '100%',
                 }}
-                onPress={() => this.setState({changeOrderStatusModal: true})}
+                onPress={() => {
+                  if (
+                    (order.deliveryMethod === 'Mr. Speedy' &&
+                      order.paymentMethod === 'COD' &&
+                      order.orderStatus.paid.status) ||
+                    (order.deliveryMethod === 'Mr. Speedy' &&
+                      order.paymentMethod === 'Online Banking' &&
+                      order.orderStatus.pending.status)
+                  ) {
+                    this.props.ordersStore.selectedOrder = order;
+
+                    if (this.props.ordersStore.mrspeedyBottomSheet) {
+                      this.props.ordersStore.mrspeedyBottomSheet.getMrspeedyOrderPriceEstimate();
+                      this.props.ordersStore.mrspeedyBottomSheet.bottomSheet.snapTo(
+                        1,
+                      );
+                    }
+                  } else {
+                    this.setState({changeOrderStatusModal: true});
+                  }
+                }}
+                //onPress={() => this.setState({changeOrderStatusModal: true})}
               />
+            ) : (
+              <Text style={{textAlign: 'right', color: colors.text_secondary}}>
+                {footerText}
+              </Text>
             )}
           </Right>
         </CardItem>
@@ -292,61 +335,51 @@ class OrderCard extends PureComponent {
 
         <Card {...otherProps} style={{borderRadius: 10, overflow: 'hidden'}}>
           <CardHeader />
-          <CardItem bordered>
-            <Left>
-              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
-                Delivery Address:
-              </Text>
-            </Left>
-            <Right>
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontFamily: 'ProductSans-Black',
-                  fontSize: 16,
-                  textAlign: 'right',
-                }}>
-                {order.deliveryAddress}
-              </Text>
-            </Right>
-          </CardItem>
-          <CardItem bordered>
-            <Left>
-              <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 16}}>
-                Total Amount:
-              </Text>
-            </Left>
-            <Right>
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontFamily: 'ProductSans-Black',
-                  fontSize: 16,
-                }}>
-                ₱ {order.subTotal}
-              </Text>
-              <Text note>{order.quantity} items</Text>
-            </Right>
-          </CardItem>
-          <CardItem>
-            <Body>
-              <Button
-                title="View Full Order"
-                onPress={this.handleViewOrderItems.bind(this)}
-                loading={this.state.loading}
-                loadingProps={{size: 'small', color: colors.accent}}
-                titleStyle={{color: colors.accent}}
-                buttonStyle={{backgroundColor: colors.icons}}
-                containerStyle={{
-                  borderRadius: 24,
-                  borderWidth: 1,
-                  borderColor: colors.accent,
-                  width: '100%',
-                }}
-              />
-            </Body>
-          </CardItem>
-          <CardFooter />
+
+          <TouchableWithoutFeedback
+            onPress={this.handleViewOrderItems.bind(this)}>
+            <View>
+              <CardItem style={{flexDirection: 'row'}}>
+                <View style={{flex: 1}}>
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      fontSize: 16,
+                      fontFamily: 'ProductSans-Bold',
+                      flexWrap: 'wrap',
+                    }}>
+                    {order.deliveryAddress}
+                  </Text>
+                  <Text style={{fontSize: 14}}>{order.deliveryMethod}</Text>
+                </View>
+
+                <View
+                  style={{
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    marginLeft: 10,
+                  }}>
+                  <View style={{alignItems: 'center'}}>
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: colors.primary,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>{`₱${order.subTotal}`}</Text>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: colors.text_secondary,
+                      }}>
+                      {`${order.quantity} Items`}
+                    </Text>
+                  </View>
+                </View>
+              </CardItem>
+
+              <CardFooter />
+            </View>
+          </TouchableWithoutFeedback>
         </Card>
       </View>
     );

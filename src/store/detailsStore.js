@@ -11,6 +11,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 
 const functions = firebase.app().functions('asia-northeast1');
 const storesCollection = firestore().collection('stores');
+const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 class DetailsStore {
   @observable storeDetails = {};
   @observable merchantDetails = {};
@@ -219,7 +220,7 @@ class DetailsStore {
   }
 
   @action async deleteImage(imageRef) {
-    return await storage()
+    return await publicStorageBucket
       .ref(imageRef)
       .delete()
       .catch((err) => {
@@ -232,7 +233,7 @@ class DetailsStore {
     const fileExtension = imagePath.split('.').pop();
     const imageRef = `/images/stores/${storeId}/${type}.${fileExtension}`;
 
-    return await storage()
+    return await publicStorageBucket
       .ref(imageRef)
       .putFile(imagePath)
       .then(() =>
@@ -251,8 +252,9 @@ class DetailsStore {
     storeDescription,
     freeDelivery,
     vacationMode,
-    paymentMethods,
-    deliveryMethods,
+    availablePaymentMethods,
+    availableDeliveryMethods,
+    deliveryDiscount,
     deliveryType,
     ownDeliveryServiceFee,
     freeDeliveryMinimum,
@@ -263,8 +265,9 @@ class DetailsStore {
         freeDelivery,
         freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
         vacationMode,
-        paymentMethods: paymentMethods.slice().sort(),
-        deliveryMethods: deliveryMethods.slice().sort(),
+        availablePaymentMethods,
+        availableDeliveryMethods,
+        deliveryDiscount,
         deliveryType,
         ownDeliveryServiceFee: ownDeliveryServiceFee
           ? ownDeliveryServiceFee
