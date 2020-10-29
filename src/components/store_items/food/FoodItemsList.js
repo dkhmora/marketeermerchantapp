@@ -3,10 +3,10 @@ import {FlatList, ActivityIndicator} from 'react-native';
 import {Container, View, Fab} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components
-import ItemCard from './ItemCard';
-import {colors} from '../../assets/colors';
+import FoodItemCard from './FoodItemCard';
+import {colors} from '../../../../assets/colors';
 import {Text, Icon} from 'react-native-elements';
-import Toast from './Toast';
+import Toast from '../../Toast';
 import DeviceInfo from 'react-native-device-info';
 
 @inject('itemsStore')
@@ -50,7 +50,7 @@ class ItemsList extends Component {
     item.empty ? (
       <View style={{flex: 1, backgroundColor: 'transparent'}} key={index} />
     ) : (
-      <ItemCard
+      <FoodItemCard
         item={item}
         key={`${item.name}${this.props.route.params.category}`}
       />
@@ -70,7 +70,7 @@ class ItemsList extends Component {
     }
 
     const isTablet = DeviceInfo.isTablet();
-    const numColumns = isTablet ? 3 : 2;
+    const numColumns = isTablet ? 2 : 1;
 
     return (
       <Container style={{flex: 1}}>

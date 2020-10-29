@@ -6,11 +6,11 @@ import moment from 'moment';
 import {inject, observer} from 'mobx-react';
 import {computed} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
-import BaseOptionsMenu from './BaseOptionsMenu';
-import {colors} from '../../assets/colors';
-import Toast from './Toast';
+import BaseOptionsMenu from '../../BaseOptionsMenu';
+import {colors} from '../../../../assets/colors';
+import Toast from '../../Toast';
 import FastImage from 'react-native-fast-image';
-import ConfirmationModal from './ConfirmationModal';
+import ConfirmationModal from '../../ConfirmationModal';
 import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 
 @inject('itemsStore')
@@ -22,7 +22,7 @@ class ItemCard extends PureComponent {
     super(props);
 
     this.state = {
-      url: require('../../assets/placeholder.jpg'),
+      url: require('../../../../assets/placeholder.jpg'),
       imageReady: false,
       imageWidth: null,
       deleting: false,
