@@ -18,23 +18,13 @@ class ItemsStore {
   @observable selectedItem = null;
   @observable loaded = false;
 
-  @action async editItem(storeId, newItem, additionalStock) {
-    const item = this.selectedItem;
+  @action async editItem(storeId, newItem, additionalStock, imagePath) {
     const storeItemsRef = firestore()
       .collection('stores')
       .doc(storeId)
       .collection('items')
-      .doc(item.doc);
+      .doc(newItem.doc);
     const timeStamp = firestore.Timestamp.now().toMillis();
-
-    const fileExtension = newItem.image ? newItem.image.split('.').pop() : null;
-    const imageRef = newItem.image
-      ? `/images/stores/${storeId}/items/${item.itemId}_${timeStamp}.${fileExtension}`
-      : null;
-
-    if (newItem.image) {
-      await this.uploadImage(imageRef, newItem.image);
-    }
 
     return firestore()
       .runTransaction(async (transaction) => {
@@ -44,22 +34,27 @@ class ItemsStore {
           let dbItems = [...storeItemsDocument.data().items];
 
           const dbItemIndex = dbItems.findIndex(
-            (dbItem) => item.itemId === dbItem.itemId,
+            (dbItem) => newItem.itemId === dbItem.itemId,
           );
 
           if (dbItemIndex >= 0) {
-            dbItems[dbItemIndex].stock += additionalStock;
-            dbItems[dbItemIndex].name = newItem.name;
-            dbItems[dbItemIndex].description = newItem.description;
-            dbItems[dbItemIndex].price = newItem.price;
-            dbItems[dbItemIndex].discountedPrice = newItem.discountedPrice;
-            dbItems[dbItemIndex].category = newItem.category;
-            dbItems[dbItemIndex].unit = newItem.unit;
-            dbItems[dbItemIndex].updatedAt = timeStamp;
+            newItem.updatedAt = timeStamp;
+            newItem.stock += additionalStock;
 
-            if (newItem.image) {
-              dbItems[dbItemIndex].image = imageRef;
+            if (imagePath) {
+              const fileExtension = imagePath
+                ? imagePath.split('.').pop()
+                : null;
+              const imageRef = imagePath
+                ? `/images/stores/${storeId}/items/${newItem.itemId}_${timeStamp}.${fileExtension}`
+                : null;
+
+              await this.uploadImage(imageRef, imagePath).then(() => {
+                dbItems[dbItemIndex].image = imageRef;
+              });
             }
+
+            dbItems[dbItemIndex] = newItem;
 
             await dbItems.sort((a, b) => a.name > b.name);
 

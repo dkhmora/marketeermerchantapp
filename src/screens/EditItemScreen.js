@@ -97,20 +97,25 @@ class EditItemScreen extends Component {
 
   handleEditItem() {
     const {storeId, itemCategories} = this.props.detailsStore.storeDetails;
-    const {newItem} = this.state;
-    const {name} = newItem;
+    const {navigation} = this.props;
+    const {item} = this.props.route.params;
+    const {newItem, newImagePath, newStock} = this.state;
+    const {name} = item;
 
     this.setState({loading: true}, () => {
-      this.props.itemsStore.editItem(storeId, newItem).then(() => {
-        this.setState({loading: false}, () =>
-          Toast({
-            text: `Item ${name} successfully edited!`,
-            type: 'success',
-            duration: 3500,
-            style: {margin: 20, borderRadius: 16},
-          }),
-        );
-      });
+      this.props.itemsStore
+        .editItem(storeId, newItem, newStock, newImagePath)
+        .then(() => {
+          this.setState({loading: false}, () => {
+            navigation.goBack();
+            Toast({
+              text: `Item ${name} successfully edited!`,
+              type: 'success',
+              duration: 3500,
+              style: {margin: 20, borderRadius: 16},
+            });
+          });
+        });
     });
   }
 
@@ -141,12 +146,6 @@ class EditItemScreen extends Component {
 
     return (
       <SafeAreaView style={{flex: 1}}>
-        <StatusBar
-          barStyle={
-            Platform.OS === 'android' ? 'light-content' : 'dark-content'
-          }
-        />
-
         <BaseHeader
           title={`Edit ${name}`}
           rightComponent={
@@ -302,7 +301,11 @@ class EditItemScreen extends Component {
             style={styles.textInput}
             autoCapitalize="words"
             value={newItem.name}
-            onChangeText={(value) => this.setState({['newItem.name']: value})}
+            onChangeText={(value) =>
+              this.setState((prevState) => ({
+                newItem: {...prevState.newItem, name: value},
+              }))
+            }
           />
 
           <Input
@@ -318,25 +321,54 @@ class EditItemScreen extends Component {
             autoCapitalize="sentences"
             value={description}
             onChangeText={(value) =>
-              this.setState({['newItem.description']: value})
+              this.setState((prevState) => ({
+                newItem: {...prevState.newItem, description: value},
+              }))
             }
           />
 
-          <Input
-            placeholder={`${name}'s Price`}
-            leftIcon={
-              <Text style={{color: colors.primary, fontSize: 25}}>₱</Text>
-            }
-            containerStyle={{flex: 1}}
-            maxLength={10}
-            keyboardType="numeric"
-            style={styles.textInput}
-            autoCapitalize="none"
-            value={String(price)}
-            onChangeText={(value) =>
-              this.setState({['newItem.price']: Number(value)})
-            }
-          />
+          <View style={{flexDirection: 'row'}}>
+            <Input
+              placeholder={`${name}'s Price`}
+              leftIcon={
+                <Text style={{color: colors.primary, fontSize: 25}}>₱</Text>
+              }
+              containerStyle={{flex: 1}}
+              maxLength={10}
+              keyboardType="numeric"
+              style={styles.textInput}
+              autoCapitalize="none"
+              value={String(price)}
+              onChangeText={(value) =>
+                this.setState((prevState) => ({
+                  newItem: {...prevState.newItem, price: Number(value)},
+                }))
+              }
+            />
+
+            <Text
+              style={{
+                fontSize: 34,
+                textAlignVertical: 'center',
+                marginBottom: 15,
+              }}>
+              /
+            </Text>
+
+            <Input
+              placeholder={`${name}'s New Unit`}
+              maxLength={10}
+              containerStyle={{flex: 1}}
+              style={styles.textInput}
+              autoCapitalize="none"
+              value={unit}
+              onChangeText={(value) =>
+                this.setState((prevState) => ({
+                  newItem: {...prevState.newItem, unit: value},
+                }))
+              }
+            />
+          </View>
 
           <Input
             placeholder={`${name}'s Discounted Price`}
@@ -350,9 +382,9 @@ class EditItemScreen extends Component {
             autoCapitalize="none"
             value={discountedPrice ? String(discountedPrice) : ''}
             onChangeText={(value) =>
-              this.setState({
-                ['newItem.discountedPrice']: Number(value),
-              })
+              this.setState((prevState) => ({
+                newItem: {...prevState.newItem, discountedPrice: Number(value)},
+              }))
             }
           />
 
