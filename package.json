@@ -40,6 +40,7 @@
     "@react-navigation/native": "^5.7.2",
     "@react-navigation/stack": "^5.8.0",
     "@turf/turf": "^5.1.6",
+    "formik": "^2.2.1",
     "geolib": "^3.3.1",
     "lodash": "^4.17.19",
     "lottie-ios": "^3.1.8",
@@ -82,7 +83,8 @@
     "rn-placeholder": "^3.0.1",
     "rn-sliding-up-panel": "^2.4.3",
     "string-strip-html": "^5.0.1",
-    "uuid": "^8.3.0"
+    "uuid": "^8.3.0",
+    "yup": "^0.29.3"
   },
   "devDependencies": {
     "@babel/core": "^7.11.0",

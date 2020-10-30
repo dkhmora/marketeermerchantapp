@@ -16,7 +16,7 @@ class CustomizationOptionsCard extends Component {
     if (options) {
       return options.map((item, index) => {
         return (
-          <View>
+          <View key={item.title}>
             {index !== 0 && <Divider />}
 
             <View

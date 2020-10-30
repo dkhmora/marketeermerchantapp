@@ -54,9 +54,7 @@ class ItemCard extends PureComponent {
   }
 
   handleEditItem() {
-    this.props.itemsStore.selectedItem = this.props.item;
-
-    this.props.itemsStore.editItemModal = true;
+    this.props.navigation.navigate('Edit Item', {item: this.props.item});
   }
 
   componentDidUpdate(prevProps, prevState) {

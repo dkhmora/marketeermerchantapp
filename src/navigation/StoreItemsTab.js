@@ -2,17 +2,14 @@ import React, {Component} from 'react';
 import {Container, View, CardItem, Input, Item, Picker} from 'native-base';
 import {Text, Button, Icon, Overlay} from 'react-native-elements';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import ItemsList from '../components/store_items/basic/ItemsList';
-import FoodItemsList from '../components/store_items/food/FoodItemsList';
+import ItemsList from '../components/ItemsList';
 import BaseHeader from '../components/BaseHeader';
 import {observer, inject} from 'mobx-react';
 import {observable, action, computed} from 'mobx';
 import {colors} from '../../assets/colors';
-import EditItemModal from '../components/EditItemModal';
 import Toast from '../components/Toast';
 import {Dimensions} from 'react-native';
 import crashlytics from '@react-native-firebase/crashlytics';
-import EditFoodItemModal from '../components/store_items/food/EditFoodItemModal';
 
 const TabBase = createMaterialTopTabNavigator();
 
@@ -151,9 +148,6 @@ class StoreItemsTab extends Component {
     const {name} = this.props.route;
     const {navigation} = this.props;
     const {storeType} = this.props.detailsStore.storeDetails;
-    const ItemListComponent = storeType === 'food' ? FoodItemsList : ItemsList;
-    const EditListItemComponent =
-      storeType === 'food' ? EditFoodItemModal : EditItemModal;
 
     return (
       <Container style={{flex: 1}}>
@@ -297,10 +291,6 @@ class StoreItemsTab extends Component {
           </Overlay>
         </View>
 
-        <EditListItemComponent
-          isVisible={this.props.itemsStore.editItemModal}
-        />
-
         <TabBase.Navigator
           lazy
           lazyPreloadDistance={1}
@@ -340,7 +330,7 @@ class StoreItemsTab extends Component {
           }}>
           <TabBase.Screen
             name="All"
-            component={ItemListComponent}
+            component={ItemsList}
             initialParams={{
               category: 'All',
             }}
@@ -350,7 +340,7 @@ class StoreItemsTab extends Component {
               return (
                 <TabBase.Screen
                   name={`${category}`}
-                  component={ItemListComponent}
+                  component={ItemsList}
                   key={index}
                   initialParams={{
                     category,
