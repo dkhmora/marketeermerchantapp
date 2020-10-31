@@ -26,6 +26,15 @@ class ItemsStore {
       .doc(newItem.doc);
     const timeStamp = firestore.Timestamp.now().toMillis();
 
+    const fileExtension = imagePath ? imagePath.split('.').pop() : null;
+    const imageRef = imagePath
+      ? `/images/stores/${storeId}/items/${newItem.itemId}_${timeStamp}.${fileExtension}`
+      : null;
+
+    if (imagePath) {
+      await this.uploadImage(imageRef, imagePath);
+    }
+
     return firestore()
       .runTransaction(async (transaction) => {
         const storeItemsDocument = await transaction.get(storeItemsRef);
@@ -39,19 +48,14 @@ class ItemsStore {
 
           if (dbItemIndex >= 0) {
             newItem.updatedAt = timeStamp;
-            newItem.stock += additionalStock;
+            if (newItem.stock + additionalStock >= 0) {
+              newItem.stock += additionalStock;
+            } else {
+              newItem.stock = 0;
+            }
 
             if (imagePath) {
-              const fileExtension = imagePath
-                ? imagePath.split('.').pop()
-                : null;
-              const imageRef = imagePath
-                ? `/images/stores/${storeId}/items/${newItem.itemId}_${timeStamp}.${fileExtension}`
-                : null;
-
-              await this.uploadImage(imageRef, imagePath).then(() => {
-                dbItems[dbItemIndex].image = imageRef;
-              });
+              newItem.image = imageRef;
             }
 
             dbItems[dbItemIndex] = newItem;

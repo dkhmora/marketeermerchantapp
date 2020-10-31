@@ -41,8 +41,9 @@ class EditItemScreen extends Component {
   constructor(props) {
     super(props);
 
-    const {item} = this.props.route.params;
-    const {image} = item;
+    const {
+      item: {image},
+    } = this.props.route.params;
 
     this.state = {
       loading: false,
@@ -52,7 +53,6 @@ class EditItemScreen extends Component {
         ? {uri: `https://cdn.marketeer.ph${image}`}
         : require('../../assets/placeholder.jpg'),
       editItemConfirmModal: false,
-      newItem: item,
       newStock: null,
       selectedStockNumberSignIndex: 1,
     };
@@ -102,7 +102,7 @@ class EditItemScreen extends Component {
     const {storeId, itemCategories} = this.props.detailsStore.storeDetails;
     const {navigation} = this.props;
     const {item} = this.props.route.params;
-    const {newImagePath} = this.state;
+    const {newImagePath, selectedStockNumberSignIndex} = this.state;
     const {name} = item;
     const newItem = {
       ...item,
@@ -111,11 +111,18 @@ class EditItemScreen extends Component {
       unit: values.unit,
       price: Number(values.price),
       discountedPrice: Number(values.discountedPrice),
+      category: values.category,
     };
+    const sign = selectedStockNumberSignIndex === 0 ? '-' : '+';
 
     this.setState({loading: true}, () => {
       this.props.itemsStore
-        .editItem(storeId, newItem, values.additionalStock, newImagePath)
+        .editItem(
+          storeId,
+          newItem,
+          Number(`${sign}${values.additionalStock}`),
+          newImagePath,
+        )
         .then(() => {
           this.setState({loading: false}, () => {
             navigation.goBack();
@@ -134,7 +141,6 @@ class EditItemScreen extends Component {
     const {
       imageDisplay,
       imageReady,
-      newItem,
       loading,
       editItemConfirmModal,
       selectedStockNumberSignIndex,
@@ -153,6 +159,7 @@ class EditItemScreen extends Component {
       stock,
     } = item;
     const {storeType} = this.props.detailsStore.storeDetails;
+    const sign = selectedStockNumberSignIndex === 0 ? '-' : '+';
 
     return (
       <View style={{flex: 1}}>
@@ -183,13 +190,14 @@ class EditItemScreen extends Component {
             price: String(price),
             discountedPrice: String(discountedPrice),
             additionalStock: 0,
+            category,
           }}
           onSubmit={(values) => {
             this.setState({editItemConfirmModal: false}, () => {
               this.handleEditItem(values);
             });
           }}>
-          {({handleSubmit, isValid, values}) => (
+          {({handleSubmit, isValid, values, setFieldValue}) => (
             <KeyboardAwareScrollView
               showsVerticalScrollIndicator={false}
               contentInsetAdjustmentBehavior="automatic"
@@ -305,12 +313,10 @@ class EditItemScreen extends Component {
                     note={false}
                     placeholder="Select Item Category"
                     mode="dropdown"
-                    selectedValue={category}
+                    selectedValue={values.category}
                     iosIcon={<Icon name="chevron-down" />}
                     itemTextStyle={{textAlign: 'right'}}
-                    onValueChange={(value) =>
-                      this.setState({['newItem.category']: value})
-                    }>
+                    onValueChange={(value) => setFieldValue('category', value)}>
                     {this.categories &&
                       this.categories.map((cat, index) => {
                         return (
@@ -388,50 +394,98 @@ class EditItemScreen extends Component {
               />
 
               {storeType === 'basic' && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                  }}>
-                  <ButtonGroup
-                    onPress={(index) =>
-                      this.setState({selectedStockNumberSignIndex: index})
-                    }
-                    selectedIndex={selectedStockNumberSignIndex}
-                    buttons={['-', '+']}
-                    activeOpacity={0.7}
-                    containerStyle={{
-                      height: 40,
-                      width: 80,
-                      borderRadius: 8,
+                <View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignSelf: 'center',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.icons,
                       elevation: 2,
-                      shadowColor: '#000',
-                      shadowOffset: {
-                        width: 0,
-                        height: 1,
-                      },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 1.41,
-                      borderWidth: 0.7,
-                      borderColor: 'rgba(0,0,0,0.4)',
-                    }}
-                    selectedButtonStyle={{backgroundColor: colors.primary}}
-                  />
+                      borderRadius: 10,
+                      paddingHorizontal: 5,
+                      paddingVertical: 2,
+                    }}>
+                    <Text>{'Current Stock/New Stock: '}</Text>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontFamily: 'ProductSans-Bold',
+                      }}>{`${stock} | `}</Text>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontFamily: 'ProductSans-Bold',
+                        color: colors.accent,
+                      }}>{`${
+                      values.additionalStock
+                        ? Math.max(
+                            0,
+                            Number(`${sign}${values.additionalStock}`) + stock,
+                          )
+                        : stock
+                    }`}</Text>
+                  </View>
 
-                  <Field
-                    component={CustomInput}
-                    name="additionalStock"
-                    placeholder={`${
-                      selectedStockNumberSignIndex === 0
-                        ? 'Decrease'
-                        : 'Increase'
-                    } ${name} Stock`}
-                    placeholderStyle={{color: colors.primary}}
-                    maxLength={10}
-                    containerStyle={{flex: 1}}
-                    keyboardType="numeric"
-                    autoCapitalize="none"
-                    leftIcon="hash"
-                  />
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                    }}>
+                    <ButtonGroup
+                      onPress={(index) =>
+                        this.setState({selectedStockNumberSignIndex: index})
+                      }
+                      selectedIndex={selectedStockNumberSignIndex}
+                      buttons={['-', '+']}
+                      activeOpacity={0.7}
+                      buttonStyle={{
+                        borderRadius: 40,
+                      }}
+                      buttonContainerStyle={{
+                        borderRadius: 40,
+                      }}
+                      innerBorderStyle={{color: 'transparent', width: 10}}
+                      containerStyle={{
+                        height: 40,
+                        width: 100,
+                        borderRadius: 40,
+                        elevation: 2,
+                        shadowColor: '#000',
+                        shadowOffset: {
+                          width: 0,
+                          height: 1,
+                        },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 1.41,
+                      }}
+                      textStyle={{textAlign: 'center'}}
+                      selectedButtonStyle={{
+                        backgroundColor: colors.icons,
+                        borderColor: colors.primary,
+                        borderWidth: 1,
+                      }}
+                      selectedTextStyle={{
+                        color: colors.primary,
+                      }}
+                    />
+
+                    <Field
+                      component={CustomInput}
+                      name="additionalStock"
+                      placeholder={`${
+                        selectedStockNumberSignIndex === 0
+                          ? 'Decrease'
+                          : 'Increase'
+                      } ${name} Stock`}
+                      placeholderStyle={{color: colors.primary}}
+                      maxLength={10}
+                      containerStyle={{flex: 1}}
+                      keyboardType="numeric"
+                      autoCapitalize="none"
+                      leftIcon="hash"
+                    />
+                  </View>
                 </View>
               )}
 
@@ -512,7 +566,7 @@ class EditItemScreen extends Component {
                 marginLeft: 10,
                 marginRight: 5,
               }}
-              onPress={() => this.closeModal()}
+              onPress={() => navigation.goBack()}
             />
           )}
 
