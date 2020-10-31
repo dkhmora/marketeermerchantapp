@@ -12,6 +12,7 @@ import MerchantDashboardScreen from './screens/MerchantDashboardScreen';
 import TopUpHistoryScreen from './screens/TopUpHistoryScreen';
 import EditItemScreen from './screens/EditItemScreen';
 import MrSpeedyBottomSheet from './components/MrSpeedyBottomSheet';
+import StoreItemsTab from './navigation/StoreItemsTab';
 
 const StackMain = createStackNavigator();
 
@@ -45,6 +46,7 @@ export default () => (
         <StackMain.Screen name="Order Details" component={OrderDetailsScreen} />
         <StackMain.Screen name="Order Chat" component={OrderChatScreen} />
         <StackMain.Screen name="Edit Item" component={EditItemScreen} />
+        <StackMain.Screen name="Store Items" component={StoreItemsTab} />
       </StackMain.Navigator>
     </NavigationContainer>
   </RootSiblingParent>

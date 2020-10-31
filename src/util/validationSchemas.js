@@ -10,9 +10,6 @@ export const foodItemValidationSchema = yup.object().shape({
     .required()
     .positive()
     .integer()
-    .lessThan(
-      yup.ref('price'),
-      'Discounted Price should be greater than Price',
-    ),
+    .lessThan(yup.ref('price'), 'Discounted Price should be less than Price'),
   additionalStock: yup.number().integer(),
 });

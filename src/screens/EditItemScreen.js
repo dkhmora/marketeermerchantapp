@@ -36,22 +36,22 @@ import CustomInput from '../components/CustomInput';
 
 @inject('detailsStore')
 @inject('itemsStore')
+@inject('authStore')
 @observer
 class EditItemScreen extends Component {
   constructor(props) {
     super(props);
 
-    const {
-      item: {image},
-    } = this.props.route.params;
+    const {item} = this.props.route.params;
 
     this.state = {
       loading: false,
       newImagePath: null,
       imageReady: false,
-      imageDisplay: image
-        ? {uri: `https://cdn.marketeer.ph${image}`}
-        : require('../../assets/placeholder.jpg'),
+      imageDisplay:
+        item && item.image
+          ? {uri: `https://cdn.marketeer.ph${item.image}`}
+          : require('../../assets/placeholder.jpg'),
       editItemConfirmModal: false,
       newStock: null,
       selectedStockNumberSignIndex: 1,
@@ -103,19 +103,21 @@ class EditItemScreen extends Component {
     const {navigation} = this.props;
     const {item} = this.props.route.params;
     const {newImagePath, selectedStockNumberSignIndex} = this.state;
-    const {name} = item;
     const newItem = {
       ...item,
       name: values.name,
       description: values.description,
       unit: values.unit,
       price: Number(values.price),
-      discountedPrice: Number(values.discountedPrice),
+      discountedPrice: values.discountedPrice
+        ? Number(values.discountedPrice)
+        : 0,
       category: values.category,
     };
     const sign = selectedStockNumberSignIndex === 0 ? '-' : '+';
 
     this.setState({loading: true}, () => {
+      this.props.authStore.appReady = false;
       this.props.itemsStore
         .editItem(
           storeId,
@@ -125,9 +127,48 @@ class EditItemScreen extends Component {
         )
         .then(() => {
           this.setState({loading: false}, () => {
+            this.props.authStore.appReady = true;
             navigation.goBack();
             Toast({
-              text: `Item ${name} successfully edited!`,
+              text: `Item ${item.name} successfully edited!`,
+              type: 'success',
+              duration: 3500,
+              style: {margin: 20, borderRadius: 16},
+            });
+          });
+        });
+    });
+  }
+
+  async handleAddItem(values) {
+    const {navigation} = this.props;
+    const {newImagePath} = this.state;
+    const {storeId} = this.props.detailsStore.storeDetails;
+
+    this.setState({loading: true}, () => {
+      this.props.authStore.appReady = false;
+
+      const newItem = {
+        category: values.category,
+        name: values.name,
+        description: values.description,
+        unit: values.unit,
+        price: Number(values.price),
+        discountedPrice: values.discountedPrice
+          ? Number(values.discountedPrice)
+          : null,
+        stock: Number(values.additionalStock),
+        sales: 0,
+      };
+
+      this.props.itemsStore
+        .addStoreItem(storeId, newItem, newImagePath)
+        .then(() => {
+          this.setState({loading: false}, () => {
+            navigation.goBack();
+            this.props.authStore.appReady = true;
+            Toast({
+              text: `Item ${values.name} successfully added!`,
               type: 'success',
               duration: 3500,
               style: {margin: 20, borderRadius: 16},
@@ -146,25 +187,15 @@ class EditItemScreen extends Component {
       selectedStockNumberSignIndex,
       newStock,
     } = this.state;
-    const {item} = this.props.route.params;
+    const {item, itemCategory} = this.props.route.params;
     const {navigation} = this.props;
-    const {
-      name,
-      category,
-      description,
-      price,
-      discountedPrice,
-      unit,
-      options,
-      stock,
-    } = item;
     const {storeType} = this.props.detailsStore.storeDetails;
     const sign = selectedStockNumberSignIndex === 0 ? '-' : '+';
 
     return (
       <View style={{flex: 1}}>
         <BaseHeader
-          title={`Edit ${name}`}
+          title={item ? `Edit ${item.name}` : 'Add Item'}
           rightComponent={
             !loading && (
               <Button
@@ -183,18 +214,30 @@ class EditItemScreen extends Component {
         <Formik
           innerRef={(formRef) => (this.formikRef = formRef)}
           validationSchema={foodItemValidationSchema}
-          initialValues={{
-            name,
-            description,
-            unit,
-            price: String(price),
-            discountedPrice: String(discountedPrice),
-            additionalStock: 0,
-            category,
-          }}
+          initialValues={
+            item
+              ? {
+                  name: item.name,
+                  description: item.description,
+                  unit: item.unit,
+                  price: String(item.price),
+                  discountedPrice: String(item.discountedPrice),
+                  additionalStock: 0,
+                  category: item.category,
+                }
+              : {
+                  name: '',
+                  description: '',
+                  unit: '',
+                  price: null,
+                  discountedPrice: null,
+                  additionalStock: null,
+                  category: itemCategory,
+                }
+          }
           onSubmit={(values) => {
             this.setState({editItemConfirmModal: false}, () => {
-              this.handleEditItem(values);
+              item ? this.handleEditItem(values) : this.handleAddItem(values);
             });
           }}>
           {({handleSubmit, isValid, values, setFieldValue}) => (
@@ -210,8 +253,16 @@ class EditItemScreen extends Component {
               }}>
               <ConfirmationModal
                 isVisible={editItemConfirmModal}
-                title={`Edit Item "${name}"`}
-                body={`Are you sure you want to edit "${name}"? Buyers will immediately see changes.`}
+                title={
+                  item
+                    ? `Edit Item "${item.name}"`
+                    : `Add Item "${values.name}"`
+                }
+                body={
+                  item
+                    ? `Are you sure you want to edit "${item.name}"? Buyers will immediately see changes.`
+                    : `Are you sure you want to add the item "${values.name}"? Buyers will immediately see changes.`
+                }
                 onConfirm={() => {
                   handleSubmit();
                 }}
@@ -330,7 +381,7 @@ class EditItemScreen extends Component {
               <Field
                 component={CustomInput}
                 name="name"
-                placeholder={`${name}'s Name`}
+                placeholder={item ? `${item.name}'s Name` : 'Item Name'}
                 leftIcon="type"
               />
 
@@ -338,7 +389,9 @@ class EditItemScreen extends Component {
                 component={CustomInput}
                 name="description"
                 leftIcon="align-justify"
-                placeholder={`${name}'s Description`}
+                placeholder={
+                  item ? `${item.name}'s Description` : 'Item Description'
+                }
                 maxLength={150}
                 numberOfLines={3}
                 multiline
@@ -350,7 +403,7 @@ class EditItemScreen extends Component {
                 <Field
                   component={CustomInput}
                   name="price"
-                  placeholder={`${name}'s Price`}
+                  placeholder={item ? `${item.name}'s Price` : 'Item Price'}
                   leftIcon={
                     <Text style={{color: colors.primary, fontSize: 25}}>₱</Text>
                   }
@@ -372,10 +425,9 @@ class EditItemScreen extends Component {
                 <Field
                   component={CustomInput}
                   name="unit"
-                  placeholder={`${name}'s Unit`}
+                  placeholder={item ? `${item.name}'s Unit` : 'Item Unit'}
                   maxLength={10}
                   containerStyle={{flex: 1}}
-                  keyboardType="numeric"
                   autoCapitalize="none"
                 />
               </View>
@@ -383,7 +435,11 @@ class EditItemScreen extends Component {
               <Field
                 component={CustomInput}
                 name="discountedPrice"
-                placeholder={`${name}'s Discounted Price`}
+                placeholder={
+                  item
+                    ? `${item.name}'s Discounted Price`
+                    : 'Item Discounted Price'
+                }
                 maxLength={10}
                 containerStyle={{flex: 1}}
                 keyboardType="numeric"
@@ -395,89 +451,98 @@ class EditItemScreen extends Component {
 
               {storeType === 'basic' && (
                 <View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignSelf: 'center',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: colors.icons,
-                      elevation: 2,
-                      borderRadius: 10,
-                      paddingHorizontal: 5,
-                      paddingVertical: 2,
-                    }}>
-                    <Text>{'Current Stock/New Stock: '}</Text>
-                    <Text
+                  {item && (
+                    <View
                       style={{
-                        fontSize: 14,
-                        fontFamily: 'ProductSans-Bold',
-                      }}>{`${stock} | `}</Text>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        fontFamily: 'ProductSans-Bold',
-                        color: colors.accent,
-                      }}>{`${
-                      values.additionalStock
-                        ? Math.max(
-                            0,
-                            Number(`${sign}${values.additionalStock}`) + stock,
-                          )
-                        : stock
-                    }`}</Text>
-                  </View>
+                        flexDirection: 'row',
+                        alignSelf: 'center',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: colors.icons,
+                        elevation: 2,
+                        borderRadius: 10,
+                        paddingHorizontal: 5,
+                        paddingVertical: 2,
+                      }}>
+                      <Text>{'Current Stock/New Stock: '}</Text>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>{`${item.stock} | `}</Text>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontFamily: 'ProductSans-Bold',
+                          color: colors.accent,
+                        }}>{`${
+                        values.additionalStock
+                          ? Math.max(
+                              0,
+                              Number(`${sign}${values.additionalStock}`) +
+                                item.stock,
+                            )
+                          : item.stock
+                      }`}</Text>
+                    </View>
+                  )}
 
                   <View
                     style={{
                       flexDirection: 'row',
                     }}>
-                    <ButtonGroup
-                      onPress={(index) =>
-                        this.setState({selectedStockNumberSignIndex: index})
-                      }
-                      selectedIndex={selectedStockNumberSignIndex}
-                      buttons={['-', '+']}
-                      activeOpacity={0.7}
-                      buttonStyle={{
-                        borderRadius: 40,
-                      }}
-                      buttonContainerStyle={{
-                        borderRadius: 40,
-                      }}
-                      innerBorderStyle={{color: 'transparent', width: 10}}
-                      containerStyle={{
-                        height: 40,
-                        width: 100,
-                        borderRadius: 40,
-                        elevation: 2,
-                        shadowColor: '#000',
-                        shadowOffset: {
-                          width: 0,
-                          height: 1,
-                        },
-                        shadowOpacity: 0.2,
-                        shadowRadius: 1.41,
-                      }}
-                      textStyle={{textAlign: 'center'}}
-                      selectedButtonStyle={{
-                        backgroundColor: colors.icons,
-                        borderColor: colors.primary,
-                        borderWidth: 1,
-                      }}
-                      selectedTextStyle={{
-                        color: colors.primary,
-                      }}
-                    />
+                    {item && (
+                      <ButtonGroup
+                        onPress={(index) =>
+                          this.setState({selectedStockNumberSignIndex: index})
+                        }
+                        selectedIndex={selectedStockNumberSignIndex}
+                        buttons={['-', '+']}
+                        activeOpacity={0.7}
+                        buttonStyle={{
+                          borderRadius: 40,
+                        }}
+                        buttonContainerStyle={{
+                          borderRadius: 40,
+                        }}
+                        innerBorderStyle={{color: 'transparent', width: 10}}
+                        containerStyle={{
+                          height: 40,
+                          width: 100,
+                          borderRadius: 40,
+                          elevation: 2,
+                          shadowColor: '#000',
+                          shadowOffset: {
+                            width: 0,
+                            height: 1,
+                          },
+                          shadowOpacity: 0.2,
+                          shadowRadius: 1.41,
+                        }}
+                        textStyle={{textAlign: 'center'}}
+                        selectedButtonStyle={{
+                          backgroundColor: colors.icons,
+                          borderColor: colors.primary,
+                          borderWidth: 1,
+                        }}
+                        selectedTextStyle={{
+                          color: colors.primary,
+                        }}
+                      />
+                    )}
 
                     <Field
                       component={CustomInput}
                       name="additionalStock"
-                      placeholder={`${
-                        selectedStockNumberSignIndex === 0
-                          ? 'Decrease'
-                          : 'Increase'
-                      } ${name} Stock`}
+                      placeholder={
+                        item
+                          ? `${
+                              selectedStockNumberSignIndex === 0
+                                ? 'Decrease'
+                                : 'Increase'
+                            } ${item.name} Stock`
+                          : 'Item Initial Stock'
+                      }
                       placeholderStyle={{color: colors.primary}}
                       maxLength={10}
                       containerStyle={{flex: 1}}
@@ -500,8 +565,8 @@ class EditItemScreen extends Component {
                     }}>
                     <Text style={{fontSize: 24}}>Customization</Text>
 
-                    {options &&
-                      Object.entries(options).map(
+                    {item.options &&
+                      Object.entries(item.options).map(
                         ([optionTitle, optionData], index) => {
                           const {multipleSelection, selection} = optionData;
 

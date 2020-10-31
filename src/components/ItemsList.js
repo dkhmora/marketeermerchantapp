@@ -149,7 +149,10 @@ class ItemsList extends Component {
               this.props.detailsStore.storeDetails.itemCategories &&
               this.props.detailsStore.storeDetails.itemCategories.length > 0
             ) {
-              navigation.navigate('Add Item', {pageCategory: category});
+              navigation.navigate('Edit Item', {
+                item: null,
+                itemCategory: category,
+              });
             } else {
               Toast({
                 text: 'Please add a category before adding an item.',

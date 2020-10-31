@@ -199,31 +199,33 @@ class ItemsStore {
       updatedAt: timeStamp,
     };
 
-    return await this.uploadImage(imageRef, imagePath).then(async () => {
-      return await functions
-        .httpsCallable('addStoreItem')({
-          item: JSON.stringify(newItem),
-          storeId,
-        })
-        .then((response) => {
-          if (response.data.s === 200) {
-            Toast({
-              text: `"${newItem.name}" successfully added to Item List!`,
-            });
-          } else {
-            Toast({
-              text: `Error: ${response.data.m} (${response.data.s})!`,
-              type: 'danger',
-            });
-          }
+    if (imagePath) {
+      await this.uploadImage(imageRef, imagePath);
+    }
 
-          return response.data;
-        })
-        .catch((err) => {
-          crashlytics().recordError(err);
-          Toast({text: err.message, type: 'danger'});
-        });
-    });
+    return await await functions
+      .httpsCallable('addStoreItem')({
+        item: JSON.stringify(newItem),
+        storeId,
+      })
+      .then((response) => {
+        if (response.data.s === 200) {
+          Toast({
+            text: `"${newItem.name}" successfully added to Item List!`,
+          });
+        } else {
+          Toast({
+            text: `Error: ${response.data.m} (${response.data.s})!`,
+            type: 'danger',
+          });
+        }
+
+        return response.data;
+      })
+      .catch((err) => {
+        crashlytics().recordError(err);
+        Toast({text: err.message, type: 'danger'});
+      });
   }
 
   @action async deleteImage(image) {
