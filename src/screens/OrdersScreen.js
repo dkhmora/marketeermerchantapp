@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
 import OrdersTab from '../navigation/OrdersTab';
 import crashlytics from '@react-native-firebase/crashlytics';
-import {View, Dimensions, StatusBar} from 'react-native';
+import {View, Dimensions, StatusBar, StyleSheet} from 'react-native';
 import MrSpeedyBottomSheet from '../components/MrSpeedyBottomSheet';
 import {inject, observer} from 'mobx-react';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
+import BaseHeader from '../components/BaseHeader';
+import CancelOrderModal from '../components/CancelOrderModal';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -16,8 +18,12 @@ class OrdersScreen extends Component {
   }
 
   render() {
+    const {navigation} = this.props;
+
     return (
-      <View>
+      <View style={{...StyleSheet.absoluteFillObject}}>
+        <CancelOrderModal navigation={navigation} />
+
         <TouchableWithoutFeedback
           onPress={() => {
             if (
@@ -27,6 +33,12 @@ class OrdersScreen extends Component {
             }
           }}>
           <View style={{height: SCREEN_HEIGHT + StatusBar.currentHeight}}>
+            <BaseHeader
+              title="Orders"
+              destructiveIndex={1}
+              navigation={navigation}
+            />
+
             <OrdersTab navigation={this.props.navigation} />
           </View>
         </TouchableWithoutFeedback>

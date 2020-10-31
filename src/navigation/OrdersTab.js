@@ -1,13 +1,11 @@
 import React, {Component} from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {Container} from 'native-base';
 // Custom Components
 import OrdersList from '../components/OrdersList';
-import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import CancelOrderModal from '../components/CancelOrderModal';
 import crashlytics from '@react-native-firebase/crashlytics';
+import {View} from 'react-native';
 
 const TabOrders = createMaterialTopTabNavigator();
 
@@ -34,17 +32,8 @@ class OrdersTab extends Component {
   }
 
   render() {
-    const {navigation} = this.props;
-
     return (
-      <Container>
-        <BaseHeader
-          title="Orders"
-          destructiveIndex={1}
-          navigation={navigation}
-        />
-        <CancelOrderModal navigation={navigation} />
-
+      <View style={{flex: 1}}>
         <TabOrders.Navigator
           lazy
           lazyPreloadDistance={1}
@@ -97,7 +86,7 @@ class OrdersTab extends Component {
           <TabOrders.Screen name="Completed" component={OrdersList} />
           <TabOrders.Screen name="Cancelled" component={OrdersList} />
         </TabOrders.Navigator>
-      </Container>
+      </View>
     );
   }
 }
