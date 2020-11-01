@@ -18,7 +18,13 @@ class ItemsStore {
   @observable selectedItem = null;
   @observable loaded = false;
 
-  @action async editItem(storeId, newItem, additionalStock, imagePath) {
+  @action async editItem(
+    storeId,
+    newItem,
+    additionalStock,
+    itemOptions,
+    imagePath,
+  ) {
     const storeItemsRef = firestore()
       .collection('stores')
       .doc(storeId)
@@ -56,6 +62,10 @@ class ItemsStore {
 
             if (imagePath) {
               newItem.image = imageRef;
+            }
+
+            if (itemOptions) {
+              newItem.options = itemOptions;
             }
 
             dbItems[dbItemIndex] = newItem;
@@ -182,7 +192,7 @@ class ItemsStore {
     }
   }
 
-  @action async addStoreItem(storeId, item, imagePath) {
+  @action async addStoreItem(storeId, item, itemOptions, imagePath) {
     const itemId = uuidv4();
     const timeStamp = firestore.Timestamp.now().toMillis();
 
@@ -191,13 +201,17 @@ class ItemsStore {
       ? `/images/stores/${storeId}/items/${itemId}_${timeStamp}.${fileExtension}`
       : null;
 
-    const newItem = {
+    let newItem = {
       ...item,
       image: imageRef,
       itemId,
       createdAt: timeStamp,
       updatedAt: timeStamp,
     };
+
+    if (itemOptions) {
+      newItem.options = itemOptions;
+    }
 
     if (imagePath) {
       await this.uploadImage(imageRef, imagePath);

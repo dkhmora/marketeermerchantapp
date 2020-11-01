@@ -60,6 +60,7 @@ class EditItemScreen extends Component {
           ? {uri: `https://cdn.marketeer.ph${item.image}`}
           : require('../../assets/placeholder.jpg'),
       editItemConfirmModal: false,
+      selectedOptionTitle: null,
       selectedStockNumberSignIndex: 1,
       itemOptions: item && item.options ? item.options : {},
     };
@@ -109,7 +110,11 @@ class EditItemScreen extends Component {
     const {storeId, itemCategories} = this.props.detailsStore.storeDetails;
     const {navigation} = this.props;
     const {item} = this.props.route.params;
-    const {newImagePath, selectedStockNumberSignIndex} = this.state;
+    const {
+      newImagePath,
+      selectedStockNumberSignIndex,
+      itemOptions,
+    } = this.state;
     const newItem = {
       ...item,
       name: values.name,
@@ -130,6 +135,7 @@ class EditItemScreen extends Component {
           storeId,
           newItem,
           Number(`${sign}${values.additionalStock}`),
+          itemOptions,
           newImagePath,
         )
         .then(() => {
@@ -149,7 +155,7 @@ class EditItemScreen extends Component {
 
   async handleAddItem(values) {
     const {navigation} = this.props;
-    const {newImagePath} = this.state;
+    const {newImagePath, itemOptions} = this.state;
     const {storeId} = this.props.detailsStore.storeDetails;
 
     this.setState({loading: true}, () => {
@@ -169,7 +175,7 @@ class EditItemScreen extends Component {
       };
 
       this.props.itemsStore
-        .addStoreItem(storeId, newItem, newImagePath)
+        .addStoreItem(storeId, newItem, itemOptions, newImagePath)
         .then(() => {
           this.setState({loading: false}, () => {
             navigation.goBack();
@@ -204,7 +210,7 @@ class EditItemScreen extends Component {
 
     delete newItemOptions[optionTitle];
 
-    this.setState({itemOptions: newItemOptions});
+    this.setState({itemOptions: newItemOptions, selectedOptionTitle: null});
   }
 
   handleDeleteSelection(optionTitle, selectionIndex) {
@@ -238,6 +244,7 @@ class EditItemScreen extends Component {
       editItemConfirmModal,
       selectedStockNumberSignIndex,
       itemOptions,
+      selectedOptionTitle,
     } = this.state;
     const {item, itemCategory} = this.props.route.params;
     const {navigation} = this.props;
@@ -424,6 +431,26 @@ class EditItemScreen extends Component {
                     }}
                     closeModal={() =>
                       this.setState({editItemConfirmModal: false})
+                    }
+                  />
+
+                  <ConfirmationModal
+                    isVisible={selectedOptionTitle !== null}
+                    title={
+                      selectedOptionTitle
+                        ? `Remove Option ${selectedOptionTitle}`
+                        : ''
+                    }
+                    body={
+                      selectedOptionTitle
+                        ? `Are you sure you want to remove the customization option ${selectedOptionTitle}? This will also remove all selections within the option.`
+                        : ''
+                    }
+                    onConfirm={() => {
+                      this.handleDeleteOption(selectedOptionTitle);
+                    }}
+                    closeModal={() =>
+                      this.setState({selectedOptionTitle: null})
                     }
                   />
 
@@ -670,7 +697,7 @@ class EditItemScreen extends Component {
                           multipleSelection={multipleSelection}
                           options={selection}
                           onDeleteCustomizationOption={() =>
-                            this.handleDeleteOption(optionTitle)
+                            this.setState({selectedOptionTitle: optionTitle})
                           }
                           onDeleteSelection={(selectionIndex) =>
                             this.handleDeleteSelection(
