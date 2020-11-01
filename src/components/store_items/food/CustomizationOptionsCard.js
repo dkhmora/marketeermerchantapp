@@ -19,84 +19,87 @@ class CustomizationOptionsCard extends Component {
     const {options, checkedIcon, uncheckedIcon, onDeleteSelection} = props;
 
     if (options) {
-      return options.map((item, index) => {
-        return (
-          <View key={item.title}>
-            {index !== 0 && <Divider />}
+      return options
+        .slice()
+        .sort((a, b) => a.title.localeCompare(b.title, 'en', {numeric: true}))
+        .map((item, index) => {
+          return (
+            <View key={item.title}>
+              {index !== 0 && <Divider />}
 
-            <View
-              style={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <CheckBox
-                disabled
-                center
-                title={
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      paddingHorizontal: 10,
-                    }}>
-                    <Text style={{flex: 1}}>{item.title}</Text>
-
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                <CheckBox
+                  disabled
+                  center
+                  title={
                     <View
                       style={{
+                        flex: 1,
                         flexDirection: 'row',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        justifyContent: 'flex-end',
-                        marginRight: -10,
+                        paddingHorizontal: 10,
                       }}>
-                      <Text
-                        style={{
-                          fontFamily: 'ProductSans-Bold',
-                          textAlign: 'center',
-                        }}>
-                        +₱{item.price.toFixed(2)}
-                      </Text>
+                      <Text style={{flex: 1}}>{item.title}</Text>
 
-                      <Button
-                        type="clear"
-                        icon={
-                          <Icon name="x" color={colors.primary} size={20} />
-                        }
-                        onPress={() => onDeleteSelection(index)}
-                      />
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                          marginRight: -10,
+                        }}>
+                        <Text
+                          style={{
+                            fontFamily: 'ProductSans-Bold',
+                            textAlign: 'center',
+                          }}>
+                          +₱{item.price.toFixed(2)}
+                        </Text>
+
+                        <Button
+                          type="clear"
+                          icon={
+                            <Icon name="x" color={colors.primary} size={20} />
+                          }
+                          onPress={() => onDeleteSelection(index)}
+                        />
+                      </View>
                     </View>
-                  </View>
-                }
-                checkedIcon={checkedIcon}
-                uncheckedIcon={uncheckedIcon}
-                containerStyle={{
-                  flex: 1,
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  paddingBottom: 0,
-                  paddingTop: 0,
-                  borderRadius: 0,
-                  backgroundColor: colors.icons,
-                  elevation: 0,
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 1.41,
-                  paddingHorizontal: 5,
-                  marginRight: 0,
-                  marginLeft: 0,
-                }}
-              />
+                  }
+                  checkedIcon={checkedIcon}
+                  uncheckedIcon={uncheckedIcon}
+                  containerStyle={{
+                    flex: 1,
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    paddingBottom: 0,
+                    paddingTop: 0,
+                    borderRadius: 0,
+                    backgroundColor: colors.icons,
+                    elevation: 0,
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 1,
+                    },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 1.41,
+                    paddingHorizontal: 5,
+                    marginRight: 0,
+                    marginLeft: 0,
+                  }}
+                />
+              </View>
             </View>
-          </View>
-        );
-      });
+          );
+        });
     }
   }
 

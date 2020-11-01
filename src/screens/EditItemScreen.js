@@ -62,8 +62,17 @@ class EditItemScreen extends Component {
       editItemConfirmModal: false,
       selectedOptionTitle: null,
       selectedStockNumberSignIndex: 1,
-      itemOptions: item && item.options ? item.options : {},
+      itemOptions: {},
     };
+  }
+
+  componentDidMount() {
+    const {item} = this.props.route.params;
+
+    if (item.options) {
+      const itemOptions = JSON.parse(JSON.stringify(item.options));
+      this.setState({itemOptions});
+    }
   }
 
   @computed get categories() {
@@ -204,9 +213,7 @@ class EditItemScreen extends Component {
   }
 
   handleDeleteOption(optionTitle) {
-    const newItemOptions = {
-      ...this.state.itemOptions,
-    };
+    const newItemOptions = Object.assign({}, this.state.itemOptions);
 
     delete newItemOptions[optionTitle];
 
@@ -214,9 +221,7 @@ class EditItemScreen extends Component {
   }
 
   handleDeleteSelection(optionTitle, selectionIndex) {
-    let newItemOptions = {
-      ...this.state.itemOptions,
-    };
+    let newItemOptions = Object.assign({}, this.state.itemOptions);
 
     newItemOptions[optionTitle].selection.splice(selectionIndex, 1);
 
@@ -224,9 +229,7 @@ class EditItemScreen extends Component {
   }
 
   handleAddSelection(optionTitle, values, {resetForm}) {
-    let newItemOptions = {
-      ...this.state.itemOptions,
-    };
+    let newItemOptions = Object.assign({}, this.state.itemOptions);
 
     newItemOptions[optionTitle].selection.push({
       price: Number(values.price),
