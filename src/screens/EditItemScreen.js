@@ -236,6 +236,17 @@ class EditItemScreen extends Component {
     this.setState({itemOptions: newItemOptions}, () => resetForm({}));
   }
 
+  handleChangeMultipleSelection(optionTitle) {
+    let newItemOptions = {
+      ...this.state.itemOptions,
+    };
+
+    newItemOptions[optionTitle].multipleSelection = !newItemOptions[optionTitle]
+      .multipleSelection;
+
+    this.setState({itemOptions: newItemOptions});
+  }
+
   render() {
     const {
       imageDisplay,
@@ -709,6 +720,9 @@ class EditItemScreen extends Component {
                             this.handleAddSelection(optionTitle, values, {
                               resetForm,
                             })
+                          }
+                          onChangeMultipleSelection={() =>
+                            this.handleChangeMultipleSelection(optionTitle)
                           }
                         />
                       );

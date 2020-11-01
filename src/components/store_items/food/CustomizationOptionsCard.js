@@ -6,6 +6,8 @@ import {colors} from '../../../../assets/colors';
 import CustomInput from '../../CustomInput';
 import Divider from '../../Divider';
 import {itemOptionSelectionValidationSchema} from '../../../util/validationSchemas';
+import {Picker} from '@react-native-community/picker';
+import {Switch} from 'react-native-gesture-handler';
 
 class CustomizationOptionsCard extends Component {
   constructor(props) {
@@ -106,6 +108,7 @@ class CustomizationOptionsCard extends Component {
       onDeleteCustomizationOption,
       onDeleteSelection,
       onAddSelection,
+      onChangeMultipleSelection,
     } = this.props;
     const checkedIcon = multipleSelection ? 'checked-square-o' : 'dot-circle-o';
     const uncheckedIcon = multipleSelection ? 'square-o' : 'circle-o';
@@ -123,40 +126,58 @@ class CustomizationOptionsCard extends Component {
         <View
           style={{
             flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}>
-          <View>
-            <Text style={{fontSize: 20, marginBottom: 5}}>{title}</Text>
+          <Text
+            style={{
+              fontSize: 20,
+              fontFamily: 'ProductSans-Bold',
+              marginBottom: 5,
+              flex: 1,
+            }}>
+            {title}
+          </Text>
 
-            {multipleSelection ? (
-              <View
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                backgroundColor: colors.icons,
+                borderRadius: 5,
+                paddingVertical: 5,
+                paddingHorizontal: 10,
+                elevation: 2,
+                alignItems: 'center',
+              }}>
+              <Text
                 style={{
-                  borderRadius: 5,
-                  backgroundColor: colors.primary,
-                  padding: 3,
-                  elevation: 2,
+                  fontSize: 16,
                 }}>
-                <Text style={{color: colors.icons}}>Not Required</Text>
-              </View>
-            ) : (
-              <View
-                style={{
-                  borderRadius: 5,
-                  backgroundColor: colors.accent,
-                  padding: 3,
-                  elevation: 2,
-                }}>
-                <Text style={{color: colors.icons}}>At least 1 Required</Text>
-              </View>
-            )}
+                Multiple Select
+              </Text>
+
+              <Switch
+                trackColor={{
+                  false: '#767577',
+                  true: colors.accent,
+                }}
+                thumbColor={'#f4f3f4'}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={onChangeMultipleSelection}
+                value={multipleSelection}
+              />
+            </View>
+
+            <Button
+              type="clear"
+              icon={<Icon name="x" color={colors.primary} size={22} />}
+              onPress={() => onDeleteCustomizationOption()}
+            />
           </View>
-
-          <Button
-            type="clear"
-            icon={<Icon name="x" color={colors.primary} size={22} />}
-            onPress={() => onDeleteCustomizationOption()}
-          />
         </View>
 
         <OptionsList

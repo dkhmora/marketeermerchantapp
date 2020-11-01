@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {View, CardItem, Input, Item, Picker} from 'native-base';
+import {View, CardItem, Input, Item} from 'native-base';
 import {Text, Button, Icon, Overlay} from 'react-native-elements';
+import {Picker} from '@react-native-community/picker';
 import BaseHeader from '../components/BaseHeader';
 import {observer, inject} from 'mobx-react';
 import {observable, action, computed} from 'mobx';
