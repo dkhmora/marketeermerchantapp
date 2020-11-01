@@ -94,7 +94,7 @@ class OrderDetailsScreen extends Component {
           return 'Available for Couriers';
 
         case 'reactivated':
-          return 'yes';
+          return 'Reactivated';
 
         default:
           return status.toUpperCase();

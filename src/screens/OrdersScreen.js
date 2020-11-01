@@ -21,7 +21,7 @@ class OrdersScreen extends Component {
     const {navigation} = this.props;
 
     return (
-      <View style={{...StyleSheet.absoluteFillObject}}>
+      <View style={{height: SCREEN_HEIGHT + StatusBar.currentHeight}}>
         <CancelOrderModal navigation={navigation} />
 
         <TouchableWithoutFeedback

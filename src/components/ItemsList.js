@@ -125,7 +125,7 @@ class ItemsList extends Component {
                   />
                 </View>
               }
-              keyExtractor={(item, index) => `${item.name}${category}`}
+              keyExtractor={(item, index) => `${item.name}${category}${index}`}
               showsVerticalScrollIndicator={false}
             />
           ) : (

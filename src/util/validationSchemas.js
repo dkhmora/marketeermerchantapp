@@ -12,4 +12,9 @@ export const foodItemValidationSchema = yup.object().shape({
     .integer()
     .lessThan(yup.ref('price'), 'Discounted Price should be less than Price'),
   additionalStock: yup.number().integer(),
+  category: yup.string().required(),
+});
+
+export const categoryOptionValidationSchema = yup.object().shape({
+  name: yup.string().max(50).required('Option Name is required'),
 });
