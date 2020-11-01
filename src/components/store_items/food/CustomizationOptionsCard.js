@@ -1,8 +1,11 @@
+import {Field, Formik} from 'formik';
 import React, {Component} from 'react';
 import {View} from 'react-native';
 import {Button, Card, CheckBox, Icon, Text} from 'react-native-elements';
 import {colors} from '../../../../assets/colors';
+import CustomInput from '../../CustomInput';
 import Divider from '../../Divider';
+import {itemOptionSelectionValidationSchema} from '../../../util/validationSchemas';
 
 class CustomizationOptionsCard extends Component {
   constructor(props) {
@@ -11,7 +14,7 @@ class CustomizationOptionsCard extends Component {
   }
 
   OptionsList(props) {
-    const {options, checkedIcon, uncheckedIcon} = props;
+    const {options, checkedIcon, uncheckedIcon, onDeleteSelection} = props;
 
     if (options) {
       return options.map((item, index) => {
@@ -60,6 +63,7 @@ class CustomizationOptionsCard extends Component {
                         icon={
                           <Icon name="x" color={colors.primary} size={20} />
                         }
+                        onPress={() => onDeleteSelection(index)}
                       />
                     </View>
                   </View>
@@ -95,14 +99,27 @@ class CustomizationOptionsCard extends Component {
   }
 
   render() {
-    const {title, multipleSelection, options} = this.props;
+    const {
+      title,
+      multipleSelection,
+      options,
+      onDeleteCustomizationOption,
+      onDeleteSelection,
+      onAddSelection,
+    } = this.props;
     const checkedIcon = multipleSelection ? 'checked-square-o' : 'dot-circle-o';
     const uncheckedIcon = multipleSelection ? 'square-o' : 'circle-o';
     const {OptionsList} = this;
 
     return (
       <Card
-        containerStyle={{paddingBottom: 0, paddingTop: 10, borderRadius: 10}}>
+        containerStyle={{
+          paddingBottom: 0,
+          paddingTop: 10,
+          marginLeft: 0,
+          marginRight: 0,
+          borderRadius: 10,
+        }}>
         <View
           style={{
             flexDirection: 'row',
@@ -138,6 +155,7 @@ class CustomizationOptionsCard extends Component {
           <Button
             type="clear"
             icon={<Icon name="x" color={colors.primary} size={22} />}
+            onPress={() => onDeleteCustomizationOption()}
           />
         </View>
 
@@ -145,16 +163,54 @@ class CustomizationOptionsCard extends Component {
           options={options}
           checkedIcon={checkedIcon}
           uncheckedIcon={uncheckedIcon}
+          onDeleteSelection={(index) => onDeleteSelection(index)}
         />
 
         <Divider />
 
-        <Button
-          type="clear"
-          title="Add Selection"
-          containerStyle={{marginVertical: 5}}
-          icon={<Icon name="plus" color={colors.primary} size={20} />}
-        />
+        <Formik
+          innerRef={(formRef) => (this.addOptionForm = formRef)}
+          validationSchema={itemOptionSelectionValidationSchema}
+          initialValues={{
+            title: '',
+            price: 0,
+          }}
+          onSubmit={onAddSelection}>
+          {({handleSubmit, isValid, values, setFieldValue}) => (
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Field
+                component={CustomInput}
+                name="title"
+                placeholder="Selection Name"
+                leftIcon="plus"
+                containerStyle={{flex: 2}}
+              />
+
+              <Field
+                containerStyle={{flex: 1}}
+                component={CustomInput}
+                name="price"
+                placeholder="Price"
+                leftIcon={
+                  <Text style={{color: colors.primary, fontSize: 25}}>₱</Text>
+                }
+              />
+
+              <Button
+                type="clear"
+                title="Add"
+                buttonStyle={{borderRadius: 30}}
+                containerStyle={{borderRadius: 30, margin: 0}}
+                onPress={handleSubmit}
+              />
+            </View>
+          )}
+        </Formik>
       </Card>
     );
   }

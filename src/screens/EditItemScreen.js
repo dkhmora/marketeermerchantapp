@@ -34,7 +34,7 @@ import CustomizationOptionsCard from '../components/store_items/food/Customizati
 import BaseHeader from '../components/BaseHeader';
 import {Formik, Field} from 'formik';
 import {
-  categoryOptionValidationSchema,
+  itemOptionValidationSchema,
   foodItemValidationSchema,
 } from '../util/validationSchemas';
 import CustomInput from '../components/CustomInput';
@@ -195,6 +195,39 @@ class EditItemScreen extends Component {
       }),
       () => resetForm({}),
     );
+  }
+
+  handleDeleteOption(optionTitle) {
+    const newItemOptions = {
+      ...this.state.itemOptions,
+    };
+
+    delete newItemOptions[optionTitle];
+
+    this.setState({itemOptions: newItemOptions});
+  }
+
+  handleDeleteSelection(optionTitle, selectionIndex) {
+    let newItemOptions = {
+      ...this.state.itemOptions,
+    };
+
+    newItemOptions[optionTitle].selection.splice(selectionIndex, 1);
+
+    this.setState({itemOptions: newItemOptions});
+  }
+
+  handleAddSelection(optionTitle, values, {resetForm}) {
+    let newItemOptions = {
+      ...this.state.itemOptions,
+    };
+
+    newItemOptions[optionTitle].selection.push({
+      price: Number(values.price),
+      title: values.title,
+    });
+
+    this.setState({itemOptions: newItemOptions}, () => resetForm({}));
   }
 
   render() {
@@ -636,6 +669,20 @@ class EditItemScreen extends Component {
                           title={optionTitle}
                           multipleSelection={multipleSelection}
                           options={selection}
+                          onDeleteCustomizationOption={() =>
+                            this.handleDeleteOption(optionTitle)
+                          }
+                          onDeleteSelection={(selectionIndex) =>
+                            this.handleDeleteSelection(
+                              optionTitle,
+                              selectionIndex,
+                            )
+                          }
+                          onAddSelection={(values, {resetForm}) =>
+                            this.handleAddSelection(optionTitle, values, {
+                              resetForm,
+                            })
+                          }
                         />
                       );
                     },
@@ -646,7 +693,7 @@ class EditItemScreen extends Component {
 
                 <Formik
                   innerRef={(formRef) => (this.addOptionForm = formRef)}
-                  validationSchema={categoryOptionValidationSchema}
+                  validationSchema={itemOptionValidationSchema}
                   initialValues={{
                     name: '',
                   }}
@@ -659,6 +706,8 @@ class EditItemScreen extends Component {
                           paddingTop: 10,
                           marginTop: 10,
                           borderRadius: 10,
+                          marginLeft: 0,
+                          marginRight: 0,
                         }}>
                         <Field
                           component={CustomInput}

@@ -13,7 +13,6 @@ class CustomInput extends Component {
       field: {name, onBlur, onChange, value},
       form: {errors, touched, setFieldTouched},
       leftIcon,
-      style,
       ...inputProps
     } = this.props;
 
@@ -21,7 +20,6 @@ class CustomInput extends Component {
 
     return (
       <Input
-        style={{...styles.textInput, ...style}}
         value={value}
         errorMessage={hasError ? errors[name] : ''}
         leftIcon={

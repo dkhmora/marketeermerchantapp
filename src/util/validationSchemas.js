@@ -15,6 +15,11 @@ export const foodItemValidationSchema = yup.object().shape({
   category: yup.string().required(),
 });
 
-export const categoryOptionValidationSchema = yup.object().shape({
+export const itemOptionValidationSchema = yup.object().shape({
   name: yup.string().max(50).required('Option Name is required'),
+});
+
+export const itemOptionSelectionValidationSchema = yup.object().shape({
+  title: yup.string().max(50).required('Selection Name is required'),
+  price: yup.number().required('Price is required').integer(),
 });
