@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, CardItem, Left, Right, Body} from 'native-base';
-import {Text, Icon, Button} from 'react-native-elements';
+import {Text, Icon, Button, Avatar} from 'react-native-elements';
 import {
   View,
   ActivityIndicator,
@@ -41,7 +41,6 @@ class OrderDetailsScreen extends Component {
       allowDragging: true,
       changeOrderStatusModal: false,
       cancelMrspeedyBookingModal: false,
-      courier: null,
     };
   }
 
@@ -88,13 +87,19 @@ class OrderDetailsScreen extends Component {
 
       switch (status) {
         case 'new':
-          return 'Awaiting Verification';
-
+          return 'Newly created order, waiting for verification from our dispatchers.';
         case 'available':
-          return 'Available for Couriers';
-
+          return 'Order was verified and is available for couriers.';
+        case 'active':
+          return 'A courier was assigned and is working on the order.';
+        case 'completed':
+          return 'Order is completed.';
+        case 'canceled':
+          return 'Order was canceled.';
+        case 'delayed':
+          return 'Order execution was delayed by a dispatcher.';
         case 'reactivated':
-          return 'Reactivated';
+          return 'Order was reactivated and is again available for couriers.';
 
         default:
           return status.toUpperCase();
@@ -176,45 +181,12 @@ class OrderDetailsScreen extends Component {
       this.getOrderItems();
       this.props.ordersStore.getOrder(orderId);
     }
-
     crashlytics().log('OrderDetailsScreen');
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      this.props.ordersStore.selectedOrder &&
-      this.props.ordersStore.selectedOrder.deliveryMethod === 'Mr. Speedy' &&
-      this.props.ordersStore.selectedOrder.mrspeedyBookingData &&
-      this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
-    ) {
-      if (
-        this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
-          .status === 'active' &&
-        !this.getCourierInterval
-      ) {
-        this.getCourierInterval = setInterval(() => {
-          this.props.ordersStore
-            .getMrSpeedyCourierInfo(
-              this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
-                .order_id,
-            )
-            .then((response) => {
-              if (response.s === 200) {
-                this.setState({courier: response.d});
-              }
-            });
-        }, 5000);
-      } else {
-        clearInterval(this.getCourierInterval);
-      }
-    }
   }
 
   componentWillUnmount() {
     this.props.ordersStore.unsubscribeGetOrder &&
       this.props.ordersStore.unsubscribeGetOrder();
-
-    this.getCourierInterval && clearInterval(this.getCourierInterval);
 
     this.props.ordersStore.selectedOrder = null;
     this.props.ordersStore.orderMessages = null;
@@ -331,7 +303,7 @@ class OrderDetailsScreen extends Component {
     const {orderId} = this.props.route.params;
     const {orderStatus} = this;
     const {navigation} = this.props;
-    const {orderItems, loading, courier} = this.state;
+    const {orderItems, loading} = this.state;
     const buttonText =
       orderStatus[0] === 'PAID'
         ? 'SHIP'
@@ -705,26 +677,44 @@ class OrderDetailsScreen extends Component {
                         {selectedOrder.mrspeedyBookingData.order.courier && (
                           <View>
                             <CardItem bordered>
-                              <Left>
-                                <Text
-                                  style={{
-                                    fontSize: 16,
-                                    fontFamily: 'ProductSans-Bold',
-                                  }}>
-                                  Courier Name:
-                                </Text>
-                              </Left>
+                              <Text
+                                style={{
+                                  flex: 1,
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Courier Name:
+                              </Text>
 
-                              <Right>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  justifyContent: 'flex-end',
+                                  alignItems: 'center',
+                                }}>
+                                {selectedOrder.mrspeedyBookingData.order.courier
+                                  .photo_url && (
+                                  <Avatar
+                                    rounded
+                                    size="medium"
+                                    source={{
+                                      uri:
+                                        selectedOrder.mrspeedyBookingData.order
+                                          .courier.photo_url,
+                                    }}
+                                  />
+                                )}
+
                                 <Text
                                   style={{
                                     color: colors.text_primary,
                                     fontSize: 16,
                                     textAlign: 'right',
+                                    marginLeft: 10,
                                   }}>
                                   {`${selectedOrder.mrspeedyBookingData.order.courier.name} ${selectedOrder.mrspeedyBookingData.order.courier.surname}`}
                                 </Text>
-                              </Right>
+                              </View>
                             </CardItem>
 
                             <CardItem bordered>
@@ -779,26 +769,21 @@ class OrderDetailsScreen extends Component {
                           </Right>
                         </CardItem>
 
-                        <MapCardItem
-                          onTouchStart={() =>
-                            this.setState({allowDragging: false})
-                          }
-                          onTouchEnd={() =>
-                            this.setState({allowDragging: true})
-                          }
-                          onTouchCancel={() =>
-                            this.setState({allowDragging: true})
-                          }
-                          courierCoordinates={
-                            courier
-                              ? {
-                                  latitude: Number(courier.latitude),
-                                  longitude: Number(courier.longitude),
-                                }
-                              : null
-                          }
-                          vehicleType={this.mrspeedyVehicleType}
-                        />
+                        {this.props.ordersStore.selectedOrder
+                          .mrspeedyBookingData.order.status === 'active' && (
+                          <MapCardItem
+                            onTouchStart={() =>
+                              this.setState({allowDragging: false})
+                            }
+                            onTouchEnd={() =>
+                              this.setState({allowDragging: true})
+                            }
+                            onTouchCancel={() =>
+                              this.setState({allowDragging: true})
+                            }
+                            vehicleType={this.mrspeedyVehicleType}
+                          />
+                        )}
                       </Card>
                     )}
 

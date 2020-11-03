@@ -1,30 +1,79 @@
 import {CardItem} from 'native-base';
 import React, {Component} from 'react';
-import MapView, {Marker} from 'react-native-maps';
-import {View} from 'react-native';
+import MapView, {AnimatedRegion, Marker} from 'react-native-maps';
+import {Dimensions, Platform, View} from 'react-native';
 import {inject, observer} from 'mobx-react';
 import {Button, Icon} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 
+const screen = Dimensions.get('window');
+const ASPECT_RATIO = screen.width / screen.height;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 @inject('ordersStore')
 @inject('detailsStore')
 @observer
 class MapCardItem extends Component {
   constructor(props) {
     super(props);
-    this.state = {riderCoordinatesUpdated: false};
+
+    this.state = {
+      initialCourierCoordinates: null,
+    };
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
     if (
-      prevProps.riderCoordinates !== this.props.riderCoordinates &&
-      !this.state.riderCoordinatesUpdated
+      this.props.ordersStore.selectedOrder &&
+      this.props.ordersStore.selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData &&
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
     ) {
-      this.setState({riderCoordinatesUpdated: true}, () => {
-        this.fitMarkers();
-        this.setState({riderCoordinatesUpdated: false});
-      });
+      if (
+        this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
+          .status === 'active' &&
+        !this.getCourierInterval
+      ) {
+        this.initializeGetCourierInterval();
+      } else {
+        clearInterval(this.getCourierInterval);
+      }
     }
+  }
+
+  componentWillUnmount() {
+    this.getCourierInterval && clearInterval(this.getCourierInterval);
+  }
+
+  initializeGetCourierInterval() {
+    this.getCourierInterval = setInterval(() => {
+      this.props.ordersStore
+        .getMrSpeedyCourierInfo(
+          this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
+            .order_id,
+        )
+        .then((response) => {
+          if (response.s === 200) {
+            const courierInfo = response.d;
+            const courierCoordinates = {
+              latitude: Number(courierInfo.latitude),
+              longitude: Number(courierInfo.longitude),
+            };
+
+            if (!this.state.initialCourierCoordinates) {
+              this.setState({
+                initialCourierCoordinates: new AnimatedRegion({
+                  ...courierCoordinates,
+                  latitudeDelta: 0,
+                  longitudeDelta: 0,
+                }),
+              });
+            } else {
+              this.animateMarkerToCoordinate(courierCoordinates);
+            }
+          }
+        });
+    }, 3500);
   }
 
   onMapReady() {
@@ -65,17 +114,23 @@ class MapCardItem extends Component {
     });
   }
 
+  animateMarkerToCoordinate(coordinate) {
+    const {initialCourierCoordinates} = this.state;
+
+    if (Platform.OS === 'android') {
+      if (this.courierMarker) {
+        this.courierMarker.animateMarkerToCoordinate(coordinate, 500);
+      }
+    } else {
+      initialCourierCoordinates.timing(coordinate).start();
+    }
+  }
+
   render() {
     const {selectedOrder} = this.props.ordersStore;
     const {storeDetails} = this.props.detailsStore;
-    const {
-      onTouchStart,
-      onTouchEnd,
-      onTouchCancel,
-      courierCoordinates,
-      vehicleType,
-    } = this.props;
-    const {riderCoordinatesUpdated} = this.state;
+    const {onTouchStart, onTouchEnd, onTouchCancel, vehicleType} = this.props;
+    const {initialCourierCoordinates} = this.state;
 
     return (
       <CardItem
@@ -147,8 +202,8 @@ class MapCardItem extends Component {
                 </Marker>
               )}
 
-            {courierCoordinates && (
-              <Marker
+            {initialCourierCoordinates && (
+              <Marker.Animated
                 ref={(marker) => {
                   this.courierMarker = marker;
                 }}
@@ -158,9 +213,9 @@ class MapCardItem extends Component {
                     : require('../../assets/images/mrspeedy-car-mapmarker.png')
                 }
                 style={{width: 26, height: 28}}
-                tracksViewChanges={riderCoordinatesUpdated}
+                tracksViewChanges={true}
                 title="Mr. Speedy Courier Location"
-                coordinate={courierCoordinates}
+                coordinate={initialCourierCoordinates}
               />
             )}
           </MapView>
