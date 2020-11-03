@@ -1,15 +1,11 @@
 import {CardItem} from 'native-base';
 import React, {Component} from 'react';
 import MapView, {AnimatedRegion, Marker} from 'react-native-maps';
-import {Dimensions, Platform, View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {inject, observer} from 'mobx-react';
 import {Button, Icon} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 
-const screen = Dimensions.get('window');
-const ASPECT_RATIO = screen.width / screen.height;
-const LATITUDE_DELTA = 0.0922;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 @inject('ordersStore')
 @inject('detailsStore')
 @observer
@@ -19,6 +15,7 @@ class MapCardItem extends Component {
 
     this.state = {
       initialCourierCoordinates: null,
+      newCourierCoordinates: null,
     };
   }
 
@@ -69,7 +66,9 @@ class MapCardItem extends Component {
                 }),
               });
             } else {
-              this.animateMarkerToCoordinate(courierCoordinates);
+              this.setState({newCourierCoordinates: courierCoordinates}, () =>
+                this.animateMarkerToCoordinate(courierCoordinates),
+              );
             }
           }
         });
@@ -80,16 +79,12 @@ class MapCardItem extends Component {
     this.fitMarkers();
 
     this.customerMarker.showCallout();
-
-    if (this.props.courierCoordinates) {
-      this.courierMarker.showCallout();
-    }
   }
 
   fitMarkers() {
     const {selectedOrder} = this.props.ordersStore;
     const {storeDetails} = this.props.detailsStore;
-    const {courierCoordinates} = this.props;
+    const {newCourierCoordinates} = this.state;
 
     const markerCoordinates = [
       {
@@ -102,9 +97,9 @@ class MapCardItem extends Component {
       },
     ];
 
-    if (courierCoordinates) {
+    if (newCourierCoordinates) {
       markerCoordinates.push({
-        ...courierCoordinates,
+        ...newCourierCoordinates,
       });
     }
 
