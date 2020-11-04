@@ -41,7 +41,49 @@ class OrderDetailsScreen extends Component {
       allowDragging: true,
       changeOrderStatusModal: false,
       cancelMrspeedyBookingModal: false,
+      courierCoordinates: null,
     };
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.props.ordersStore.selectedOrder &&
+      this.props.ordersStore.selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData &&
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
+    ) {
+      if (
+        this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
+          .status === 'active' &&
+        !this.getCourierInterval
+      ) {
+        this.getCourierInterval = setInterval(() => {
+          this.props.ordersStore
+            .getMrSpeedyCourierInfo(
+              this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
+                .order_id,
+            )
+            .then((response) => {
+              if (response.s === 200) {
+                const courierInfo = response.d;
+
+                if (courierInfo) {
+                  const courierCoordinates = {
+                    latitude: Number(courierInfo.latitude),
+                    longitude: Number(courierInfo.longitude),
+                  };
+
+                  this.setState({courierCoordinates});
+                }
+              }
+            });
+        }, 5000);
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.getCourierInterval);
   }
 
   @computed get orderStatus() {
@@ -303,7 +345,7 @@ class OrderDetailsScreen extends Component {
     const {orderId} = this.props.route.params;
     const {orderStatus} = this;
     const {navigation} = this.props;
-    const {orderItems, loading} = this.state;
+    const {orderItems, loading, courierCoordinates} = this.state;
     const buttonText =
       orderStatus[0] === 'PAID'
         ? 'SHIP'
@@ -769,21 +811,19 @@ class OrderDetailsScreen extends Component {
                           </Right>
                         </CardItem>
 
-                        {this.props.ordersStore.selectedOrder
-                          .mrspeedyBookingData.order.status === 'active' && (
-                          <MapCardItem
-                            onTouchStart={() =>
-                              this.setState({allowDragging: false})
-                            }
-                            onTouchEnd={() =>
-                              this.setState({allowDragging: true})
-                            }
-                            onTouchCancel={() =>
-                              this.setState({allowDragging: true})
-                            }
-                            vehicleType={this.mrspeedyVehicleType}
-                          />
-                        )}
+                        <MapCardItem
+                          onTouchStart={() =>
+                            this.setState({allowDragging: false})
+                          }
+                          onTouchEnd={() =>
+                            this.setState({allowDragging: true})
+                          }
+                          onTouchCancel={() =>
+                            this.setState({allowDragging: true})
+                          }
+                          vehicleType={this.mrspeedyVehicleType}
+                          courierCoordinates={courierCoordinates}
+                        />
                       </Card>
                     )}
 

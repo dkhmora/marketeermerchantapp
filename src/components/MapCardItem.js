@@ -5,6 +5,7 @@ import {Platform, View} from 'react-native';
 import {inject, observer} from 'mobx-react';
 import {Button, Icon} from 'react-native-elements';
 import {colors} from '../../assets/colors';
+import Toast from './Toast';
 
 @inject('ordersStore')
 @inject('detailsStore')
@@ -15,64 +16,23 @@ class MapCardItem extends Component {
 
     this.state = {
       initialCourierCoordinates: null,
-      newCourierCoordinates: null,
     };
   }
 
-  componentDidUpdate() {
-    if (
-      this.props.ordersStore.selectedOrder &&
-      this.props.ordersStore.selectedOrder.deliveryMethod === 'Mr. Speedy' &&
-      this.props.ordersStore.selectedOrder.mrspeedyBookingData &&
-      this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
-    ) {
-      if (
-        this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
-          .status === 'active' &&
-        !this.getCourierInterval
-      ) {
-        this.initializeGetCourierInterval();
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.courierCoordinates !== prevProps.courierCoordinates) {
+      if (!this.state.initialCourierCoordinates) {
+        this.setState({
+          initialCourierCoordinates: new AnimatedRegion({
+            ...this.props.courierCoordinates,
+            latitudeDelta: 0,
+            longitudeDelta: 0,
+          }),
+        });
       } else {
-        clearInterval(this.getCourierInterval);
+        this.animateMarkerToCoordinate(this.props.courierCoordinates);
       }
     }
-  }
-
-  componentWillUnmount() {
-    this.getCourierInterval && clearInterval(this.getCourierInterval);
-  }
-
-  initializeGetCourierInterval() {
-    this.getCourierInterval = setInterval(() => {
-      this.props.ordersStore
-        .getMrSpeedyCourierInfo(
-          this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
-            .order_id,
-        )
-        .then((response) => {
-          if (response.s === 200) {
-            const courierInfo = response.d;
-            const courierCoordinates = {
-              latitude: Number(courierInfo.latitude),
-              longitude: Number(courierInfo.longitude),
-            };
-
-            if (!this.state.initialCourierCoordinates) {
-              this.setState({
-                initialCourierCoordinates: new AnimatedRegion({
-                  ...courierCoordinates,
-                  latitudeDelta: 0,
-                  longitudeDelta: 0,
-                }),
-              });
-            } else {
-              this.setState({newCourierCoordinates: courierCoordinates}, () =>
-                this.animateMarkerToCoordinate(courierCoordinates),
-              );
-            }
-          }
-        });
-    }, 3500);
   }
 
   onMapReady() {
@@ -84,7 +44,7 @@ class MapCardItem extends Component {
   fitMarkers() {
     const {selectedOrder} = this.props.ordersStore;
     const {storeDetails} = this.props.detailsStore;
-    const {newCourierCoordinates} = this.state;
+    const {courierCoordinates} = this.props;
 
     const markerCoordinates = [
       {
@@ -97,9 +57,9 @@ class MapCardItem extends Component {
       },
     ];
 
-    if (newCourierCoordinates) {
+    if (courierCoordinates) {
       markerCoordinates.push({
-        ...newCourierCoordinates,
+        ...courierCoordinates,
       });
     }
 

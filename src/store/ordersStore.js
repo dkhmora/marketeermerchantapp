@@ -236,7 +236,7 @@ class OrdersStore {
     mrspeedyBookingData,
   ) {
     return await functions
-      .httpsCallable('changeOrderStatus')({
+      .httpsCallable('changeOrderStatusTest')({
         orderId,
         storeId,
         merchantId,
