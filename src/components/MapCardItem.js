@@ -22,13 +22,18 @@ class MapCardItem extends Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.props.courierCoordinates !== prevProps.courierCoordinates) {
       if (!this.state.initialCourierCoordinates) {
-        this.setState({
-          initialCourierCoordinates: new AnimatedRegion({
-            ...this.props.courierCoordinates,
-            latitudeDelta: 0,
-            longitudeDelta: 0,
-          }),
-        });
+        this.setState(
+          {
+            initialCourierCoordinates: new AnimatedRegion({
+              ...this.props.courierCoordinates,
+              latitudeDelta: 0,
+              longitudeDelta: 0,
+            }),
+          },
+          () => {
+            this.fitMarkers();
+          },
+        );
       } else {
         this.animateMarkerToCoordinate(this.props.courierCoordinates);
       }
@@ -72,11 +77,7 @@ class MapCardItem extends Component {
   animateMarkerToCoordinate(coordinate) {
     const {initialCourierCoordinates} = this.state;
 
-    if (Platform.OS === 'android') {
-      if (this.courierMarker) {
-        this.courierMarker.animateMarkerToCoordinate(coordinate, 500);
-      }
-    } else {
+    if (initialCourierCoordinates) {
       initialCourierCoordinates.timing(coordinate).start();
     }
   }

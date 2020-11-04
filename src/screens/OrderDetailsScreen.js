@@ -24,6 +24,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import MapCardItem from '../components/MapCardItem';
 import CardItemHeader from '../components/CardItemHeader';
 import MrSpeedyBottomSheet from '../components/MrSpeedyBottomSheet';
+import moment from 'moment';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -55,35 +56,54 @@ class OrderDetailsScreen extends Component {
       if (
         this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
           .status === 'active' &&
-        !this.getCourierInterval
+        !this.props.ordersStore.getCourierInterval
       ) {
-        this.getCourierInterval = setInterval(() => {
-          this.props.ordersStore
-            .getMrSpeedyCourierInfo(
-              this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
-                .order_id,
-            )
-            .then((response) => {
-              if (response.s === 200) {
-                const courierInfo = response.d;
+        this.props.ordersStore.clearGetCourierInterval();
 
-                if (courierInfo) {
-                  const courierCoordinates = {
-                    latitude: Number(courierInfo.latitude),
-                    longitude: Number(courierInfo.longitude),
-                  };
+        this.setCourierInfo();
 
-                  this.setState({courierCoordinates});
-                }
-              }
-            });
-        }, 5000);
+        this.props.ordersStore.getCourierInterval = setInterval(() => {
+          this.setCourierInfo();
+        }, 10000);
       }
+    } else {
+      this.props.ordersStore.clearGetCourierInterval();
     }
   }
 
-  componentWillUnmount() {
-    clearInterval(this.getCourierInterval);
+  componentDidMount() {
+    this.props.ordersStore.clearGetCourierInterval();
+  }
+
+  setCourierInfo() {
+    if (
+      this.props.ordersStore.selectedOrder &&
+      this.props.ordersStore.selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData &&
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData.order &&
+      this.props.ordersStore.selectedOrder.mrspeedyBookingData.order.status ===
+        'active'
+    ) {
+      this.props.ordersStore
+        .getMrSpeedyCourierInfo(
+          this.props.ordersStore.selectedOrder.mrspeedyBookingData.order
+            .order_id,
+        )
+        .then((response) => {
+          if (response.s === 200) {
+            const courierInfo = response.d;
+
+            if (courierInfo && courierInfo.latitude && courierInfo.longitude) {
+              const courierCoordinates = {
+                latitude: Number(courierInfo.latitude),
+                longitude: Number(courierInfo.longitude),
+              };
+
+              this.setState({courierCoordinates});
+            }
+          }
+        });
+    }
   }
 
   @computed get orderStatus() {

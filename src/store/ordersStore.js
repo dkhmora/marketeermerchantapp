@@ -22,6 +22,12 @@ class OrdersStore {
   @observable selectedCancelOrder = null;
   @observable mrspeedyBottomSheet = null;
   @observable mrspeedyBottomSheetSnapIndex = null;
+  @observable getCourierInterval = null;
+
+  @action clearGetCourierInterval() {
+    clearInterval(this.getCourierInterval);
+    this.getCourierInterval = null;
+  }
 
   @action async getMrspeedyOrderPriceEstimate({
     subTotal,

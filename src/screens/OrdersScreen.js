@@ -14,6 +14,8 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 @observer
 class OrdersScreen extends Component {
   componentDidMount() {
+    this.props.ordersStore.clearGetCourierInterval();
+
     crashlytics().log('OrdersScreen');
   }
 
