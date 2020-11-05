@@ -82,7 +82,7 @@ class ItemsList extends Component {
 
     const isTablet = DeviceInfo.isTablet();
     const numColumns =
-      storeType === 'basic' ? (isTablet ? 3 : 2) : isTablet ? 2 : 1;
+      storeType === 'food' ? (isTablet ? 2 : 1) : isTablet ? 3 : 2;
 
     return (
       <Container style={{flex: 1}}>

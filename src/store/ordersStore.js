@@ -278,6 +278,17 @@ class OrdersStore {
       });
   }
 
+  @action async rebookMrspeedyBooking({mrspeedyBookingData, orderId}) {
+    return await functions
+      .httpsCallable('rebookMrSpeedyBooking')({mrspeedyBookingData, orderId})
+      .then((response) => {
+        return response.data;
+      })
+      .catch((err) => {
+        Toast({text: err.message, type: 'danger'});
+      });
+  }
+
   @action async getMrSpeedyCourierInfo(mrspeedyOrderId) {
     return await functions
       .httpsCallable('getMrSpeedyCourierInfo')({mrspeedyOrderId})

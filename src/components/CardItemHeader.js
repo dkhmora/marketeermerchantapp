@@ -10,7 +10,14 @@ class CardItemHeader extends Component {
   }
 
   render() {
-    const {title, onPress, activeOpacity} = this.props;
+    const {
+      title,
+      onPress,
+      activeOpacity,
+      style,
+      titleStyle,
+      ...otherProps
+    } = this.props;
 
     return (
       <CardItem
@@ -25,9 +32,19 @@ class CardItemHeader extends Component {
           paddingBottom: 0,
           height: 60,
           elevation: 2,
-        }}>
+          ...style,
+        }}
+        {...otherProps}>
         {typeof title === 'string' ? (
-          <Text style={{color: colors.primary, fontSize: 20}}>{title}</Text>
+          <Text
+            style={{
+              color: colors.primary,
+              fontFamily: 'ProductSans-Bold',
+              fontSize: 20,
+              ...titleStyle,
+            }}>
+            {title}
+          </Text>
         ) : (
           title
         )}
