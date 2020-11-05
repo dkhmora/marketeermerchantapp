@@ -194,103 +194,105 @@ class StoreDetailsScreen extends Component {
           </Card>
         )}
 
-        <Card
-          containerStyle={{
-            flex: 1,
-            borderRadius: 10,
-            paddingLeft: 0,
-            paddingRight: 0,
-            paddingTop: 0,
-            paddingBottom: 0,
-            overflow: 'hidden',
-          }}>
-          <CardItemHeader
-            style={{height: 25}}
-            title="Online Banking Transactions"
-            titleStyle={{fontSize: 15}}
-          />
-
-          <View
-            style={{
+        {item.onlineBanking && (
+          <Card
+            containerStyle={{
               flex: 1,
-              flexDirection: 'row',
-              paddingHorizontal: 10,
-              paddingVertical: 10,
+              borderRadius: 10,
+              paddingLeft: 0,
+              paddingRight: 0,
+              paddingTop: 0,
+              paddingBottom: 0,
+              overflow: 'hidden',
             }}>
-            <View style={{flex: 1}}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  flex: 1,
-                }}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontFamily: 'ProductSans-Bold',
-                    color: colors.text_primary,
-                    textAlign: 'left',
-                  }}>
-                  {'Payment Gateway Fee: '}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontFamily: 'ProductSans-Regular',
-                    color: colors.text_primary,
-                    textAlign: 'left',
-                  }}>
-                  -₱{item.onlineBanking.totalPaymentGatewayFees}
-                </Text>
-              </View>
-
-              <Text
-                style={{
-                  fontSize: 14,
-                }}>
-                {`${item.onlineBanking.transactionCount} `}
-                {item.onlineBanking.transactionCount < 2
-                  ? 'transaction'
-                  : 'transactions'}
-              </Text>
-
-              <Text style={{color: colors.text_secondary, paddingTop: 8}}>
-                Updated {timeStamp}
-              </Text>
-            </View>
+            <CardItemHeader
+              style={{height: 25}}
+              title="Online Banking Transactions"
+              titleStyle={{fontSize: 15}}
+            />
 
             <View
               style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: colors.primary,
-                borderRadius: 10,
-                elevation: 3,
-                padding: 5,
-                width: '30%',
+                flex: 1,
+                flexDirection: 'row',
+                paddingHorizontal: 10,
+                paddingVertical: 10,
               }}>
-              <Text
-                numberOfLines={2}
-                adjustsFontSizeToFit
+              <View style={{flex: 1}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flex: 1,
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: 'ProductSans-Bold',
+                      color: colors.text_primary,
+                      textAlign: 'left',
+                    }}>
+                    {'Payment Gateway Fee: '}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: 'ProductSans-Regular',
+                      color: colors.text_primary,
+                      textAlign: 'left',
+                    }}>
+                    -₱{item.onlineBanking.totalPaymentGatewayFees}
+                  </Text>
+                </View>
+
+                <Text
+                  style={{
+                    fontSize: 14,
+                  }}>
+                  {`${item.onlineBanking.transactionCount} `}
+                  {item.onlineBanking.transactionCount < 2
+                    ? 'transaction'
+                    : 'transactions'}
+                </Text>
+
+                <Text style={{color: colors.text_secondary, paddingTop: 8}}>
+                  Updated {timeStamp}
+                </Text>
+              </View>
+
+              <View
                 style={{
-                  fontSize: 20,
-                  flex: 1,
-                  fontFamily: 'ProductSans-Bold',
-                  color: colors.icons,
-                  textAlign: 'center',
-                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: colors.primary,
+                  borderRadius: 10,
+                  elevation: 3,
+                  padding: 5,
+                  width: '30%',
                 }}>
-                ₱{item.onlineBanking.totalAmount.toFixed(2)}
-              </Text>
-              <Text
-                style={{
-                  color: colors.icons,
-                  textAlign: 'center',
-                }}>
-                Total Amount
-              </Text>
+                <Text
+                  numberOfLines={2}
+                  adjustsFontSizeToFit
+                  style={{
+                    fontSize: 20,
+                    flex: 1,
+                    fontFamily: 'ProductSans-Bold',
+                    color: colors.icons,
+                    textAlign: 'center',
+                    flexWrap: 'wrap',
+                  }}>
+                  ₱{item.onlineBanking.totalAmount.toFixed(2)}
+                </Text>
+                <Text
+                  style={{
+                    color: colors.icons,
+                    textAlign: 'center',
+                  }}>
+                  Total Amount
+                </Text>
+              </View>
             </View>
-          </View>
-        </Card>
+          </Card>
+        )}
       </View>
     );
   }

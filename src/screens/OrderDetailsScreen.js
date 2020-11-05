@@ -471,7 +471,12 @@ class OrderDetailsScreen extends Component {
                           justifyContent: 'space-between',
                           alignItems: 'center',
                         }}>
-                        <Text style={{color: colors.primary, fontSize: 20}}>
+                        <Text
+                          style={{
+                            color: colors.primary,
+                            fontFamily: 'ProductSans-Bold',
+                            fontSize: 20,
+                          }}>
                           Customer Details
                         </Text>
 

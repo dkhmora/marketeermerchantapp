@@ -50,10 +50,14 @@ class BaseHeader extends Component {
   };
 
   leftComponent = () => {
-    const {backButton} = this.props;
+    const {backButton, leftComponent} = this.props;
 
     if (backButton) {
       return this.backButton();
+    }
+
+    if (leftComponent) {
+      return leftComponent;
     }
 
     return this.menuButton();
@@ -101,7 +105,7 @@ class BaseHeader extends Component {
   };
 
   render() {
-    const {...otherProps} = this.props;
+    const {statusBarProps, containerStyle} = this.props;
 
     return (
       <Header
@@ -113,14 +117,14 @@ class BaseHeader extends Component {
           barStyle: 'light-content',
           backgroundColor: colors.statusBar,
           translucent: true,
+          ...statusBarProps,
         }}
-        containerStyle={styles.header}
+        containerStyle={{...styles.header, ...containerStyle}}
         leftContainerStyle={{flex: 0}}
         rightContainerStyle={{flex: 0}}
         centerContainerStyle={{
           flex: 1,
         }}
-        {...otherProps}
       />
     );
   }

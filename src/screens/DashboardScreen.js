@@ -520,6 +520,21 @@ class DashboardScreen extends Component {
         <BaseHeader
           title={this.props.route.name}
           navigation={navigation}
+          containerStyle={editMode ? {backgroundColor: colors.accent} : null}
+          leftComponent={
+            editMode && (
+              <Button
+                type="clear"
+                color={colors.icons}
+                icon={<Icon name="x" color={colors.icons} />}
+                onPress={() => this.cancelEditing()}
+                titleStyle={{color: colors.icons}}
+                containerStyle={{
+                  borderRadius: 24,
+                }}
+              />
+            )
+          }
           rightComponent={
             editMode ? (
               <View
@@ -536,17 +551,6 @@ class DashboardScreen extends Component {
                   loadingProps={{color: colors.icons}}
                   onPress={() => this.handleConfirmDetails()}
                   disabled={saveDisabled}
-                />
-
-                <Button
-                  type="clear"
-                  color={colors.icons}
-                  icon={<Icon name="x" color={colors.icons} />}
-                  onPress={() => this.cancelEditing()}
-                  titleStyle={{color: colors.icons}}
-                  containerStyle={{
-                    borderRadius: 24,
-                  }}
                 />
               </View>
             ) : (
