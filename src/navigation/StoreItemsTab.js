@@ -44,7 +44,7 @@ class StoreItemsTab extends Component {
             allowFontScaling: false,
             scrollEnabled: true,
             activeTintColor: colors.primary,
-            inactiveTintColor: colors.text_primary,
+            inactiveTintColor: colors.text_secondary,
             tabStyle: {
               width: this.tabWidth,
               paddingTop: 0,
