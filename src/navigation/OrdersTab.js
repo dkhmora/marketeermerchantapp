@@ -6,6 +6,7 @@ import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {View} from 'react-native';
+import {color} from 'react-native-reanimated';
 
 const TabOrders = createMaterialTopTabNavigator();
 
@@ -41,25 +42,22 @@ class OrdersTab extends Component {
             allowFontScaling: false,
             scrollEnabled: true,
             activeTintColor: colors.primary,
+            inactiveTintColor: colors.text_primary,
             tabStyle: {
               width: 'auto',
               paddingTop: 0,
             },
-            labelStyle: {marginTop: 0},
+            labelStyle: {
+              marginTop: 0,
+              fontFamily: 'ProductSans-Regular',
+            },
             indicatorStyle: {
+              height: 1,
               backgroundColor: colors.primary,
-              elevation: 7,
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 1,
-              },
-              shadowOpacity: 0.2,
-              shadowRadius: 1.41,
             },
             style: {
               backgroundColor: colors.icons,
-              height: 30,
+              height: 35,
               paddingTop: 0,
               shadowColor: '#000',
               shadowOffset: {

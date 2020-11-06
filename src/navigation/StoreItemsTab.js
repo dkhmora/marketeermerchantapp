@@ -44,25 +44,22 @@ class StoreItemsTab extends Component {
             allowFontScaling: false,
             scrollEnabled: true,
             activeTintColor: colors.primary,
+            inactiveTintColor: colors.text_primary,
             tabStyle: {
               width: this.tabWidth,
               paddingTop: 0,
             },
-            labelStyle: {marginTop: 0},
+            labelStyle: {
+              marginTop: 0,
+              fontFamily: 'ProductSans-Regular',
+            },
             indicatorStyle: {
+              height: 1,
               backgroundColor: colors.primary,
-              elevation: 7,
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 1,
-              },
-              shadowOpacity: 0.2,
-              shadowRadius: 1.41,
             },
             style: {
               backgroundColor: colors.icons,
-              height: 30,
+              height: 35,
               paddingTop: 0,
               shadowColor: '#000',
               shadowOffset: {

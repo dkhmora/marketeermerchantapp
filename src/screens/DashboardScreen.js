@@ -518,7 +518,7 @@ class DashboardScreen extends Component {
     return (
       <View style={{flex: 1}}>
         <BaseHeader
-          title={this.props.route.name}
+          title={editMode ? 'Edit Details' : this.props.route.name}
           navigation={navigation}
           containerStyle={editMode ? {backgroundColor: colors.accent} : null}
           leftComponent={
