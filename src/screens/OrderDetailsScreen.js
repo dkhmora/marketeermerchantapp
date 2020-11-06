@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Card, CardItem, Left, Right, Body} from 'native-base';
-import {Text, Icon, Button, Avatar} from 'react-native-elements';
+import {Text, Icon, Button, Avatar, Badge} from 'react-native-elements';
 import {
   View,
   ActivityIndicator,
@@ -61,16 +61,12 @@ class OrderDetailsScreen extends Component {
           .status === 'active' &&
         !this.props.ordersStore.getCourierInterval
       ) {
-        this.props.ordersStore.clearGetCourierInterval();
-
         this.setCourierInfo();
 
         this.props.ordersStore.getCourierInterval = setInterval(() => {
           this.setCourierInfo();
         }, 10000);
       }
-    } else {
-      this.props.ordersStore.clearGetCourierInterval();
     }
   }
 
@@ -115,6 +111,8 @@ class OrderDetailsScreen extends Component {
             }
           }
         });
+    } else {
+      this.props.generalStore.clearGetCourierInterval();
     }
   }
 
@@ -353,22 +351,22 @@ class OrderDetailsScreen extends Component {
   }
 
   rebookMrspeedyBooking() {
-    this.props.authStore.appReady = false;
-
     const {orderId} = this.props.route.params;
     const {selectedOrder} = this.props.ordersStore;
 
-    if (selectedOrder.paymentMethod === 'Online Banking') {
+    if (selectedOrder.paymentMethod === 'COD') {
       this.mrspeedyBottomSheet.bottomSheet &&
         this.mrspeedyBottomSheet.bottomSheet.snapTo(1);
     } else {
+      this.props.authStore.appReady = false;
+
       this.props.ordersStore
         .rebookMrspeedyBooking({orderId})
         .then((response) => {
-          if (response.s === 200) {
-            Toast({text: response.m});
+          if (response.data.s === 200) {
+            Toast({text: response.data.m});
           } else {
-            Toast({text: response.m, type: 'danger'});
+            Toast({text: response.data.m, type: 'danger'});
           }
 
           this.props.authStore.appReady = true;
@@ -423,7 +421,19 @@ class OrderDetailsScreen extends Component {
               )
             }
             backButton
-            options={orderStatus[0] === 'PENDING' ? ['Cancel Order'] : null}
+            options={
+              orderStatus[0] === 'PENDING' ||
+              orderStatus[0] === 'UNPAID' ||
+              (orderStatus[0] === 'PAID' &&
+                selectedOrder.paymentMethod === 'COD') ||
+              (orderStatus[0] === 'SHIPPED' &&
+                (selectedOrder.deliveryMethod === 'Own Delivery' ||
+                  (selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+                    selectedOrder.mrspeedyBookingData.order.status ===
+                      'canceled')))
+                ? ['Cancel Order']
+                : null
+            }
             actions={[
               () => {
                 this.props.ordersStore.cancelOrderModal = true;
@@ -480,8 +490,32 @@ class OrderDetailsScreen extends Component {
                           Customer Details
                         </Text>
 
-                        <View>
-                          <Icon name="message-square" color={colors.primary} />
+                        <View style={{alignItems: 'center'}}>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              paddingHorizontal: 5,
+                              paddingTop: 5,
+                            }}>
+                            <Icon
+                              name="message-square"
+                              color={colors.primary}
+                            />
+
+                            {selectedOrder.storeUnreadCount !== null &&
+                              selectedOrder.storeUnreadCount > 0 && (
+                                <Badge
+                                  value={selectedOrder.storeUnreadCount}
+                                  badgeStyle={{backgroundColor: colors.accent}}
+                                  containerStyle={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 0,
+                                  }}
+                                />
+                              )}
+                          </View>
+
                           <Text style={{color: colors.primary}}>Chat</Text>
                         </View>
                       </View>

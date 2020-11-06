@@ -51,6 +51,65 @@ class OrderCard extends PureComponent {
     return null;
   }
 
+  @computed get footerText() {
+    const {order, tabName} = this.props;
+    const {mrspeedyOrderStatus} = this;
+
+    if (
+      order.deliveryMethod === 'Mr. Speedy' &&
+      order.orderStatus.shipped.status
+    ) {
+      return mrspeedyOrderStatus;
+    }
+
+    if (tabName === 'Unpaid' && order.paymentMethod === 'Online Banking') {
+      return 'Order will be ready to ship after the customer pays';
+    }
+  }
+
+  @computed get buttonText() {
+    const {order, tabName} = this.props;
+
+    return (
+      (tabName === 'Paid' && 'Ship') ||
+      (tabName === 'Unpaid' &&
+        order.paymentMethod === 'Online Payment' &&
+        'Mark as Paid') ||
+      (tabName === 'Pending' && 'Accept') ||
+      (tabName === 'Shipped' && 'Complete')
+    );
+  }
+
+  @computed get mrspeedyOrderStatus() {
+    const {order} = this.props;
+
+    if (order.mrspeedyBookingData && order.mrspeedyBookingData.order) {
+      const {status} = order.mrspeedyBookingData.order;
+
+      switch (status) {
+        case 'new':
+          return "Newly created order, waiting for verification from Mr. Speedy's dispatchers.";
+        case 'available':
+          return 'Order was verified and is available for couriers.';
+        case 'active':
+          return 'A courier was assigned and is working on the order.';
+        case 'completed':
+          return 'Order is completed.';
+        case 'canceled':
+          return 'Order was canceled.';
+        case 'delayed':
+          return 'Order execution was delayed by a dispatcher.';
+        case 'reactivated':
+          return 'Order was reactivated and is again available for couriers.';
+
+        default:
+          return status.toUpperCase();
+      }
+    }
+
+    return null;
+  }
+
   handleChangeOrderStatus() {
     const {storeDetails} = this.props.detailsStore;
     const {order} = this.props;
@@ -89,18 +148,17 @@ class OrderCard extends PureComponent {
 
   render() {
     const {order, tabName, navigation, ...otherProps} = this.props;
-
-    const buttonText =
-      (tabName === 'Paid' && 'Ship') ||
-      (tabName === 'Unpaid' &&
-        order.paymentMethod === 'Online Payment' &&
-        'Mark as Paid') ||
-      (tabName === 'Pending' && 'Accept') ||
-      (tabName === 'Shipped' && 'Complete');
+    const {orderStatus, footerText, buttonText} = this;
 
     const CardHeader = () => {
       const optionsButton =
-        tabName === 'Pending' || tabName === 'Unpaid' ? true : false;
+        orderStatus[0] === 'PENDING' ||
+        orderStatus[0] === 'UNPAID' ||
+        (orderStatus[0] === 'PAID' && order.paymentMethod === 'COD') ||
+        (orderStatus[0] === 'SHIPPED' &&
+          (order.deliveryMethod === 'Own Delivery' ||
+            (order.deliveryMethod === 'Mr. Speedy' &&
+              order.mrspeedyBookingData.order.status === 'canceled')));
 
       return (
         <CardItem
@@ -234,8 +292,8 @@ class OrderCard extends PureComponent {
                   options={['Cancel Order']}
                   actions={[
                     () => {
-                      this.props.ordersStore.cancelOrderModal = true;
                       this.props.ordersStore.selectedCancelOrder = order;
+                      this.props.ordersStore.cancelOrderModal = true;
                     },
                   ]}
                 />
@@ -247,13 +305,6 @@ class OrderCard extends PureComponent {
     };
 
     const CardFooter = () => {
-      const footerText =
-        buttonText === 'Complete' && order.deliveryMethod === 'Mr. Speedy'
-          ? 'Order will be completed once the courier delivers the items to the customer'
-          : tabName === 'Unpaid' && order.paymentMethod === 'Online Banking'
-          ? 'Order will be ready to ship after the customer pays'
-          : '';
-
       return (
         <CardItem footer style={{paddingTop: 0, paddingBottom: 10}}>
           <Left>
@@ -286,7 +337,7 @@ class OrderCard extends PureComponent {
                       order.paymentMethod === 'Online Banking' &&
                       order.orderStatus.pending.status)
                   ) {
-                    this.props.ordersStore.selectedOrder = order;
+                    this.props.ordersStore.order = order;
 
                     if (this.props.ordersStore.mrspeedyBottomSheet) {
                       this.props.ordersStore.mrspeedyBottomSheet.getMrspeedyOrderPriceEstimate();

@@ -242,7 +242,7 @@ class OrdersStore {
     mrspeedyBookingData,
   ) {
     return await functions
-      .httpsCallable('changeOrderStatusTest')({
+      .httpsCallable('changeOrderStatus')({
         orderId,
         storeId,
         merchantId,
@@ -281,9 +281,6 @@ class OrdersStore {
   @action async rebookMrspeedyBooking({mrspeedyBookingData, orderId}) {
     return await functions
       .httpsCallable('rebookMrSpeedyBooking')({mrspeedyBookingData, orderId})
-      .then((response) => {
-        return response.data;
-      })
       .catch((err) => {
         Toast({text: err.message, type: 'danger'});
       });

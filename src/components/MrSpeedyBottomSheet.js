@@ -34,7 +34,7 @@ class MrSpeedyBottomSheet extends Component {
       bottomSheetPadding: 0,
       selectedVehicleIndex: 0,
       selectedWeightIndex: 0,
-      motobox: false,
+      motobox: true,
       mrspeedyEstimateLoading: false,
       storePhoneNumber: '',
       storePhoneNumberError: null,
@@ -67,12 +67,19 @@ class MrSpeedyBottomSheet extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const {selectedVehicleIndex, selectedWeightIndex} = this.state;
+    const {
+      selectedVehicleIndex,
+      selectedWeightIndex,
+      mrspeedyEstimateLoading,
+      mrspeedyOrderPrice,
+      openRatio,
+    } = this.state;
 
     if (
-      prevState !== this.state &&
       this.props.ordersStore.selectedOrder &&
-      (prevState.selectedVehicleIndex !== selectedVehicleIndex ||
+      openRatio > 0 &&
+      ((!mrspeedyEstimateLoading && mrspeedyOrderPrice === '0.00') ||
+        prevState.selectedVehicleIndex !== selectedVehicleIndex ||
         (selectedVehicleIndex === 1 &&
           prevState.selectedWeightIndex !== selectedWeightIndex))
     ) {
@@ -211,33 +218,64 @@ class MrSpeedyBottomSheet extends Component {
       storePhoneNumber: formattedPhoneNubmer,
     };
 
-    this.props.ordersStore
-      .setOrderStatus(
-        orderId,
-        storeId,
-        storeDetails.merchantId,
-        mrspeedyBookingData,
-      )
-      .then((response) => {
-        this.props.authStore.appReady = true;
+    if (
+      selectedOrder.mrspeedyBookingData &&
+      selectedOrder.mrspeedyBookingData.order &&
+      selectedOrder.mrspeedyBookingData.order.status === 'canceled'
+    ) {
+      this.props.ordersStore
+        .rebookMrspeedyBooking({
+          mrspeedyBookingData,
+          orderId,
+        })
+        .then((response) => {
+          if (response.data.s === 200) {
+            this.bottomSheet && this.bottomSheet.snapTo(0);
 
-        if (response.data.s === 200) {
-          this.bottomSheet && this.bottomSheet.snapTo(0);
+            return Toast({
+              text: response.data.m,
+              type: 'success',
+              duration: 3500,
+            });
+          }
 
           return Toast({
             text: response.data.m,
-            type: 'success',
+            type: 'danger',
             duration: 3500,
           });
-        }
-
-        return Toast({
-          text: response.data.m,
-          type: 'danger',
-          duration: 3500,
         });
-      });
+    } else {
+      this.props.ordersStore
+        .setOrderStatus(
+          orderId,
+          storeId,
+          storeDetails.merchantId,
+          mrspeedyBookingData,
+        )
+        .then((response) => {
+          this.props.authStore.appReady = true;
+
+          if (response.data.s === 200) {
+            this.bottomSheet && this.bottomSheet.snapTo(0);
+
+            return Toast({
+              text: response.data.m,
+              type: 'success',
+              duration: 3500,
+            });
+          }
+
+          return Toast({
+            text: response.data.m,
+            type: 'danger',
+            duration: 3500,
+          });
+        });
+    }
   }
+
+  rebookMrspeedyBooking() {}
 
   onCallback = ([value]) => {
     this.setState({
@@ -250,7 +288,7 @@ class MrSpeedyBottomSheet extends Component {
       bottomSheetPadding: 0,
       selectedVehicleIndex: 0,
       selectedWeightIndex: 0,
-      motobox: false,
+      motobox: true,
       mrspeedyEstimateLoading: false,
       storePhoneNumber: '',
       storePhoneNumberError: null,
@@ -307,11 +345,13 @@ class MrSpeedyBottomSheet extends Component {
           borderRadius={30}
           initialSnap={0}
           callbackNode={this.drawerCallbackNode}
-          onCloseEnd={
-            (clearSelectedOrderOnClose
-              ? () => (this.props.ordersStore.selectedOrder = null)
-              : null) && (() => this.resetState())
-          }
+          onCloseEnd={() => {
+            if (clearSelectedOrderOnClose) {
+              this.props.ordersStore.selectedOrder = null;
+            } else {
+              this.resetState();
+            }
+          }}
           renderContent={() => (
             <View
               onTouchStart={() => Keyboard.dismiss()}
@@ -327,14 +367,28 @@ class MrSpeedyBottomSheet extends Component {
                 height: 320 + bottomSheetPadding,
                 paddingVertical: 5,
               }}>
-              <Image
-                source={require('../../assets/images/mrspeedy-logo.png')}
+              <View
                 style={{
-                  height: 50,
-                  width: 100,
-                  resizeMode: 'contain',
-                }}
-              />
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Image
+                  source={require('../../assets/images/mrspeedy-logo.png')}
+                  style={{
+                    height: 50,
+                    width: 100,
+                    resizeMode: 'contain',
+                  }}
+                />
+
+                <Text numberOfLines={1} style={{fontSize: 18}}>
+                  {` | Order # ${
+                    selectedOrder ? selectedOrder.storeOrderNumber : ''
+                  }`}
+                </Text>
+              </View>
+
               <View style={{paddingHorizontal: 10}}>
                 <ButtonGroup
                   onPress={(index) => {
