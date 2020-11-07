@@ -3,11 +3,12 @@ import {FlatList, ActivityIndicator} from 'react-native';
 import {Container, View, Fab} from 'native-base';
 import {observer, inject} from 'mobx-react';
 // Custom Components
-import ItemCard from './ItemCard';
+import ItemCard from './store_items/basic/ItemCard';
 import {colors} from '../../assets/colors';
 import {Text, Icon} from 'react-native-elements';
 import Toast from './Toast';
 import DeviceInfo from 'react-native-device-info';
+import FoodItemCard from './store_items/food/FoodItemCard';
 
 @inject('itemsStore')
 @inject('detailsStore')
@@ -36,7 +37,8 @@ class ItemsList extends Component {
     this.unsubscribeTabPress = this.props.navigation.addListener(
       'tabPress',
       (e) => {
-        this.flatList.scrollToOffset({animated: true, offset: 0});
+        this.flatList &&
+          this.flatList.scrollToOffset({animated: true, offset: 0});
       },
     );
   }
@@ -45,8 +47,28 @@ class ItemsList extends Component {
     this.unsubscribeTabPress && this.unsubscribeTabPress();
   }
 
+  renderItem = ({item, index}) => {
+    const {storeType} = this.props.detailsStore.storeDetails;
+    const ItemCardComponent = storeType === 'food' ? FoodItemCard : ItemCard;
+
+    if (item.empty) {
+      return (
+        <View style={{flex: 1, backgroundColor: 'transparent'}} key={index} />
+      );
+    }
+
+    return (
+      <ItemCardComponent
+        item={item}
+        navigation={this.props.navigation}
+        key={`${item.name}${this.props.route.params.category}`}
+      />
+    );
+  };
+
   render() {
     const {category} = this.props.route.params;
+    const {storeType} = this.props.detailsStore.storeDetails;
     const {navigation} = this.props;
     let dataSource = [];
 
@@ -59,7 +81,8 @@ class ItemsList extends Component {
     }
 
     const isTablet = DeviceInfo.isTablet();
-    const numColumns = isTablet ? 3 : 2;
+    const numColumns =
+      storeType === 'food' ? (isTablet ? 2 : 1) : isTablet ? 3 : 2;
 
     return (
       <Container style={{flex: 1}}>
@@ -71,16 +94,7 @@ class ItemsList extends Component {
               numColumns={numColumns}
               contentContainerStyle={{flexGrow: 1}}
               initialNumToRender={4}
-              renderItem={({item, index}) =>
-                item.empty ? (
-                  <View
-                    style={{flex: 1, backgroundColor: 'transparent'}}
-                    key={index}
-                  />
-                ) : (
-                  <ItemCard item={item} key={`${item.name}${category}`} />
-                )
-              }
+              renderItem={this.renderItem}
               ListEmptyComponent={
                 <View
                   style={{
@@ -111,7 +125,7 @@ class ItemsList extends Component {
                   />
                 </View>
               }
-              keyExtractor={(item, index) => `${item.name}${category}`}
+              keyExtractor={(item, index) => `${item.name}${category}${index}`}
               showsVerticalScrollIndicator={false}
             />
           ) : (
@@ -135,7 +149,10 @@ class ItemsList extends Component {
               this.props.detailsStore.storeDetails.itemCategories &&
               this.props.detailsStore.storeDetails.itemCategories.length > 0
             ) {
-              navigation.navigate('Add Item', {pageCategory: category});
+              navigation.navigate('Edit Item', {
+                item: null,
+                itemCategory: category,
+              });
             } else {
               Toast({
                 text: 'Please add a category before adding an item.',

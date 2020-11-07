@@ -136,9 +136,8 @@ class PaymentOptionsModal extends Component {
             <ScrollView
               showsVerticalScrollIndicator={false}
               contentInsetAdjustmentBehavior="automatic">
-              {Object.entries(availablePaymentMethods)
-                .sort((a, b) => a[1].longName > b[1].longName)
-                .map(([key, value], index) => {
+              {Object.entries(availablePaymentMethods).map(
+                ([key, value], index) => {
                   const paymentMethod = {[key]: value};
 
                   return (
@@ -193,7 +192,8 @@ class PaymentOptionsModal extends Component {
                       }
                     />
                   );
-                })}
+                },
+              )}
             </ScrollView>
           ) : (
             <View

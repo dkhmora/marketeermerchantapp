@@ -14,6 +14,7 @@ import {CardItem, Card} from 'native-base';
 import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
 import {initialWindowMetrics} from 'react-native-safe-area-context';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const SCREEN_HEIGHT = Dimensions.get('screen').height;
 const inset = initialWindowMetrics && initialWindowMetrics.insets;
@@ -68,6 +69,8 @@ class TopUpScreen extends Component {
 
   componentDidMount() {
     this.checkEmail(this.state.email);
+
+    crashlytics().log('StoreItemsScreen');
   }
 
   handleEmailChange = (email) => {
@@ -99,7 +102,7 @@ class TopUpScreen extends Component {
     this.props.authStore.appReady = false;
 
     this.props.paymentsStore
-      .getPaymentLink({
+      .getTopUpPaymentLink({
         topUpAmount,
         email,
         processId: selectedPaymentProcId,
@@ -161,7 +164,7 @@ class TopUpScreen extends Component {
 
     const {selectedPayment, totalAmount} = this;
 
-    const {storeDetails} = this.props.detailsStore;
+    const {merchantDetails} = this.props.detailsStore;
 
     return (
       <View style={{flex: 1}}>
@@ -217,7 +220,7 @@ class TopUpScreen extends Component {
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
                   }}>
-                  Current Markee Credits:{' '}
+                  {'Current Markee Credits: '}
                 </Text>
 
                 <Text
@@ -226,7 +229,7 @@ class TopUpScreen extends Component {
                     fontFamily: 'ProductSans-Bold',
                     color: colors.primary,
                   }}>
-                  ₱{storeDetails.creditData.credits.toFixed(2)}
+                  ₱{merchantDetails.creditData.credits.toFixed(2)}
                 </Text>
               </CardItem>
 
@@ -239,7 +242,7 @@ class TopUpScreen extends Component {
                     fontSize: 16,
                     fontFamily: 'ProductSans-Bold',
                   }}>
-                  New Markee Credits:{' '}
+                  {'New Markee Credits: '}
                 </Text>
 
                 <Text
@@ -250,7 +253,10 @@ class TopUpScreen extends Component {
                     fontFamily: 'ProductSans-Bold',
                     color: colors.primary,
                   }}>
-                  ₱{(storeDetails.creditData.credits + topUpAmount).toFixed(2)}
+                  ₱
+                  {(merchantDetails.creditData.credits + topUpAmount).toFixed(
+                    2,
+                  )}
                 </Text>
               </CardItem>
             </Card>

@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import _ from 'lodash';
 import moment from 'moment';
 import SplashScreen from 'react-native-splash-screen';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 global._ = _;
 global.moment = moment;
@@ -36,7 +37,7 @@ const paymentsStore = (window.store = new PaymentsStore());
 
 hydrate('list', ordersStore);
 hydrate('list', itemsStore);
-hydrate('firstLoad', detailsStore);
+hydrate('list', detailsStore);
 hydrate('subscribedToNotifications', detailsStore);
 
 YellowBox.ignoreWarnings([
@@ -56,17 +57,22 @@ export default class App extends React.Component {
   componentDidMount() {
     const provider = Platform.OS === 'android' ? 'playStore' : 'appStore';
 
+    crashlytics().log('App Mounted');
+
     VersionCheck.needUpdate({
       provider,
       forceUpdate: true,
     }).then(async (res) => {
       if (res) {
         if (res.isNeeded) {
+          crashlytics().log('Request Update');
           this.setState({appUpdateModal: true, appUrl: res.storeUrl});
         } else {
+          crashlytics().log('Hide SplashScreen');
           setTimeout(() => SplashScreen.hide(), 500);
         }
       } else {
+        crashlytics().log('Res cannot be found');
         setTimeout(() => SplashScreen.hide(), 500);
       }
     });

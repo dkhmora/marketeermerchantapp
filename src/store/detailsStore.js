@@ -7,12 +7,18 @@ import '@react-native-firebase/functions';
 import Toast from '../components/Toast';
 import {Platform} from 'react-native';
 import {persist} from 'mobx-persist';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const functions = firebase.app().functions('asia-northeast1');
 const storesCollection = firestore().collection('stores');
+const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 class DetailsStore {
   @observable storeDetails = {};
+  @observable merchantDetails = {};
+  @persist('list') @observable disbursementPeriods = [];
+  @persist @observable lastDisbursementPeriodUpdatedAt = 0;
   @observable unsubscribeSetStoreDetails = null;
+  @observable unsubscribeSetMerchantDetails = null;
   @persist @observable subscribedToNotifications = false;
   @persist @observable firstLoad = true;
 
@@ -20,6 +26,93 @@ class DetailsStore {
     const {storeId} = this.storeDetails;
 
     return storesCollection.doc(storeId);
+  }
+
+  @action async setStoreDeliveryArea({distance, midPoint}) {
+    const {storeId} = this.storeDetails;
+
+    return await functions
+      .httpsCallable('setStoreDeliveryArea')({
+        distance,
+        midPoint,
+        storeId,
+      })
+      .then((response) => {
+        if (response.data.s === 200) {
+          Toast({
+            text: response.data.m,
+          });
+        } else {
+          Toast({
+            text: response.data.m,
+            type: 'danger',
+          });
+        }
+
+        return response.data;
+      })
+      .catch((err) => {
+        crashlytics().recordError(err);
+
+        Toast({
+          text: `Error: ${err}!`,
+          type: 'danger',
+        });
+      });
+  }
+
+  @action async setDisbursementPeriods() {
+    const {merchantId} = this.merchantDetails;
+
+    return await firestore()
+      .collection('merchants')
+      .doc(merchantId)
+      .collection('disbursement_periods')
+      .where('updatedAt', '>', this.lastDisbursementPeriodUpdatedAt)
+      .orderBy('updatedAt', 'desc')
+      .get()
+      .then((querySnapshot) => {
+        return querySnapshot.forEach((doc, index) => {
+          const disbursementData = doc.data();
+          const disbursementIndex = this.disbursementPeriods.findIndex(
+            (disbursement) =>
+              disbursement.startDate === disbursementData.startDate,
+          );
+
+          if (disbursementIndex >= 0) {
+            this.disbursementPeriods[disbursementIndex] = disbursementData;
+          } else {
+            this.disbursementPeriods.push(disbursementData);
+          }
+
+          if (
+            this.lastDisbursementPeriodUpdatedAt < disbursementData.updatedAt
+          ) {
+            this.lastDisbursementPeriodUpdatedAt = disbursementData.updatedAt;
+          }
+        });
+      })
+      .catch((err) => {
+        crashlytics().recordError(err);
+
+        Toast({text: err.message, type: 'danger'});
+      });
+  }
+
+  @action async setMerchantDetails(merchantId) {
+    if (merchantId && !this.unsubscribeSetMerchantDetails) {
+      this.unsubscribeSetMerchantDetails = firestore()
+        .collection('merchants')
+        .doc(merchantId)
+        .onSnapshot(async (documentSnapshot) => {
+          if (!documentSnapshot.empty) {
+            this.merchantDetails = {
+              ...documentSnapshot.data(),
+              merchantId,
+            };
+          }
+        });
+    }
   }
 
   @action async getStoreReviews() {
@@ -43,30 +136,27 @@ class DetailsStore {
         return data;
       })
       .catch((err) => {
-        Toast({text: err.message, type: 'danger'});
-      });
-  }
+        crashlytics().recordError(err);
 
-  @action async getAddressFromCoordinates({latitude, longitude}) {
-    return await functions
-      .httpsCallable('getAddressFromCoordinates')({latitude, longitude})
-      .then((response) => {
-        return response.data.locationDetails;
-      })
-      .catch((err) => {
         Toast({text: err.message, type: 'danger'});
       });
   }
 
   @action updateCoordinates(lowerRange, upperRange, boundingBox) {
-    return this.storeRef.update({
-      deliveryCoordinates: {
-        lowerRange,
-        upperRange,
-        boundingBox,
-      },
-      updatedAt: firestore.Timestamp.now().toMillis(),
-    });
+    return this.storeRef
+      .update({
+        deliveryCoordinates: {
+          lowerRange,
+          upperRange,
+          boundingBox,
+        },
+        updatedAt: firestore.Timestamp.now().toMillis(),
+      })
+      .catch((err) => {
+        crashlytics().recordError(err);
+
+        Toast({text: err.message, type: 'danger'});
+      });
   }
 
   @action async setStoreDetails(storeId) {
@@ -103,7 +193,10 @@ class DetailsStore {
           .then(() => {
             this.subscribedToNotifications = true;
           })
-          .catch((err) => Toast({text: err.message, type: 'danger'}));
+          .catch((err) => {
+            crashlytics().recordError(err);
+            Toast({text: err.message, type: 'danger'});
+          });
       }
     }
   }
@@ -119,12 +212,15 @@ class DetailsStore {
               this.subscribedToNotifications = false;
             }),
         )
-        .catch((err) => Toast({text: err.message, type: 'danger'}));
+        .catch((err) => {
+          crashlytics().recordError(err);
+          Toast({text: err.message, type: 'danger'});
+        });
     }
   }
 
   @action async deleteImage(imageRef) {
-    return await storage()
+    return await publicStorageBucket
       .ref(imageRef)
       .delete()
       .catch((err) => {
@@ -137,7 +233,7 @@ class DetailsStore {
     const fileExtension = imagePath.split('.').pop();
     const imageRef = `/images/stores/${storeId}/${type}.${fileExtension}`;
 
-    return await storage()
+    return await publicStorageBucket
       .ref(imageRef)
       .putFile(imagePath)
       .then(() =>
@@ -146,15 +242,19 @@ class DetailsStore {
           updatedAt: firestore.Timestamp.now().toMillis(),
         }),
       )
-      .catch((err) => Toast({text: err.message, type: 'danger'}));
+      .catch((err) => {
+        crashlytics().recordError(err);
+        Toast({text: err.message, type: 'danger'});
+      });
   }
 
   @action async updateStoreDetails(
     storeDescription,
     freeDelivery,
     vacationMode,
-    paymentMethods,
-    deliveryMethods,
+    availablePaymentMethods,
+    availableDeliveryMethods,
+    deliveryDiscount,
     deliveryType,
     ownDeliveryServiceFee,
     freeDeliveryMinimum,
@@ -165,8 +265,9 @@ class DetailsStore {
         freeDelivery,
         freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
         vacationMode,
-        paymentMethods: paymentMethods.slice().sort(),
-        deliveryMethods: deliveryMethods.slice().sort(),
+        availablePaymentMethods,
+        availableDeliveryMethods,
+        deliveryDiscount,
         deliveryType,
         ownDeliveryServiceFee: ownDeliveryServiceFee
           ? ownDeliveryServiceFee
@@ -174,6 +275,7 @@ class DetailsStore {
         updatedAt: firestore.Timestamp.now().toMillis(),
       })
       .catch((err) => {
+        crashlytics().recordError(err);
         Toast({text: `Something went wrong. Error: ${err}`, type: 'danger'});
       });
   }

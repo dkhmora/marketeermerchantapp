@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {View} from 'react-native';
+import {KeyboardAvoidingView, Platform, View} from 'react-native';
 import {Container} from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import {GiftedChat, Bubble, Send} from 'react-native-gifted-chat';
@@ -12,7 +12,7 @@ import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
-
+import crashlytics from '@react-native-firebase/crashlytics';
 @inject('ordersStore')
 @inject('detailsStore')
 @inject('authStore')
@@ -22,10 +22,6 @@ class OrderChatScreen extends Component {
     super(props);
 
     this.state = {
-      user: {
-        _id: this.props.detailsStore.storeDetails.storeId,
-        name: this.props.detailsStore.storeDetails.storeName,
-      },
       confirmImageModal: false,
       loading: true,
     };
@@ -83,6 +79,8 @@ class OrderChatScreen extends Component {
     if (!data) {
       this.props.ordersStore.getOrder(orderId);
     }
+
+    crashlytics().log('OrderChatScreen');
   }
 
   componentWillUnmount() {
@@ -155,10 +153,10 @@ class OrderChatScreen extends Component {
           flexDirection: 'row',
         }}>
         <Text style={{textAlign: 'center', textAlignVertical: 'center'}}>
-          Chat is disabled since order is{' '}
+          Chat is disabled since order is
           {orderStatus[0] === 'CANCELLED'
-            ? orderStatus[0]
-            : 'COMPLETED and has surpassed 7 days'}
+            ? ` ${orderStatus[0]}`
+            : ' COMPLETED and has surpassed 7 days'}
         </Text>
       </View>
     );
@@ -194,7 +192,9 @@ class OrderChatScreen extends Component {
   }
 
   renderAvatar(props) {
-    const userInitial = props.currentMessage.user.name.charAt(0);
+    const userInitial =
+      props.currentMessage.user.name &&
+      props.currentMessage.user.name.charAt(0);
 
     return (
       <Avatar
@@ -212,6 +212,11 @@ class OrderChatScreen extends Component {
     const {orderMessages, selectedOrder} = this.props.ordersStore;
     const {navigation} = this.props;
     const {chatDisabled} = this;
+
+    const user = {
+      _id: this.props.detailsStore.storeDetails.storeId,
+      name: this.props.detailsStore.storeDetails.storeName,
+    };
 
     if (selectedOrder && orderMessages) {
       const headerTitle = `Order # ${selectedOrder.storeOrderNumber} | ${selectedOrder.userName}`;
@@ -231,7 +236,7 @@ class OrderChatScreen extends Component {
                 selectedOrder.orderId,
                 selectedOrder.userId,
                 selectedOrder.storeId,
-                this.state.user,
+                user,
                 this.imagePath,
               );
               this.imagePath = '';
@@ -239,7 +244,9 @@ class OrderChatScreen extends Component {
             closeModal={() => (this.imagePath = '')}
           />
 
-          <View style={{flex: 1}}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={{flex: 1}}>
             <GiftedChat
               textStyle={{color: colors.primary}}
               renderAvatar={this.renderAvatar}
@@ -256,14 +263,15 @@ class OrderChatScreen extends Component {
                 borderBottomWidth: 1,
                 borderBottomColor: colors.primary,
               }}
+              isKeyboardInternallyHandled={false}
               listViewProps={{marginBottom: 20}}
               alwaysShowSend={!chatDisabled}
               showAvatarForEveryMessage
               messages={dataSource}
               onSend={(messages) => this.onSend(messages)}
-              user={this.state.user}
+              user={user}
             />
-          </View>
+          </KeyboardAvoidingView>
         </Container>
       );
     }

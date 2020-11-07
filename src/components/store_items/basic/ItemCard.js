@@ -3,15 +3,15 @@ import {Card, CardItem, Body} from 'native-base';
 import {View, ActivityIndicator} from 'react-native';
 import {Text} from 'react-native-elements';
 import moment from 'moment';
-import storage from '@react-native-firebase/storage';
 import {inject, observer} from 'mobx-react';
 import {computed} from 'mobx';
 import {ScrollView} from 'react-native-gesture-handler';
-import BaseOptionsMenu from './BaseOptionsMenu';
-import {colors} from '../../assets/colors';
-import Toast from './Toast';
+import BaseOptionsMenu from '../../BaseOptionsMenu';
+import {colors} from '../../../../assets/colors';
+import Toast from '../../Toast';
 import FastImage from 'react-native-fast-image';
-import ConfirmationModal from './ConfirmationModal';
+import ConfirmationModal from '../../ConfirmationModal';
+import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 
 @inject('itemsStore')
 @inject('authStore')
@@ -22,8 +22,9 @@ class ItemCard extends PureComponent {
     super(props);
 
     this.state = {
-      url: require('../../assets/placeholder.jpg'),
-      loaded: false,
+      url: require('../../../../assets/placeholder.jpg'),
+      imageReady: false,
+      imageWidth: null,
       deleting: false,
       deleteItemConfirmModal: false,
     };
@@ -34,12 +35,13 @@ class ItemCard extends PureComponent {
   }
 
   getImage = async () => {
-    const ref = storage().ref(this.props.item.image);
-    const link = await ref
-      .getDownloadURL()
-      .catch((err) => Toast({text: err.message, type: 'danger'}));
-
-    this.setState({url: {uri: link}, loaded: true});
+    if (this.props.item.image) {
+      this.setState({imageReady: false}, () => {
+        this.setState({
+          url: {uri: `https://cdn.marketeer.ph${this.props.item.image}`},
+        });
+      });
+    }
   };
 
   handleDelete() {
@@ -52,35 +54,24 @@ class ItemCard extends PureComponent {
   }
 
   handleEditItem() {
-    this.props.itemsStore.selectedItem = this.props.item;
-
-    this.props.itemsStore.editItemModal = true;
+    this.props.navigation.navigate('Edit Item', {item: this.props.item});
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.item !== this.props.item) {
-      this.setState({loaded: false});
-    }
-
-    if (!this.state.loaded && this.props.item.image) {
+    if (prevProps.item.image !== this.props.item.image) {
       this.getImage();
     }
   }
 
   componentDidMount() {
-    const {url} = this.state;
-
-    if (
-      url === require('../../assets/placeholder.jpg') &&
-      this.props.item.image
-    ) {
+    if (this.props.item.image) {
       this.getImage();
     }
   }
 
   render() {
     const {item, ...otherProps} = this.props;
-    const {url} = this.state;
+    const {url, imageReady, imageWidth} = this.state;
 
     return (
       <View
@@ -125,7 +116,7 @@ class ItemCard extends PureComponent {
               backgroundColor: colors.primary,
               justifyContent: 'space-between',
             }}>
-            <View style={{flexDirection: 'column'}}>
+            <View style={{flexDirection: 'column', flex: 1}}>
               <Text
                 style={{
                   color: colors.icons,
@@ -159,14 +150,39 @@ class ItemCard extends PureComponent {
           </CardItem>
 
           <CardItem cardBody>
-            <FastImage
-              source={url}
-              style={{
-                height: 150,
-                aspectRatio: 1,
-                flex: 1,
-              }}
-            />
+            <View
+              style={{flex: 1}}
+              onLayout={(event) => {
+                const {width} = event.nativeEvent.layout;
+                this.setState({imageWidth: width});
+              }}>
+              <FastImage
+                source={url}
+                style={{
+                  aspectRatio: 1,
+                  flex: 1,
+                }}
+                onLoad={() => this.setState({imageReady: true})}
+              />
+
+              {!imageReady && (
+                <View
+                  style={{
+                    position: 'absolute',
+                  }}>
+                  <Placeholder Animation={Fade}>
+                    <PlaceholderMedia
+                      style={{
+                        backgroundColor: colors.primary,
+                        aspectRatio: 1,
+                        width: imageWidth ? imageWidth : 0,
+                        height: imageWidth ? imageWidth : 0,
+                      }}
+                    />
+                  </Placeholder>
+                </View>
+              )}
+            </View>
           </CardItem>
 
           <CardItem
@@ -183,8 +199,8 @@ class ItemCard extends PureComponent {
                 flexGrow: 1,
                 flexShrink: 1,
               }}>
-              <ScrollView style={{flex: 1}}>
-                <Text>
+              <ScrollView>
+                <Text style={{paddingBottom: 10}}>
                   {item.description ? item.description : 'No description'}
                 </Text>
               </ScrollView>
@@ -206,8 +222,10 @@ class ItemCard extends PureComponent {
                 backgroundColor: colors.primary,
                 elevation: 3,
                 flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}>
-              {item.discountedPrice && (
+              {item.discountedPrice ? (
                 <Text
                   style={{
                     textDecorationLine: 'line-through',
@@ -215,16 +233,16 @@ class ItemCard extends PureComponent {
                     color: colors.icons,
                     marginRight: 5,
                   }}>
-                  ₱ {item.price}
+                  ₱{item.price}
                 </Text>
-              )}
+              ) : null}
 
               <Text
                 style={{
                   fontFamily: 'ProductSans-Black',
                   color: colors.icons,
                 }}>
-                ₱ {item.discountedPrice ? item.discountedPrice : item.price}
+                ₱{item.discountedPrice ? item.discountedPrice : item.price}
                 {item.unit ? `/${item.unit}` : ''}
               </Text>
             </View>

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import MapView, {Marker, Polygon} from 'react-native-maps';
-import {View, StatusBar, StyleSheet} from 'react-native';
+import {View, StatusBar, StyleSheet, Platform, Dimensions} from 'react-native';
 import {Card, CardItem} from 'native-base';
 import {Slider, Button, Icon, Text} from 'react-native-elements';
 import {observer, inject} from 'mobx-react';
@@ -11,6 +11,7 @@ import BaseHeader from '../components/BaseHeader';
 import * as turf from '@turf/turf';
 import {computed, toJS} from 'mobx';
 import Toast from '../components/Toast';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @inject('detailsStore')
@@ -24,32 +25,49 @@ class DeliveryAreaScreen extends Component {
       updating: false,
       distance: 0,
       newDistance: 0,
+      bboxCenter: null,
+      centerOfScreen: (Dimensions.get('window').height + 10) / 2,
     };
   }
 
   @computed get boundingBox() {
-    const {storeLocation} = this.props.detailsStore.storeDetails;
-    const {newDistance, editMode} = this.state;
+    const {bboxCenter, newDistance, editMode} = this.state;
 
-    if (storeLocation && editMode) {
-      const bounds = this.getBoundsOfDistance({...storeLocation}, newDistance);
+    if (bboxCenter && editMode) {
+      const bounds = this.getBoundsOfDistance(bboxCenter, newDistance);
 
       const boundingBox = this.getBoundingBox(bounds[0], bounds[1]);
 
       return boundingBox;
     }
 
-    return [];
+    return null;
   }
 
   @computed get currentBoundingBox() {
     const deliveryCoordinates = toJS(this.props.detailsStore.storeDetails)
       .deliveryCoordinates;
-    if (deliveryCoordinates) {
+    if (deliveryCoordinates && deliveryCoordinates.boundingBox) {
       return deliveryCoordinates.boundingBox;
     }
 
     return null;
+  }
+
+  @computed get storeLocationIsInBBox() {
+    const {editMode} = this.state;
+    const {storeLocation} = this.props.detailsStore.storeDetails;
+
+    if (
+      this.boundingBox &&
+      storeLocation &&
+      editMode &&
+      geolib.isPointInPolygon(storeLocation, this.boundingBox)
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   componentDidMount() {
@@ -58,6 +76,8 @@ class DeliveryAreaScreen extends Component {
     if (deliveryCoordinates) {
       this.decodeGeohash();
     }
+
+    crashlytics().log('DeliveryAreaScreen');
   }
 
   getBoundsOfDistance({latitude, longitude}, distance) {
@@ -131,32 +151,25 @@ class DeliveryAreaScreen extends Component {
     });
   }
 
-  async handleSetStoreLocation() {
-    const {storeLocation} = this.props.detailsStore.storeDetails;
-    const {newDistance} = this.state;
-    const {boundingBox} = this;
+  handleSetStoreLocation() {
+    const {newDistance, bboxCenter} = this.state;
 
     this.props.authStore.appReady = false;
 
-    const range = await this.getGeohashRange(
-      storeLocation.latitude,
-      storeLocation.longitude,
-      newDistance,
-    );
-
     this.props.detailsStore
-      .updateCoordinates(range.lower, range.upper, boundingBox)
+      .setStoreDeliveryArea({distance: newDistance, midPoint: bboxCenter})
       .then(() => {
-        Toast({text: 'Delivery Area successfully set!'});
-
-        this.props.authStore.appReady = true;
-
-        this.setState({
-          editMode: false,
-          distance: newDistance,
-        });
-      })
-      .catch((err) => Toast({text: err.message, type: 'danger'}));
+        this.setState(
+          {
+            editMode: false,
+            distance: newDistance,
+            bboxCenter: null,
+          },
+          () => {
+            this.props.authStore.appReady = true;
+          },
+        );
+      });
   }
 
   panMapToLocation(position) {
@@ -165,32 +178,62 @@ class DeliveryAreaScreen extends Component {
         center: position,
         pitch: 2,
         heading: 1,
-        altitude: 200,
-        zoom: 18,
+        altitude: 1500,
+        zoom: 13,
       },
-      150,
+      30,
     );
   }
 
   handleEditDeliveryArea() {
-    this.setState({
-      newDistance: this.state.distance,
-      editMode: true,
-    });
+    const {storeLocation} = toJS(this.props.detailsStore.storeDetails);
+
+    if (storeLocation) {
+      const initialBboxCenter = this.currentBoundingBox
+        ? geolib.getCenterOfBounds(this.currentBoundingBox)
+        : storeLocation;
+
+      this.panMapToLocation(initialBboxCenter);
+
+      this.setState({
+        newDistance: this.state.distance,
+        editMode: true,
+        bboxCenter: initialBboxCenter,
+      });
+    } else {
+      Toast({
+        text:
+          'Error: Your store location is not set. Please contact Marketeer Support and provide them with your location details. Thank you',
+        type: 'danger',
+        duration: 10000,
+      });
+    }
   }
 
   handleCancelChanges() {
     const {distance} = this.state;
 
     this.setState({
+      bboxCenter: null,
       newDistance: distance,
       editMode: false,
     });
   }
 
+  handleRegionChange = (mapData) => {
+    const {editMode} = this.state;
+
+    if (editMode) {
+      const {latitude, longitude} = mapData;
+      this.setState({
+        bboxCenter: {latitude, longitude},
+      });
+    }
+  };
+
   render() {
     const {navigation} = this.props;
-    const {editMode, newDistance} = this.state;
+    const {editMode, newDistance, centerOfScreen} = this.state;
     const {storeLocation} = toJS(this.props.detailsStore.storeDetails);
     const {boundingBox} = this;
 
@@ -205,6 +248,7 @@ class DeliveryAreaScreen extends Component {
             ref={(map) => {
               this.map = map;
             }}
+            onRegionChangeComplete={this.handleRegionChange}
             initialRegion={{
               latitude: storeLocation.latitude,
               longitude: storeLocation.longitude,
@@ -221,6 +265,7 @@ class DeliveryAreaScreen extends Component {
                 <Icon color={colors.primary} name="map-pin" />
               </View>
             </Marker>
+
             {this.currentBoundingBox && (
               <Polygon
                 coordinates={this.currentBoundingBox}
@@ -229,7 +274,8 @@ class DeliveryAreaScreen extends Component {
                 strokeWidth={1}
               />
             )}
-            {editMode && (
+
+            {editMode && boundingBox && (
               <Polygon
                 coordinates={boundingBox}
                 fillColor="rgba(68, 138, 255, 0.3)"
@@ -258,16 +304,23 @@ class DeliveryAreaScreen extends Component {
                 backgroundColor: 'rgba(255,255,255, 0.6)',
               }}>
               <CardItem style={{flexDirection: 'column'}}>
-                <Text style={{alignSelf: 'flex-start', marginBottom: 5}}>
+                <Text
+                  style={{
+                    alignSelf: 'flex-start',
+                    fontSize: 18,
+                    fontFamily: 'ProductSans-Regular',
+                  }}>
                   Delivery distance
                 </Text>
+
                 <View
                   style={{
                     width: '100%',
+                    paddingVertical: 10,
                   }}>
                   <Slider
                     step={1}
-                    minimumValue={0}
+                    minimumValue={1}
                     maximumValue={100}
                     value={newDistance}
                     thumbTintColor={colors.accent}
@@ -275,9 +328,45 @@ class DeliveryAreaScreen extends Component {
                       this.setState({newDistance: value})
                     }
                   />
-                  <Text style={{alignSelf: 'center'}}>{newDistance} KM</Text>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignSelf: 'center',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        color: colors.primary,
+                        fontFamily: 'ProductSans-Black',
+                        textAlignVertical: 'bottom',
+                      }}>
+                      {`${newDistance} `}
+                    </Text>
+
+                    <Text
+                      style={{
+                        textAlignVertical: 'bottom',
+                      }}>
+                      KM
+                    </Text>
+                  </View>
                 </View>
+
+                {!this.storeLocationIsInBBox && (
+                  <Text
+                    style={{
+                      alignSelf: 'center',
+                      color: colors.danger,
+                      textAlign: 'center',
+                    }}>
+                    Store location is not within delivery area! Please move the
+                    delivery box within your store location.
+                  </Text>
+                )}
               </CardItem>
+
               <CardItem>
                 <View
                   style={{
@@ -299,6 +388,7 @@ class DeliveryAreaScreen extends Component {
                     buttonStyle={{backgroundColor: colors.primary}}
                     containerStyle={{marginRight: 20}}
                   />
+
                   <Button
                     title="Save Changes"
                     titleStyle={{
@@ -308,6 +398,7 @@ class DeliveryAreaScreen extends Component {
                     }}
                     icon={<Icon name="save" color={colors.icons} />}
                     iconRight
+                    disabled={!this.storeLocationIsInBBox || newDistance < 1}
                     buttonStyle={{backgroundColor: colors.accent}}
                     onPress={() => this.handleSetStoreLocation()}
                   />
@@ -331,6 +422,43 @@ class DeliveryAreaScreen extends Component {
             }}
           />
         )}
+
+        {editMode && (
+          <View
+            style={{
+              left: 0,
+              right: 0,
+              marginLeft: 0,
+              marginTop: 0,
+              position: 'absolute',
+              top: centerOfScreen,
+              alignItems: 'center',
+            }}>
+            <Icon color={colors.accent} name="crosshair" />
+          </View>
+        )}
+
+        <View
+          style={{
+            position: 'absolute',
+            top: 120,
+            right: 20,
+          }}>
+          <Button
+            onPress={() => this.panMapToLocation(storeLocation)}
+            disabled={!storeLocation}
+            icon={<Icon name="map-pin" color={colors.icons} size={35} />}
+            titleStyle={{color: colors.icons}}
+            buttonStyle={{
+              backgroundColor: colors.primary,
+              borderRadius: 35,
+              paddingBottom: Platform.OS === 'ios' ? 5 : null,
+            }}
+            containerStyle={{
+              overflow: 'hidden',
+            }}
+          />
+        </View>
 
         <BaseHeader backButton navigation={navigation} title="Delivery Area" />
       </View>

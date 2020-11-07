@@ -49,7 +49,7 @@ class BaseOptionsMenu extends PureComponent {
 
   render() {
     const {options, actions, destructiveIndex} = this.props;
-    const {iconStyle} = this.props;
+    const {iconStyle, iconColor} = this.props;
 
     const ActionSheetButton = () => {
       return (
@@ -58,7 +58,7 @@ class BaseOptionsMenu extends PureComponent {
           icon={
             <Icon
               name="more-vertical"
-              color={colors.icons}
+              color={iconColor ? iconColor : colors.icons}
               style={{...iconStyle}}
             />
           }
@@ -74,7 +74,7 @@ class BaseOptionsMenu extends PureComponent {
         customButton={
           <Icon
             name="more-vertical"
-            color={colors.icons}
+            color={iconColor ? iconColor : colors.icons}
             style={{...iconStyle}}
           />
         }

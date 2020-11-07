@@ -1,14 +1,12 @@
 import React, {Component} from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {Container} from 'native-base';
 // Custom Components
 import OrdersList from '../components/OrdersList';
-import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
-import {computed} from 'mobx';
-import CancelOrderModal from '../components/CancelOrderModal';
-import Toast from '../components/Toast';
+import crashlytics from '@react-native-firebase/crashlytics';
+import {View} from 'react-native';
+import {color} from 'react-native-reanimated';
 
 const TabOrders = createMaterialTopTabNavigator();
 
@@ -21,47 +19,12 @@ class OrdersTab extends Component {
     super(props);
   }
 
-  @computed get notificationSubscriptionStatus() {
-    return this.props.detailsStore.subscribedToNotifications
-      ? 'Unsubscribed'
-      : 'Subscribed';
-  }
-
-  @computed get optionsLabel() {
-    return this.props.detailsStore.subscribedToNotifications
-      ? 'Unsubscribe to Order Notifications'
-      : 'Subscribe to Order Notifications';
-  }
-
-  handleNotificationSubscription = () => {
-    const {notificationSubscriptionStatus} = this;
-
-    this.subscribeToNotificationsTimeout &&
-      clearTimeout(this.subscribeToNotificationsTimeout);
-
-    this.props.authStore.appReady = false;
-
-    this.subscribeToNotificationsTimeout = setTimeout(() => {
-      (this.props.detailsStore.subscribedToNotifications
-        ? this.props.detailsStore.unsubscribeToNotifications()
-        : this.props.detailsStore.subscribeToNotifications()
-      ).then(() => {
-        this.props.authStore.appReady = true;
-
-        Toast({
-          text: `Successfully ${notificationSubscriptionStatus} to Order Notifications!`,
-          type: 'success',
-          duration: 3500,
-          style: {margin: 20, borderRadius: 16},
-        });
-      });
-    }, 500);
-  };
-
   componentDidMount() {
     const {storeId} = this.props.detailsStore.storeDetails;
 
     this.props.ordersStore.setOrders(storeId);
+
+    crashlytics().log('OrdersTab');
   }
 
   componentWillUnmount() {
@@ -70,43 +33,58 @@ class OrdersTab extends Component {
   }
 
   render() {
-    const {navigation} = this.props;
-    const {optionsLabel} = this;
-
     return (
-      <Container>
-        <BaseHeader
-          title="Orders"
-          options={[optionsLabel]}
-          actions={[this.handleNotificationSubscription]}
-          destructiveIndex={1}
-          navigation={navigation}
-        />
-        <CancelOrderModal navigation={navigation} />
-
+      <View style={{flex: 1}}>
         <TabOrders.Navigator
           lazy
           lazyPreloadDistance={1}
           tabBarOptions={{
+            allowFontScaling: false,
             scrollEnabled: true,
-            style: {backgroundColor: colors.icons},
             activeTintColor: colors.primary,
-            inactiveTintcolor: '#eee',
-            tabStyle: {width: 'auto'},
+            inactiveTintColor: colors.text_secondary,
+            tabStyle: {
+              width: 'auto',
+              paddingTop: 0,
+            },
+            labelStyle: {
+              marginTop: 0,
+              fontFamily: 'ProductSans-Regular',
+            },
             indicatorStyle: {
+              height: 1,
               backgroundColor: colors.primary,
+            },
+            style: {
+              backgroundColor: colors.icons,
+              height: 35,
+              paddingTop: 0,
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 1,
+              },
+              shadowOpacity: 0.2,
+              shadowRadius: 1.41,
+              elevation: 5,
             },
           }}
           headerMode="none"
           backBehavior="initialRoute">
           <TabOrders.Screen name="Pending" component={OrdersList} />
           <TabOrders.Screen name="Unpaid" component={OrdersList} />
-          <TabOrders.Screen name="Paid" component={OrdersList} />
+          <TabOrders.Screen
+            name="Paid"
+            component={OrdersList}
+            options={{
+              tabBarLabel: 'Paid (To Ship)',
+            }}
+          />
           <TabOrders.Screen name="Shipped" component={OrdersList} />
           <TabOrders.Screen name="Completed" component={OrdersList} />
           <TabOrders.Screen name="Cancelled" component={OrdersList} />
         </TabOrders.Navigator>
-      </Container>
+      </View>
     );
   }
 }

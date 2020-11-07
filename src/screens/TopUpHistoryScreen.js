@@ -9,6 +9,7 @@ import BaseHeader from '../components/BaseHeader';
 import {computed} from 'mobx';
 import * as Animatable from 'react-native-animatable';
 import {initialWindowMetrics} from 'react-native-safe-area-context';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const inset = initialWindowMetrics && initialWindowMetrics.insets;
 const bottomPadding = Platform.OS === 'ios' ? inset.bottom : 0;
@@ -38,6 +39,8 @@ class TopUpHistoryScreen extends Component {
 
   componentDidMount() {
     this.getInitialPayments();
+
+    crashlytics().log('TopUpHistoryScreen');
   }
 
   getAvailablePaymentMethods() {
@@ -54,35 +57,40 @@ class TopUpHistoryScreen extends Component {
 
   getInitialPayments() {
     const {retrieveLimit} = this.state;
-    const {storeId} = this.props.detailsStore.storeDetails;
+    const {merchantId} = this.props.detailsStore.merchantDetails;
 
     this.setState({refreshing: true}, () => {
-      this.props.paymentsStore
-        .getPayments({
-          storeId,
-          retrieveLimit,
-        })
-        .then(() => {
-          this.getAvailablePaymentMethods();
-        });
+      this.props.paymentsStore.getMerchantTopups({
+        merchantId,
+        retrieveLimit,
+      });
+
+      this.getAvailablePaymentMethods();
     });
   }
 
   retrieveMorePayments() {
+    const {
+      refreshing,
+      endReached,
+      onEndReachedCalledDuringMomentum,
+    } = this.state;
+
     if (
-      !this.state.onEndReachedCalledDuringMomentum &&
+      !onEndReachedCalledDuringMomentum &&
       this.lastPaymentCreatedAt >= 1 &&
-      !this.state.endReached
+      !endReached &&
+      !refreshing
     ) {
       const {retrieveLimit} = this.state;
-      const {storeId} = this.props.detailsStore.storeDetails;
+      const {merchantId} = this.props.detailsStore.merchantDetails;
 
       this.setState(
         {refreshing: true, onEndReachedCalledDuringMomentum: true},
         () => {
           this.props.paymentsStore
-            .getPayments({
-              storeId,
+            .getMerchantTopups({
+              merchantId,
               lastVisible: this.lastPaymentCreatedAt,
               retrieveLimit,
             })
@@ -186,10 +194,16 @@ class TopUpHistoryScreen extends Component {
   }
 
   renderFooter = () => {
+    const {paymentsLoading, onEndReachedCalledDuringMomentum} = this.state;
+
     return (
-      <View style={{bottom: 50, width: '100%'}}>
+      <View
+        style={{
+          bottom: 0,
+          height: 60,
+        }}>
         <View style={{height: bottomPadding}} />
-        {this.state.onEndReachedCalledDuringMomentum && (
+        {onEndReachedCalledDuringMomentum && !paymentsLoading && (
           <Animatable.View
             animation="slideInUp"
             duration={400}
@@ -224,12 +238,15 @@ class TopUpHistoryScreen extends Component {
         <BaseHeader
           title="Markee Credits Top Up History"
           navigation={navigation}
+          backButton
         />
 
         <FlatList
           style={{flex: 1}}
           data={payments}
           initialNumToRender={30}
+          contentContainerStyle={{flexGrow: 1}}
+          ListFooterComponentStyle={{flexGrow: 1, justifyContent: 'flex-end'}}
           renderItem={({item, index}) => (
             <this.PaymentListItem
               item={item}

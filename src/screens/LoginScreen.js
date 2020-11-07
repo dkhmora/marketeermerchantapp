@@ -17,6 +17,8 @@ import {styles} from '../../assets/styles';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from '../components/Toast';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
+import ForgotPasswordModal from '../components/ForgotPasswordModal';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @observer
@@ -29,6 +31,7 @@ class LoginScreen extends Component {
       password: '',
       emailCheck: false,
       secureTextEntry: true,
+      forgotPasswordModal: false,
     };
   }
 
@@ -45,6 +48,8 @@ class LoginScreen extends Component {
         });
       }
     }
+
+    crashlytics().log('LoginScreen');
   }
 
   handleEmailChange = (email) => {
@@ -147,6 +152,11 @@ class LoginScreen extends Component {
       <View style={[styles.container, {paddingTop: 0}]}>
         <StatusBar animated translucent backgroundColor={colors.statusBar} />
 
+        <ForgotPasswordModal
+          isVisible={this.state.forgotPasswordModal}
+          closeModal={() => this.setState({forgotPasswordModal: false})}
+        />
+
         <Animatable.View
           duration={800}
           useNativeDriver
@@ -231,6 +241,11 @@ class LoginScreen extends Component {
                 </TouchableOpacity>
               </View>
 
+              <TouchableOpacity
+                onPress={() => this.setState({forgotPasswordModal: true})}>
+                <Text style={styles.touchable_text}>Forgot Password?</Text>
+              </TouchableOpacity>
+
               <View
                 style={{
                   flex: 1,
@@ -247,8 +262,7 @@ class LoginScreen extends Component {
 
                 <TouchableOpacity onPress={() => this.openTermsAndConditions()}>
                   <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
-                    {' '}
-                    Terms and Conditions{' '}
+                    {' Terms and Conditions'}
                   </Text>
                 </TouchableOpacity>
 
@@ -259,8 +273,7 @@ class LoginScreen extends Component {
 
                 <TouchableOpacity onPress={() => this.openPrivacyPolicy()}>
                   <Text style={[styles.touchable_text, {textAlign: 'justify'}]}>
-                    {' '}
-                    Privacy Policy
+                    {' Privacy Policy'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -290,7 +303,7 @@ class LoginScreen extends Component {
                     flexWrap: 'wrap',
                   }}>
                   <Text style={styles.color_textPrivate}>
-                    Are you a merchant?{' '}
+                    {'Are you a merchant? '}
                   </Text>
 
                   <TouchableOpacity

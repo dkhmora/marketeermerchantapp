@@ -22,7 +22,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 import messaging from '@react-native-firebase/messaging';
 import RemotePushController from '../services/RemotePushController';
-import TopUpHistoryScreen from '../screens/TopUpHistoryScreen';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @inject('itemsStore')
@@ -52,7 +52,11 @@ class MainDrawer extends Component {
       if (initialLink.url !== null) {
         this.handleDynamicLink(initialLink);
       }
-    } catch (error) {}
+    } catch (error) {
+      crashlytics().recordError(error);
+    }
+
+    crashlytics().log('MainDrawer');
   }
 
   initializeForegroundNotificationHandlers() {
@@ -67,6 +71,12 @@ class MainDrawer extends Component {
           }
 
           if (notification.data.type === 'new_order') {
+            this.props.navigation.navigate('Order Details', {
+              orderId: notification.data.orderId,
+            });
+          }
+
+          if (notification.data.type === 'order_update') {
             this.props.navigation.navigate('Order Details', {
               orderId: notification.data.orderId,
             });
@@ -180,7 +190,12 @@ class MainDrawer extends Component {
       this.props.detailsStore.subscribedToNotifications = false;
       this.props.detailsStore.unsubscribeSetStoreDetails &&
         this.props.detailsStore.unsubscribeSetStoreDetails();
+      this.props.detailsStore.unsubscribeSetMerchantDetails &&
+        this.props.detailsStore.unsubscribeSetMerchantDetails();
+      this.props.detailsStore.merchantDetails = {};
       this.props.detailsStore.unsubscribeSetStoreDetails = null;
+      this.props.detailsStore.disbursementPeriods = [];
+      this.props.detailsStore.lastDisbursementPeriodUpdatedAt = 0;
       this.props.itemsStore.unsubscribeSetStoreItems &&
         this.props.itemsStore.unsubscribeSetStoreItems();
       this.props.itemsStore.unsubscribeSetStoreItems = null;
@@ -188,7 +203,6 @@ class MainDrawer extends Component {
       this.props.ordersStore.maxOrderUpdatedAt = 0;
       this.props.itemsStore.categoryItems = new Map();
       this.props.itemsStore.storeItems = [];
-      this.props.itemsStore.maxItemsUpdatedAt = 0;
 
       this.props.navigation.navigate('Loader');
 
@@ -200,6 +214,7 @@ class MainDrawer extends Component {
     const Drawer = createDrawerNavigator();
     const {initialRoute} = this.state;
     const {navigation} = this.props;
+    const {merchantDetails} = this.props.detailsStore;
 
     return (
       <View style={{flex: 1}}>
@@ -228,6 +243,50 @@ class MainDrawer extends Component {
                   justifyContent: 'space-between',
                 }}>
                 <View style={{justifyContent: 'flex-start'}}>
+                  {Object.keys(merchantDetails).length > 0 && (
+                    <View>
+                      <DrawerItem
+                        onPress={() =>
+                          this.props.navigation.navigate('Merchant Dashboard')
+                        }
+                        label="Merchant Dashboard"
+                        labelStyle={{
+                          fontFamily: 'ProductSans-Light',
+                          fontSize: 18,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          color: colors.icons,
+                        }}
+                        style={{
+                          marginHorizontal: 0,
+                          marginVertical: 0,
+                          borderRadius: 0,
+                          backgroundColor: colors.primary,
+                        }}
+                      />
+
+                      <DrawerItem
+                        onPress={() =>
+                          this.props.navigation.navigate('Top Up History')
+                        }
+                        label="Top Ups"
+                        labelStyle={{
+                          fontFamily: 'ProductSans-Light',
+                          fontSize: 18,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          color: colors.icons,
+                        }}
+                        style={{
+                          marginHorizontal: 0,
+                          marginVertical: 0,
+                          borderRadius: 0,
+                          backgroundColor: colors.primary,
+                        }}
+                      />
+                    </View>
+                  )}
+
                   <DrawerItemList
                     {...props}
                     labelStyle={{
@@ -315,8 +374,6 @@ class MainDrawer extends Component {
           <Drawer.Screen name="Delivery Area" component={DeliveryAreaScreen} />
 
           <Drawer.Screen name="Account Settings" component={AccountScreen} />
-
-          <Drawer.Screen name="Top Up History" component={TopUpHistoryScreen} />
         </Drawer.Navigator>
 
         <RemotePushController navigation={navigation} />
