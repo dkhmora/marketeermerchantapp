@@ -1,13 +1,7 @@
 import {computed} from 'mobx';
 import {inject, observer} from 'mobx-react';
 import React, {Component} from 'react';
-import {
-  ActivityIndicator,
-  Keyboard,
-  Platform,
-  View,
-  StyleSheet,
-} from 'react-native';
+import {ActivityIndicator, Platform, View, StyleSheet} from 'react-native';
 import {
   Button,
   ButtonGroup,
@@ -17,12 +11,14 @@ import {
   Text,
 } from 'react-native-elements';
 import {Switch, ScrollView} from 'react-native-gesture-handler';
-import Animated, {call, onChange} from 'react-native-reanimated';
-import BottomSheet from 'reanimated-bottom-sheet';
+import {Modalize} from 'react-native-modalize';
+import {initialWindowMetrics} from 'react-native-safe-area-context';
 import {colors} from '../../assets/colors';
 import ConfirmationModal from './ConfirmationModal';
 import Toast from './Toast';
 
+const inset = initialWindowMetrics && initialWindowMetrics.insets;
+const bottomPadding = Platform.OS === 'ios' ? inset.bottom : 0;
 @inject('ordersStore')
 @inject('authStore')
 @inject('detailsStore')
@@ -31,7 +27,6 @@ class MrSpeedyBottomSheet extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      bottomSheetPadding: 0,
       selectedVehicleIndex: 0,
       selectedWeightIndex: 0,
       motobox: true,
@@ -39,11 +34,8 @@ class MrSpeedyBottomSheet extends Component {
       storePhoneNumber: '',
       storePhoneNumberError: null,
       mrspeedyOrderPrice: '0.00',
-      openRatio: 0,
       changeOrderStatusModal: false,
     };
-
-    this.drawerCallbackNode = new Animated.Value(0);
   }
 
   @computed get weightButtonLabels() {
@@ -62,44 +54,22 @@ class MrSpeedyBottomSheet extends Component {
     return ['Less than 300 Kg', 'Less than 500 Kg', 'Less than 750 Kg'];
   }
 
-  componentDidMount() {
-    this.initializeKeyboardConfiguration();
-  }
-
   componentDidUpdate(prevProps, prevState) {
     const {
       selectedVehicleIndex,
       selectedWeightIndex,
       mrspeedyEstimateLoading,
       mrspeedyOrderPrice,
-      openRatio,
     } = this.state;
 
     if (
       this.props.ordersStore.selectedOrder &&
-      openRatio > 0 &&
       ((!mrspeedyEstimateLoading && mrspeedyOrderPrice === '0.00') ||
         prevState.selectedVehicleIndex !== selectedVehicleIndex ||
         (selectedVehicleIndex === 1 &&
           prevState.selectedWeightIndex !== selectedWeightIndex))
     ) {
       this.getMrspeedyOrderPriceEstimate();
-    }
-  }
-
-  initializeKeyboardConfiguration() {
-    if (Platform.OS === 'android') {
-      Keyboard.addListener('keyboardDidShow', (event) => {
-        const keyboardHeight = event.endCoordinates.height;
-        this.setState({bottomSheetPadding: keyboardHeight - 20});
-      });
-      Keyboard.addListener('keyboardDidHide', (event) => {
-        this.setState({bottomSheetPadding: 0}, () => {
-          if (this.bottomSheet) {
-            this.bottomSheet.snapTo(1);
-          }
-        });
-      });
     }
   }
 
@@ -230,7 +200,7 @@ class MrSpeedyBottomSheet extends Component {
         })
         .then((response) => {
           if (response.data.s === 200) {
-            this.bottomSheet && this.bottomSheet.snapTo(0);
+            this.modalizeRef && this.modalizeRef.open();
 
             return Toast({
               text: response.data.m,
@@ -257,7 +227,7 @@ class MrSpeedyBottomSheet extends Component {
           this.props.authStore.appReady = true;
 
           if (response.data.s === 200) {
-            this.bottomSheet && this.bottomSheet.snapTo(0);
+            this.modalizeRef && this.modalizeRef.open();
 
             return Toast({
               text: response.data.m,
@@ -275,17 +245,8 @@ class MrSpeedyBottomSheet extends Component {
     }
   }
 
-  rebookMrspeedyBooking() {}
-
-  onCallback = ([value]) => {
-    this.setState({
-      openRatio: 1 - value,
-    });
-  };
-
   resetState() {
     this.setState({
-      bottomSheetPadding: 0,
       selectedVehicleIndex: 0,
       selectedWeightIndex: 0,
       motobox: true,
@@ -293,13 +254,11 @@ class MrSpeedyBottomSheet extends Component {
       storePhoneNumber: '',
       storePhoneNumberError: null,
       mrspeedyOrderPrice: '0.00',
-      openRatio: 0,
     });
   }
 
   render() {
     const {
-      bottomSheetPadding,
       selectedVehicleIndex,
       selectedWeightIndex,
       motobox,
@@ -319,13 +278,6 @@ class MrSpeedyBottomSheet extends Component {
 
     return (
       <>
-        <Animated.Code
-          exec={onChange(
-            this.drawerCallbackNode,
-            call([this.drawerCallbackNode], this.onCallback),
-          )}
-        />
-
         {selectedOrder && (
           <ConfirmationModal
             isVisible={changeOrderStatusModal}
@@ -339,87 +291,137 @@ class MrSpeedyBottomSheet extends Component {
             closeModal={() => this.setState({changeOrderStatusModal: false})}
           />
         )}
-        <BottomSheet
-          ref={(sheetRef) => (this.bottomSheet = sheetRef)}
-          snapPoints={[0, 320, 320 + bottomSheetPadding]}
-          borderRadius={30}
-          initialSnap={0}
-          callbackNode={this.drawerCallbackNode}
-          onCloseEnd={() => {
+
+        <Modalize
+          ref={(modalizeRef) => (this.modalizeRef = modalizeRef)}
+          modalHeight={400 + bottomPadding}
+          onClosed={() => {
             if (clearSelectedOrderOnClose) {
               this.props.ordersStore.selectedOrder = null;
             }
 
             this.resetState();
           }}
-          renderContent={() => (
+          onOpened={() =>
+            mrspeedyOrderPrice === '0.00' &&
+            this.getMrspeedyOrderPriceEstimate()
+          }
+          avoidKeyboardLikeIOS={true}
+          keyboardAvoidingBehavior="padding"
+          handleStyle={{backgroundColor: colors.text_secondary, opacity: 0.85}}
+          modalStyle={{
+            backgroundColor: colors.icons,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: 'rgba(0,0,0,0.2)',
+          }}>
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.icons,
+              borderTopRightRadius: 10,
+              borderTopLeftRadius: 10,
+              overflow: 'hidden',
+              paddingVertical: 5,
+              paddingBottom: bottomPadding,
+            }}>
             <View
-              onTouchStart={() => Keyboard.dismiss()}
               style={{
+                flexDirection: 'row',
                 alignItems: 'center',
-                backgroundColor: colors.icons,
-                borderTopWidth: 0.7,
-                borderRightWidth: 0.7,
-                borderLeftWidth: 0.7,
-                borderTopLeftRadius: 30,
-                borderTopRightRadius: 30,
-                borderColor: 'rgba(0,0,0,0.4)',
-                height: 320 + bottomSheetPadding,
-                paddingVertical: 5,
+                justifyContent: 'center',
               }}>
-              <View
+              <Image
+                source={require('../../assets/images/mrspeedy-logo.png')}
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Image
-                  source={require('../../assets/images/mrspeedy-logo.png')}
-                  style={{
-                    height: 50,
-                    width: 100,
-                    resizeMode: 'contain',
-                  }}
-                />
+                  height: 50,
+                  width: 100,
+                  resizeMode: 'contain',
+                }}
+              />
 
-                <Text numberOfLines={1} style={{fontSize: 18}}>
-                  {` | Order # ${
-                    selectedOrder ? selectedOrder.storeOrderNumber : ''
-                  }`}
-                </Text>
-              </View>
+              <Text numberOfLines={1} style={{fontSize: 18}}>
+                {` | Order # ${
+                  selectedOrder ? selectedOrder.storeOrderNumber : ''
+                }`}
+              </Text>
+            </View>
 
-              <View style={{paddingHorizontal: 10}}>
+            <View style={{paddingHorizontal: 10}}>
+              <ButtonGroup
+                onPress={(index) => {
+                  this.weightScrollViewRef &&
+                    this.weightScrollViewRef.scrollTo({
+                      animated: false,
+                      x: 0,
+                      y: 0,
+                    });
+                  if (index !== selectedVehicleIndex) {
+                    this.setState({selectedWeightIndex: 0});
+                  }
+                  this.setState({selectedVehicleIndex: index});
+                }}
+                selectedIndex={selectedVehicleIndex}
+                buttons={['Motorbike', 'Car']}
+                buttonStyle={{
+                  borderRadius: 30,
+                  paddingRight: 0,
+                  padding: 0,
+                }}
+                buttonContainerStyle={{
+                  borderRadius: 30,
+                }}
+                innerBorderStyle={{color: 'transparent', width: 5}}
+                activeOpacity={0.7}
+                containerStyle={{
+                  height: 30,
+                  width: '80%',
+                  borderRadius: 30,
+                  paddingLeft: -5,
+                  elevation: 2,
+                  shadowColor: '#000',
+                  shadowOffset: {
+                    width: 0,
+                    height: 1,
+                  },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 1.41,
+                }}
+                selectedButtonStyle={{
+                  backgroundColor: colors.icons,
+                  borderColor: colors.primary,
+                  borderWidth: 1,
+                }}
+                selectedTextStyle={{
+                  color: colors.primary,
+                }}
+              />
+            </View>
+
+            <View style={{flex: 1}}>
+              <ScrollView
+                ref={(scrollref) => (this.weightScrollViewRef = scrollref)}
+                style={{flexGrow: 0}}
+                horizontal
+                showsHorizontalScrollIndicator={false}>
                 <ButtonGroup
-                  onPress={(index) => {
-                    this.weightScrollViewRef &&
-                      this.weightScrollViewRef.scrollTo({
-                        animated: false,
-                        x: 0,
-                        y: 0,
-                      });
-                    if (index !== selectedVehicleIndex) {
-                      this.setState({selectedWeightIndex: 0});
-                    }
-                    this.setState({selectedVehicleIndex: index});
-                  }}
-                  selectedIndex={selectedVehicleIndex}
-                  buttons={['Motorbike', 'Car']}
+                  onPress={(index) =>
+                    this.setState({selectedWeightIndex: index})
+                  }
+                  selectedIndex={selectedWeightIndex}
+                  buttons={this.weightButtonLabels}
+                  activeOpacity={0.7}
                   buttonStyle={{
                     borderRadius: 30,
-                    paddingRight: 0,
-                    padding: 0,
+                    paddingHorizontal: 10,
                   }}
                   buttonContainerStyle={{
                     borderRadius: 30,
                   }}
-                  innerBorderStyle={{color: 'transparent', width: 5}}
-                  activeOpacity={0.7}
+                  innerBorderStyle={{color: 'transparent', width: 10}}
                   containerStyle={{
-                    height: 30,
-                    width: '80%',
+                    height: 40,
+                    flex: 1,
                     borderRadius: 30,
-                    paddingLeft: -5,
                     elevation: 2,
                     shadowColor: '#000',
                     shadowOffset: {
@@ -429,6 +431,7 @@ class MrSpeedyBottomSheet extends Component {
                     shadowOpacity: 0.2,
                     shadowRadius: 1.41,
                   }}
+                  textStyle={{textAlign: 'center'}}
                   selectedButtonStyle={{
                     backgroundColor: colors.icons,
                     borderColor: colors.primary,
@@ -438,191 +441,130 @@ class MrSpeedyBottomSheet extends Component {
                     color: colors.primary,
                   }}
                 />
-              </View>
-
-              <View style={{flex: 1}}>
-                <ScrollView
-                  ref={(scrollref) => (this.weightScrollViewRef = scrollref)}
-                  style={{flexGrow: 0}}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}>
-                  <ButtonGroup
-                    onPress={(index) =>
-                      this.setState({selectedWeightIndex: index})
-                    }
-                    selectedIndex={selectedWeightIndex}
-                    buttons={this.weightButtonLabels}
-                    activeOpacity={0.7}
-                    buttonStyle={{
-                      borderRadius: 30,
-                      paddingHorizontal: 10,
-                    }}
-                    buttonContainerStyle={{
-                      borderRadius: 30,
-                    }}
-                    innerBorderStyle={{color: 'transparent', width: 10}}
-                    containerStyle={{
-                      height: 40,
-                      flex: 1,
-                      borderRadius: 30,
-                      elevation: 2,
-                      shadowColor: '#000',
-                      shadowOffset: {
-                        width: 0,
-                        height: 1,
-                      },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 1.41,
-                    }}
-                    textStyle={{textAlign: 'center'}}
-                    selectedButtonStyle={{
-                      backgroundColor: colors.icons,
-                      borderColor: colors.primary,
-                      borderWidth: 1,
-                    }}
-                    selectedTextStyle={{
-                      color: colors.primary,
-                    }}
-                  />
-                </ScrollView>
-
-                <ListItem
-                  title="Require Motobox"
-                  titleStyle={{
-                    fontSize: 17,
-                    color: colors.text_primary,
-                  }}
-                  containerStyle={{
-                    width: '100%',
-                    height: 40,
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                  }}
-                  rightElement={
-                    <Switch
-                      trackColor={{
-                        false: '#767577',
-                        true: colors.primary,
-                      }}
-                      thumbColor={'#f4f3f4'}
-                      ios_backgroundColor="#3e3e3e"
-                      onValueChange={() => this.setState({motobox: !motobox})}
-                      value={selectedVehicleIndex === 0 ? motobox : false}
-                      disabled={selectedVehicleIndex === 1}
-                    />
-                  }
-                />
-
-                <ListItem
-                  title="Your Contact Number"
-                  titleStyle={{
-                    fontSize: 17,
-                    color: colors.text_primary,
-                  }}
-                  containerStyle={{
-                    width: '100%',
-                    height: 65,
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                  }}
-                  input={{
-                    leftIcon: (
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                        }}>
-                        <Icon
-                          name="hash"
-                          color={colors.primary}
-                          size={18}
-                          style={{marginRight: 5}}
-                        />
-                        <Text
-                          style={{
-                            color: colors.text_primary,
-                            fontSize: 18,
-                          }}>
-                          (+63)
-                        </Text>
-                      </View>
-                    ),
-                    inputStyle: {
-                      textAlign: 'left',
-                      fontFamily: 'ProductSans-Light',
-                      fontSize: 17,
-                      color: colors.primary,
-                      borderBottomWidth: 1,
-                    },
-                    inputContainerStyle: {
-                      paddingVertical: 20,
-                    },
-                    placeholder: '9171234567',
-                    placeholderTextColor: colors.text_secondary,
-                    keyboardType: 'numeric',
-                    value: storePhoneNumber,
-                    onChangeText: (phone) => {
-                      this.setState({storePhoneNumber: phone}, () =>
-                        this.checkStorePhoneNumber(),
-                      );
-                    },
-                    onFocus: () => {
-                      if (this.bottomSheet) {
-                        this.bottomSheet.snapTo(2);
-                      }
-                    },
-                    errorMessage: storePhoneNumberError,
-                    errorStyle: {flexWrap: 'wrap'},
-                    errorProps: {numberOfLines: 2},
-                  }}
-                />
-              </View>
+              </ScrollView>
 
               <ListItem
-                title={
-                  mrspeedyEstimateLoading ? (
-                    <ActivityIndicator color={colors.primary} size="small" />
-                  ) : (
-                    `₱${mrspeedyOrderPrice}`
-                  )
-                }
+                title="Require Motobox"
                 titleStyle={{
-                  fontSize: 26,
-                  fontFamily: 'ProductSans-Black',
-                  color: colors.primary,
+                  fontSize: 17,
+                  color: colors.text_primary,
                 }}
                 containerStyle={{
                   width: '100%',
-                  height: 65,
-                  paddingTop: 10,
-                  paddingBottom: 10,
                 }}
                 rightElement={
-                  <Button
-                    onPress={() => {
-                      this.setState({changeOrderStatusModal: true});
+                  <Switch
+                    trackColor={{
+                      false: '#767577',
+                      true: colors.primary,
                     }}
-                    disabled={
-                      mrspeedyEstimateLoading ||
-                      storePhoneNumber.length <= 0 ||
-                      storePhoneNumberError !== null
-                    }
-                    title={preBooking ? 'Accept Order' : 'Place Order'}
-                    titleStyle={{color: colors.icons}}
-                    containerStyle={{
-                      borderRadius: 24,
-                      marginTop: 0,
-                      marginBottom: 0,
-                    }}
-                    buttonStyle={{
-                      backgroundColor: colors.accent,
-                    }}
+                    thumbColor={'#f4f3f4'}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={() => this.setState({motobox: !motobox})}
+                    value={selectedVehicleIndex === 0 ? motobox : false}
+                    disabled={selectedVehicleIndex === 1}
                   />
                 }
               />
+
+              <ListItem
+                title="Your Contact Number"
+                titleStyle={{
+                  fontSize: 17,
+                  color: colors.text_primary,
+                }}
+                containerStyle={{
+                  width: '100%',
+                }}
+                input={{
+                  leftIcon: (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                      }}>
+                      <Icon
+                        name="hash"
+                        color={colors.primary}
+                        size={18}
+                        style={{marginRight: 5}}
+                      />
+                      <Text
+                        style={{
+                          color: colors.text_primary,
+                          fontSize: 18,
+                        }}>
+                        (+63)
+                      </Text>
+                    </View>
+                  ),
+                  inputStyle: {
+                    textAlign: 'left',
+                    fontFamily: 'ProductSans-Light',
+                    fontSize: 17,
+                    color: colors.primary,
+                    borderBottomWidth: 1,
+                  },
+                  inputContainerStyle: {
+                    paddingVertical: 20,
+                  },
+                  placeholder: '9171234567',
+                  placeholderTextColor: colors.text_secondary,
+                  keyboardType: 'numeric',
+                  value: storePhoneNumber,
+                  onChangeText: (phone) => {
+                    this.setState({storePhoneNumber: phone}, () =>
+                      this.checkStorePhoneNumber(),
+                    );
+                  },
+                  errorMessage: storePhoneNumberError,
+                  errorStyle: {flexWrap: 'wrap'},
+                  errorProps: {numberOfLines: 2},
+                }}
+              />
             </View>
-          )}
-        />
+
+            <ListItem
+              title={
+                mrspeedyEstimateLoading ? (
+                  <ActivityIndicator color={colors.primary} size="small" />
+                ) : (
+                  `₱${mrspeedyOrderPrice}`
+                )
+              }
+              titleStyle={{
+                fontSize: 26,
+                fontFamily: 'ProductSans-Black',
+                color: colors.primary,
+              }}
+              containerStyle={{
+                width: '100%',
+              }}
+              rightElement={
+                <Button
+                  onPress={() => {
+                    this.setState({changeOrderStatusModal: true});
+                  }}
+                  disabled={
+                    mrspeedyEstimateLoading ||
+                    storePhoneNumber.length <= 0 ||
+                    storePhoneNumberError !== null
+                  }
+                  title={preBooking ? 'Accept Order' : 'Place Order'}
+                  titleStyle={{color: colors.icons}}
+                  containerStyle={{
+                    borderRadius: 24,
+                    marginTop: 0,
+                    marginBottom: 0,
+                  }}
+                  buttonStyle={{
+                    backgroundColor: colors.accent,
+                  }}
+                />
+              }
+            />
+          </View>
+        </Modalize>
       </>
     );
   }

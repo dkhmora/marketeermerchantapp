@@ -340,9 +340,7 @@ class OrderCard extends PureComponent {
                     this.props.ordersStore.selectedOrder = order;
 
                     if (this.props.ordersStore.mrspeedyBottomSheet) {
-                      this.props.ordersStore.mrspeedyBottomSheet.bottomSheet.snapTo(
-                        1,
-                      );
+                      this.props.ordersStore.mrspeedyBottomSheet.modalizeRef.open();
                     }
                   } else {
                     this.setState({changeOrderStatusModal: true});

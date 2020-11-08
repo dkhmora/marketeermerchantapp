@@ -24,25 +24,15 @@ class OrdersScreen extends Component {
 
     return (
       <View style={{height: SCREEN_HEIGHT + StatusBar.currentHeight}}>
-        <View
-          style={{flex: 1}}
-          onTouchStart={() => {
-            if (
-              this.props.ordersStore.mrspeedyBottomSheet.state.openRatio > 0
-            ) {
-              this.props.ordersStore.mrspeedyBottomSheet.bottomSheet.snapTo(0);
-            }
-          }}>
-          <CancelOrderModal navigation={navigation} />
+        <CancelOrderModal navigation={navigation} />
 
-          <BaseHeader
-            title="Orders"
-            destructiveIndex={1}
-            navigation={navigation}
-          />
+        <BaseHeader
+          title="Orders"
+          destructiveIndex={1}
+          navigation={navigation}
+        />
 
-          <OrdersTab navigation={this.props.navigation} />
-        </View>
+        <OrdersTab navigation={this.props.navigation} />
 
         <MrSpeedyBottomSheet
           ref={(mrspeedyBottomSheet) =>
