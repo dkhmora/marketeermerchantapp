@@ -7,7 +7,7 @@
  */
 import 'react-native-gesture-handler';
 import React from 'react';
-import {YellowBox, Linking, Platform} from 'react-native';
+import {YellowBox, Linking, Platform, LogBox} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import _ from 'lodash';
 import moment from 'moment';
@@ -40,7 +40,7 @@ hydrate('list', itemsStore);
 hydrate('list', detailsStore);
 hydrate('subscribedToNotifications', detailsStore);
 
-YellowBox.ignoreWarnings([
+LogBox.ignoreLogs([
   'Animated: `useNativeDriver` was not specified. This is a required option and must be explicitly set to `true` or `false`',
 ]);
 

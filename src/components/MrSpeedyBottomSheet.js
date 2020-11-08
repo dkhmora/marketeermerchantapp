@@ -318,7 +318,7 @@ class MrSpeedyBottomSheet extends Component {
       selectedOrder.orderStatus.pending.status;
 
     return (
-      <View style={{...StyleSheet.absoluteFillObject}}>
+      <>
         <Animated.Code
           exec={onChange(
             this.drawerCallbackNode,
@@ -348,9 +348,9 @@ class MrSpeedyBottomSheet extends Component {
           onCloseEnd={() => {
             if (clearSelectedOrderOnClose) {
               this.props.ordersStore.selectedOrder = null;
-            } else {
-              this.resetState();
             }
+
+            this.resetState();
           }}
           renderContent={() => (
             <View
@@ -623,7 +623,7 @@ class MrSpeedyBottomSheet extends Component {
             </View>
           )}
         />
-      </View>
+      </>
     );
   }
 }

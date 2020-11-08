@@ -249,7 +249,7 @@ class OrderCard extends PureComponent {
               flex: 1,
               backgroundColor: colors.primary,
               borderRadius: 16,
-              paddingVertical: 10,
+              padding: 5,
             }}>
             <View
               style={{
@@ -337,10 +337,9 @@ class OrderCard extends PureComponent {
                       order.paymentMethod === 'Online Banking' &&
                       order.orderStatus.pending.status)
                   ) {
-                    this.props.ordersStore.order = order;
+                    this.props.ordersStore.selectedOrder = order;
 
                     if (this.props.ordersStore.mrspeedyBottomSheet) {
-                      this.props.ordersStore.mrspeedyBottomSheet.getMrspeedyOrderPriceEstimate();
                       this.props.ordersStore.mrspeedyBottomSheet.bottomSheet.snapTo(
                         1,
                       );
