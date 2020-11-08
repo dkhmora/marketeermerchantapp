@@ -151,7 +151,7 @@ class ItemsList extends Component {
             ) {
               navigation.navigate('Edit Item', {
                 item: null,
-                itemCategory: category,
+                itemCategory: category !== 'All' ? category : null,
               });
             } else {
               Toast({

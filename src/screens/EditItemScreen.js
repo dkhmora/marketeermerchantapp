@@ -63,13 +63,14 @@ class EditItemScreen extends Component {
       selectedOptionTitle: null,
       selectedStockNumberSignIndex: 1,
       itemOptions: {},
+      itemDetailsIsValid: false,
     };
   }
 
   componentDidMount() {
     const {item} = this.props.route.params;
 
-    if (item.options) {
+    if (item && item.options) {
       const itemOptions = JSON.parse(JSON.stringify(item.options));
       this.setState({itemOptions});
     }
@@ -259,6 +260,7 @@ class EditItemScreen extends Component {
       selectedStockNumberSignIndex,
       itemOptions,
       selectedOptionTitle,
+      itemDetailsIsValid,
     } = this.state;
     const {item, itemCategory} = this.props.route.params;
     const {navigation} = this.props;
@@ -284,7 +286,8 @@ class EditItemScreen extends Component {
             <Button
               title="Save"
               type="clear"
-              disabled={loading}
+              disabled={!itemDetailsIsValid}
+              disabledTitleStyle={{color: colors.text_disabled}}
               loading={loading}
               loadingProps={{size: 'small', color: colors.primary}}
               titleStyle={{color: colors.icons}}
@@ -302,20 +305,19 @@ class EditItemScreen extends Component {
           innerRef={(ref) => {
             this.scroll = ref;
           }}
-          contentContainerStyle={{paddingBottom: 20, flexGrow: 1}}
-          style={{
+          contentContainerStyle={{
+            paddingBottom: 20,
+            paddingTop: 20,
             paddingHorizontal: 15,
-            paddingTop: 15,
+            flexGrow: 1,
           }}>
           <View style={{flex: 1}}>
             <View
               style={{
-                flex: 1,
                 flexDirection: 'row',
-                justifyContent: 'space-between',
-                paddingBottom: 10,
+                alignItems: 'center',
               }}>
-              <View style={{flex: 1, height: 150}}>
+              <View style={{flex: 1}}>
                 {imageDisplay && (
                   <FastImage
                     source={imageDisplay}
@@ -385,9 +387,8 @@ class EditItemScreen extends Component {
               containerStyle={{
                 marginRight: 0,
                 marginLeft: 0,
-                marginTop: 0,
+                marginVertical: 10,
                 borderRadius: 10,
-                overflow: 'hidden',
               }}>
               <Text note style={{textAlign: 'left'}}>
                 Tip: Uploading a photo makes customers more likely to buy your
@@ -397,6 +398,7 @@ class EditItemScreen extends Component {
 
             <Formik
               innerRef={(formRef) => (this.formikRef = formRef)}
+              validateOnMount
               validationSchema={foodItemValidationSchema}
               initialValues={
                 item
@@ -426,267 +428,282 @@ class EditItemScreen extends Component {
                     : this.handleAddItem(values);
                 });
               }}>
-              {({handleSubmit, isValid, values, setFieldValue}) => (
-                <View>
-                  <ConfirmationModal
-                    isVisible={editItemConfirmModal}
-                    title={
-                      item
-                        ? `Edit Item "${item.name}"`
-                        : `Add Item "${values.name}"`
-                    }
-                    body={
-                      item
-                        ? `Are you sure you want to edit "${item.name}"? Buyers will immediately see changes.`
-                        : `Are you sure you want to add the item "${values.name}"? Buyers will immediately see changes.`
-                    }
-                    onConfirm={() => {
-                      handleSubmit();
-                    }}
-                    closeModal={() =>
-                      this.setState({editItemConfirmModal: false})
-                    }
-                  />
+              {({handleSubmit, isValid, values, setFieldValue}) => {
+                if (itemDetailsIsValid !== isValid) {
+                  this.setState({itemDetailsIsValid: isValid});
+                }
 
-                  <ConfirmationModal
-                    isVisible={selectedOptionTitle !== null}
-                    title={
-                      selectedOptionTitle
-                        ? `Remove Option ${selectedOptionTitle}`
-                        : ''
-                    }
-                    body={
-                      selectedOptionTitle
-                        ? `Are you sure you want to remove the customization option ${selectedOptionTitle}? This will also remove all selections within the option.`
-                        : ''
-                    }
-                    onConfirm={() => {
-                      this.handleDeleteOption(selectedOptionTitle);
-                    }}
-                    closeModal={() =>
-                      this.setState({selectedOptionTitle: null})
-                    }
-                  />
+                return (
+                  <View>
+                    <ConfirmationModal
+                      isVisible={editItemConfirmModal}
+                      title={
+                        item
+                          ? `Edit Item "${item.name}"`
+                          : `Add Item "${values.name}"`
+                      }
+                      body={
+                        item
+                          ? `Are you sure you want to edit "${item.name}"? Buyers will immediately see changes.`
+                          : `Are you sure you want to add the item "${values.name}"? Buyers will immediately see changes.`
+                      }
+                      onConfirm={() => {
+                        handleSubmit();
+                      }}
+                      closeModal={() =>
+                        this.setState({editItemConfirmModal: false})
+                      }
+                    />
 
-                  <View style={styles.action}>
-                    <Item
-                      style={{
-                        paddingHorizontal: 10,
-                        flex: 1,
-                        borderBottomWidth: 0,
-                      }}>
-                      <View style={[styles.icon_container, {flex: 1}]}>
-                        <Icon name="folder" color={colors.primary} size={20} />
-                      </View>
-                      <Picker
-                        note={false}
-                        placeholder="Select Item Category"
-                        mode="dropdown"
-                        selectedValue={values.category}
-                        iosIcon={<Icon name="chevron-down" />}
-                        itemTextStyle={{textAlign: 'right'}}
-                        onValueChange={(value) =>
-                          setFieldValue('category', value)
-                        }>
-                        {this.categories &&
-                          this.categories.map((cat, index) => {
-                            return (
-                              <Picker.Item
-                                key={index}
-                                label={cat}
-                                value={cat}
-                              />
-                            );
-                          })}
-                      </Picker>
-                    </Item>
-                  </View>
+                    <ConfirmationModal
+                      isVisible={selectedOptionTitle !== null}
+                      title={
+                        selectedOptionTitle
+                          ? `Remove Option ${selectedOptionTitle}`
+                          : ''
+                      }
+                      body={
+                        selectedOptionTitle
+                          ? `Are you sure you want to remove the customization option ${selectedOptionTitle}? This will also remove all selections within the option.`
+                          : ''
+                      }
+                      onConfirm={() => {
+                        this.handleDeleteOption(selectedOptionTitle);
+                      }}
+                      closeModal={() =>
+                        this.setState({selectedOptionTitle: null})
+                      }
+                    />
 
-                  <Field
-                    component={CustomInput}
-                    name="name"
-                    placeholder={item ? `${item.name}'s Name` : 'Item Name'}
-                    leftIcon="type"
-                  />
+                    <View style={styles.action}>
+                      <Item
+                        style={{
+                          paddingHorizontal: 10,
+                          flex: 1,
+                          borderBottomWidth: 0,
+                        }}>
+                        <View style={[styles.icon_container, {flex: 1}]}>
+                          <Icon
+                            name="folder"
+                            color={colors.primary}
+                            size={20}
+                          />
+                        </View>
+                        <Picker
+                          note={false}
+                          placeholder="Select Item Category"
+                          mode="dropdown"
+                          selectedValue={values.category}
+                          iosIcon={<Icon name="chevron-down" />}
+                          itemTextStyle={{textAlign: 'right'}}
+                          onValueChange={(value) =>
+                            setFieldValue('category', value)
+                          }>
+                          {this.categories &&
+                            this.categories.map((cat, index) => {
+                              return (
+                                <Picker.Item
+                                  key={index}
+                                  label={cat}
+                                  value={cat}
+                                />
+                              );
+                            })}
+                        </Picker>
+                      </Item>
+                    </View>
 
-                  <Field
-                    component={CustomInput}
-                    name="description"
-                    leftIcon="align-justify"
-                    placeholder={
-                      item ? `${item.name}'s Description` : 'Item Description'
-                    }
-                    maxLength={150}
-                    numberOfLines={3}
-                    multiline
-                    inputStyle={{textAlignVertical: 'top'}}
-                    autoCapitalize="sentences"
-                  />
-
-                  <View style={{flexDirection: 'row'}}>
                     <Field
                       component={CustomInput}
-                      name="price"
-                      placeholder={item ? `${item.name}'s Price` : 'Item Price'}
+                      name="name"
+                      placeholder={item ? `${item.name}'s Name` : 'Item Name'}
+                      leftIcon="type"
+                    />
+
+                    <Field
+                      component={CustomInput}
+                      name="description"
+                      leftIcon="align-justify"
+                      placeholder={
+                        item ? `${item.name}'s Description` : 'Item Description'
+                      }
+                      maxLength={150}
+                      numberOfLines={3}
+                      multiline
+                      inputStyle={{textAlignVertical: 'top'}}
+                      autoCapitalize="sentences"
+                    />
+
+                    <View style={{flexDirection: 'row'}}>
+                      <Field
+                        component={CustomInput}
+                        name="price"
+                        placeholder={
+                          item ? `${item.name}'s Price` : 'Item Price'
+                        }
+                        leftIcon={
+                          <Text style={{color: colors.primary, fontSize: 25}}>
+                            ₱
+                          </Text>
+                        }
+                        containerStyle={{flex: 1}}
+                        maxLength={10}
+                        keyboardType="numeric"
+                        autoCapitalize="none"
+                      />
+
+                      <Text
+                        style={{
+                          fontSize: 34,
+                          textAlignVertical: 'center',
+                          marginBottom: 15,
+                        }}>
+                        /
+                      </Text>
+
+                      <Field
+                        component={CustomInput}
+                        name="unit"
+                        placeholder={item ? `${item.name}'s Unit` : 'Item Unit'}
+                        maxLength={10}
+                        containerStyle={{flex: 1}}
+                        autoCapitalize="none"
+                      />
+                    </View>
+
+                    <Field
+                      component={CustomInput}
+                      name="discountedPrice"
+                      placeholder={
+                        item
+                          ? `${item.name}'s Discounted Price`
+                          : 'Item Discounted Price'
+                      }
+                      maxLength={10}
+                      containerStyle={{flex: 1}}
+                      keyboardType="numeric"
+                      autoCapitalize="none"
                       leftIcon={
                         <Text style={{color: colors.primary, fontSize: 25}}>
                           ₱
                         </Text>
                       }
-                      containerStyle={{flex: 1}}
-                      maxLength={10}
-                      keyboardType="numeric"
-                      autoCapitalize="none"
                     />
 
-                    <Text
-                      style={{
-                        fontSize: 34,
-                        textAlignVertical: 'center',
-                        marginBottom: 15,
-                      }}>
-                      /
-                    </Text>
+                    {storeType === 'basic' && (
+                      <View>
+                        {item && (
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignSelf: 'center',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: colors.icons,
+                              elevation: 2,
+                              borderRadius: 10,
+                              paddingHorizontal: 5,
+                              paddingVertical: 2,
+                            }}>
+                            <Text>{'Current Stock/New Stock: '}</Text>
 
-                    <Field
-                      component={CustomInput}
-                      name="unit"
-                      placeholder={item ? `${item.name}'s Unit` : 'Item Unit'}
-                      maxLength={10}
-                      containerStyle={{flex: 1}}
-                      autoCapitalize="none"
-                    />
-                  </View>
+                            <Text
+                              style={{
+                                fontSize: 14,
+                                fontFamily: 'ProductSans-Bold',
+                              }}>{`${item.stock} | `}</Text>
 
-                  <Field
-                    component={CustomInput}
-                    name="discountedPrice"
-                    placeholder={
-                      item
-                        ? `${item.name}'s Discounted Price`
-                        : 'Item Discounted Price'
-                    }
-                    maxLength={10}
-                    containerStyle={{flex: 1}}
-                    keyboardType="numeric"
-                    autoCapitalize="none"
-                    leftIcon={
-                      <Text style={{color: colors.primary, fontSize: 25}}>
-                        ₱
-                      </Text>
-                    }
-                  />
+                            <Text
+                              style={{
+                                fontSize: 14,
+                                fontFamily: 'ProductSans-Bold',
+                                color: colors.accent,
+                              }}>{`${
+                              values.additionalStock
+                                ? Math.max(
+                                    0,
+                                    Number(`${sign}${values.additionalStock}`) +
+                                      item.stock,
+                                  )
+                                : item.stock
+                            }`}</Text>
+                          </View>
+                        )}
 
-                  {storeType === 'basic' && (
-                    <View>
-                      {item && (
                         <View
                           style={{
                             flexDirection: 'row',
-                            alignSelf: 'center',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: colors.icons,
-                            elevation: 2,
-                            borderRadius: 10,
-                            paddingHorizontal: 5,
-                            paddingVertical: 2,
                           }}>
-                          <Text>{'Current Stock/New Stock: '}</Text>
+                          {item && (
+                            <ButtonGroup
+                              onPress={(index) =>
+                                this.setState({
+                                  selectedStockNumberSignIndex: index,
+                                })
+                              }
+                              selectedIndex={selectedStockNumberSignIndex}
+                              buttons={['-', '+']}
+                              activeOpacity={0.7}
+                              buttonStyle={{
+                                borderRadius: 40,
+                              }}
+                              buttonContainerStyle={{
+                                borderRadius: 40,
+                              }}
+                              innerBorderStyle={{
+                                color: 'transparent',
+                                width: 10,
+                              }}
+                              containerStyle={{
+                                height: 40,
+                                width: 100,
+                                borderRadius: 40,
+                                elevation: 2,
+                                shadowColor: '#000',
+                                shadowOffset: {
+                                  width: 0,
+                                  height: 1,
+                                },
+                                shadowOpacity: 0.2,
+                                shadowRadius: 1.41,
+                              }}
+                              textStyle={{textAlign: 'center'}}
+                              selectedButtonStyle={{
+                                backgroundColor: colors.icons,
+                                borderColor: colors.primary,
+                                borderWidth: 1,
+                              }}
+                              selectedTextStyle={{
+                                color: colors.primary,
+                              }}
+                            />
+                          )}
 
-                          <Text
-                            style={{
-                              fontSize: 14,
-                              fontFamily: 'ProductSans-Bold',
-                            }}>{`${item.stock} | `}</Text>
-
-                          <Text
-                            style={{
-                              fontSize: 14,
-                              fontFamily: 'ProductSans-Bold',
-                              color: colors.accent,
-                            }}>{`${
-                            values.additionalStock
-                              ? Math.max(
-                                  0,
-                                  Number(`${sign}${values.additionalStock}`) +
-                                    item.stock,
-                                )
-                              : item.stock
-                          }`}</Text>
-                        </View>
-                      )}
-
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                        }}>
-                        {item && (
-                          <ButtonGroup
-                            onPress={(index) =>
-                              this.setState({
-                                selectedStockNumberSignIndex: index,
-                              })
+                          <Field
+                            component={CustomInput}
+                            name="additionalStock"
+                            placeholder={
+                              item
+                                ? `${
+                                    selectedStockNumberSignIndex === 0
+                                      ? 'Decrease'
+                                      : 'Increase'
+                                  } ${item.name} Stock`
+                                : 'Item Initial Stock'
                             }
-                            selectedIndex={selectedStockNumberSignIndex}
-                            buttons={['-', '+']}
-                            activeOpacity={0.7}
-                            buttonStyle={{
-                              borderRadius: 40,
-                            }}
-                            buttonContainerStyle={{
-                              borderRadius: 40,
-                            }}
-                            innerBorderStyle={{color: 'transparent', width: 10}}
-                            containerStyle={{
-                              height: 40,
-                              width: 100,
-                              borderRadius: 40,
-                              elevation: 2,
-                              shadowColor: '#000',
-                              shadowOffset: {
-                                width: 0,
-                                height: 1,
-                              },
-                              shadowOpacity: 0.2,
-                              shadowRadius: 1.41,
-                            }}
-                            textStyle={{textAlign: 'center'}}
-                            selectedButtonStyle={{
-                              backgroundColor: colors.icons,
-                              borderColor: colors.primary,
-                              borderWidth: 1,
-                            }}
-                            selectedTextStyle={{
-                              color: colors.primary,
-                            }}
+                            placeholderStyle={{color: colors.primary}}
+                            maxLength={10}
+                            containerStyle={{flex: 1}}
+                            keyboardType="numeric"
+                            autoCapitalize="none"
+                            leftIcon="hash"
                           />
-                        )}
-
-                        <Field
-                          component={CustomInput}
-                          name="additionalStock"
-                          placeholder={
-                            item
-                              ? `${
-                                  selectedStockNumberSignIndex === 0
-                                    ? 'Decrease'
-                                    : 'Increase'
-                                } ${item.name} Stock`
-                              : 'Item Initial Stock'
-                          }
-                          placeholderStyle={{color: colors.primary}}
-                          maxLength={10}
-                          containerStyle={{flex: 1}}
-                          keyboardType="numeric"
-                          autoCapitalize="none"
-                          leftIcon="hash"
-                        />
+                        </View>
                       </View>
-                    </View>
-                  )}
-                </View>
-              )}
+                    )}
+                  </View>
+                );
+              }}
             </Formik>
 
             {storeType === 'food' && (
