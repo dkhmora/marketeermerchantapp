@@ -5,7 +5,7 @@ import {Button, Card, CheckBox, Icon, Text} from 'react-native-elements';
 import {colors} from '../../../../assets/colors';
 import CustomInput from '../../CustomInput';
 import Divider from '../../Divider';
-import {itemOptionSelectionValidationSchema} from '../../../util/validationSchemas';
+import {foodItemOptionSelectionValidationSchema} from '../../../util/validationSchemas';
 import {Picker} from '@react-native-community/picker';
 import {Switch} from 'react-native-gesture-handler';
 
@@ -194,7 +194,7 @@ class CustomizationOptionsCard extends Component {
 
         <Formik
           innerRef={(formRef) => (this.addOptionForm = formRef)}
-          validationSchema={itemOptionSelectionValidationSchema}
+          validationSchema={foodItemOptionSelectionValidationSchema}
           initialValues={{
             title: '',
             price: 0,

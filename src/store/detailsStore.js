@@ -248,32 +248,15 @@ class DetailsStore {
       });
   }
 
-  @action async updateStoreDetails(
-    storeDescription,
-    freeDelivery,
-    vacationMode,
-    availablePaymentMethods,
-    availableDeliveryMethods,
-    deliveryDiscount,
-    deliveryType,
-    ownDeliveryServiceFee,
-    freeDeliveryMinimum,
-  ) {
+  @action async updateStoreDetails(values) {
     await this.storeRef
-      .update({
-        storeDescription,
-        freeDelivery,
-        freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
-        vacationMode,
-        availablePaymentMethods,
-        availableDeliveryMethods,
-        deliveryDiscount,
-        deliveryType,
-        ownDeliveryServiceFee: ownDeliveryServiceFee
-          ? ownDeliveryServiceFee
-          : 0,
-        updatedAt: firestore.Timestamp.now().toMillis(),
-      })
+      .set(
+        {
+          ...values,
+          updatedAt: firestore.Timestamp.now().toMillis(),
+        },
+        {merge: true},
+      )
       .catch((err) => {
         crashlytics().recordError(err);
         Toast({text: `Something went wrong. Error: ${err}`, type: 'danger'});

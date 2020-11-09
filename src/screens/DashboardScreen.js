@@ -13,7 +13,6 @@ import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 import {observable, action, computed} from 'mobx';
 import {Text, Input, Icon, Button, CheckBox} from 'react-native-elements';
-import storage from '@react-native-firebase/storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import BaseOptionsMenu from '../components/BaseOptionsMenu';
 import {colors} from '../../assets/colors';
@@ -25,6 +24,9 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import CardItemHeader from '../components/CardItemHeader';
 import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 import firebase from '@react-native-firebase/app';
+import {Field, Formik} from 'formik';
+import {deliveryDiscountValidationSchema} from '../util/validationSchemas';
+import CustomInput from '../components/CustomInput';
 
 const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 @inject('detailsStore')
@@ -55,8 +57,10 @@ class DashboardScreen extends Component {
       oldCoverImageUrl: null,
       displayImageReady: false,
       coverImageReady: false,
+      deliverySettingsIsValid: false,
       displayImageWidth: null,
       coverImageWidth: null,
+      deliveryEditMode: false,
     };
   }
 
@@ -449,6 +453,18 @@ class DashboardScreen extends Component {
     });
   }
 
+  handleEditDeliverySettings(values) {
+    this.setState({loading: true, deliveryEditMode: false}, async () => {
+      await this.props.detailsStore.updateStoreDetails(values).then(() => {
+        Toast({
+          text: 'Store details successfully updated!',
+          type: 'success',
+          duration: 3000,
+        });
+      });
+    });
+  }
+
   CategoryPills = (items) => {
     const pills = [];
 
@@ -509,11 +525,19 @@ class DashboardScreen extends Component {
       displayImageWidth,
       coverImageWidth,
       loading,
+      deliverySettingsIsValid,
+      deliveryEditMode,
     } = this.state;
 
     const {navigation} = this.props;
 
     const {editMode, saveDisabled} = this;
+
+    const deliveryTypes = [
+      'Same Day Delivery',
+      'Next Day Delivery',
+      'Scheduled Delivery',
+    ];
 
     return (
       <View style={{flex: 1}}>
@@ -1071,452 +1095,502 @@ class DashboardScreen extends Component {
                 </Card>
               </View>
 
-              <View
-                style={{
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 1.41,
+              <Formik
+                innerRef={(formRef) => (this.formikRef = formRef)}
+                validateOnMount
+                validationSchema={deliveryDiscountValidationSchema}
+                initialValues={{
+                  availableDeliveryMethods,
+                  deliveryDiscount,
+                  deliveryType,
+                }}
+                onSubmit={(values) => {
+                  this.handleEditDeliverySettings(values);
                 }}>
-                <Card
-                  style={{
-                    borderRadius: 10,
-                    overflow: 'hidden',
-                  }}>
-                  <CardItemHeader title="Delivery Settings" />
+                {({
+                  handleSubmit,
+                  isValid,
+                  values,
+                  setFieldValue,
+                  resetForm,
+                }) => {
+                  if (deliverySettingsIsValid !== isValid) {
+                    this.setState({deliverySettingsIsValid: isValid});
+                  }
 
-                  {availableDeliveryMethods['Mr. Speedy'] && (
-                    <CardItem bordered>
-                      <View style={{width: '100%'}}>
-                        <View
-                          style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Text
-                            style={{
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                            }}>
-                            Mr. Speedy
-                          </Text>
-
-                          <Switch
-                            trackColor={{
-                              false: '#767577',
-                              true: editMode ? colors.accent : colors.primary,
-                            }}
-                            thumbColor={'#f4f3f4'}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={() =>
-                              (this.newAvailableDeliveryMethods[
-                                'Mr. Speedy'
-                              ].activated = !this.newAvailableDeliveryMethods[
-                                'Mr. Speedy'
-                              ].activated)
-                            }
-                            value={
-                              editMode &&
-                              this.newAvailableDeliveryMethods['Mr. Speedy']
-                                ? this.newAvailableDeliveryMethods['Mr. Speedy']
-                                    .activated
-                                : availableDeliveryMethods['Mr. Speedy']
-                                    .activated
-                            }
-                            disabled={!editMode}
-                          />
-                        </View>
-                      </View>
-                    </CardItem>
-                  )}
-
-                  {availableDeliveryMethods['Own Delivery'] && (
-                    <CardItem bordered>
-                      <View style={{width: '100%'}}>
-                        <View
-                          style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Text
-                            style={{
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                            }}>
-                            Own Delivery
-                          </Text>
-
-                          <Switch
-                            trackColor={{
-                              false: '#767577',
-                              true: editMode ? colors.accent : colors.primary,
-                            }}
-                            thumbColor={'#f4f3f4'}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={() =>
-                              (this.newAvailableDeliveryMethods[
-                                'Own Delivery'
-                              ].activated = !this.newAvailableDeliveryMethods[
-                                'Own Delivery'
-                              ].activated)
-                            }
-                            value={
-                              editMode &&
-                              this.newAvailableDeliveryMethods['Own Delivery']
-                                ? this.newAvailableDeliveryMethods[
-                                    'Own Delivery'
-                                  ].activated
-                                : availableDeliveryMethods['Own Delivery']
-                                    .activated
-                            }
-                            disabled={!editMode}
-                          />
-                        </View>
-
-                        <Card
-                          style={{
-                            borderRadius: 10,
-                            overflow: 'hidden',
-                            marginTop: 10,
-                          }}>
-                          <CardItem bordered>
-                            <View
-                              style={{
-                                flex: 1,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                              }}>
-                              <View style={{flex: 1, paddingright: 10}}>
-                                <Text
-                                  style={{
-                                    fontSize: 16,
-                                  }}>
-                                  Delivery Price
-                                </Text>
-                              </View>
-
-                              <View style={{flex: 1, alignItems: 'flex-end'}}>
-                                {editMode &&
-                                this.newAvailableDeliveryMethods[
-                                  'Own Delivery'
-                                ] ? (
-                                  <Input
-                                    value={
-                                      this.newAvailableDeliveryMethods[
-                                        'Own Delivery'
-                                      ].deliveryPrice
-                                        ? String(
-                                            this.newAvailableDeliveryMethods[
-                                              'Own Delivery'
-                                            ].deliveryPrice,
-                                          )
-                                        : null
-                                    }
-                                    leftIcon={
-                                      <Text style={{fontSize: 18}}>₱</Text>
-                                    }
-                                    keyboardType="number-pad"
-                                    errorMessage={
-                                      this.newAvailableDeliveryMethods[
-                                        'Own Delivery'
-                                      ][`deliveryPriceError`]
-                                    }
-                                    onChangeText={(value) =>
-                                      this.handleChangeDeliveryValue(
-                                        'Own Delivery',
-                                        'deliveryPrice',
-                                        value,
-                                      )
-                                    }
-                                    inputStyle={{textAlign: 'right'}}
-                                    containerStyle={{
-                                      borderColor: this.editModeHeaderColor,
-                                    }}
-                                  />
-                                ) : (
-                                  <Text
-                                    style={{
-                                      color: colors.primary,
-                                      fontSize: 16,
-                                      fontFamily: 'ProductSans-Bold',
-                                      textAlign: 'right',
-                                    }}>
-                                    {availableDeliveryMethods['Own Delivery']
-                                      .deliveryPrice
-                                      ? `₱${availableDeliveryMethods['Own Delivery'].deliveryPrice}`
-                                      : 'Not Set'}
-                                  </Text>
-                                )}
-                              </View>
-                            </View>
-                          </CardItem>
-                        </Card>
-                      </View>
-                    </CardItem>
-                  )}
-
-                  {deliveryDiscount && (
-                    <CardItem bordered>
-                      <View
+                  return (
+                    <>
+                      <Card
                         style={{
-                          width: '100%',
+                          borderRadius: 10,
                         }}>
-                        <View
-                          style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                          }}>
-                          <Text
-                            style={{
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                            }}>
-                            Delivery Fee Discount
-                          </Text>
-
-                          <Switch
-                            trackColor={{
-                              false: '#767577',
-                              true: editMode ? colors.accent : colors.primary,
-                            }}
-                            thumbColor={'#f4f3f4'}
-                            ios_backgroundColor="#3e3e3e"
-                            onValueChange={() =>
-                              (this.newDeliveryDiscount.activated = !this
-                                .newDeliveryDiscount.activated)
+                        <View style={{borderRadius: 10, overflow: 'hidden'}}>
+                          <CardItemHeader
+                            title="Delivery Settings"
+                            titleStyle={
+                              deliveryEditMode ? {color: colors.icons} : {}
                             }
-                            value={
-                              editMode && this.newDeliveryDiscount
-                                ? this.newDeliveryDiscount.activated
-                                : deliveryDiscount.activated
+                            style={
+                              deliveryEditMode
+                                ? {
+                                    backgroundColor: colors.accent,
+                                  }
+                                : {}
                             }
-                            disabled={!editMode}
+                            leftComponent={
+                              deliveryEditMode && (
+                                <Button
+                                  type="clear"
+                                  color={colors.icons}
+                                  icon={<Icon name="x" color={colors.icons} />}
+                                  onPress={() => {
+                                    this.setState(
+                                      {deliveryEditMode: false},
+                                      () => resetForm(),
+                                    );
+                                  }}
+                                  titleStyle={{color: colors.icons}}
+                                  containerStyle={{
+                                    borderRadius: 24,
+                                  }}
+                                />
+                              )
+                            }
+                            rightComponent={
+                              deliveryEditMode ? (
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'flex-end',
+                                    justifyContent: 'space-between',
+                                  }}>
+                                  <Button
+                                    type="clear"
+                                    title="Save"
+                                    titleStyle={{color: colors.icons}}
+                                    loading={loading}
+                                    loadingProps={{color: colors.icons}}
+                                    onPress={() => handleSubmit()}
+                                    disabled={saveDisabled}
+                                  />
+                                </View>
+                              ) : (
+                                <BaseOptionsMenu
+                                  iconColor={
+                                    deliveryEditMode
+                                      ? colors.icons
+                                      : colors.primary
+                                  }
+                                  options={['Edit Delivery Settings']}
+                                  actions={[
+                                    () =>
+                                      this.setState({deliveryEditMode: true}),
+                                  ]}
+                                />
+                              )
+                            }
                           />
+
+                          {availableDeliveryMethods['Mr. Speedy'] && (
+                            <CardItem bordered>
+                              <View style={{width: '100%'}}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 16,
+                                      fontFamily: 'ProductSans-Bold',
+                                    }}>
+                                    Mr. Speedy
+                                  </Text>
+
+                                  <Switch
+                                    trackColor={{
+                                      false: '#767577',
+                                      true: deliveryEditMode
+                                        ? colors.accent
+                                        : colors.primary,
+                                    }}
+                                    thumbColor={'#f4f3f4'}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={() =>
+                                      setFieldValue(
+                                        'availableDeliveryMethods["Mr. Speedy"].activated',
+                                        !values.availableDeliveryMethods[
+                                          'Mr. Speedy'
+                                        ].activated,
+                                      )
+                                    }
+                                    value={
+                                      deliveryEditMode
+                                        ? values.availableDeliveryMethods[
+                                            'Mr. Speedy'
+                                          ].activated
+                                        : availableDeliveryMethods['Mr. Speedy']
+                                            .activated
+                                    }
+                                    disabled={!deliveryEditMode}
+                                  />
+                                </View>
+                              </View>
+                            </CardItem>
+                          )}
+
+                          {availableDeliveryMethods['Own Delivery'] && (
+                            <CardItem bordered>
+                              <View style={{width: '100%'}}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 16,
+                                      fontFamily: 'ProductSans-Bold',
+                                    }}>
+                                    Own Delivery
+                                  </Text>
+
+                                  <Switch
+                                    trackColor={{
+                                      false: '#767577',
+                                      true: deliveryEditMode
+                                        ? colors.accent
+                                        : colors.primary,
+                                    }}
+                                    thumbColor={'#f4f3f4'}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={() =>
+                                      setFieldValue(
+                                        'availableDeliveryMethods["Own Delivery"].activated',
+                                        !values.availableDeliveryMethods[
+                                          'Own Delivery'
+                                        ].activated,
+                                      )
+                                    }
+                                    value={
+                                      deliveryEditMode
+                                        ? values.availableDeliveryMethods[
+                                            'Own Delivery'
+                                          ].activated
+                                        : availableDeliveryMethods[
+                                            'Own Delivery'
+                                          ].activated
+                                    }
+                                    disabled={!deliveryEditMode}
+                                  />
+                                </View>
+
+                                <Card
+                                  style={{
+                                    borderRadius: 10,
+                                    overflow: 'hidden',
+                                    marginTop: 10,
+                                  }}>
+                                  <CardItem bordered>
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                      }}>
+                                      <View style={{flex: 1, paddingright: 10}}>
+                                        <Text
+                                          style={{
+                                            fontSize: 16,
+                                          }}>
+                                          Delivery Price
+                                        </Text>
+                                      </View>
+
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                          alignItems: 'flex-end',
+                                        }}>
+                                        {deliveryEditMode ? (
+                                          <Field
+                                            component={CustomInput}
+                                            name="availableDeliveryMethods[Own Delivery].deliveryPrice"
+                                            placeholder="Delivery Discount Amount"
+                                            leftIcon={
+                                              <Text
+                                                style={{
+                                                  color: colors.primary,
+                                                  fontSize: 25,
+                                                }}>
+                                                ₱
+                                              </Text>
+                                            }
+                                            containerStyle={{flex: 1}}
+                                            maxLength={10}
+                                            keyboardType="numeric"
+                                            autoCapitalize="none"
+                                            type="number"
+                                          />
+                                        ) : (
+                                          <Text
+                                            style={{
+                                              color: colors.primary,
+                                              fontSize: 16,
+                                              fontFamily: 'ProductSans-Bold',
+                                              textAlign: 'right',
+                                            }}>
+                                            {availableDeliveryMethods[
+                                              'Own Delivery'
+                                            ].deliveryPrice
+                                              ? `₱${availableDeliveryMethods['Own Delivery'].deliveryPrice}`
+                                              : 'Not Set'}
+                                          </Text>
+                                        )}
+                                      </View>
+                                    </View>
+                                  </CardItem>
+                                </Card>
+                              </View>
+                            </CardItem>
+                          )}
+
+                          {deliveryDiscount && (
+                            <CardItem bordered>
+                              <View
+                                style={{
+                                  width: '100%',
+                                }}>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                  }}>
+                                  <Text
+                                    style={{
+                                      fontSize: 16,
+                                      fontFamily: 'ProductSans-Bold',
+                                    }}>
+                                    Delivery Fee Discount
+                                  </Text>
+
+                                  <Switch
+                                    trackColor={{
+                                      false: '#767577',
+                                      true: deliveryEditMode
+                                        ? colors.accent
+                                        : colors.primary,
+                                    }}
+                                    thumbColor={'#f4f3f4'}
+                                    ios_backgroundColor="#3e3e3e"
+                                    onValueChange={() =>
+                                      setFieldValue(
+                                        'deliveryDiscount.activated',
+                                        !values.deliveryDiscount.activated,
+                                      )
+                                    }
+                                    value={values.deliveryDiscount.activated}
+                                    disabled={!deliveryEditMode}
+                                  />
+                                </View>
+
+                                <Card
+                                  style={{
+                                    borderRadius: 10,
+                                    overflow: 'hidden',
+                                    marginTop: 10,
+                                  }}>
+                                  <CardItem bordered>
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                      }}>
+                                      <View style={{flex: 1, paddingright: 10}}>
+                                        <Text
+                                          style={{
+                                            fontSize: 16,
+                                          }}>
+                                          Discount Amount
+                                        </Text>
+                                      </View>
+
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                          alignItems: 'flex-end',
+                                        }}>
+                                        {deliveryEditMode ? (
+                                          <Field
+                                            component={CustomInput}
+                                            name="deliveryDiscount.discountAmount"
+                                            placeholder="Delivery Discount Amount"
+                                            leftIcon={
+                                              <Text
+                                                style={{
+                                                  color: colors.primary,
+                                                  fontSize: 25,
+                                                }}>
+                                                ₱
+                                              </Text>
+                                            }
+                                            containerStyle={{flex: 1}}
+                                            maxLength={10}
+                                            keyboardType="numeric"
+                                            autoCapitalize="none"
+                                            type="number"
+                                          />
+                                        ) : (
+                                          <Text
+                                            style={{
+                                              color: colors.primary,
+                                              fontSize: 16,
+                                              fontFamily: 'ProductSans-Bold',
+                                              textAlign: 'right',
+                                            }}>
+                                            {deliveryDiscount.discountAmount
+                                              ? `₱${deliveryDiscount.discountAmount}`
+                                              : 'Not Set'}
+                                          </Text>
+                                        )}
+                                      </View>
+                                    </View>
+                                  </CardItem>
+
+                                  <CardItem bordered>
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                      }}>
+                                      <View style={{flex: 1, paddingright: 10}}>
+                                        <Text
+                                          style={{
+                                            fontSize: 16,
+                                          }}>
+                                          Minimum Order Amount
+                                        </Text>
+                                      </View>
+
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                          alignItems: 'flex-end',
+                                        }}>
+                                        {deliveryEditMode ? (
+                                          <Field
+                                            component={CustomInput}
+                                            name="deliveryDiscount.minimumOrderAmount"
+                                            placeholder="Minimum Order Amount"
+                                            leftIcon={
+                                              <Text
+                                                style={{
+                                                  color: colors.primary,
+                                                  fontSize: 25,
+                                                }}>
+                                                ₱
+                                              </Text>
+                                            }
+                                            containerStyle={{flex: 1}}
+                                            maxLength={10}
+                                            keyboardType="numeric"
+                                            autoCapitalize="none"
+                                            type="number"
+                                          />
+                                        ) : (
+                                          <Text
+                                            style={{
+                                              color: colors.primary,
+                                              fontSize: 16,
+                                              fontFamily: 'ProductSans-Bold',
+                                              textAlign: 'right',
+                                            }}>
+                                            {deliveryDiscount.minimumOrderAmount
+                                              ? `₱${deliveryDiscount.minimumOrderAmount}`
+                                              : 'Not Set'}
+                                          </Text>
+                                        )}
+                                      </View>
+                                    </View>
+                                  </CardItem>
+                                </Card>
+                              </View>
+                            </CardItem>
+                          )}
+
+                          <CardItem bordered>
+                            <View
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                              }}>
+                              <View style={{flex: 1, paddingright: 10}}>
+                                <Text
+                                  style={{
+                                    fontSize: 16,
+                                    fontFamily: 'ProductSans-Bold',
+                                  }}>
+                                  Delivery Period
+                                </Text>
+                              </View>
+
+                              <View style={{flex: 1, alignItems: 'flex-end'}}>
+                                {deliveryEditMode ? (
+                                  <View>
+                                    {deliveryTypes.map(
+                                      (deliveryTypeName, index) => (
+                                        <CheckBox
+                                          key={`${deliveryTypeName}${index}`}
+                                          title={deliveryTypeName}
+                                          checked={
+                                            values.deliveryType ===
+                                            deliveryTypeName
+                                          }
+                                          checkedIcon="dot-circle-o"
+                                          uncheckedIcon="circle-o"
+                                          onPress={() =>
+                                            setFieldValue(
+                                              'deliveryType',
+                                              deliveryTypeName,
+                                            )
+                                          }
+                                        />
+                                      ),
+                                    )}
+                                  </View>
+                                ) : (
+                                  <Text
+                                    style={{
+                                      color: colors.primary,
+                                      fontSize: 16,
+                                      fontFamily: 'ProductSans-Bold',
+                                      textAlign: 'right',
+                                    }}>
+                                    {deliveryType}
+                                  </Text>
+                                )}
+                              </View>
+                            </View>
+                          </CardItem>
                         </View>
-
-                        <Card
-                          style={{
-                            borderRadius: 10,
-                            overflow: 'hidden',
-                            marginTop: 10,
-                          }}>
-                          <CardItem bordered>
-                            <View
-                              style={{
-                                flex: 1,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                              }}>
-                              <View style={{flex: 1, paddingright: 10}}>
-                                <Text
-                                  style={{
-                                    fontSize: 16,
-                                  }}>
-                                  Discount Amount
-                                </Text>
-                              </View>
-
-                              <View style={{flex: 1, alignItems: 'flex-end'}}>
-                                {editMode && this.newDeliveryDiscount ? (
-                                  <Input
-                                    value={
-                                      this.newDeliveryDiscount.discountAmount
-                                        ? String(
-                                            this.newDeliveryDiscount
-                                              .discountAmount,
-                                          )
-                                        : null
-                                    }
-                                    leftIcon={
-                                      <Text style={{fontSize: 18}}>₱</Text>
-                                    }
-                                    keyboardType="number-pad"
-                                    errorMessage={
-                                      this.newDeliveryDiscount[
-                                        'discountAmountError'
-                                      ]
-                                    }
-                                    onChangeText={(value) =>
-                                      this.handleChangeDeliveryDiscountValue(
-                                        'discountAmount',
-                                        value,
-                                      )
-                                    }
-                                    inputStyle={{textAlign: 'right'}}
-                                    containerStyle={{
-                                      borderColor: this.editModeHeaderColor,
-                                    }}
-                                  />
-                                ) : (
-                                  <Text
-                                    style={{
-                                      color: colors.primary,
-                                      fontSize: 16,
-                                      fontFamily: 'ProductSans-Bold',
-                                      textAlign: 'right',
-                                    }}>
-                                    {deliveryDiscount.discountAmount
-                                      ? `₱${deliveryDiscount.discountAmount}`
-                                      : 'Not Set'}
-                                  </Text>
-                                )}
-                              </View>
-                            </View>
-                          </CardItem>
-
-                          <CardItem bordered>
-                            <View
-                              style={{
-                                flex: 1,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                              }}>
-                              <View style={{flex: 1, paddingright: 10}}>
-                                <Text
-                                  style={{
-                                    fontSize: 16,
-                                  }}>
-                                  Minimum Order Amount
-                                </Text>
-                              </View>
-
-                              <View style={{flex: 1, alignItems: 'flex-end'}}>
-                                {editMode &&
-                                this.newDeliveryDiscount.minimumOrderAmount ? (
-                                  <Input
-                                    value={
-                                      this.newDeliveryDiscount
-                                        .minimumOrderAmount
-                                        ? String(
-                                            this.newDeliveryDiscount
-                                              .minimumOrderAmount,
-                                          )
-                                        : null
-                                    }
-                                    leftIcon={
-                                      <Text style={{fontSize: 18}}>₱</Text>
-                                    }
-                                    keyboardType="number-pad"
-                                    errorMessage={
-                                      this.newDeliveryDiscount[
-                                        'minimumOrderAmountError'
-                                      ]
-                                    }
-                                    onChangeText={(value) =>
-                                      this.handleChangeDeliveryDiscountValue(
-                                        'minimumOrderAmount',
-                                        value,
-                                      )
-                                    }
-                                    inputStyle={{textAlign: 'right'}}
-                                    containerStyle={{
-                                      borderColor: this.editModeHeaderColor,
-                                    }}
-                                  />
-                                ) : (
-                                  <Text
-                                    style={{
-                                      color: colors.primary,
-                                      fontSize: 16,
-                                      fontFamily: 'ProductSans-Bold',
-                                      textAlign: 'right',
-                                    }}>
-                                    {deliveryDiscount.minimumOrderAmount
-                                      ? `₱${deliveryDiscount.minimumOrderAmount}`
-                                      : 'Not Set'}
-                                  </Text>
-                                )}
-                              </View>
-                            </View>
-                          </CardItem>
-                        </Card>
-                      </View>
-                    </CardItem>
-                  )}
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
-                      <View style={{flex: 1, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Delivery Period
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 1, alignItems: 'flex-end'}}>
-                        {editMode ? (
-                          <View>
-                            <CheckBox
-                              title="Same Day Delivery"
-                              checked={
-                                this.newDeliveryType === 'Same Day Delivery'
-                              }
-                              checkedIcon="dot-circle-o"
-                              uncheckedIcon="circle-o"
-                              onPress={() =>
-                                (this.newDeliveryType = 'Same Day Delivery')
-                              }
-                            />
-                            <CheckBox
-                              title="Next Day Delivery"
-                              checked={
-                                this.newDeliveryType === 'Next Day Delivery'
-                              }
-                              checkedIcon="dot-circle-o"
-                              uncheckedIcon="circle-o"
-                              onPress={() =>
-                                (this.newDeliveryType = 'Next Day Delivery')
-                              }
-                            />
-                            <CheckBox
-                              title="Scheduled Delivery"
-                              checked={
-                                this.newDeliveryType === 'Scheduled Delivery'
-                              }
-                              checkedIcon="dot-circle-o"
-                              uncheckedIcon="circle-o"
-                              onPress={() =>
-                                (this.newDeliveryType = 'Scheduled Delivery')
-                              }
-                            />
-                          </View>
-                        ) : (
-                          <Text
-                            style={{
-                              color: colors.primary,
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                              textAlign: 'right',
-                            }}>
-                            {deliveryType}
-                          </Text>
-                        )}
-                      </View>
-                    </View>
-                  </CardItem>
-                </Card>
-              </View>
+                      </Card>
+                    </>
+                  );
+                }}
+              </Formik>
 
               <View
                 style={{

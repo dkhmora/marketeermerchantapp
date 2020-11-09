@@ -1,30 +1,13 @@
 import React, {Component} from 'react';
-import {
-  Overlay,
-  Text,
-  Button,
-  Icon,
-  Input,
-  ButtonGroup,
-  Card,
-} from 'react-native-elements';
-import {
-  SafeAreaView,
-  StatusBar,
-  Platform,
-  StyleSheet,
-  Dimensions,
-  View,
-  KeyboardAvoidingView,
-  findNodeHandle,
-} from 'react-native';
+import {Text, Button, Icon, ButtonGroup, Card} from 'react-native-elements';
+import {View} from 'react-native';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
 import {inject, observer} from 'mobx-react';
 import Toast from '../components/Toast';
-import {computed, when} from 'mobx';
+import {computed} from 'mobx';
 import ImagePicker from 'react-native-image-crop-picker';
-import {CardItem, Picker, Item} from 'native-base';
+import {Picker, Item} from 'native-base';
 import FastImage from 'react-native-fast-image';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -34,13 +17,11 @@ import CustomizationOptionsCard from '../components/store_items/food/Customizati
 import BaseHeader from '../components/BaseHeader';
 import {Formik, Field} from 'formik';
 import {
-  itemOptionValidationSchema,
-  foodItemValidationSchema,
+  foodItemOptionValidationSchema,
+  itemValidationSchema,
 } from '../util/validationSchemas';
 import CustomInput from '../components/CustomInput';
-import {ScrollView} from 'react-native-gesture-handler';
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
 @inject('detailsStore')
 @inject('itemsStore')
 @inject('authStore')
@@ -399,7 +380,7 @@ class EditItemScreen extends Component {
             <Formik
               innerRef={(formRef) => (this.formikRef = formRef)}
               validateOnMount
-              validationSchema={foodItemValidationSchema}
+              validationSchema={itemValidationSchema}
               initialValues={
                 item
                   ? {
@@ -754,7 +735,7 @@ class EditItemScreen extends Component {
 
                 <Formik
                   innerRef={(formRef) => (this.addOptionForm = formRef)}
-                  validationSchema={itemOptionValidationSchema}
+                  validationSchema={foodItemOptionValidationSchema}
                   initialValues={{
                     name: '',
                   }}
