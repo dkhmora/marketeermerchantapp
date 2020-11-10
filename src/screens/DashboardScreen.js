@@ -41,6 +41,7 @@ class DashboardScreen extends Component {
       coverImageUrl: null,
       displayImageReady: false,
       coverImageReady: false,
+      gettingImages: false,
       displayImageWidth: null,
       coverImageWidth: null,
       deliveryDetailsEditMode: false,
@@ -53,23 +54,16 @@ class DashboardScreen extends Component {
   }
 
   componentDidMount() {
-    const {displayImageUrl, coverImageUrl} = this.state;
-
-    if (!displayImageUrl || !coverImageUrl) {
-      this.getImage();
-    }
-
     crashlytics().log('DashboardScreen');
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const {displayImageUrl, coverImageUrl} = this.state;
+    const {displayImageUrl, coverImageUrl, gettingImages} = this.state;
 
     if (
       prevProps.detailsStore.storeDetails.updatedAt !==
         this.props.detailsStore.storeDetails.updatedAt ||
-      !displayImageUrl ||
-      !coverImageUrl
+      (!gettingImages && (!displayImageUrl || !coverImageUrl))
     ) {
       this.getImage();
     }
@@ -90,31 +84,40 @@ class DashboardScreen extends Component {
   getImage = async () => {
     const {displayImage, coverImage} = this.props.detailsStore.storeDetails;
 
-    if (displayImage) {
-      const displayRef = publicStorageBucket.ref(displayImage);
-      const displayLink = await displayRef.getDownloadURL().catch((err) => {
-        Toast({text: err.message, type: 'danger'});
-        return null;
-      });
+    this.setState(
+      {
+        gettingImages: true,
+      },
+      async () => {
+        if (displayImage) {
+          const displayRef = publicStorageBucket.ref(displayImage);
+          const displayLink = await displayRef.getDownloadURL().catch((err) => {
+            Toast({text: err.message, type: 'danger'});
+            return null;
+          });
 
-      if (displayLink) {
-        this.setState({
-          displayImageUrl: {uri: displayLink},
-        });
-      }
-    }
+          if (displayLink) {
+            this.setState({
+              displayImageUrl: {uri: displayLink},
+            });
+          }
+        }
 
-    if (coverImage) {
-      const coverRef = publicStorageBucket.ref(coverImage);
-      const coverLink = await coverRef.getDownloadURL().catch((err) => {
-        Toast({text: err.message, type: 'danger'});
-        return null;
-      });
+        if (coverImage) {
+          const coverRef = publicStorageBucket.ref(coverImage);
+          const coverLink = await coverRef.getDownloadURL().catch((err) => {
+            Toast({text: err.message, type: 'danger'});
+            return null;
+          });
 
-      if (coverLink) {
-        this.setState({coverImageUrl: {uri: coverLink}});
-      }
-    }
+          if (coverLink) {
+            this.setState({coverImageUrl: {uri: coverLink}});
+          }
+        }
+
+        this.setState({gettingImages: false});
+      },
+    );
   };
 
   handleTakePhoto(type) {
@@ -183,13 +186,21 @@ class DashboardScreen extends Component {
         }
 
         await this.props.detailsStore.updateStoreDetails(values).then(() => {
-          this.setState({storeDetailsSaving: false}, () =>
+          this.setState({storeDetailsSaving: false}, () => {
+            if (!values.displayImage) {
+              this.setState({displayImageUrl: null});
+            }
+
+            if (!values.coverImage) {
+              this.setState({coverImageUrl: null});
+            }
+
             Toast({
               text: 'Store details successfully updated!',
               type: 'success',
               duration: 3000,
-            }),
-          );
+            });
+          });
         });
       },
     );
