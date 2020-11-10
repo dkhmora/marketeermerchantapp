@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
 import {ActivityIndicator, View, SafeAreaView, Image} from 'react-native';
 import {Card, CardItem} from 'native-base';
-// Custom Components
 import BaseHeader from '../components/BaseHeader';
-// Mobx
 import {inject, observer} from 'mobx-react';
 import {computed} from 'mobx';
 import {Text, Icon, Button, CheckBox} from 'react-native-elements';
@@ -24,7 +22,6 @@ import {
   storeDetailsValidationSchema,
 } from '../util/validationSchemas';
 import CustomInput from '../components/CustomInput';
-import {styles} from '../../assets/styles';
 
 const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 @inject('detailsStore')
@@ -247,6 +244,10 @@ class DashboardScreen extends Component {
 
     const selectablePaymentMethods = availablePaymentMethods
       ? Object.keys(availablePaymentMethods)
+      : [];
+
+    const selectableDeliveryMethods = availableDeliveryMethods
+      ? Object.keys(availableDeliveryMethods)
       : [];
 
     const {
@@ -965,6 +966,7 @@ class DashboardScreen extends Component {
                   values,
                   setFieldValue,
                   resetForm,
+                  errors,
                 }) => {
                   if (deliverySettingsIsValid !== isValid) {
                     this.setState({deliverySettingsIsValid: isValid});
@@ -1050,173 +1052,137 @@ class DashboardScreen extends Component {
                             }
                           />
 
-                          {availableDeliveryMethods['Mr. Speedy'] && (
-                            <CardItem bordered>
-                              <View style={{width: '100%'}}>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                  }}>
-                                  <Text
+                          {selectableDeliveryMethods.map(
+                            (deliveryMethod, index) => (
+                              <CardItem bordered>
+                                <View style={{width: '100%'}}>
+                                  <View
                                     style={{
-                                      fontSize: 16,
-                                      fontFamily: 'ProductSans-Bold',
+                                      flex: 1,
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
                                     }}>
-                                    Mr. Speedy
-                                  </Text>
-
-                                  <Switch
-                                    trackColor={{
-                                      false: '#767577',
-                                      true: deliveryDetailsEditMode
-                                        ? colors.accent
-                                        : colors.primary,
-                                    }}
-                                    thumbColor={'#f4f3f4'}
-                                    ios_backgroundColor="#3e3e3e"
-                                    onValueChange={() =>
-                                      setFieldValue(
-                                        'availableDeliveryMethods["Mr. Speedy"].activated',
-                                        !values.availableDeliveryMethods[
-                                          'Mr. Speedy'
-                                        ].activated,
-                                      )
-                                    }
-                                    value={
-                                      deliveryDetailsEditMode
-                                        ? values.availableDeliveryMethods[
-                                            'Mr. Speedy'
-                                          ].activated
-                                        : availableDeliveryMethods['Mr. Speedy']
-                                            .activated
-                                    }
-                                    disabled={!deliveryDetailsEditMode}
-                                  />
-                                </View>
-                              </View>
-                            </CardItem>
-                          )}
-
-                          {availableDeliveryMethods['Own Delivery'] && (
-                            <CardItem bordered>
-                              <View style={{width: '100%'}}>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                  }}>
-                                  <Text
-                                    style={{
-                                      fontSize: 16,
-                                      fontFamily: 'ProductSans-Bold',
-                                    }}>
-                                    Own Delivery
-                                  </Text>
-
-                                  <Switch
-                                    trackColor={{
-                                      false: '#767577',
-                                      true: deliveryDetailsEditMode
-                                        ? colors.accent
-                                        : colors.primary,
-                                    }}
-                                    thumbColor={'#f4f3f4'}
-                                    ios_backgroundColor="#3e3e3e"
-                                    onValueChange={() =>
-                                      setFieldValue(
-                                        'availableDeliveryMethods["Own Delivery"].activated',
-                                        !values.availableDeliveryMethods[
-                                          'Own Delivery'
-                                        ].activated,
-                                      )
-                                    }
-                                    value={
-                                      deliveryDetailsEditMode
-                                        ? values.availableDeliveryMethods[
-                                            'Own Delivery'
-                                          ].activated
-                                        : availableDeliveryMethods[
-                                            'Own Delivery'
-                                          ].activated
-                                    }
-                                    disabled={!deliveryDetailsEditMode}
-                                  />
-                                </View>
-
-                                <Card
-                                  style={{
-                                    borderRadius: 10,
-                                    overflow: 'hidden',
-                                    marginTop: 10,
-                                  }}>
-                                  <CardItem bordered>
-                                    <View
+                                    <Text
                                       style={{
-                                        flex: 1,
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
+                                        fontSize: 16,
+                                        fontFamily: 'ProductSans-Bold',
                                       }}>
-                                      <View style={{flex: 1, paddingright: 10}}>
-                                        <Text
-                                          style={{
-                                            fontSize: 16,
-                                          }}>
-                                          Delivery Price
-                                        </Text>
-                                      </View>
+                                      {deliveryMethod}
+                                    </Text>
 
-                                      <View
-                                        style={{
-                                          flex: 1,
-                                          alignItems: 'flex-end',
-                                        }}>
-                                        {deliveryDetailsEditMode ? (
-                                          <Field
-                                            component={CustomInput}
-                                            name="availableDeliveryMethods.Own Delivery.deliveryPrice"
-                                            placeholder="Delivery Price"
-                                            leftIcon={
+                                    <Switch
+                                      trackColor={{
+                                        false: '#767577',
+                                        true: deliveryDetailsEditMode
+                                          ? colors.accent
+                                          : colors.primary,
+                                      }}
+                                      thumbColor={'#f4f3f4'}
+                                      ios_backgroundColor="#3e3e3e"
+                                      onValueChange={() =>
+                                        setFieldValue(
+                                          `availableDeliveryMethods["${deliveryMethod}"].activated`,
+                                          !values.availableDeliveryMethods[
+                                            deliveryMethod
+                                          ].activated,
+                                        )
+                                      }
+                                      value={
+                                        deliveryDetailsEditMode
+                                          ? values.availableDeliveryMethods[
+                                              deliveryMethod
+                                            ].activated
+                                          : availableDeliveryMethods[
+                                              deliveryMethod
+                                            ].activated
+                                      }
+                                      disabled={!deliveryDetailsEditMode}
+                                    />
+                                  </View>
+
+                                  <Text
+                                    style={{
+                                      color: colors.danger,
+                                      fontSize: 12,
+                                    }}>
+                                    {errors?.testAvailableDeliveryMethods}
+                                  </Text>
+
+                                  {deliveryMethod === 'Own Delivery' && (
+                                    <Card
+                                      style={{
+                                        borderRadius: 10,
+                                        overflow: 'hidden',
+                                        marginTop: 10,
+                                      }}>
+                                      <CardItem bordered>
+                                        <View
+                                          style={{
+                                            flex: 1,
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                          }}>
+                                          <View
+                                            style={{flex: 1, paddingright: 10}}>
+                                            <Text
+                                              style={{
+                                                fontSize: 16,
+                                              }}>
+                                              Delivery Price
+                                            </Text>
+                                          </View>
+
+                                          <View
+                                            style={{
+                                              flex: 1,
+                                              alignItems: 'flex-end',
+                                            }}>
+                                            {deliveryDetailsEditMode ? (
+                                              <Field
+                                                component={CustomInput}
+                                                name="availableDeliveryMethods.Own Delivery.deliveryPrice"
+                                                placeholder="Delivery Price"
+                                                leftIcon={
+                                                  <Text
+                                                    style={{
+                                                      color: colors.primary,
+                                                      fontSize: 25,
+                                                    }}>
+                                                    ₱
+                                                  </Text>
+                                                }
+                                                containerStyle={{flex: 1}}
+                                                maxLength={10}
+                                                keyboardType="numeric"
+                                                autoCapitalize="none"
+                                                type="number"
+                                              />
+                                            ) : (
                                               <Text
                                                 style={{
                                                   color: colors.primary,
-                                                  fontSize: 25,
+                                                  fontSize: 16,
+                                                  fontFamily:
+                                                    'ProductSans-Bold',
+                                                  textAlign: 'right',
                                                 }}>
-                                                ₱
+                                                {availableDeliveryMethods[
+                                                  'Own Delivery'
+                                                ].deliveryPrice
+                                                  ? `₱${availableDeliveryMethods['Own Delivery'].deliveryPrice}`
+                                                  : 'Not Set'}
                                               </Text>
-                                            }
-                                            containerStyle={{flex: 1}}
-                                            maxLength={10}
-                                            keyboardType="numeric"
-                                            autoCapitalize="none"
-                                            type="number"
-                                          />
-                                        ) : (
-                                          <Text
-                                            style={{
-                                              color: colors.primary,
-                                              fontSize: 16,
-                                              fontFamily: 'ProductSans-Bold',
-                                              textAlign: 'right',
-                                            }}>
-                                            {availableDeliveryMethods[
-                                              'Own Delivery'
-                                            ].deliveryPrice
-                                              ? `₱${availableDeliveryMethods['Own Delivery'].deliveryPrice}`
-                                              : 'Not Set'}
-                                          </Text>
-                                        )}
-                                      </View>
-                                    </View>
-                                  </CardItem>
-                                </Card>
-                              </View>
-                            </CardItem>
+                                            )}
+                                          </View>
+                                        </View>
+                                      </CardItem>
+                                    </Card>
+                                  )}
+                                </View>
+                              </CardItem>
+                            ),
                           )}
 
                           {deliveryDiscount && (
@@ -1450,31 +1416,6 @@ class DashboardScreen extends Component {
                   );
                 }}
               </Formik>
-
-              <View
-                style={{
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 1.41,
-                }}>
-                <Card
-                  style={{
-                    borderRadius: 10,
-                    overflow: 'hidden',
-                  }}>
-                  <CardItemHeader title="Sales" />
-
-                  <CardItem bordered>
-                    <Text style={{textAlign: 'center', width: '100%'}}>
-                      Coming Soon! View your sales summary here in the future.
-                    </Text>
-                  </CardItem>
-                </Card>
-              </View>
             </SafeAreaView>
           </KeyboardAwareScrollView>
         )}

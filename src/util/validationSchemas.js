@@ -30,19 +30,31 @@ const foodItemOptionSelectionValidationSchema = yup.object().shape({
 });
 
 const deliveryDetailsValidationSchema = yup.object().shape({
-  availableDeliveryMethods: yup.object({
-    ['Mr. Speedy']: yup.object({
-      activated: yup.boolean(),
-    }),
-    ['Own Delivery']: yup.object({
-      activated: yup.boolean(),
-      deliveryPrice: yup.number().when('activated', {
-        is: true,
-        then: yup.number().min(0).required(),
-        otherwise: yup.number().min(0).integer().nullable(),
+  availableDeliveryMethods: yup
+    .object({
+      ['Mr. Speedy']: yup.object({
+        activated: yup.boolean(),
       }),
+      ['Own Delivery']: yup.object({
+        activated: yup.boolean(),
+        deliveryPrice: yup.number().when('activated', {
+          is: true,
+          then: yup.number().min(0).required(),
+          otherwise: yup.number().min(0).integer().nullable(),
+        }),
+      }),
+    })
+    .test('testAvailableDeliveryMethods', null, (obj) => {
+      if (obj['Own Delivery']?.activated || obj['Mr. Speedy']?.activated) {
+        return true;
+      }
+
+      return new yup.ValidationError(
+        'Please enable at least one delivery method',
+        null,
+        'testAvailableDeliveryMethods',
+      );
     }),
-  }),
   deliveryDiscount: yup.object({
     activated: yup.boolean(),
     discountAmount: yup
@@ -82,7 +94,7 @@ const storeDetailsValidationSchema = yup.object().shape({
       }
 
       return new yup.ValidationError(
-        'Please check atleast one checkbox',
+        'Please select at least one payment method',
         null,
         'testAvailablePaymentMethods',
       );
