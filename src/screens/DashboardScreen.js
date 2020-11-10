@@ -22,6 +22,7 @@ import {
   storeDetailsValidationSchema,
 } from '../util/validationSchemas';
 import CustomInput from '../components/CustomInput';
+import Divider from '../components/Divider';
 
 const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 @inject('detailsStore')
@@ -309,7 +310,6 @@ class DashboardScreen extends Component {
                   <CardItemHeader title="Store Card Preview" />
 
                   <CardItem
-                    bordered
                     style={{
                       flex: 1,
                       paddingLeft: 0,
@@ -424,7 +424,7 @@ class DashboardScreen extends Component {
                           }
                         />
 
-                        <CardItem bordered>
+                        <CardItem>
                           <View
                             style={{
                               flex: 1,
@@ -567,7 +567,9 @@ class DashboardScreen extends Component {
                           </View>
                         </CardItem>
 
-                        <CardItem bordered>
+                        <Divider />
+
+                        <CardItem>
                           <View
                             style={{
                               flex: 1,
@@ -699,7 +701,9 @@ class DashboardScreen extends Component {
                           </View>
                         </CardItem>
 
-                        <CardItem bordered>
+                        <Divider />
+
+                        <CardItem>
                           <View
                             style={{
                               flex: 1,
@@ -731,7 +735,9 @@ class DashboardScreen extends Component {
                           </View>
                         </CardItem>
 
-                        <CardItem bordered>
+                        <Divider />
+
+                        <CardItem>
                           <View
                             style={{
                               flex: 1,
@@ -777,7 +783,9 @@ class DashboardScreen extends Component {
                           </View>
                         </CardItem>
 
-                        <CardItem bordered>
+                        <Divider />
+
+                        <CardItem>
                           <View
                             style={{
                               flex: 1,
@@ -809,7 +817,9 @@ class DashboardScreen extends Component {
                           </View>
                         </CardItem>
 
-                        <CardItem bordered>
+                        <Divider />
+
+                        <CardItem>
                           <View
                             style={{
                               flex: 1,
@@ -851,13 +861,16 @@ class DashboardScreen extends Component {
                                       />
                                     ),
                                   )}
-                                  <Text
-                                    style={{
-                                      color: colors.danger,
-                                      fontSize: 12,
-                                    }}>
-                                    {errors?.testAvailablePaymentMethods}
-                                  </Text>
+
+                                  {errors?.testAvailablePaymentMethods && (
+                                    <Text
+                                      style={{
+                                        color: colors.danger,
+                                        fontSize: 12,
+                                      }}>
+                                      {errors?.testAvailablePaymentMethods}
+                                    </Text>
+                                  )}
                                 </View>
                               ) : (
                                 this.CategoryPills(this.selectedPaymentMethods)
@@ -866,7 +879,9 @@ class DashboardScreen extends Component {
                           </View>
                         </CardItem>
 
-                        <CardItem bordered>
+                        <Divider />
+
+                        <CardItem>
                           <View
                             style={{
                               flex: 1,
@@ -898,7 +913,9 @@ class DashboardScreen extends Component {
                           </View>
                         </CardItem>
 
-                        <CardItem bordered>
+                        <Divider />
+
+                        <CardItem>
                           <View
                             style={{
                               flex: 1,
@@ -1054,139 +1071,148 @@ class DashboardScreen extends Component {
 
                           {selectableDeliveryMethods.map(
                             (deliveryMethod, index) => (
-                              <CardItem bordered>
-                                <View style={{width: '100%'}}>
-                                  <View
-                                    style={{
-                                      flex: 1,
-                                      flexDirection: 'row',
-                                      alignItems: 'center',
-                                      justifyContent: 'space-between',
-                                    }}>
-                                    <Text
+                              <View>
+                                <CardItem>
+                                  <View style={{width: '100%'}}>
+                                    <View
                                       style={{
-                                        fontSize: 16,
-                                        fontFamily: 'ProductSans-Bold',
+                                        flex: 1,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
                                       }}>
-                                      {deliveryMethod}
-                                    </Text>
+                                      <Text
+                                        style={{
+                                          fontSize: 16,
+                                          fontFamily: 'ProductSans-Bold',
+                                        }}>
+                                        {deliveryMethod}
+                                      </Text>
 
-                                    <Switch
-                                      trackColor={{
-                                        false: '#767577',
-                                        true: deliveryDetailsEditMode
-                                          ? colors.accent
-                                          : colors.primary,
-                                      }}
-                                      thumbColor={'#f4f3f4'}
-                                      ios_backgroundColor="#3e3e3e"
-                                      onValueChange={() =>
-                                        setFieldValue(
-                                          `availableDeliveryMethods["${deliveryMethod}"].activated`,
-                                          !values.availableDeliveryMethods[
-                                            deliveryMethod
-                                          ].activated,
-                                        )
-                                      }
-                                      value={
-                                        deliveryDetailsEditMode
-                                          ? values.availableDeliveryMethods[
+                                      <Switch
+                                        trackColor={{
+                                          false: '#767577',
+                                          true: deliveryDetailsEditMode
+                                            ? colors.accent
+                                            : colors.primary,
+                                        }}
+                                        thumbColor={'#f4f3f4'}
+                                        ios_backgroundColor="#3e3e3e"
+                                        onValueChange={() =>
+                                          setFieldValue(
+                                            `availableDeliveryMethods["${deliveryMethod}"].activated`,
+                                            !values.availableDeliveryMethods[
                                               deliveryMethod
-                                            ].activated
-                                          : availableDeliveryMethods[
-                                              deliveryMethod
-                                            ].activated
-                                      }
-                                      disabled={!deliveryDetailsEditMode}
-                                    />
-                                  </View>
+                                            ].activated,
+                                          )
+                                        }
+                                        value={
+                                          deliveryDetailsEditMode
+                                            ? values.availableDeliveryMethods[
+                                                deliveryMethod
+                                              ].activated
+                                            : availableDeliveryMethods[
+                                                deliveryMethod
+                                              ].activated
+                                        }
+                                        disabled={!deliveryDetailsEditMode}
+                                      />
+                                    </View>
 
-                                  <Text
-                                    style={{
-                                      color: colors.danger,
-                                      fontSize: 12,
-                                    }}>
-                                    {errors?.testAvailableDeliveryMethods}
-                                  </Text>
+                                    {errors?.testAvailableDeliveryMethods && (
+                                      <Text
+                                        style={{
+                                          color: colors.danger,
+                                          fontSize: 12,
+                                        }}>
+                                        {errors?.testAvailableDeliveryMethods}
+                                      </Text>
+                                    )}
 
-                                  {deliveryMethod === 'Own Delivery' && (
-                                    <Card
-                                      style={{
-                                        borderRadius: 10,
-                                        overflow: 'hidden',
-                                        marginTop: 10,
-                                      }}>
-                                      <CardItem bordered>
-                                        <View
-                                          style={{
-                                            flex: 1,
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                          }}>
-                                          <View
-                                            style={{flex: 1, paddingright: 10}}>
-                                            <Text
-                                              style={{
-                                                fontSize: 16,
-                                              }}>
-                                              Delivery Price
-                                            </Text>
-                                          </View>
-
+                                    {deliveryMethod === 'Own Delivery' && (
+                                      <Card
+                                        style={{
+                                          borderRadius: 10,
+                                          overflow: 'hidden',
+                                          marginTop: 10,
+                                        }}>
+                                        <CardItem>
                                           <View
                                             style={{
                                               flex: 1,
-                                              alignItems: 'flex-end',
+                                              flexDirection: 'row',
+                                              alignItems: 'center',
+                                              justifyContent: 'space-between',
                                             }}>
-                                            {deliveryDetailsEditMode ? (
-                                              <Field
-                                                component={CustomInput}
-                                                name="availableDeliveryMethods.Own Delivery.deliveryPrice"
-                                                placeholder="Delivery Price"
-                                                leftIcon={
-                                                  <Text
-                                                    style={{
-                                                      color: colors.primary,
-                                                      fontSize: 25,
-                                                    }}>
-                                                    ₱
-                                                  </Text>
-                                                }
-                                                containerStyle={{flex: 1}}
-                                                maxLength={10}
-                                                keyboardType="numeric"
-                                                autoCapitalize="none"
-                                                type="number"
-                                              />
-                                            ) : (
+                                            <View
+                                              style={{
+                                                flex: 1,
+                                                paddingright: 10,
+                                              }}>
                                               <Text
                                                 style={{
-                                                  color: colors.primary,
                                                   fontSize: 16,
-                                                  fontFamily:
-                                                    'ProductSans-Bold',
-                                                  textAlign: 'right',
                                                 }}>
-                                                {availableDeliveryMethods[
-                                                  'Own Delivery'
-                                                ].deliveryPrice
-                                                  ? `₱${availableDeliveryMethods['Own Delivery'].deliveryPrice}`
-                                                  : 'Not Set'}
+                                                Delivery Price
                                               </Text>
-                                            )}
+                                            </View>
+
+                                            <View
+                                              style={{
+                                                flex: 1,
+                                                alignItems: 'flex-end',
+                                              }}>
+                                              {deliveryDetailsEditMode ? (
+                                                <Field
+                                                  component={CustomInput}
+                                                  name="availableDeliveryMethods.Own Delivery.deliveryPrice"
+                                                  placeholder="Delivery Price"
+                                                  leftIcon={
+                                                    <Text
+                                                      style={{
+                                                        color: colors.primary,
+                                                        fontSize: 25,
+                                                      }}>
+                                                      ₱
+                                                    </Text>
+                                                  }
+                                                  containerStyle={{flex: 1}}
+                                                  maxLength={10}
+                                                  keyboardType="numeric"
+                                                  autoCapitalize="none"
+                                                  type="number"
+                                                />
+                                              ) : (
+                                                <Text
+                                                  style={{
+                                                    color: colors.primary,
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                      'ProductSans-Bold',
+                                                    textAlign: 'right',
+                                                  }}>
+                                                  {availableDeliveryMethods[
+                                                    'Own Delivery'
+                                                  ].deliveryPrice
+                                                    ? `₱${availableDeliveryMethods['Own Delivery'].deliveryPrice}`
+                                                    : 'Not Set'}
+                                                </Text>
+                                              )}
+                                            </View>
                                           </View>
-                                        </View>
-                                      </CardItem>
-                                    </Card>
-                                  )}
-                                </View>
-                              </CardItem>
+                                        </CardItem>
+                                      </Card>
+                                    )}
+                                  </View>
+                                </CardItem>
+
+                                <Divider />
+                              </View>
                             ),
                           )}
 
                           {deliveryDiscount && (
-                            <CardItem bordered>
+                            <CardItem>
                               <View
                                 style={{
                                   width: '100%',
@@ -1232,7 +1258,7 @@ class DashboardScreen extends Component {
                                     overflow: 'hidden',
                                     marginTop: 10,
                                   }}>
-                                  <CardItem bordered>
+                                  <CardItem>
                                     <View
                                       style={{
                                         flex: 1,
@@ -1291,7 +1317,9 @@ class DashboardScreen extends Component {
                                     </View>
                                   </CardItem>
 
-                                  <CardItem bordered>
+                                  <Divider />
+
+                                  <CardItem>
                                     <View
                                       style={{
                                         flex: 1,
@@ -1354,7 +1382,9 @@ class DashboardScreen extends Component {
                             </CardItem>
                           )}
 
-                          <CardItem bordered>
+                          <Divider />
+
+                          <CardItem>
                             <View
                               style={{
                                 flex: 1,
