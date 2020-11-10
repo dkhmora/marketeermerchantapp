@@ -64,6 +64,18 @@ const deliveryDetailsValidationSchema = yup.object().shape({
 });
 
 const storeDetailsValidationSchema = yup.object().shape({
+  displayImage: yup.string().nullable(),
+  coverImage: yup.string().nullable(),
+  storeDescription: yup.string().max(200),
+  availablePaymentMethods: yup.object({
+    ['Online Banking']: yup.object({
+      activated: yup.boolean(),
+    }),
+    ['COD']: yup.object({
+      activated: yup.boolean(),
+    }),
+  }),
+  vacationMode: yup.boolean(),
 });
 
 export {
