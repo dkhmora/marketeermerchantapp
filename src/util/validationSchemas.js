@@ -29,23 +29,18 @@ const foodItemOptionSelectionValidationSchema = yup.object().shape({
   price: yup.number().required('Price is a required field').integer(),
 });
 
-const deliveryDiscountValidationSchema = yup.object().shape({
+const deliveryDetailsValidationSchema = yup.object().shape({
   availableDeliveryMethods: yup.object({
     ['Mr. Speedy']: yup.object({
       activated: yup.boolean(),
     }),
     ['Own Delivery']: yup.object({
       activated: yup.boolean(),
-      deliveryPrice: yup
-        .number()
-        .min(0)
-        .nullable()
-        .integer()
-        .when('availableDeliveryMethods["Own Delivery"].activated', {
-          is: true,
-          then: yup.number().min(0).required(),
-          otherwise: yup.number().min(0).integer(),
-        }),
+      deliveryPrice: yup.number().when('activated', {
+        is: true,
+        then: yup.number().min(0).required(),
+        otherwise: yup.number().min(0).integer().nullable(),
+      }),
     }),
   }),
   deliveryDiscount: yup.object({
@@ -54,28 +49,27 @@ const deliveryDiscountValidationSchema = yup.object().shape({
       .number()
       .min(0)
       .integer()
-      .when('deliveryDiscount.activated', {
+      .when('activated', {
         is: true,
         then: yup.number().min(0).integer().required(),
         otherwise: yup.number().nullable().min(0).integer(),
       }),
-    minimumOrderAmount: yup
-      .number()
-      .nullable()
-      .min(0)
-      .integer()
-      .when('["deliveryDiscount.activated"]', {
-        is: true,
-        then: yup.number().min(0).required(),
-        otherwise: yup.number().min(0).integer(),
-      }),
+    minimumOrderAmount: yup.number().when('activated', {
+      is: true,
+      then: yup.number().min(0).required(),
+      otherwise: yup.number().min(0).integer().nullable(),
+    }),
   }),
   deliveryType: yup.string().required('Delivery Type is a required field'),
+});
+
+const storeDetailsValidationSchema = yup.object().shape({
 });
 
 export {
   itemValidationSchema,
   foodItemOptionValidationSchema,
   foodItemOptionSelectionValidationSchema,
-  deliveryDiscountValidationSchema,
+  deliveryDetailsValidationSchema,
+  storeDetailsValidationSchema,
 };

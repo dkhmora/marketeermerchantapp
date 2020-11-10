@@ -236,12 +236,7 @@ class DetailsStore {
     return await publicStorageBucket
       .ref(imageRef)
       .putFile(imagePath)
-      .then(() =>
-        this.storeRef.update({
-          [`${type}Image`]: imageRef,
-          updatedAt: firestore.Timestamp.now().toMillis(),
-        }),
-      )
+      .then(() => imageRef)
       .catch((err) => {
         crashlytics().recordError(err);
         Toast({text: err.message, type: 'danger'});
@@ -249,18 +244,29 @@ class DetailsStore {
   }
 
   @action async updateStoreDetails(values) {
-    await this.storeRef
-      .set(
-        {
-          ...values,
-          updatedAt: firestore.Timestamp.now().toMillis(),
-        },
-        {merge: true},
-      )
-      .catch((err) => {
-        crashlytics().recordError(err);
-        Toast({text: `Something went wrong. Error: ${err}`, type: 'danger'});
-      });
+    let finalValues = {
+      ...values,
+      updatedAt: firestore.Timestamp.now().toMillis(),
+    };
+
+    if (values.displayImage) {
+      finalValues.displayImage = await this.uploadImage(
+        values.displayImage,
+        'display',
+      );
+    }
+
+    if (values.coverImage) {
+      finalValues.coverImage = await this.uploadImage(
+        values.coverImage,
+        'cover',
+      );
+    }
+
+    return await this.storeRef.set(finalValues, {merge: true}).catch((err) => {
+      crashlytics().recordError(err);
+      Toast({text: `Something went wrong. Error: ${err}`, type: 'danger'});
+    });
   }
 }
 

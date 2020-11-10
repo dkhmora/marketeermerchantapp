@@ -1,18 +1,12 @@
 import React, {Component} from 'react';
-import {
-  ActivityIndicator,
-  View,
-  SafeAreaView,
-  Platform,
-  Image,
-} from 'react-native';
+import {ActivityIndicator, View, SafeAreaView, Image} from 'react-native';
 import {Card, CardItem} from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
 // Mobx
 import {inject, observer} from 'mobx-react';
-import {observable, action, computed} from 'mobx';
-import {Text, Input, Icon, Button, CheckBox} from 'react-native-elements';
+import {computed} from 'mobx';
+import {Text, Icon, Button, CheckBox} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
 import BaseOptionsMenu from '../components/BaseOptionsMenu';
 import {colors} from '../../assets/colors';
@@ -25,7 +19,10 @@ import CardItemHeader from '../components/CardItemHeader';
 import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 import firebase from '@react-native-firebase/app';
 import {Field, Formik} from 'formik';
-import {deliveryDiscountValidationSchema} from '../util/validationSchemas';
+import {
+  deliveryDetailsValidationSchema,
+  storeDetailsValidationSchema,
+} from '../util/validationSchemas';
 import CustomInput from '../components/CustomInput';
 
 const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
@@ -41,40 +38,20 @@ class DashboardScreen extends Component {
     );
 
     this.state = {
-      loading: false,
-      CODCheckbox: false,
-      onlineBankingCheckbox: false,
-      grabExpressCheckbox: false,
-      lalamoveCheckbox: false,
-      mrSpeedyCheckbox: false,
-      ownServiceCheckbox: false,
-      sameDayDeliveryCheckbox: false,
-      newOwnDeliveryServiceFeeError: null,
-      newFreeDeliveryMinimumError: null,
       displayImageUrl: null,
       coverImageUrl: null,
-      oldDisplayImageUrl: null,
-      oldCoverImageUrl: null,
       displayImageReady: false,
       coverImageReady: false,
-      deliverySettingsIsValid: false,
       displayImageWidth: null,
       coverImageWidth: null,
-      deliveryEditMode: false,
+      deliveryDetailsEditMode: false,
+      deliveryDetailsSaving: false,
+      deliverySettingsIsValid: false,
+      storeDetailsEditMode: false,
+      storeDetailsSaving: false,
+      storeDetailsIsValid: false,
     };
   }
-
-  @observable editMode = false;
-  @observable newStoreDescription = '';
-  @observable newFreeDelivery = null;
-  @observable newVacationMode = null;
-  @observable newAvailablePaymentMethods = {};
-  @observable newAvailableDeliveryMethods = {};
-  @observable newDeliveryDiscount = {};
-  @observable newDeliveryType = '';
-  @observable newOwnDeliveryServiceFee = '0';
-  @observable newFreeDeliveryMinimum = '0';
-  @observable editModeHeaderColor = colors.primary;
 
   componentDidMount() {
     const {displayImageUrl, coverImageUrl} = this.state;
@@ -111,108 +88,11 @@ class DashboardScreen extends Component {
     return [];
   }
 
-  @computed get selectedDeliveryMethods() {
-    const {availableDeliveryMethods} = this.props.detailsStore.storeDetails;
-
-    if (availableDeliveryMethods) {
-      return Object.entries(availableDeliveryMethods)
-        .filter(([key, value]) => value.activated)
-        .map(([key, value]) => key);
-    }
-
-    return [];
-  }
-
-  @computed get saveDisabled() {
-    if (Object.keys(this.newAvailableDeliveryMethods).length > 0) {
-      if (this.newAvailableDeliveryMethods['Own Delivery']) {
-        if (
-          this.newAvailableDeliveryMethods['Own Delivery'][`deliveryPriceError`]
-        ) {
-          return true;
-        }
-      }
-
-      if (
-        this.newDeliveryDiscount['discountAmountError'] ||
-        this.newDeliveryDiscount['minimumOrderAmountError']
-      ) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  @action cancelEditing() {
-    this.newFreeDelivery = null;
-    this.newStoreDescription = '';
-    this.newVacationMode = this.props.detailsStore.storeDetails.vacation;
-    this.newAvailablePaymentMethods = {};
-    this.newAvailableDeliveryMethods = {};
-    this.newDeliveryDiscount = {};
-    this.newOwnDeliveryServiceFee = '0';
-    this.newFreeDeliveryMinimum = '0';
-    this.editModeHeaderColor = colors.primary;
-
-    this.setState({
-      displayImageUrl: this.state.oldDisplayImageUrl,
-      coverImageUrl: this.state.oldCoverImageUrl,
-    });
-
-    this.editMode = !this.editMode;
-  }
-
-  @action toggleEditing() {
-    const {
-      freeDelivery,
-      storeDescription,
-      vacationMode,
-      deliveryType,
-      ownDeliveryServiceFee,
-      freeDeliveryMinimum,
-      availableDeliveryMethods,
-      availablePaymentMethods,
-      deliveryDiscount,
-    } = this.props.detailsStore.storeDetails;
-
-    if (this.editMode) {
-      this.cancelEditing();
-    } else {
-      this.editModeHeaderColor = colors.accent;
-      this.newFreeDelivery = freeDelivery;
-      this.newStoreDescription = storeDescription;
-      this.newVacationMode = vacationMode;
-      this.newDeliveryType = deliveryType;
-      this.newAvailablePaymentMethods = JSON.parse(
-        JSON.stringify(availablePaymentMethods),
-      );
-      this.newAvailableDeliveryMethods = JSON.parse(
-        JSON.stringify(availableDeliveryMethods),
-      );
-      this.newDeliveryDiscount = JSON.parse(JSON.stringify(deliveryDiscount));
-      this.newOwnDeliveryServiceFee = ownDeliveryServiceFee
-        ? String(ownDeliveryServiceFee)
-        : '0';
-      this.newFreeDeliveryMinimum = freeDeliveryMinimum
-        ? String(freeDeliveryMinimum)
-        : '0';
-
-      this.setState({
-        oldDisplayImageUrl: this.state.displayImageUrl,
-        oldCoverImageUrl: this.state.coverImageUrl,
-      });
-      this.editMode = !this.editMode;
-    }
-
-    this.setState({loading: false});
-  }
-
   getImage = async () => {
-    if (this.props.detailsStore.storeDetails.displayImage) {
-      const displayRef = publicStorageBucket.ref(
-        this.props.detailsStore.storeDetails.displayImage,
-      );
+    const {displayImage, coverImage} = this.props.detailsStore.storeDetails;
+
+    if (displayImage) {
+      const displayRef = publicStorageBucket.ref(displayImage);
       const displayLink = await displayRef.getDownloadURL().catch((err) => {
         Toast({text: err.message, type: 'danger'});
         return null;
@@ -225,10 +105,8 @@ class DashboardScreen extends Component {
       }
     }
 
-    if (this.props.detailsStore.storeDetails.coverImage) {
-      const coverRef = publicStorageBucket.ref(
-        this.props.detailsStore.storeDetails.coverImage,
-      );
+    if (coverImage) {
+      const coverRef = publicStorageBucket.ref(coverImage);
       const coverLink = await coverRef.getDownloadURL().catch((err) => {
         Toast({text: err.message, type: 'danger'});
         return null;
@@ -244,7 +122,7 @@ class DashboardScreen extends Component {
     const height = type === 'display' ? 600 : 720;
     const width = type === 'display' ? 600 : 1080;
 
-    ImagePicker.openCamera({
+    return ImagePicker.openCamera({
       width,
       height,
       cropping: true,
@@ -253,11 +131,7 @@ class DashboardScreen extends Component {
       compressImageQuality: 0.85,
     })
       .then((image) => {
-        if (type === 'display') {
-          this.setState({displayImageUrl: {uri: image.path}});
-        } else {
-          this.setState({coverImageUrl: {uri: image.path}});
-        }
+        return image.path;
       })
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
@@ -266,7 +140,7 @@ class DashboardScreen extends Component {
     const height = type === 'display' ? 600 : 720;
     const width = type === 'display' ? 600 : 1080;
 
-    ImagePicker.openPicker({
+    return ImagePicker.openPicker({
       width,
       height,
       cropping: true,
@@ -275,194 +149,51 @@ class DashboardScreen extends Component {
       compressImageQuality: 0.85,
     })
       .then((image) => {
-        if (type === 'display') {
-          this.setState({displayImageUrl: {uri: image.path}});
-        } else {
-          this.setState({coverImageUrl: {uri: image.path}});
-        }
+        return image.path;
       })
       .catch((err) => Toast({text: err.message, type: 'danger'}));
   }
 
-  handlePaymentMethods(paymentMethod) {
-    const {newAvailablePaymentMethods} = this;
-
-    if (newAvailablePaymentMethods.includes(paymentMethod)) {
-      this.newAvailablePaymentMethods = newAvailablePaymentMethods.filter(
-        (item) => item !== paymentMethod,
-      );
-    } else {
-      this.newAvailablePaymentMethods.push(paymentMethod);
-    }
+  handleEditDeliverySettings(values) {
+    this.setState(
+      {deliveryDetailsSaving: true, deliveryDetailsEditMode: false},
+      async () => {
+        await this.props.detailsStore.updateStoreDetails(values).then(() => {
+          this.setState({deliveryDetailsSaving: false}, () =>
+            Toast({
+              text: 'Delivery details successfully updated!',
+              type: 'success',
+              duration: 3000,
+            }),
+          );
+        });
+      },
+    );
   }
 
-  handledeliveryMethods(deliveryMethod) {
-    const {newAvailableDeliveryMethods} = this;
+  handleEditStoreDetails(values) {
+    this.setState(
+      {storeDetailsSaving: true, storeDetailsEditMode: false},
+      async () => {
+        if (!values.displayImage) {
+          delete values.displayImage;
+        }
 
-    if (newAvailableDeliveryMethods.includes(deliveryMethod)) {
-      this.newAvailableDeliveryMethods = newAvailableDeliveryMethods.filter(
-        (item) => item !== deliveryMethod,
-      );
-    } else {
-      newAvailableDeliveryMethods.push(deliveryMethod);
-    }
-  }
+        if (!values.coverImage) {
+          delete values.coverImage;
+        }
 
-  handleOwnDeliveryServiceFee(ownDeliveryServiceFee) {
-    const numberRegexp = /^[0-9]+$/;
-
-    this.newOwnDeliveryServiceFee = ownDeliveryServiceFee;
-
-    if (ownDeliveryServiceFee === '') {
-      this.setState({
-        newOwnDeliveryServiceFeeError: 'Price must not be empty',
-      });
-    } else if (!numberRegexp.test(Number(ownDeliveryServiceFee))) {
-      this.setState({
-        newOwnDeliveryServiceFeeError: 'Price can only consist of numbers',
-      });
-    } else {
-      this.setState({newOwnDeliveryServiceFeeError: null});
-    }
-  }
-
-  handleFreeDeliveryMinimum(freeDeliveryMinimum) {
-    const numberRegexp = /^[0-9]+$/;
-
-    this.newFreeDeliveryMinimum = freeDeliveryMinimum;
-
-    if (!numberRegexp.test(Number(freeDeliveryMinimum))) {
-      this.setState({
-        newFreeDeliveryMinimumError: 'Price can only consist of numbers',
-      });
-    } else {
-      this.setState({newFreeDeliveryMinimumError: null});
-    }
-  }
-
-  handleChangeDeliveryValue(deliveryMethod, key, value) {
-    const numberRegexp = /^[0-9]+$/;
-
-    this.newAvailableDeliveryMethods[deliveryMethod][key] = Number(value);
-
-    if (!numberRegexp.test(Number(value))) {
-      this.newAvailableDeliveryMethods[deliveryMethod][`${key}Error`] =
-        'Please input a valid number';
-    } else if (value.length <= 0) {
-      this.newAvailableDeliveryMethods[deliveryMethod][`${key}Error`] =
-        'Please input a valid number';
-    } else {
-      this.newAvailableDeliveryMethods[deliveryMethod][`${key}Error`] = null;
-    }
-  }
-
-  handleChangeDeliveryDiscountValue(key, value) {
-    const numberRegexp = /^[0-9]+$/;
-
-    this.newDeliveryDiscount[key] = Number(value);
-
-    if (!numberRegexp.test(Number(value))) {
-      this.newDeliveryDiscount[`${key}Error`] = 'Please input a valid number';
-    } else if (value.length <= 0) {
-      this.newDeliveryDiscount[`${key}Error`] = 'Please input a valid number';
-    } else {
-      this.newDeliveryDiscount[`${key}Error`] = null;
-    }
-  }
-
-  handleConfirmDetails() {
-    this.setState({loading: true}, async () => {
-      const {
-        displayImageUrl,
-        coverImageUrl,
-        oldDisplayImageUrl,
-        oldCoverImageUrl,
-      } = this.state;
-      const {
-        freeDelivery,
-        storeDescription,
-        vacationMode,
-        deliveryType,
-        ownDeliveryServiceFee,
-        freeDeliveryMinimum,
-        availableDeliveryMethods,
-        availablePaymentMethods,
-        deliveryDiscount,
-      } = this.props.detailsStore.storeDetails;
-
-      if (coverImageUrl !== oldCoverImageUrl) {
-        await this.props.detailsStore
-          .uploadImage(coverImageUrl.uri, 'cover')
-          .then(() => {
-            this.setState({oldCoverImageUrl: coverImageUrl});
-          });
-      }
-
-      if (displayImageUrl !== oldDisplayImageUrl) {
-        await this.props.detailsStore
-          .uploadImage(displayImageUrl.uri, 'display')
-          .then(() => {
-            this.setState({oldDisplayImageUrl: displayImageUrl});
-          });
-      }
-
-      if (
-        freeDelivery !== this.newFreeDelivery ||
-        storeDescription !== this.newStoreDescription ||
-        vacationMode !== this.newVacationMode ||
-        availablePaymentMethods !== this.newAvailablePaymentMethods ||
-        availableDeliveryMethods !== this.newAvailableDeliveryMethods ||
-        deliveryDiscount !== this.newDeliveryDiscount ||
-        deliveryType !== this.newDeliveryType ||
-        ownDeliveryServiceFee !== this.newOwnDeliveryServiceFee ||
-        freeDeliveryMinimum !== this.newFreeDeliveryMinimum
-      ) {
-        delete this.newDeliveryDiscount[`discountAmountError`];
-        delete this.newDeliveryDiscount[`minimumOrderAmountError`];
-        delete this.newAvailableDeliveryMethods['Own Delivery'][
-          `deliveryPriceError`
-        ];
-
-        await this.props.detailsStore
-          .updateStoreDetails(
-            this.newStoreDescription,
-            this.newFreeDelivery,
-            this.newVacationMode,
-            this.newAvailablePaymentMethods,
-            this.newAvailableDeliveryMethods,
-            this.newDeliveryDiscount,
-            this.newDeliveryType,
-            Number(this.newOwnDeliveryServiceFee),
-            Number(this.newFreeDeliveryMinimum),
-          )
-          .then(() => {
+        await this.props.detailsStore.updateStoreDetails(values).then(() => {
+          this.setState({storeDetailsSaving: false}, () =>
             Toast({
               text: 'Store details successfully updated!',
               type: 'success',
               duration: 3000,
-            });
-          });
-      } else {
-        Toast({
-          text: 'Store details successfully updated!',
-          type: 'success',
-          duration: 3000,
+            }),
+          );
         });
-      }
-      this.toggleEditing();
-    });
-  }
-
-  handleEditDeliverySettings(values) {
-    this.setState({loading: true, deliveryEditMode: false}, async () => {
-      await this.props.detailsStore.updateStoreDetails(values).then(() => {
-        Toast({
-          text: 'Store details successfully updated!',
-          type: 'success',
-          duration: 3000,
-        });
-      });
-    });
+      },
+    );
   }
 
   CategoryPills = (items) => {
@@ -524,14 +255,15 @@ class DashboardScreen extends Component {
       coverImageReady,
       displayImageWidth,
       coverImageWidth,
-      loading,
       deliverySettingsIsValid,
-      deliveryEditMode,
+      deliveryDetailsEditMode,
+      deliveryDetailsSaving,
+      storeDetailsEditMode,
+      storeDetailsSaving,
+      storeDetailsIsValid,
     } = this.state;
 
     const {navigation} = this.props;
-
-    const {editMode, saveDisabled} = this;
 
     const deliveryTypes = [
       'Same Day Delivery',
@@ -541,55 +273,7 @@ class DashboardScreen extends Component {
 
     return (
       <View style={{flex: 1}}>
-        <BaseHeader
-          title={editMode ? 'Edit Details' : this.props.route.name}
-          navigation={navigation}
-          containerStyle={editMode ? {backgroundColor: colors.accent} : null}
-          leftComponent={
-            editMode && (
-              <Button
-                type="clear"
-                color={colors.icons}
-                icon={<Icon name="x" color={colors.icons} />}
-                onPress={() => this.cancelEditing()}
-                titleStyle={{color: colors.icons}}
-                containerStyle={{
-                  borderRadius: 24,
-                }}
-              />
-            )
-          }
-          rightComponent={
-            editMode ? (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'flex-end',
-                  justifyContent: 'space-between',
-                }}>
-                <Button
-                  type="clear"
-                  title="Save"
-                  titleStyle={{color: colors.icons}}
-                  loading={loading}
-                  loadingProps={{color: colors.icons}}
-                  onPress={() => this.handleConfirmDetails()}
-                  disabled={saveDisabled}
-                />
-              </View>
-            ) : (
-              <BaseOptionsMenu
-                iconStyle={{
-                  color: colors.icons,
-                  fontSize: 25,
-                  marginRight: Platform.OS === 'android' ? 10 : 0,
-                }}
-                options={['Edit Details']}
-                actions={[this.toggleEditing.bind(this)]}
-              />
-            )
-          }
-        />
+        <BaseHeader title={this.props.route.name} navigation={navigation} />
 
         {Object.keys(this.props.detailsStore.storeDetails).length <= 0 ? (
           <View
@@ -636,469 +320,628 @@ class DashboardScreen extends Component {
                 </Card>
               </View>
 
-              <View
-                style={{
-                  shadowColor: '#000',
-                  shadowOffset: {
-                    width: 0,
-                    height: 1,
-                  },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 1.41,
+              <Formik
+                validateOnMount
+                validationSchema={storeDetailsValidationSchema}
+                initialValues={{
+                  displayImage: null,
+                  coverImage: null,
+                  storeDescription,
+                  availablePaymentMethods,
+                  vacationMode,
+                }}
+                onSubmit={(values) => {
+                  this.handleEditStoreDetails(values);
                 }}>
-                <Card
-                  style={{
-                    borderRadius: 10,
-                    overflow: 'hidden',
-                  }}>
-                  <CardItemHeader title="Store Details" />
+                {({
+                  handleSubmit,
+                  isValid,
+                  values,
+                  setFieldValue,
+                  resetForm,
+                }) => {
+                  if (storeDetailsIsValid !== isValid) {
+                    this.setState({storeDetailsIsValid: isValid});
+                  }
 
-                  <CardItem bordered>
-                    <View
+                  return (
+                    <Card
                       style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
+                        borderRadius: 10,
                       }}>
-                      <View style={{paddingRight: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Display Image
-                        </Text>
-
-                        {editMode && (
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                            }}>
-                            <Button
-                              type="clear"
-                              titleStyle={{color: colors.accent}}
-                              color={colors.icons}
-                              onPress={() => this.handleTakePhoto('display')}
-                              icon={
-                                <Icon name="camera" color={colors.accent} />
-                              }
-                              containerStyle={{borderRadius: 24}}
-                            />
-
-                            <Button
-                              type="clear"
-                              titleStyle={{color: colors.accent}}
-                              color={colors.icons}
-                              onPress={() => this.handleSelectImage('display')}
-                              icon={<Icon name="image" color={colors.accent} />}
-                              containerStyle={{borderRadius: 24}}
-                            />
-                          </View>
-                        )}
-                      </View>
-
-                      <View
-                        style={{
-                          flex: 1,
-                          alignSelf: 'flex-start',
-                          alignItems: 'flex-end',
-                        }}>
-                        <View
-                          onLayout={(event) =>
-                            this.setState({
-                              displayImageWidth: event.nativeEvent.layout.width,
-                            })
-                          }>
-                          <View
-                            style={{
-                              width: '70%',
-                              borderRadius: 10,
-                              borderWidth: 1,
-                              borderColor: editMode
-                                ? this.editModeHeaderColor
-                                : colors.primary,
-                              overflow: 'hidden',
-                            }}>
-                            <Image
-                              source={displayImageUrl}
-                              style={{
-                                width: '100%',
-                                aspectRatio: 1,
-                                resizeMode: 'contain',
-                              }}
-                              onLoad={() =>
-                                this.setState({displayImageReady: true})
-                              }
-                            />
-                          </View>
-
-                          {!displayImageReady && (
-                            <View
-                              style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                              }}>
-                              <Placeholder Animation={Fade}>
-                                <PlaceholderMedia
-                                  style={{
-                                    backgroundColor: colors.primary,
-                                    borderRadius: 10,
-                                    width: displayImageWidth
-                                      ? displayImageWidth
-                                      : 0,
-                                    height: displayImageWidth
-                                      ? displayImageWidth
-                                      : 0,
-                                  }}
-                                />
-                              </Placeholder>
-                            </View>
-                          )}
-                        </View>
-                      </View>
-                    </View>
-                  </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
-                      <View style={{paddingRight: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Cover Image
-                        </Text>
-
-                        {editMode && (
-                          <View style={{flexDirection: 'row'}}>
-                            <Button
-                              type="clear"
-                              color={colors.icons}
-                              titleStyle={{color: colors.accent}}
-                              icon={
-                                <Icon name="camera" color={colors.accent} />
-                              }
-                              onPress={() => this.handleTakePhoto('cover')}
-                              containerStyle={{borderRadius: 24}}
-                            />
-                            <Button
-                              type="clear"
-                              color={colors.icons}
-                              titleStyle={{color: colors.accent}}
-                              icon={<Icon name="image" color={colors.accent} />}
-                              onPress={() => this.handleSelectImage('cover')}
-                              containerStyle={{borderRadius: 24}}
-                            />
-                          </View>
-                        )}
-                      </View>
-
-                      <View
-                        style={{
-                          flex: 1,
-                          alignSelf: 'flex-start',
-                          alignItems: 'flex-end',
-                        }}>
-                        <View
-                          onLayout={(event) =>
-                            this.setState({
-                              coverImageWidth: event.nativeEvent.layout.width,
-                            })
-                          }>
-                          <View
-                            style={{
-                              width: '100%',
-                              borderRadius: 10,
-                              borderWidth: 1,
-                              borderColor: editMode
-                                ? this.editModeHeaderColor
-                                : colors.primary,
-                              overflow: 'hidden',
-                            }}>
-                            <Image
-                              source={coverImageUrl}
-                              style={{
-                                width: '100%',
-                                aspectRatio: 1620 / 1080,
-                                resizeMode: 'contain',
-                              }}
-                              onLoad={() =>
-                                this.setState({coverImageReady: true})
-                              }
-                            />
-                          </View>
-
-                          {!coverImageReady && (
-                            <View
-                              style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                              }}>
-                              <Placeholder Animation={Fade}>
-                                <PlaceholderMedia
-                                  style={{
-                                    backgroundColor: colors.primary,
-                                    borderRadius: 10,
-                                    width: coverImageWidth
-                                      ? coverImageWidth
-                                      : 0,
-                                    height: coverImageWidth
-                                      ? coverImageWidth
-                                      : 0,
-                                  }}
-                                />
-                              </Placeholder>
-                            </View>
-                          )}
-                        </View>
-                      </View>
-                    </View>
-                  </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
-                      <View style={{flex: 1, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Store Name
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 1, alignItems: 'flex-end'}}>
-                        <Text
-                          style={{
-                            color: colors.primary,
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                            textAlign: 'right',
-                          }}>
-                          {storeName}
-                        </Text>
-                      </View>
-                    </View>
-                  </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
-                      <View style={{flex: 1, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Store Description
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 1, alignItems: 'flex-end'}}>
-                        {editMode ? (
-                          <Input
-                            multiline
-                            maxLength={200}
-                            value={this.newStoreDescription}
-                            onChangeText={(value) =>
-                              (this.newStoreDescription = value)
-                            }
-                            inputStyle={{textAlign: 'right'}}
-                            containerStyle={{
-                              borderColor: this.editModeHeaderColor,
-                            }}
-                          />
-                        ) : (
-                          <Text
-                            style={{
-                              color: colors.primary,
-                              fontSize: 16,
-                              fontFamily: 'ProductSans-Bold',
-                              textAlign: 'right',
-                            }}>
-                            {storeDescription}
-                          </Text>
-                        )}
-                      </View>
-                    </View>
-                  </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
-                      <View style={{flex: 1, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Store Category
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 1, alignItems: 'flex-end'}}>
-                        <Text
-                          style={{
-                            color: colors.primary,
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                            textAlign: 'right',
-                          }}>
-                          {storeCategory}
-                        </Text>
-                      </View>
-                    </View>
-                  </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
-                      <View style={{flex: 1, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Payment Methods
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 1, alignItems: 'flex-end'}}>
-                        {editMode ? (
-                          <View>
-                            {Object.keys(this.newAvailablePaymentMethods)
-                              .length > 0 &&
-                              selectablePaymentMethods.map((paymentMethod) => (
-                                <CheckBox
-                                  title={paymentMethod}
-                                  checked={
-                                    this.newAvailablePaymentMethods[
-                                      paymentMethod
-                                    ].activated
-                                  }
-                                  key={paymentMethod}
-                                  onPress={() =>
-                                    (this.newAvailablePaymentMethods[
-                                      paymentMethod
-                                    ].activated = !this
-                                      .newAvailablePaymentMethods[paymentMethod]
-                                      .activated)
-                                  }
-                                />
-                              ))}
-                          </View>
-                        ) : (
-                          this.CategoryPills(this.selectedPaymentMethods)
-                        )}
-                      </View>
-                    </View>
-                  </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
-                      <View style={{flex: 1, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Number of Orders
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 1, alignItems: 'flex-end'}}>
-                        <Text
-                          style={{
-                            color: colors.primary,
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                            textAlign: 'right',
-                          }}>
-                          {orderNumber ? orderNumber : 0}
-                        </Text>
-                      </View>
-                    </View>
-                  </CardItem>
-
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                      }}>
-                      <View style={{flex: 1, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Vacation Mode
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 1, alignItems: 'flex-end'}}>
-                        <Switch
-                          trackColor={{
-                            false: '#767577',
-                            true: editMode ? colors.accent : colors.primary,
-                          }}
-                          thumbColor={'#f4f3f4'}
-                          ios_backgroundColor="#3e3e3e"
-                          onValueChange={() =>
-                            (this.newVacationMode = !this.newVacationMode)
+                      <View style={{borderRadius: 10, overflow: 'hidden'}}>
+                        <CardItemHeader
+                          title="Store Details"
+                          titleStyle={
+                            storeDetailsEditMode ? {color: colors.icons} : {}
                           }
-                          value={editMode ? this.newVacationMode : vacationMode}
-                          disabled={!editMode}
+                          style={
+                            storeDetailsEditMode
+                              ? {
+                                  backgroundColor: colors.accent,
+                                }
+                              : {}
+                          }
+                          leftComponent={
+                            storeDetailsEditMode && (
+                              <Button
+                                type="clear"
+                                color={colors.icons}
+                                icon={<Icon name="x" color={colors.icons} />}
+                                onPress={() => {
+                                  this.setState(
+                                    {storeDetailsEditMode: false},
+                                    () => resetForm(),
+                                  );
+                                }}
+                                titleStyle={{color: colors.icons}}
+                                containerStyle={{
+                                  borderRadius: 24,
+                                }}
+                              />
+                            )
+                          }
+                          rightComponent={
+                            storeDetailsEditMode ? (
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'flex-end',
+                                  justifyContent: 'space-between',
+                                }}>
+                                <Button
+                                  type="clear"
+                                  title="Save"
+                                  titleStyle={{color: colors.icons}}
+                                  loading={storeDetailsSaving}
+                                  loadingProps={{color: colors.icons}}
+                                  onPress={() => handleSubmit()}
+                                  disabled={!storeDetailsIsValid}
+                                  disabledTitleStyle={{
+                                    color: colors.text_disabled,
+                                  }}
+                                />
+                              </View>
+                            ) : (
+                              <BaseOptionsMenu
+                                iconColor={
+                                  storeDetailsEditMode
+                                    ? colors.icons
+                                    : colors.primary
+                                }
+                                options={['Edit Store Details']}
+                                actions={[
+                                  () =>
+                                    this.setState({
+                                      storeDetailsEditMode: true,
+                                    }),
+                                ]}
+                              />
+                            )
+                          }
                         />
+
+                        <CardItem bordered>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <View style={{paddingRight: 10}}>
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Display Image
+                              </Text>
+
+                              {storeDetailsEditMode && (
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                  }}>
+                                  <Button
+                                    type="clear"
+                                    titleStyle={{color: colors.accent}}
+                                    color={colors.icons}
+                                    onPress={() =>
+                                      this.handleTakePhoto(
+                                        'display',
+                                      ).then((imagePath) =>
+                                        setFieldValue(
+                                          'displayImage',
+                                          imagePath,
+                                        ),
+                                      )
+                                    }
+                                    icon={
+                                      <Icon
+                                        name="camera"
+                                        color={colors.accent}
+                                      />
+                                    }
+                                    containerStyle={{borderRadius: 24}}
+                                  />
+
+                                  <Button
+                                    type="clear"
+                                    titleStyle={{color: colors.accent}}
+                                    color={colors.icons}
+                                    onPress={() =>
+                                      this.handleSelectImage(
+                                        'display',
+                                      ).then((imagePath) =>
+                                        setFieldValue(
+                                          'displayImage',
+                                          imagePath,
+                                        ),
+                                      )
+                                    }
+                                    icon={
+                                      <Icon
+                                        name="image"
+                                        color={colors.accent}
+                                      />
+                                    }
+                                    containerStyle={{borderRadius: 24}}
+                                  />
+                                </View>
+                              )}
+                            </View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                                alignSelf: 'flex-start',
+                                alignItems: 'flex-end',
+                              }}>
+                              <View
+                                onLayout={(event) =>
+                                  this.setState({
+                                    displayImageWidth:
+                                      event.nativeEvent.layout.width,
+                                  })
+                                }>
+                                <View
+                                  style={{
+                                    width: '70%',
+                                    borderRadius: 10,
+                                    borderWidth: 1,
+                                    borderColor: storeDetailsEditMode
+                                      ? colors.accent
+                                      : colors.primary,
+                                    overflow: 'hidden',
+                                  }}>
+                                  <Image
+                                    source={
+                                      storeDetailsEditMode &&
+                                      values.displayImage
+                                        ? {uri: values.displayImage}
+                                        : displayImageUrl
+                                    }
+                                    style={{
+                                      width: '100%',
+                                      aspectRatio: 1,
+                                      resizeMode: 'contain',
+                                    }}
+                                    onLoadStart={() =>
+                                      this.setState({displayImageReady: false})
+                                    }
+                                    onLoad={() =>
+                                      this.setState({displayImageReady: true})
+                                    }
+                                  />
+                                </View>
+
+                                {!displayImageReady && (
+                                  <View
+                                    style={{
+                                      position: 'absolute',
+                                      top: 0,
+                                      left: 0,
+                                    }}>
+                                    <Placeholder Animation={Fade}>
+                                      <PlaceholderMedia
+                                        style={{
+                                          backgroundColor: colors.primary,
+                                          borderRadius: 10,
+                                          width: displayImageWidth
+                                            ? displayImageWidth
+                                            : 0,
+                                          height: displayImageWidth
+                                            ? displayImageWidth
+                                            : 0,
+                                        }}
+                                      />
+                                    </Placeholder>
+                                  </View>
+                                )}
+                              </View>
+                            </View>
+                          </View>
+                        </CardItem>
+
+                        <CardItem bordered>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <View style={{paddingRight: 10}}>
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Cover Image
+                              </Text>
+
+                              {storeDetailsEditMode && (
+                                <View style={{flexDirection: 'row'}}>
+                                  <Button
+                                    type="clear"
+                                    color={colors.icons}
+                                    titleStyle={{color: colors.accent}}
+                                    icon={
+                                      <Icon
+                                        name="camera"
+                                        color={colors.accent}
+                                      />
+                                    }
+                                    onPress={() =>
+                                      this.handleTakePhoto(
+                                        'cover',
+                                      ).then((imagePath) =>
+                                        setFieldValue('coverImage', imagePath),
+                                      )
+                                    }
+                                    containerStyle={{borderRadius: 24}}
+                                  />
+                                  <Button
+                                    type="clear"
+                                    color={colors.icons}
+                                    titleStyle={{color: colors.accent}}
+                                    icon={
+                                      <Icon
+                                        name="image"
+                                        color={colors.accent}
+                                      />
+                                    }
+                                    onPress={() =>
+                                      this.handleSelectImage(
+                                        'cover',
+                                      ).then((imagePath) =>
+                                        setFieldValue('coverImage', imagePath),
+                                      )
+                                    }
+                                    containerStyle={{borderRadius: 24}}
+                                  />
+                                </View>
+                              )}
+                            </View>
+
+                            <View
+                              style={{
+                                flex: 1,
+                                alignSelf: 'flex-start',
+                                alignItems: 'flex-end',
+                              }}>
+                              <View
+                                onLayout={(event) =>
+                                  this.setState({
+                                    coverImageWidth:
+                                      event.nativeEvent.layout.width,
+                                  })
+                                }>
+                                <View
+                                  style={{
+                                    width: '100%',
+                                    borderRadius: 10,
+                                    borderWidth: 1,
+                                    borderColor: storeDetailsEditMode
+                                      ? colors.accent
+                                      : colors.primary,
+                                    overflow: 'hidden',
+                                  }}>
+                                  <Image
+                                    source={
+                                      storeDetailsEditMode && values.coverImage
+                                        ? {uri: values.coverImage}
+                                        : coverImageUrl
+                                    }
+                                    style={{
+                                      width: '100%',
+                                      aspectRatio: 1620 / 1080,
+                                      resizeMode: 'contain',
+                                    }}
+                                    onLoadStart={() =>
+                                      this.setState({coverImageReady: false})
+                                    }
+                                    onLoad={() =>
+                                      this.setState({coverImageReady: true})
+                                    }
+                                  />
+                                </View>
+
+                                {!coverImageReady && (
+                                  <View
+                                    style={{
+                                      position: 'absolute',
+                                      top: 0,
+                                      left: 0,
+                                    }}>
+                                    <Placeholder Animation={Fade}>
+                                      <PlaceholderMedia
+                                        style={{
+                                          backgroundColor: colors.primary,
+                                          borderRadius: 10,
+                                          width: coverImageWidth
+                                            ? coverImageWidth
+                                            : 0,
+                                          height: coverImageWidth
+                                            ? coverImageWidth
+                                            : 0,
+                                        }}
+                                      />
+                                    </Placeholder>
+                                  </View>
+                                )}
+                              </View>
+                            </View>
+                          </View>
+                        </CardItem>
+
+                        <CardItem bordered>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <View style={{flex: 1, paddingright: 10}}>
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Store Name
+                              </Text>
+                            </View>
+
+                            <View style={{flex: 1, alignItems: 'flex-end'}}>
+                              <Text
+                                style={{
+                                  color: colors.primary,
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                  textAlign: 'right',
+                                }}>
+                                {storeName}
+                              </Text>
+                            </View>
+                          </View>
+                        </CardItem>
+
+                        <CardItem bordered>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <View style={{flex: 1, paddingright: 10}}>
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Store Description
+                              </Text>
+                            </View>
+
+                            <View style={{flex: 1, alignItems: 'flex-end'}}>
+                              {storeDetailsEditMode ? (
+                                <Field
+                                  component={CustomInput}
+                                  name="storeDescription"
+                                  leftIcon="align-justify"
+                                  placeholder="Store Description"
+                                  maxLength={200}
+                                  numberOfLines={3}
+                                  multiline
+                                  inputStyle={{textAlignVertical: 'top'}}
+                                  autoCapitalize="sentences"
+                                />
+                              ) : (
+                                <Text
+                                  style={{
+                                    color: colors.primary,
+                                    fontSize: 16,
+                                    fontFamily: 'ProductSans-Bold',
+                                    textAlign: 'right',
+                                  }}>
+                                  {storeDescription}
+                                </Text>
+                              )}
+                            </View>
+                          </View>
+                        </CardItem>
+
+                        <CardItem bordered>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <View style={{flex: 1, paddingright: 10}}>
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Store Category
+                              </Text>
+                            </View>
+
+                            <View style={{flex: 1, alignItems: 'flex-end'}}>
+                              <Text
+                                style={{
+                                  color: colors.primary,
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                  textAlign: 'right',
+                                }}>
+                                {storeCategory}
+                              </Text>
+                            </View>
+                          </View>
+                        </CardItem>
+
+                        <CardItem bordered>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <View style={{flex: 1, paddingright: 10}}>
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Payment Methods
+                              </Text>
+                            </View>
+
+                            <View style={{flex: 1, alignItems: 'flex-end'}}>
+                              {storeDetailsEditMode ? (
+                                <View>
+                                  {selectablePaymentMethods.map(
+                                    (paymentMethod, index) => (
+                                      <CheckBox
+                                        title={paymentMethod}
+                                        checked={
+                                          values.availablePaymentMethods[
+                                            paymentMethod
+                                          ].activated
+                                        }
+                                        key={`${paymentMethod}${index}`}
+                                        onPress={() =>
+                                          setFieldValue(
+                                            `availablePaymentMethods["${paymentMethod}"].activated`,
+                                            !values.availablePaymentMethods[
+                                              paymentMethod
+                                            ].activated,
+                                          )
+                                        }
+                                      />
+                                    ),
+                                  )}
+                                </View>
+                              ) : (
+                                this.CategoryPills(this.selectedPaymentMethods)
+                              )}
+                            </View>
+                          </View>
+                        </CardItem>
+
+                        <CardItem bordered>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <View style={{flex: 1, paddingright: 10}}>
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Number of Orders
+                              </Text>
+                            </View>
+
+                            <View style={{flex: 1, alignItems: 'flex-end'}}>
+                              <Text
+                                style={{
+                                  color: colors.primary,
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                  textAlign: 'right',
+                                }}>
+                                {orderNumber ? orderNumber : 0}
+                              </Text>
+                            </View>
+                          </View>
+                        </CardItem>
+
+                        <CardItem bordered>
+                          <View
+                            style={{
+                              flex: 1,
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <View style={{flex: 1, paddingright: 10}}>
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Vacation Mode
+                              </Text>
+                            </View>
+
+                            <View style={{flex: 1, alignItems: 'flex-end'}}>
+                              <Switch
+                                trackColor={{
+                                  false: '#767577',
+                                  true: storeDetailsEditMode
+                                    ? colors.accent
+                                    : colors.primary,
+                                }}
+                                thumbColor={'#f4f3f4'}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={() =>
+                                  setFieldValue(
+                                    'vacationMode',
+                                    !values.vacationMode,
+                                  )
+                                }
+                                value={
+                                  storeDetailsEditMode
+                                    ? values.vacationMode
+                                    : vacationMode
+                                }
+                                disabled={!storeDetailsEditMode}
+                              />
+                            </View>
+                          </View>
+                        </CardItem>
                       </View>
-                    </View>
-                  </CardItem>
-                </Card>
-              </View>
+                    </Card>
+                  );
+                }}
+              </Formik>
 
               <Formik
                 innerRef={(formRef) => (this.formikRef = formRef)}
                 validateOnMount
-                validationSchema={deliveryDiscountValidationSchema}
+                validationSchema={deliveryDetailsValidationSchema}
                 initialValues={{
                   availableDeliveryMethods,
                   deliveryDiscount,
@@ -1128,24 +971,26 @@ class DashboardScreen extends Component {
                           <CardItemHeader
                             title="Delivery Settings"
                             titleStyle={
-                              deliveryEditMode ? {color: colors.icons} : {}
+                              deliveryDetailsEditMode
+                                ? {color: colors.icons}
+                                : {}
                             }
                             style={
-                              deliveryEditMode
+                              deliveryDetailsEditMode
                                 ? {
                                     backgroundColor: colors.accent,
                                   }
                                 : {}
                             }
                             leftComponent={
-                              deliveryEditMode && (
+                              deliveryDetailsEditMode && (
                                 <Button
                                   type="clear"
                                   color={colors.icons}
                                   icon={<Icon name="x" color={colors.icons} />}
                                   onPress={() => {
                                     this.setState(
-                                      {deliveryEditMode: false},
+                                      {deliveryDetailsEditMode: false},
                                       () => resetForm(),
                                     );
                                   }}
@@ -1157,7 +1002,7 @@ class DashboardScreen extends Component {
                               )
                             }
                             rightComponent={
-                              deliveryEditMode ? (
+                              deliveryDetailsEditMode ? (
                                 <View
                                   style={{
                                     flexDirection: 'row',
@@ -1168,23 +1013,28 @@ class DashboardScreen extends Component {
                                     type="clear"
                                     title="Save"
                                     titleStyle={{color: colors.icons}}
-                                    loading={loading}
+                                    loading={deliveryDetailsSaving}
                                     loadingProps={{color: colors.icons}}
                                     onPress={() => handleSubmit()}
-                                    disabled={saveDisabled}
+                                    disabled={!deliverySettingsIsValid}
+                                    disabledTitleStyle={{
+                                      color: colors.text_disabled,
+                                    }}
                                   />
                                 </View>
                               ) : (
                                 <BaseOptionsMenu
                                   iconColor={
-                                    deliveryEditMode
+                                    deliveryDetailsEditMode
                                       ? colors.icons
                                       : colors.primary
                                   }
                                   options={['Edit Delivery Settings']}
                                   actions={[
                                     () =>
-                                      this.setState({deliveryEditMode: true}),
+                                      this.setState({
+                                        deliveryDetailsEditMode: true,
+                                      }),
                                   ]}
                                 />
                               )
@@ -1212,7 +1062,7 @@ class DashboardScreen extends Component {
                                   <Switch
                                     trackColor={{
                                       false: '#767577',
-                                      true: deliveryEditMode
+                                      true: deliveryDetailsEditMode
                                         ? colors.accent
                                         : colors.primary,
                                     }}
@@ -1227,14 +1077,14 @@ class DashboardScreen extends Component {
                                       )
                                     }
                                     value={
-                                      deliveryEditMode
+                                      deliveryDetailsEditMode
                                         ? values.availableDeliveryMethods[
                                             'Mr. Speedy'
                                           ].activated
                                         : availableDeliveryMethods['Mr. Speedy']
                                             .activated
                                     }
-                                    disabled={!deliveryEditMode}
+                                    disabled={!deliveryDetailsEditMode}
                                   />
                                 </View>
                               </View>
@@ -1262,7 +1112,7 @@ class DashboardScreen extends Component {
                                   <Switch
                                     trackColor={{
                                       false: '#767577',
-                                      true: deliveryEditMode
+                                      true: deliveryDetailsEditMode
                                         ? colors.accent
                                         : colors.primary,
                                     }}
@@ -1277,7 +1127,7 @@ class DashboardScreen extends Component {
                                       )
                                     }
                                     value={
-                                      deliveryEditMode
+                                      deliveryDetailsEditMode
                                         ? values.availableDeliveryMethods[
                                             'Own Delivery'
                                           ].activated
@@ -1285,7 +1135,7 @@ class DashboardScreen extends Component {
                                             'Own Delivery'
                                           ].activated
                                     }
-                                    disabled={!deliveryEditMode}
+                                    disabled={!deliveryDetailsEditMode}
                                   />
                                 </View>
 
@@ -1317,11 +1167,11 @@ class DashboardScreen extends Component {
                                           flex: 1,
                                           alignItems: 'flex-end',
                                         }}>
-                                        {deliveryEditMode ? (
+                                        {deliveryDetailsEditMode ? (
                                           <Field
                                             component={CustomInput}
-                                            name="availableDeliveryMethods[Own Delivery].deliveryPrice"
-                                            placeholder="Delivery Discount Amount"
+                                            name="availableDeliveryMethods.Own Delivery.deliveryPrice"
+                                            placeholder="Delivery Price"
                                             leftIcon={
                                               <Text
                                                 style={{
@@ -1384,7 +1234,7 @@ class DashboardScreen extends Component {
                                   <Switch
                                     trackColor={{
                                       false: '#767577',
-                                      true: deliveryEditMode
+                                      true: deliveryDetailsEditMode
                                         ? colors.accent
                                         : colors.primary,
                                     }}
@@ -1397,7 +1247,7 @@ class DashboardScreen extends Component {
                                       )
                                     }
                                     value={values.deliveryDiscount.activated}
-                                    disabled={!deliveryEditMode}
+                                    disabled={!deliveryDetailsEditMode}
                                   />
                                 </View>
 
@@ -1429,7 +1279,7 @@ class DashboardScreen extends Component {
                                           flex: 1,
                                           alignItems: 'flex-end',
                                         }}>
-                                        {deliveryEditMode ? (
+                                        {deliveryDetailsEditMode ? (
                                           <Field
                                             component={CustomInput}
                                             name="deliveryDiscount.discountAmount"
@@ -1488,7 +1338,7 @@ class DashboardScreen extends Component {
                                           flex: 1,
                                           alignItems: 'flex-end',
                                         }}>
-                                        {deliveryEditMode ? (
+                                        {deliveryDetailsEditMode ? (
                                           <Field
                                             component={CustomInput}
                                             name="deliveryDiscount.minimumOrderAmount"
@@ -1548,7 +1398,7 @@ class DashboardScreen extends Component {
                               </View>
 
                               <View style={{flex: 1, alignItems: 'flex-end'}}>
-                                {deliveryEditMode ? (
+                                {deliveryDetailsEditMode ? (
                                   <View>
                                     {deliveryTypes.map(
                                       (deliveryTypeName, index) => (

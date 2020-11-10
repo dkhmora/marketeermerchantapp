@@ -199,6 +199,8 @@ class MrSpeedyBottomSheet extends Component {
           orderId,
         })
         .then((response) => {
+          this.props.authStore.appReady = true;
+
           if (response.data.s === 200) {
             this.modalizeRef && this.modalizeRef.open();
 
