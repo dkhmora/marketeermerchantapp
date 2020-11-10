@@ -1144,10 +1144,13 @@ class DashboardScreen extends Component {
                                       <Card
                                         style={{
                                           borderRadius: 10,
-                                          overflow: 'hidden',
                                           marginTop: 10,
                                         }}>
-                                        <CardItem>
+                                        <CardItem
+                                          style={{
+                                            borderRadius: 10,
+                                            overflow: 'hidden',
+                                          }}>
                                           <View
                                             style={{
                                               flex: 1,
@@ -1266,10 +1269,11 @@ class DashboardScreen extends Component {
                                 <Card
                                   style={{
                                     borderRadius: 10,
-                                    overflow: 'hidden',
                                     marginTop: 10,
                                   }}>
-                                  <CardItem>
+                                  <CardItem style={{borderRadius: 10,
+                                      overflow: 'hidden',
+                                    }}>
                                     <View
                                       style={{
                                         flex: 1,
@@ -1330,7 +1334,11 @@ class DashboardScreen extends Component {
 
                                   <Divider />
 
-                                  <CardItem>
+                                  <CardItem
+                                    style={{
+                                      borderRadius: 10,
+                                      overflow: 'hidden',
+                                    }}>
                                     <View
                                       style={{
                                         flex: 1,
