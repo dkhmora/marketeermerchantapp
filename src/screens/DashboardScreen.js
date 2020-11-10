@@ -24,6 +24,7 @@ import {
   storeDetailsValidationSchema,
 } from '../util/validationSchemas';
 import CustomInput from '../components/CustomInput';
+import {styles} from '../../assets/styles';
 
 const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 @inject('detailsStore')
@@ -339,6 +340,7 @@ class DashboardScreen extends Component {
                   values,
                   setFieldValue,
                   resetForm,
+                  errors,
                 }) => {
                   if (storeDetailsIsValid !== isValid) {
                     this.setState({storeDetailsIsValid: isValid});
@@ -830,13 +832,13 @@ class DashboardScreen extends Component {
                                   {selectablePaymentMethods.map(
                                     (paymentMethod, index) => (
                                       <CheckBox
+                                        key={`${paymentMethod}${index}`}
                                         title={paymentMethod}
                                         checked={
                                           values.availablePaymentMethods[
                                             paymentMethod
                                           ].activated
                                         }
-                                        key={`${paymentMethod}${index}`}
                                         onPress={() =>
                                           setFieldValue(
                                             `availablePaymentMethods["${paymentMethod}"].activated`,
@@ -848,6 +850,13 @@ class DashboardScreen extends Component {
                                       />
                                     ),
                                   )}
+                                  <Text
+                                    style={{
+                                      color: colors.danger,
+                                      fontSize: 12,
+                                    }}>
+                                    {errors?.testAvailablePaymentMethods}
+                                  </Text>
                                 </View>
                               ) : (
                                 this.CategoryPills(this.selectedPaymentMethods)

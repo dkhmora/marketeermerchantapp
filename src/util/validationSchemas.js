@@ -67,14 +67,26 @@ const storeDetailsValidationSchema = yup.object().shape({
   displayImage: yup.string().nullable(),
   coverImage: yup.string().nullable(),
   storeDescription: yup.string().max(200),
-  availablePaymentMethods: yup.object({
-    ['Online Banking']: yup.object({
-      activated: yup.boolean(),
+  availablePaymentMethods: yup
+    .object({
+      ['Online Banking']: yup.object({
+        activated: yup.boolean(),
+      }),
+      ['COD']: yup.object({
+        activated: yup.boolean(),
+      }),
+    })
+    .test('testAvailablePaymentMethods', null, (obj) => {
+      if (obj['Online Banking']?.activated || obj['COD']?.activated) {
+        return true;
+      }
+
+      return new yup.ValidationError(
+        'Please check atleast one checkbox',
+        null,
+        'testAvailablePaymentMethods',
+      );
     }),
-    ['COD']: yup.object({
-      activated: yup.boolean(),
-    }),
-  }),
   vacationMode: yup.boolean(),
 });
 

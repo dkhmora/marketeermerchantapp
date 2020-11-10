@@ -44,6 +44,10 @@ const theme = {
     inputStyle: {
       fontFamily: 'ProductSans-Light',
     },
+    errorStyle: {
+      fontFamily: 'ProductSans-Light',
+      color: colors.danger,
+    },
     placeholderTextColor: colors.text_secondary,
   },
   CheckBox: {
