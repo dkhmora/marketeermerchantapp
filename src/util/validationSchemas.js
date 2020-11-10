@@ -39,7 +39,10 @@ const deliveryDetailsValidationSchema = yup.object().shape({
         activated: yup.boolean(),
         deliveryPrice: yup.number().when('activated', {
           is: true,
-          then: yup.number().min(0).required(),
+          then: yup
+            .number()
+            .min(0)
+            .required('Delivery Price is a required field'),
           otherwise: yup.number().min(0).integer().nullable(),
         }),
       }),
@@ -63,12 +66,19 @@ const deliveryDetailsValidationSchema = yup.object().shape({
       .integer()
       .when('activated', {
         is: true,
-        then: yup.number().min(0).integer().required(),
+        then: yup
+          .number()
+          .min(0)
+          .integer()
+          .required('Delivery Discount Amount is a required field'),
         otherwise: yup.number().nullable().min(0).integer(),
       }),
     minimumOrderAmount: yup.number().when('activated', {
       is: true,
-      then: yup.number().min(0).required(),
+      then: yup
+        .number()
+        .min(0)
+        .required('Minimum Order Amount is a required field'),
       otherwise: yup.number().min(0).integer().nullable(),
     }),
   }),
