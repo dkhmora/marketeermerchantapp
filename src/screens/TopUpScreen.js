@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import PaymentOptionsModal from '../components/PaymentOptionsModal';
 import {View, Linking, TextInput, Dimensions, Platform} from 'react-native';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Text, ListItem, Button, Icon} from 'react-native-elements';
 import BaseHeader from '../components/BaseHeader';
 import {colors} from '../../assets/colors';
@@ -15,6 +14,7 @@ import {styles} from '../../assets/styles';
 import * as Animatable from 'react-native-animatable';
 import {initialWindowMetrics} from 'react-native-safe-area-context';
 import crashlytics from '@react-native-firebase/crashlytics';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const SCREEN_HEIGHT = Dimensions.get('screen').height;
 const inset = initialWindowMetrics && initialWindowMetrics.insets;
@@ -268,7 +268,7 @@ class TopUpScreen extends Component {
         />
 
         <View style={{flex: 1}}>
-          <KeyboardAwareScrollView
+          <ScrollView
             contentInsetAdjustmentBehavior="automatic"
             style={{height: SCREEN_HEIGHT}}>
             <ListItem
@@ -347,7 +347,7 @@ class TopUpScreen extends Component {
               }
               bottomDivider
             />
-          </KeyboardAwareScrollView>
+          </ScrollView>
         </View>
 
         <View

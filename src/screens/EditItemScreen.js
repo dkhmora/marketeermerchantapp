@@ -9,7 +9,6 @@ import {computed} from 'mobx';
 import ImagePicker from 'react-native-image-crop-picker';
 import {Picker, Item} from 'native-base';
 import FastImage from 'react-native-fast-image';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import ConfirmationModal from '../components/ConfirmationModal';
 import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 import Divider from '../components/Divider';
@@ -21,6 +20,7 @@ import {
   itemValidationSchema,
 } from '../util/validationSchemas';
 import CustomInput from '../components/CustomInput';
+import {ScrollView} from 'react-native-gesture-handler';
 
 @inject('detailsStore')
 @inject('itemsStore')
@@ -279,7 +279,7 @@ class EditItemScreen extends Component {
             />
           }
         />
-        <KeyboardAwareScrollView
+        <ScrollView
           showsVerticalScrollIndicator={false}
           contentInsetAdjustmentBehavior="automatic"
           keyboardOpeningTime={20}
@@ -772,7 +772,7 @@ class EditItemScreen extends Component {
               </View>
             )}
           </View>
-        </KeyboardAwareScrollView>
+        </ScrollView>
       </View>
     );
   }

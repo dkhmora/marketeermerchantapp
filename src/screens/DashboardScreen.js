@@ -8,9 +8,8 @@ import {Text, Icon, Button, CheckBox} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
 import BaseOptionsMenu from '../components/BaseOptionsMenu';
 import {colors} from '../../assets/colors';
-import {Switch} from 'react-native-gesture-handler';
+import {ScrollView, Switch} from 'react-native-gesture-handler';
 import StoreCard from '../components/StoreCard';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from '../components/Toast';
 import crashlytics from '@react-native-firebase/crashlytics';
 import CardItemHeader from '../components/CardItemHeader';
@@ -300,7 +299,7 @@ class DashboardScreen extends Component {
             <ActivityIndicator size="large" color={colors.icons} />
           </View>
         ) : (
-          <KeyboardAwareScrollView
+          <ScrollView
             style={{paddingHorizontal: 10}}
             showsVerticalScrollIndicator={false}
             contentInsetAdjustmentBehavior="automatic"
@@ -1466,7 +1465,7 @@ class DashboardScreen extends Component {
                 }}
               </Formik>
             </SafeAreaView>
-          </KeyboardAwareScrollView>
+          </ScrollView>
         )}
       </View>
     );

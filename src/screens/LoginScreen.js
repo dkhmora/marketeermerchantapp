@@ -14,11 +14,11 @@ import {observer, inject} from 'mobx-react';
 import {Icon, Button} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {styles} from '../../assets/styles';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import Toast from '../components/Toast';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import crashlytics from '@react-native-firebase/crashlytics';
+import { ScrollView } from 'react-native-gesture-handler';
 
 @inject('authStore')
 @observer
@@ -176,7 +176,7 @@ class LoginScreen extends Component {
           useNativeDriver
           animation="fadeInUpBig"
           style={styles.footer}>
-          <KeyboardAwareScrollView
+          <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardOpeningTime={20}
             extraScrollHeight={20}
@@ -313,7 +313,7 @@ class LoginScreen extends Component {
                 </View>
               )}
             </View>
-          </KeyboardAwareScrollView>
+          </ScrollView>
         </Animatable.View>
       </View>
     );
