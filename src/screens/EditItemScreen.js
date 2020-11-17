@@ -247,6 +247,7 @@ class EditItemScreen extends Component {
     const {navigation} = this.props;
     const {storeType} = this.props.detailsStore.storeDetails;
     const sign = selectedStockNumberSignIndex === 0 ? '-' : '+';
+    const itemStock = item?.stock !== undefined ? item.stock : 0;
 
     return (
       <View style={{flex: 1}}>
@@ -484,7 +485,7 @@ class EditItemScreen extends Component {
                             this.categories.map((cat, index) => {
                               return (
                                 <Picker.Item
-                                  key={index}
+                                  key={`${cat}${index}`}
                                   label={cat}
                                   value={cat}
                                 />
@@ -571,43 +572,76 @@ class EditItemScreen extends Component {
                       }
                     />
 
-                    {storeType === 'basic' && (
+                    {storeType !== 'food' && (
                       <View>
                         {item && (
                           <View
                             style={{
                               flexDirection: 'row',
-                              alignSelf: 'center',
+                              flex: 1,
                               alignItems: 'center',
                               justifyContent: 'center',
-                              backgroundColor: colors.icons,
-                              elevation: 2,
-                              borderRadius: 10,
-                              paddingHorizontal: 5,
-                              paddingVertical: 2,
                             }}>
-                            <Text>{'Current Stock/New Stock: '}</Text>
-
-                            <Text
+                            <View
                               style={{
-                                fontSize: 14,
-                                fontFamily: 'ProductSans-Bold',
-                              }}>{`${item.stock} | `}</Text>
+                                flexDirection: 'row',
+                                alignSelf: 'center',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: colors.primary,
+                                elevation: 2,
+                                borderRadius: 10,
+                                paddingHorizontal: 5,
+                                paddingVertical: 2,
+                                marginHorizontal: 5,
+                              }}>
+                              <Text style={{color: colors.icons}}>
+                                {'Current Stock: '}
+                              </Text>
 
-                            <Text
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  fontFamily: 'ProductSans-Bold',
+                                  color: colors.icons,
+                                }}>
+                                {itemStock}
+                              </Text>
+                            </View>
+
+                            <View
                               style={{
-                                fontSize: 14,
-                                fontFamily: 'ProductSans-Bold',
-                                color: colors.accent,
-                              }}>{`${
-                              values.additionalStock
-                                ? Math.max(
-                                    0,
-                                    Number(`${sign}${values.additionalStock}`) +
-                                      item.stock,
-                                  )
-                                : item.stock
-                            }`}</Text>
+                                flexDirection: 'row',
+                                alignSelf: 'center',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: colors.accent,
+                                elevation: 2,
+                                borderRadius: 10,
+                                paddingHorizontal: 5,
+                                paddingVertical: 2,
+                                marginHorizontal: 5,
+                              }}>
+                              <Text style={{color: colors.icons}}>
+                                {'New Stock: '}
+                              </Text>
+
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  fontFamily: 'ProductSans-Bold',
+                                  color: colors.icons,
+                                }}>
+                                {values.additionalStock
+                                  ? Math.max(
+                                      0,
+                                      Number(
+                                        `${sign}${values.additionalStock}`,
+                                      ) + itemStock,
+                                    )
+                                  : itemStock}
+                              </Text>
+                            </View>
                           </View>
                         )}
 
@@ -704,7 +738,7 @@ class EditItemScreen extends Component {
 
                       return (
                         <CustomizationOptionsCard
-                          key={optionTitle}
+                          key={`${optionTitle}${index}`}
                           title={optionTitle}
                           multipleSelection={multipleSelection}
                           options={selection}

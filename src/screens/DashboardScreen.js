@@ -213,7 +213,7 @@ class DashboardScreen extends Component {
         items.map((item, index) => {
           pills.push(
             <View
-              key={index}
+              key={`${item}${index}`}
               style={{
                 borderRadius: 20,
                 backgroundColor: colors.accent,
@@ -1081,7 +1081,7 @@ class DashboardScreen extends Component {
 
                           {selectableDeliveryMethods.map(
                             (deliveryMethod, index) => (
-                              <View>
+                              <View key={`${deliveryMethod}${index}`}>
                                 <CardItem>
                                   <View style={{width: '100%'}}>
                                     <View
@@ -1270,7 +1270,9 @@ class DashboardScreen extends Component {
                                     borderRadius: 10,
                                     marginTop: 10,
                                   }}>
-                                  <CardItem style={{borderRadius: 10,
+                                  <CardItem
+                                    style={{
+                                      borderRadius: 10,
                                       overflow: 'hidden',
                                     }}>
                                     <View

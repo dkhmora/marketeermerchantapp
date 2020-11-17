@@ -42,6 +42,7 @@ hydrate('subscribedToNotifications', detailsStore);
 
 LogBox.ignoreLogs([
   'Animated: `useNativeDriver` was not specified. This is a required option and must be explicitly set to `true` or `false`',
+  '"message":"Parse Error.',
 ]);
 
 export default class App extends React.Component {
