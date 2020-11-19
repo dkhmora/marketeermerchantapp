@@ -144,7 +144,12 @@ class ItemCard extends PureComponent {
                 {stock ? ` of ${stock}` : ''} sold
               </Text>
 
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                }}>
                 {discountedPrice ? (
                   <Text
                     maxFontSizeMultiplier={1}
@@ -154,7 +159,8 @@ class ItemCard extends PureComponent {
                       textDecorationLine: 'line-through',
                       textDecorationStyle: 'solid',
                       color: colors.text_secondary,
-                      fontSize: 14,
+                      fontFamily: 'ProductSans-Light',
+                      textAlignVertical: 'bottom',
                       marginRight: 5,
                     }}>
                     ₱{price}
@@ -166,7 +172,7 @@ class ItemCard extends PureComponent {
                   numberOfLines={1}
                   style={{
                     color: colors.text_primary,
-                    fontFamily: 'ProductSans-Black',
+                    fontFamily: 'ProductSans-Bold',
                     flexWrap: 'wrap',
                   }}>
                   ₱{discountedPrice ? discountedPrice : price}
