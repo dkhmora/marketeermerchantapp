@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 import {Card, CardItem, Left, Right, Body} from 'native-base';
-import {Text, Icon, Button, Avatar, Badge} from 'react-native-elements';
+import {
+  Text,
+  Icon,
+  Button,
+  Avatar,
+  Badge,
+  Divider,
+} from 'react-native-elements';
 import {
   View,
   ActivityIndicator,
@@ -380,10 +387,13 @@ class OrderDetailsScreen extends Component {
       <View>
         {orderItems.map((item, index) => {
           return (
-            <OrderItemListItem
-              item={item}
-              key={`${item.cartId}${item.itemId}${index}`}
-            />
+            <View>
+              <OrderItemListItem
+                item={item}
+                key={`${item.cartId}${item.itemId}${index}`}
+              />
+              <Divider />
+            </View>
           );
         })}
       </View>

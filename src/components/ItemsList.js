@@ -86,13 +86,13 @@ class ItemsList extends Component {
 
     return (
       <Container style={{flex: 1}}>
-        <View style={{paddingHorizontal: 10, flex: 1}}>
+        <View style={{flex: 1}}>
           {this.props.itemsStore.loaded ? (
             <FlatList
               ref={(flatList) => (this.flatList = flatList)}
               data={this.formatData(dataSource, numColumns)}
               numColumns={numColumns}
-              contentContainerStyle={{flexGrow: 1}}
+              contentContainerStyle={{flexGrow: 1, padding: 5}}
               initialNumToRender={4}
               renderItem={this.renderItem}
               ListEmptyComponent={
@@ -143,6 +143,12 @@ class ItemsList extends Component {
 
         <Fab
           position="bottomRight"
+          containerStyle={{
+            backgroundColor: colors.accent,
+            elevation: 5,
+            borderRadius: 100,
+            overflow: 'hidden',
+          }}
           style={{backgroundColor: colors.accent}}
           onPress={() => {
             if (

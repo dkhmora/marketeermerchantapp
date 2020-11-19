@@ -45,11 +45,10 @@ class OrderItemCard extends PureComponent {
     return (
       <CardItem
         {...otherProps}
-        bordered
         style={{
           paddingLeft: 0,
           paddingRight: 0,
-          paddingBottom: 5,
+          paddingBottom: 0,
           paddingTop: 0,
           flexDirection: 'column',
         }}>
@@ -81,26 +80,26 @@ class OrderItemCard extends PureComponent {
               resizeMode={FastImage.resizeMode.cover}
               onLoad={() => this.setState({imageReady: true})}
             />
-          </View>
 
-          {!imageReady && (
-            <View
-              style={{
-                position: 'absolute',
-              }}>
-              <Placeholder Animation={Fade}>
-                <PlaceholderMedia
-                  style={{
-                    backgroundColor: colors.primary,
-                    aspectRatio: 1,
-                    width: 55,
-                    height: 55,
-                    borderRadius: 10,
-                  }}
-                />
-              </Placeholder>
-            </View>
-          )}
+            {!imageReady && (
+              <View
+                style={{
+                  position: 'absolute',
+                }}>
+                <Placeholder Animation={Fade}>
+                  <PlaceholderMedia
+                    style={{
+                      backgroundColor: colors.primary,
+                      aspectRatio: 1,
+                      width: 55,
+                      height: 55,
+                      borderRadius: 10,
+                    }}
+                  />
+                </Placeholder>
+              </View>
+            )}
+          </View>
 
           <View
             style={{

@@ -70,7 +70,10 @@ class ItemCard extends PureComponent {
   }
 
   render() {
-    const {item, ...otherProps} = this.props;
+    const {
+      item: {name, description, price, discountedPrice, sales, stock, unit},
+      ...otherProps
+    } = this.props;
     const {url, imageReady, imageWidth} = this.state;
 
     return (
@@ -78,8 +81,7 @@ class ItemCard extends PureComponent {
         style={{
           flex: 1,
           flexDirection: 'column',
-          marginHorizontal: 6,
-          marginVertical: 3,
+          marginHorizontal: 3,
           shadowColor: '#000',
           shadowOffset: {
             width: 0,
@@ -90,8 +92,8 @@ class ItemCard extends PureComponent {
         }}>
         <ConfirmationModal
           isVisible={this.state.deleteItemConfirmModal}
-          title={`Delete Item "${item.name}"?`}
-          body={`Are you sure you want to delete "${item.name}"? Shoppers will immediately see changes.`}
+          title={`Delete Item "${name}"?`}
+          body={`Are you sure you want to delete "${name}"? Shoppers will immediately see changes.`}
           onConfirm={() => {
             this.setState(
               {deleteItemConfirmModal: false, deleting: true},
@@ -113,25 +115,29 @@ class ItemCard extends PureComponent {
             header
             bordered
             style={{
-              backgroundColor: colors.primary,
+              backgroundColor: colors.icons,
               justifyContent: 'space-between',
+              height: 60,
+              paddingLeft: 10,
+              paddingRight: 5,
+              paddingTop: 5,
+              paddingBottom: 5,
             }}>
-            <View style={{flexDirection: 'column', flex: 1}}>
+            <View style={{flex: 1}}>
               <Text
+                numberOfLines={1}
                 style={{
-                  color: colors.icons,
-                  fontFamily: 'ProductSans-Regular',
+                  color: colors.primary,
+                  fontFamily: 'ProductSans-Bold',
+                  fontSize: 16,
                 }}>
-                {item.name}
+                {name}
               </Text>
 
-              <Text
-                note
-                style={{fontFamily: 'ProductSans-Black', color: colors.icons}}>
-                Stock: {item.stock}
+              <Text style={{color: colors.text_secondary}}>
+                {sales}
+                {stock ? ` of ${stock}` : ''} sold
               </Text>
-
-              <Text style={{color: '#ddd'}}>{item.sales} Sold</Text>
             </View>
 
             {this.state.deleting ? (
@@ -139,7 +145,8 @@ class ItemCard extends PureComponent {
             ) : (
               <BaseOptionsMenu
                 destructiveIndex={1}
-                iconStyle={{color: '#fff', fontSize: 24}}
+                iconColor={colors.primary}
+                iconStyle={{fontSize: 24}}
                 options={['Edit Item', 'Delete Item']}
                 actions={[
                   this.handleEditItem.bind(this),
@@ -149,47 +156,49 @@ class ItemCard extends PureComponent {
             )}
           </CardItem>
 
-          <CardItem cardBody>
-            <View
-              style={{flex: 1}}
-              onLayout={(event) => {
-                const {width} = event.nativeEvent.layout;
-                this.setState({imageWidth: width});
-              }}>
-              <FastImage
-                source={url}
-                style={{
-                  aspectRatio: 1,
-                  flex: 1,
-                }}
-                onLoad={() => this.setState({imageReady: true})}
-              />
+          <View
+            style={{flex: 1}}
+            onLayout={(event) => {
+              const {width} = event.nativeEvent.layout;
+              this.setState({imageWidth: width});
+            }}>
+            <FastImage
+              source={url}
+              style={{
+                aspectRatio: 1,
+                flex: 1,
+              }}
+              onLoad={() => this.setState({imageReady: true})}
+            />
 
-              {!imageReady && (
-                <View
-                  style={{
-                    position: 'absolute',
-                  }}>
-                  <Placeholder Animation={Fade}>
-                    <PlaceholderMedia
-                      style={{
-                        backgroundColor: colors.primary,
-                        aspectRatio: 1,
-                        width: imageWidth ? imageWidth : 0,
-                        height: imageWidth ? imageWidth : 0,
-                      }}
-                    />
-                  </Placeholder>
-                </View>
-              )}
-            </View>
-          </CardItem>
+            {!imageReady && (
+              <View
+                style={{
+                  position: 'absolute',
+                }}>
+                <Placeholder Animation={Fade}>
+                  <PlaceholderMedia
+                    style={{
+                      backgroundColor: colors.primary,
+                      aspectRatio: 1,
+                      width: imageWidth ? imageWidth : 0,
+                      height: imageWidth ? imageWidth : 0,
+                    }}
+                  />
+                </Placeholder>
+              </View>
+            )}
+          </View>
 
           <CardItem
             bordered
             style={{
               position: 'relative',
               elevation: 5,
+              paddingLeft: 5,
+              paddingRight: 5,
+              paddingTop: 5,
+              paddingBottom: 5,
             }}>
             <Body
               style={{
@@ -201,7 +210,7 @@ class ItemCard extends PureComponent {
               }}>
               <ScrollView>
                 <Text style={{paddingBottom: 10}}>
-                  {item.description ? item.description : 'No description'}
+                  {description ? description : 'No description'}
                 </Text>
               </ScrollView>
             </Body>
@@ -225,7 +234,7 @@ class ItemCard extends PureComponent {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              {item.discountedPrice ? (
+              {discountedPrice ? (
                 <Text
                   style={{
                     textDecorationLine: 'line-through',
@@ -233,7 +242,7 @@ class ItemCard extends PureComponent {
                     color: colors.icons,
                     marginRight: 5,
                   }}>
-                  ₱{item.price}
+                  ₱{price}
                 </Text>
               ) : null}
 
@@ -242,8 +251,8 @@ class ItemCard extends PureComponent {
                   fontFamily: 'ProductSans-Black',
                   color: colors.icons,
                 }}>
-                ₱{item.discountedPrice ? item.discountedPrice : item.price}
-                {item.unit ? `/${item.unit}` : ''}
+                ₱{discountedPrice ? discountedPrice : price}
+                {unit ? `/${unit}` : ''}
               </Text>
             </View>
           </CardItem>

@@ -16,7 +16,7 @@ const theme = {
   Text: {
     style: {
       color: colors.text_primary,
-      fontFamily: 'ProductSans-Light',
+      fontFamily: 'ProductSans-Regular',
     },
   },
   Button: {
