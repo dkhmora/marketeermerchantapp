@@ -4,6 +4,7 @@ import {observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
 import FastImage from 'react-native-fast-image';
 import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
+import CustomizationOptionsList from './store_items/food/CustomizationOptionsList';
 
 @observer
 class OrderItemCard extends PureComponent {
@@ -16,28 +17,44 @@ class OrderItemCard extends PureComponent {
   }
 
   render() {
-    const {item, ...otherProps} = this.props;
-    const {imageReady} = this.state;
-    const url = item.image
-      ? {uri: `https://cdn.marketeer.ph${item.image}`}
+    const {
+      props: {
+        item: {
+          name,
+          description,
+          quantity,
+          price,
+          discountedPrice,
+          image,
+          selectedOptions,
+          specialInstructions,
+        },
+        ...otherProps
+      },
+      state: {imageReady},
+    } = this;
+    const url = image
+      ? {uri: `https://cdn.marketeer.ph${image}`}
       : require('../../assets/placeholder.jpg');
-    const itemPrice = item.discountedPrice ? item.discountedPrice : item.price;
+    const itemPrice = discountedPrice ? discountedPrice : price;
 
     return (
       <CardItem
+        {...otherProps}
         bordered
         style={{
           paddingLeft: 10,
           paddingRight: 10,
           paddingBottom: 5,
           paddingTop: 10,
+          flexDirection: 'column',
         }}>
         <View
           style={{
             flexDirection: 'row',
           }}>
           <FastImage
-            key={item.name}
+            key={name}
             source={url}
             style={{
               height: 55,
@@ -76,7 +93,7 @@ class OrderItemCard extends PureComponent {
               paddingHorizontal: 10,
             }}>
             <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 18}}>
-              {item.name}
+              {name}
             </Text>
 
             <Text
@@ -86,7 +103,7 @@ class OrderItemCard extends PureComponent {
                 fontSize: 14,
                 color: colors.text_secondary,
               }}>
-              {item.description}
+              {description}
             </Text>
           </View>
 
@@ -113,7 +130,7 @@ class OrderItemCard extends PureComponent {
                 textAlign: 'right',
                 width: '100%',
               }}>
-              x{item.quantity}
+              x{quantity}
             </Text>
 
             <Text
@@ -122,9 +139,16 @@ class OrderItemCard extends PureComponent {
                 fontSize: 18,
                 color: colors.text_primary,
               }}>
-              ₱{itemPrice * item.quantity}
+              ₱{itemPrice * quantity}
             </Text>
           </View>
+        </View>
+
+        <View style={{width: '100%'}}>
+          <CustomizationOptionsList
+            selectedOptions={selectedOptions}
+            specialInstructions={specialInstructions}
+          />
         </View>
       </CardItem>
     );
