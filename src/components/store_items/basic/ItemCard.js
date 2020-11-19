@@ -117,7 +117,7 @@ class ItemCard extends PureComponent {
             style={{
               backgroundColor: colors.icons,
               justifyContent: 'space-between',
-              height: 60,
+              minHeight: 60,
               paddingLeft: 10,
               paddingRight: 5,
               paddingTop: 5,
@@ -134,10 +134,45 @@ class ItemCard extends PureComponent {
                 {name}
               </Text>
 
-              <Text style={{color: colors.text_secondary}}>
+              <Text
+                style={{
+                  color: colors.text_secondary,
+                  fontFamily: 'ProductSans-Light',
+                  fontSize: 12,
+                }}>
                 {sales}
                 {stock ? ` of ${stock}` : ''} sold
               </Text>
+
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                {discountedPrice ? (
+                  <Text
+                    maxFontSizeMultiplier={1}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    style={{
+                      textDecorationLine: 'line-through',
+                      textDecorationStyle: 'solid',
+                      color: colors.text_secondary,
+                      fontSize: 14,
+                      marginRight: 5,
+                    }}>
+                    ₱{price}
+                  </Text>
+                ) : null}
+
+                <Text
+                  maxFontSizeMultiplier={1}
+                  numberOfLines={1}
+                  style={{
+                    color: colors.text_primary,
+                    fontFamily: 'ProductSans-Black',
+                    flexWrap: 'wrap',
+                  }}>
+                  ₱{discountedPrice ? discountedPrice : price}
+                  {unit && `/${unit}`}
+                </Text>
+              </View>
             </View>
 
             {this.state.deleting ? (
@@ -179,6 +214,7 @@ class ItemCard extends PureComponent {
                 <Placeholder Animation={Fade}>
                   <PlaceholderMedia
                     style={{
+                      borderRadius: 0,
                       backgroundColor: colors.primary,
                       aspectRatio: 1,
                       width: imageWidth ? imageWidth : 0,
@@ -193,76 +229,54 @@ class ItemCard extends PureComponent {
           <CardItem
             bordered
             style={{
-              position: 'relative',
-              elevation: 5,
-              paddingLeft: 5,
-              paddingRight: 5,
-              paddingTop: 5,
-              paddingBottom: 5,
+              paddingLeft: 0,
+              paddingRight: 0,
+              paddingTop: 0,
+              paddingBottom: 0,
+              height: 100,
+              alignItems: 'flex-start',
             }}>
-            <Body
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                height: 100,
-                flexGrow: 1,
-                flexShrink: 1,
+            <ScrollView
+              contentContainerStyle={{
+                paddingHorizontal: 5,
+                paddingVertical: 5,
               }}>
-              <ScrollView>
-                <Text style={{paddingBottom: 10}}>
-                  {description ? description : 'No description'}
+              {description ? (
+                <Text>
+                  {description ? description : 'No description'}as das dsa das
+                  dsad sadsadsadasdsadasdas das das dasd asd as dasd asd as dasd
+                  asd asd sad asd asd sadasd asdasdas as ad asdassadasdsad sadas
+                  dsadasd sad asd sad sad sad asd sad sad aas yes
                 </Text>
-              </ScrollView>
-            </Body>
-          </CardItem>
-
-          <CardItem
-            bordered
-            style={{
-              bottom: 20,
-              elevation: 5,
-              justifyContent: 'center',
-              flexDirection: 'column',
-            }}>
-            <View
-              style={{
-                borderRadius: 10,
-                padding: 8,
-                backgroundColor: colors.primary,
-                elevation: 3,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              {discountedPrice ? (
+              ) : (
                 <Text
                   style={{
-                    textDecorationLine: 'line-through',
-                    textDecorationStyle: 'solid',
-                    color: colors.icons,
-                    marginRight: 5,
+                    fontFamily: 'ProductSans-Light',
+                    colors: colors.text_secondary,
+                    textAlignVertical: 'top',
                   }}>
-                  ₱{price}
+                  No description
                 </Text>
-              ) : null}
-
-              <Text
-                style={{
-                  fontFamily: 'ProductSans-Black',
-                  color: colors.icons,
-                }}>
-                ₱{discountedPrice ? discountedPrice : price}
-                {unit ? `/${unit}` : ''}
-              </Text>
-            </View>
+              )}
+            </ScrollView>
           </CardItem>
 
           <CardItem
             footer
             bordered
-            style={{bottom: 20, marginBottom: -20, elevation: 5}}>
+            style={{
+              elevation: 5,
+              paddingLeft: 10,
+              paddingRight: 10,
+              paddingTop: 5,
+              paddingBottom: 5,
+            }}>
             <Body>
-              <Text style={{color: colors.text_secondary}}>
+              <Text
+                style={{
+                  color: colors.text_secondary,
+                  fontFamily: 'ProductSans-Light',
+                }}>
                 Updated {this.timeStamp}
               </Text>
             </Body>
