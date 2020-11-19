@@ -20,22 +20,8 @@ class CustomizationOptionsList extends PureComponent {
     return (
       <View>
         {selectedOptions && (
-          <Card
-            containerStyle={{
-              paddingLeft: 0,
-              paddingRight: 0,
-              paddingBottom: 0,
-              paddingTop: 0,
-              marginLeft: 0,
-              marginRight: 0,
-              borderRadius: 10,
-            }}>
-            <View style={{borderRadius: 10, overflow: 'hidden'}}>
-              <CardItemHeader
-                title="Options"
-                style={{height: 30, paddingLeft: 5, paddingRight: 0}}
-                titleStyle={{fontSize: 18}}
-              />
+          <View>
+            <View style={{borderRadius: 2, overflow: 'hidden'}}>
               {Object.entries(selectedOptions).map(
                 ([optionTitle, selectedSelections]) => (
                   <View key={`${optionTitle}${selectedSelections.toString()}`}>
@@ -95,35 +81,30 @@ class CustomizationOptionsList extends PureComponent {
                   </View>
                 ),
               )}
-            </View>
-          </Card>
-        )}
 
-        {specialInstructions && (
-          <Card
-            containerStyle={{
-              paddingLeft: 0,
-              paddingRight: 0,
-              paddingBottom: 0,
-              paddingTop: 0,
-              marginLeft: 0,
-              marginRight: 0,
-              borderRadius: 10,
-            }}>
-            <View style={{borderRadius: 10, overflow: 'hidden'}}>
-              <CardItemHeader
-                title="Special Instructions"
-                style={{height: 30, paddingLeft: 5, paddingRight: 0}}
-                titleStyle={{fontSize: 18}}
-              />
+              {specialInstructions && (
+                <View>
+                  <CardItemHeader
+                    title="Special Instructions"
+                    style={{
+                      height: 24,
+                      borderWidth: StyleSheet.hairlineWidth,
+                    }}
+                    titleStyle={{
+                      fontSize: 14,
+                      color: colors.text_primary,
+                    }}
+                  />
 
-              <CardItem>
-                <Text style={{fontFamily: 'ProductSans-Regular'}}>
-                  {specialInstructions}
-                </Text>
-              </CardItem>
+                  <CardItem>
+                    <Text style={{fontFamily: 'ProductSans-Regular'}}>
+                      {specialInstructions}
+                    </Text>
+                  </CardItem>
+                </View>
+              )}
             </View>
-          </Card>
+          </View>
         )}
       </View>
     );

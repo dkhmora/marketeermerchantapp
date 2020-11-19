@@ -5,6 +5,7 @@ import {colors} from '../../assets/colors';
 import FastImage from 'react-native-fast-image';
 import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
 import CustomizationOptionsList from './store_items/food/CustomizationOptionsList';
+import {StyleSheet} from 'react-native';
 
 @observer
 class OrderItemCard extends PureComponent {
@@ -43,29 +44,40 @@ class OrderItemCard extends PureComponent {
         {...otherProps}
         bordered
         style={{
-          paddingLeft: 10,
-          paddingRight: 10,
+          paddingLeft: 0,
+          paddingRight: 0,
           paddingBottom: 5,
-          paddingTop: 10,
+          paddingTop: 5,
           flexDirection: 'column',
         }}>
         <View
           style={{
             flexDirection: 'row',
+            paddingHorizontal: 10,
           }}>
-          <FastImage
-            key={name}
-            source={url}
+          <View
             style={{
+              elevation: 3,
+              borderRadius: 10,
               height: 55,
               width: 55,
-              borderColor: colors.primary,
-              borderWidth: 1,
-              borderRadius: 10,
-            }}
-            resizeMode={FastImage.resizeMode.cover}
-            onLoad={() => this.setState({imageReady: true})}
-          />
+              overflow: 'hidden',
+              backgroundColor: colors.icons,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: colors.divider,
+            }}>
+            <FastImage
+              key={name}
+              source={url}
+              style={{
+                height: 55,
+                width: 55,
+                backgroundColor: colors.primary,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+              onLoad={() => this.setState({imageReady: true})}
+            />
+          </View>
 
           {!imageReady && (
             <View
