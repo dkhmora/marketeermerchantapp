@@ -238,16 +238,11 @@ class ItemCard extends PureComponent {
             }}>
             <ScrollView
               contentContainerStyle={{
-                paddingHorizontal: 5,
+                paddingHorizontal: 10,
                 paddingVertical: 5,
               }}>
               {description ? (
-                <Text>
-                  {description ? description : 'No description'}as das dsa das
-                  dsad sadsadsadasdsadasdas das das dasd asd as dasd asd as dasd
-                  asd asd sad asd asd sadasd asdasdas as ad asdassadasdsad sadas
-                  dsadasd sad asd sad sad sad asd sad sad aas yes
-                </Text>
+                <Text>{description ? description : 'No description'}</Text>
               ) : (
                 <Text
                   style={{
