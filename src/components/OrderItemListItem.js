@@ -29,6 +29,7 @@ class OrderItemCard extends PureComponent {
           image,
           selectedOptions,
           specialInstructions,
+          totalOptionsPrice,
         },
         ...otherProps
       },
@@ -37,7 +38,9 @@ class OrderItemCard extends PureComponent {
     const url = image
       ? {uri: `https://cdn.marketeer.ph${image}`}
       : require('../../assets/placeholder.jpg');
+    const optionsPrice = totalOptionsPrice ? totalOptionsPrice : 0;
     const itemPrice = discountedPrice ? discountedPrice : price;
+    const totalItemPrice = itemPrice + optionsPrice;
 
     return (
       <CardItem
@@ -132,7 +135,7 @@ class OrderItemCard extends PureComponent {
                 fontSize: 16,
                 color: colors.text_primary,
               }}>
-              ₱{itemPrice}
+              ₱{totalItemPrice}
             </Text>
 
             <Text
@@ -153,7 +156,7 @@ class OrderItemCard extends PureComponent {
                 fontSize: 18,
                 color: colors.text_primary,
               }}>
-              ₱{itemPrice * quantity}
+              ₱{totalItemPrice * quantity}
             </Text>
           </View>
         </View>
