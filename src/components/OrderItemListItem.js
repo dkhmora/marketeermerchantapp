@@ -47,13 +47,14 @@ class OrderItemCard extends PureComponent {
           paddingLeft: 0,
           paddingRight: 0,
           paddingBottom: 5,
-          paddingTop: 5,
+          paddingTop: 0,
           flexDirection: 'column',
         }}>
         <View
           style={{
             flexDirection: 'row',
             paddingHorizontal: 10,
+            paddingVertical: 5,
           }}>
           <View
             style={{
@@ -104,14 +105,14 @@ class OrderItemCard extends PureComponent {
               flexDirection: 'column',
               paddingHorizontal: 10,
             }}>
-            <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 18}}>
+            <Text style={{fontFamily: 'ProductSans-Bold', fontSize: 18}}>
               {name}
             </Text>
 
             <Text
               numberOfLines={2}
               style={{
-                fontFamily: 'ProductSans-Light',
+                fontFamily: 'ProductSans-Regular',
                 fontSize: 14,
                 color: colors.text_secondary,
               }}>
@@ -127,7 +128,7 @@ class OrderItemCard extends PureComponent {
             }}>
             <Text
               style={{
-                fontFamily: 'ProductSans-Black',
+                fontFamily: 'ProductSans-Regular',
                 fontSize: 16,
                 color: colors.text_primary,
               }}>
@@ -141,6 +142,7 @@ class OrderItemCard extends PureComponent {
                 borderBottomWidth: 1,
                 textAlign: 'right',
                 width: '100%',
+                fontSize: 12,
               }}>
               x{quantity}
             </Text>

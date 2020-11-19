@@ -15,8 +15,6 @@ class CustomizationOptionsList extends PureComponent {
       props: {selectedOptions, specialInstructions},
     } = this;
 
-    console.log(selectedOptions);
-
     return (
       <View>
         {selectedOptions && (
@@ -32,16 +30,26 @@ class CustomizationOptionsList extends PureComponent {
                           style={{
                             height: 24,
                             borderWidth: StyleSheet.hairlineWidth,
+                            backgroundColor: colors.primary,
+                            paddingLeft: 0,
+                            paddingRight: 0,
                           }}
                           titleStyle={{
                             fontSize: 14,
-                            color: colors.text_primary,
+                            color: colors.icons,
                           }}
                         />
 
                         {Object.entries(selectedSelections).map(
                           ([selectionTitle, selectionPrice]) => (
-                            <CardItem key={`${selectionTitle}`}>
+                            <CardItem
+                              key={`${selectionTitle}`}
+                              style={{
+                                paddingTop: 5,
+                                paddingBottom: 5,
+                                paddingLeft: 10,
+                                paddingRight: 10,
+                              }}>
                               <View
                                 style={{
                                   flexDirection: 'row',
@@ -49,7 +57,12 @@ class CustomizationOptionsList extends PureComponent {
                                   justifyContent: 'space-between',
                                   alignItems: 'center',
                                 }}>
-                                <View style={{flexDirection: 'row'}}>
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    flex: 1,
+                                    alignItems: 'center',
+                                  }}>
                                   <Icon
                                     name="chevron-right"
                                     color={colors.text_primary}
@@ -61,6 +74,7 @@ class CustomizationOptionsList extends PureComponent {
                                       fontFamily: 'ProductSans-Regular',
                                       textAlignVertical: 'center',
                                       marginHorizontal: 5,
+                                      flex: 1,
                                     }}>
                                     {selectionTitle}
                                   </Text>
@@ -89,14 +103,23 @@ class CustomizationOptionsList extends PureComponent {
                     style={{
                       height: 24,
                       borderWidth: StyleSheet.hairlineWidth,
+                      backgroundColor: colors.primary,
+                      paddingLeft: 0,
+                      paddingRight: 0,
                     }}
                     titleStyle={{
                       fontSize: 14,
-                      color: colors.text_primary,
+                      color: colors.icons,
                     }}
                   />
 
-                  <CardItem>
+                  <CardItem
+                    style={{
+                      paddingTop: 5,
+                      paddingBottom: 5,
+                      paddingLeft: 10,
+                      paddingRight: 10,
+                    }}>
                     <Text style={{fontFamily: 'ProductSans-Regular'}}>
                       {specialInstructions}
                     </Text>

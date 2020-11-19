@@ -379,7 +379,12 @@ class OrderDetailsScreen extends Component {
     return (
       <View>
         {orderItems.map((item, index) => {
-          return <OrderItemListItem item={item} key={index} />;
+          return (
+            <OrderItemListItem
+              item={item}
+              key={`${item.cartId}${item.itemId}${index}`}
+            />
+          );
         })}
       </View>
     );
