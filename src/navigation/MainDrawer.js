@@ -251,7 +251,7 @@ class MainDrawer extends Component {
                         }
                         label="Merchant Dashboard"
                         labelStyle={{
-                          fontFamily: 'ProductSans-Light',
+                          fontFamily: 'ProductSans-Bold',
                           fontSize: 18,
                           paddingHorizontal: 10,
                           paddingVertical: 5,
@@ -271,7 +271,7 @@ class MainDrawer extends Component {
                         }
                         label="Top Ups"
                         labelStyle={{
-                          fontFamily: 'ProductSans-Light',
+                          fontFamily: 'ProductSans-Bold',
                           fontSize: 18,
                           paddingHorizontal: 10,
                           paddingVertical: 5,
@@ -290,7 +290,7 @@ class MainDrawer extends Component {
                   <DrawerItemList
                     {...props}
                     labelStyle={{
-                      fontFamily: 'ProductSans-Light',
+                      fontFamily: 'ProductSans-Regular',
                       padding: 10,
                     }}
                     itemStyle={{
@@ -304,7 +304,7 @@ class MainDrawer extends Component {
                     onPress={() => this.openTermsAndConditions()}
                     label="Terms and Conditions"
                     labelStyle={{
-                      fontFamily: 'ProductSans-Light',
+                      fontFamily: 'ProductSans-Regular',
                       padding: 10,
                     }}
                     style={{
@@ -318,7 +318,7 @@ class MainDrawer extends Component {
                     onPress={() => this.openPrivacyPolicy()}
                     label="Privacy Policy"
                     labelStyle={{
-                      fontFamily: 'ProductSans-Light',
+                      fontFamily: 'ProductSans-Regular',
                       padding: 10,
                     }}
                     style={{
@@ -363,7 +363,7 @@ class MainDrawer extends Component {
               </DrawerContentScrollView>
             );
           }}>
-          <Drawer.Screen name="Dashboard" component={DashboardScreen} />
+          <Drawer.Screen name="Store Dashboard" component={DashboardScreen} />
 
           <Drawer.Screen name="Store Items" component={StoreItemsScreen} />
 

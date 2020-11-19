@@ -217,7 +217,11 @@ class OrderCard extends PureComponent {
                 {order.userName}
               </Text>
 
-              <Text style={{color: colors.text_secondary}}>
+              <Text
+                style={{
+                  color: colors.text_secondary,
+                  fontFamily: 'ProductSans-Light',
+                }}>
                 Order # {order.storeOrderNumber}
               </Text>
 
@@ -271,7 +275,7 @@ class OrderCard extends PureComponent {
 
               <Text
                 style={{
-                  fontSize: 16,
+                  fontSize: 14,
                   color: colors.icons,
                   textAlign: 'center',
                 }}>
@@ -309,7 +313,9 @@ class OrderCard extends PureComponent {
         <CardItem footer style={{paddingTop: 0, paddingBottom: 10}}>
           <Left>
             <Text style={{color: colors.primary}}>{this.orderStatus}</Text>
-            <Text> - {this.timeStamp}</Text>
+            <Text style={{fontFamily: 'ProductSans-Light'}}>
+              {` - ${this.timeStamp}`}
+            </Text>
           </Left>
           <Right>
             {buttonText &&
@@ -349,7 +355,12 @@ class OrderCard extends PureComponent {
                 //onPress={() => this.setState({changeOrderStatusModal: true})}
               />
             ) : (
-              <Text style={{textAlign: 'right', color: colors.text_secondary}}>
+              <Text
+                style={{
+                  textAlign: 'right',
+                  color: colors.text_secondary,
+                  fontFamily: 'ProductSans-Light',
+                }}>
                 {footerText}
               </Text>
             )}
@@ -416,10 +427,11 @@ class OrderCard extends PureComponent {
                       }}>{`₱${order.subTotal}`}</Text>
                     <Text
                       style={{
-                        fontSize: 14,
+                        fontSize: 12,
+                        fontFamily: 'ProductSans-Light',
                         color: colors.text_secondary,
                       }}>
-                      {`${order.quantity} Items`}
+                      {`${order.quantity} items`}
                     </Text>
                   </View>
                 </View>
