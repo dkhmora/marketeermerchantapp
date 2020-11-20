@@ -25,6 +25,8 @@ class AuthLoader extends React.Component {
         .then(async (idToken) => {
           const {storeIds, role} = idToken.claims;
 
+          console.log(idToken.claims);
+
           if (!storeIds) {
             await auth()
               .signOut()

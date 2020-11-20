@@ -22,6 +22,7 @@ import {
 } from '../util/validationSchemas';
 import CustomInput from '../components/CustomInput';
 import Divider from '../components/Divider';
+import FastImage from 'react-native-fast-image';
 
 const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 @inject('detailsStore')
@@ -528,7 +529,7 @@ class DashboardScreen extends Component {
                                       : colors.primary,
                                     overflow: 'hidden',
                                   }}>
-                                  <Image
+                                  <FastImage
                                     source={
                                       storeDetailsEditMode &&
                                       values.displayImage
@@ -536,9 +537,8 @@ class DashboardScreen extends Component {
                                         : displayImageUrl
                                     }
                                     style={{
-                                      width: '100%',
+                                      flex: 1,
                                       aspectRatio: 1,
-                                      resizeMode: 'contain',
                                     }}
                                     onLoadStart={() =>
                                       this.setState({displayImageReady: false})
@@ -546,32 +546,33 @@ class DashboardScreen extends Component {
                                     onLoad={() =>
                                       this.setState({displayImageReady: true})
                                     }
+                                    resizeMode={FastImage.resizeMode.contain}
                                   />
-                                </View>
 
-                                {!displayImageReady && (
-                                  <View
-                                    style={{
-                                      position: 'absolute',
-                                      top: 0,
-                                      left: 0,
-                                    }}>
-                                    <Placeholder Animation={Fade}>
-                                      <PlaceholderMedia
-                                        style={{
-                                          backgroundColor: colors.primary,
-                                          borderRadius: 10,
-                                          width: displayImageWidth
-                                            ? displayImageWidth
-                                            : 0,
-                                          height: displayImageWidth
-                                            ? displayImageWidth
-                                            : 0,
-                                        }}
-                                      />
-                                    </Placeholder>
-                                  </View>
-                                )}
+                                  {!displayImageReady && (
+                                    <View
+                                      style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                      }}>
+                                      <Placeholder Animation={Fade}>
+                                        <PlaceholderMedia
+                                          style={{
+                                            backgroundColor: colors.primary,
+                                            borderRadius: 10,
+                                            width: displayImageWidth
+                                              ? displayImageWidth
+                                              : 0,
+                                            height: displayImageWidth
+                                              ? displayImageWidth
+                                              : 0,
+                                          }}
+                                        />
+                                      </Placeholder>
+                                    </View>
+                                  )}
+                                </View>
                               </View>
                             </View>
                           </View>
@@ -663,16 +664,15 @@ class DashboardScreen extends Component {
                                       : colors.primary,
                                     overflow: 'hidden',
                                   }}>
-                                  <Image
+                                  <FastImage
                                     source={
                                       storeDetailsEditMode && values.coverImage
                                         ? {uri: values.coverImage}
                                         : coverImageUrl
                                     }
                                     style={{
-                                      width: '100%',
                                       aspectRatio: 1620 / 1080,
-                                      resizeMode: 'contain',
+                                      flex: 1,
                                     }}
                                     onLoadStart={() =>
                                       this.setState({coverImageReady: false})
@@ -680,32 +680,33 @@ class DashboardScreen extends Component {
                                     onLoad={() =>
                                       this.setState({coverImageReady: true})
                                     }
+                                    resizeMode={FastImage.resizeMode.contain}
                                   />
-                                </View>
 
-                                {!coverImageReady && (
-                                  <View
-                                    style={{
-                                      position: 'absolute',
-                                      top: 0,
-                                      left: 0,
-                                    }}>
-                                    <Placeholder Animation={Fade}>
-                                      <PlaceholderMedia
-                                        style={{
-                                          backgroundColor: colors.primary,
-                                          borderRadius: 10,
-                                          width: coverImageWidth
-                                            ? coverImageWidth
-                                            : 0,
-                                          height: coverImageWidth
-                                            ? coverImageWidth
-                                            : 0,
-                                        }}
-                                      />
-                                    </Placeholder>
-                                  </View>
-                                )}
+                                  {!coverImageReady && (
+                                    <View
+                                      style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                      }}>
+                                      <Placeholder Animation={Fade}>
+                                        <PlaceholderMedia
+                                          style={{
+                                            backgroundColor: colors.primary,
+                                            borderRadius: 10,
+                                            width: coverImageWidth
+                                              ? coverImageWidth
+                                              : 0,
+                                            height: coverImageWidth
+                                              ? coverImageWidth
+                                              : 0,
+                                          }}
+                                        />
+                                      </Placeholder>
+                                    </View>
+                                  )}
+                                </View>
                               </View>
                             </View>
                           </View>
