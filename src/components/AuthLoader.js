@@ -25,7 +25,7 @@ class AuthLoader extends React.Component {
         .then(async (idToken) => {
           const {storeIds, role} = idToken.claims;
 
-          if (!storeIds && (!role || (role && role !== 'merchant'))) {
+          if (!storeIds) {
             await auth()
               .signOut()
               .then(() => {
@@ -40,7 +40,7 @@ class AuthLoader extends React.Component {
               );
           }
 
-          if (role) {
+          if (role === 'merchant') {
             !this.props.detailsStore.unsubscribeSetMerchantDetails &&
               this.props.detailsStore.setMerchantDetails(user.uid);
           }
