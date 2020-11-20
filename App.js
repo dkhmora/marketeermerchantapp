@@ -56,9 +56,10 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    const provider = Platform.OS === 'android' ? 'playStore' : 'appStore';
-
+    crashlytics().setCrashlyticsCollectionEnabled(true);
     crashlytics().log('App Mounted');
+
+    const provider = Platform.OS === 'android' ? 'playStore' : 'appStore';
 
     VersionCheck.needUpdate({
       provider,
