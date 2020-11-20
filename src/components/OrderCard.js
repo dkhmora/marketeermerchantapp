@@ -26,17 +26,19 @@ class OrderCard extends PureComponent {
   @computed get orderStatus() {
     const {order} = this.props;
 
-    const statusLabel = Object.entries(order.orderStatus).map(
-      ([key, value]) => {
-        if (value.status) {
-          return key.toUpperCase();
-        }
+    if (order?.orderStatus !== undefined) {
+      const statusLabel = Object.entries(order.orderStatus).map(
+        ([key, value]) => {
+          if (value.status) {
+            return key.toUpperCase();
+          }
 
-        return;
-      },
-    );
+          return;
+        },
+      );
 
-    return statusLabel.filter((item) => item != null);
+      return statusLabel.filter((item) => item != null);
+    }
   }
 
   @computed get timeStamp() {
@@ -151,14 +153,19 @@ class OrderCard extends PureComponent {
     const {orderStatus, footerText, buttonText} = this;
 
     const CardHeader = () => {
-      const optionsButton =
-        orderStatus[0] === 'PENDING' ||
-        orderStatus[0] === 'UNPAID' ||
-        (orderStatus[0] === 'PAID' && order.paymentMethod === 'COD') ||
-        (orderStatus[0] === 'SHIPPED' &&
-          (order.deliveryMethod === 'Own Delivery' ||
-            (order.deliveryMethod === 'Mr. Speedy' &&
-              order.mrspeedyBookingData.order.status === 'canceled')));
+      const optionsButton = () => {
+        if (orderStatus) {
+          return (
+            orderStatus[0] === 'PENDING' ||
+            orderStatus[0] === 'UNPAID' ||
+            (orderStatus[0] === 'PAID' && order.paymentMethod === 'COD') ||
+            (orderStatus[0] === 'SHIPPED' &&
+              (order.deliveryMethod === 'Own Delivery' ||
+                (order.deliveryMethod === 'Mr. Speedy' &&
+                  order.mrspeedyBookingData.order.status === 'canceled')))
+          );
+        }
+      };
 
       return (
         <CardItem
@@ -372,6 +379,7 @@ class OrderCard extends PureComponent {
     return (
       <View
         style={{
+          flex: 1,
           shadowColor: '#000',
           shadowOffset: {
             width: 0,
@@ -379,6 +387,7 @@ class OrderCard extends PureComponent {
           },
           shadowOpacity: 0.2,
           shadowRadius: 1.41,
+          marginHorizontal: 3,
         }}>
         <ConfirmationModal
           isVisible={this.state.changeOrderStatusModal}
