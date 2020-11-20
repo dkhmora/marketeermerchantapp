@@ -9,7 +9,7 @@
     "android:release": "cd android && gradlew clean && cd .. && react-native run-android --variant=release",
     "bundle:release": "cd android && gradlew clean && gradlew bundleRelease",
     "pod": "cd ios && pod install",
-    "ios": "react-native run-ios --simulator='iPhone 11 Pro'",
+    "ios": "react-native run-ios --simulator='iPhone 12 Pro Max'",
     "ios:iphone8": "react-native run-ios --simulator='iPhone 8 Plus'",
     "ios:iphonese": "react-native run-ios --simulator='iPhone SE (2nd generation)'",
     "ios:ipadpro4": "react-native run-ios --simulator='iPad Pro (12.9-inch) (4th generation)'",
@@ -59,7 +59,6 @@
     "react-native-device-info": "^5.6.4",
     "react-native-elements": "^2.0.4",
     "react-native-fast-image": "^8.3.2",
-    "react-native-fix-image": "^2.0.1",
     "react-native-gesture-handler": "^1.7.0",
     "react-native-get-random-values": "^1.4.0",
     "react-native-gifted-chat": "^0.16.3",
@@ -102,5 +101,8 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "resolutions": {
+    "react-native-status-bar-height": "2.6.0"
   }
 }

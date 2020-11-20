@@ -6,5 +6,6 @@
   "editor.minimap.enabled": false,
   "git.enableSmartCommit": true,
   "files.eol": "\n",
-  "javascript.implicitProjectConfig.experimentalDecorators": true
+  "javascript.implicitProjectConfig.experimentalDecorators": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
