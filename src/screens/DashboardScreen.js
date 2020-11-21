@@ -23,6 +23,7 @@ import {
 import CustomInput from '../components/CustomInput';
 import Divider from '../components/Divider';
 import FastImage from 'react-native-fast-image';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 @inject('detailsStore')
@@ -252,6 +253,7 @@ class DashboardScreen extends Component {
       availableDeliveryMethods,
       availablePaymentMethods,
       deliveryDiscount,
+      storeHours,
     } = this.props.detailsStore.storeDetails;
 
     const selectablePaymentMethods = availablePaymentMethods
@@ -283,6 +285,16 @@ class DashboardScreen extends Component {
       'Same Day Delivery',
       'Next Day Delivery',
       'Scheduled Delivery',
+    ];
+
+    const daysList = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
     ];
 
     return (
@@ -825,6 +837,120 @@ class DashboardScreen extends Component {
                                 {storeCategory}
                               </Text>
                             </View>
+                          </View>
+                        </CardItem>
+
+                        <Divider />
+
+                        <CardItem>
+                          <View style={{width: '100%'}}>
+                            <Text
+                              style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Bold',
+                              }}>
+                              Store Hours
+                            </Text>
+
+                            <Card
+                              style={{
+                                borderRadius: 10,
+                                marginTop: 10,
+                              }}>
+                              {daysList.map((day) => (
+                                <View>
+                                  <CardItem
+                                    style={{
+                                      borderRadius: 10,
+                                      overflow: 'hidden',
+                                    }}>
+                                    <View
+                                      style={{
+                                        flex: 1,
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                      }}>
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                          paddingright: 10,
+                                        }}>
+                                        <Text
+                                          style={{
+                                            fontSize: 16,
+                                          }}>
+                                          {day}
+                                        </Text>
+                                      </View>
+
+                                      <View
+                                        style={{
+                                          flex: 1,
+                                          alignItems: 'flex-end',
+                                        }}>
+                                        {storeDetailsEditMode ? (
+                                          <Text>Edit Time</Text>
+                                        ) : (
+                                          <View>
+                                            {storeHours?.[day]?.closed !==
+                                            true ? (
+                                              <View>
+                                                <Text
+                                                  style={{
+                                                    color: colors.primary,
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                      'ProductSans-Bold',
+                                                    textAlign: 'right',
+                                                  }}>
+                                                  {`Opening: ${
+                                                    storeHours?.[day]?.start !==
+                                                    undefined
+                                                      ? `${storeHours?.[day]?.start}`
+                                                      : 'Not Set'
+                                                  }`}
+                                                </Text>
+                                                <Text
+                                                  style={{
+                                                    color: colors.primary,
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                      'ProductSans-Bold',
+                                                    textAlign: 'right',
+                                                  }}>
+                                                  {`Closing: ${
+                                                    storeHours?.[day]?.end !==
+                                                    undefined
+                                                      ? `${storeHours?.[day]?.end}`
+                                                      : 'Not Set'
+                                                  }`}
+                                                </Text>
+                                              </View>
+                                            ) : (
+                                              <Text
+                                                style={{
+                                                  color: colors.primary,
+                                                  fontSize: 16,
+                                                  fontFamily:
+                                                    'ProductSans-Bold',
+                                                  textAlign: 'right',
+                                                }}>
+                                                Closed
+                                              </Text>
+                                            )}
+                                          </View>
+                                        )}
+                                      </View>
+                                    </View>
+                                  </CardItem>
+
+                                  <Divider />
+                                </View>
+                              ))}
+                            </Card>
                           </View>
                         </CardItem>
 

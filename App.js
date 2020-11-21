@@ -7,7 +7,7 @@
  */
 import 'react-native-gesture-handler';
 import React from 'react';
-import {YellowBox, Linking, Platform, LogBox} from 'react-native';
+import {Linking, Platform, LogBox} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import _ from 'lodash';
 import moment from 'moment';
