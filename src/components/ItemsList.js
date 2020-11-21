@@ -109,8 +109,8 @@ class ItemsList extends Component {
                       textAlign: 'center',
                       paddingHorizontal: 15,
                     }}>
-                    You haven't placed added an item to this category yet. Add
-                    an item by pressing
+                    You haven't added an item to this category yet. Add an item
+                    by pressing
                   </Text>
                   <Icon
                     name="plus"
