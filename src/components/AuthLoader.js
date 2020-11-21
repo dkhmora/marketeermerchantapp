@@ -25,17 +25,6 @@ class AuthLoader extends React.Component {
         .currentUser.getIdTokenResult(true)
         .then(async (idToken) => {
           const {authTime, email, user_id, storeIds, role} = idToken.claims;
-          const storeIdsRoles = Object.entries(storeIds)
-            .map(([storeId, roles]) => `${storeId}: ${roles.join(', ')}`)
-            .join('; ');
-
-          crashlytics().setAttributes({
-            authTime,
-            email,
-            user_id,
-            storeIdsRoles,
-            role,
-          });
 
           if (!storeIds) {
             await auth()
@@ -51,6 +40,18 @@ class AuthLoader extends React.Component {
                 Toast({text: err.message, type: 'danger', duration: 5000}),
               );
           }
+
+          const storeIdsRoles = Object.entries(storeIds)
+            .map(([storeId, roles]) => `${storeId}: ${roles.join(', ')}`)
+            .join('; ');
+
+          crashlytics().setAttributes({
+            authTime,
+            email,
+            user_id,
+            storeIdsRoles,
+            role,
+          });
 
           if (role === 'merchant') {
             !this.props.detailsStore.unsubscribeSetMerchantDetails &&
