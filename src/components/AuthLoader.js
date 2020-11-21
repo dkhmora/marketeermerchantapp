@@ -6,6 +6,7 @@ import {View} from 'native-base';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import {when} from 'mobx';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @inject('ordersStore')
@@ -23,9 +24,18 @@ class AuthLoader extends React.Component {
       await auth()
         .currentUser.getIdTokenResult(true)
         .then(async (idToken) => {
-          const {storeIds, role} = idToken.claims;
+          const {authTime, email, user_id, storeIds, role} = idToken.claims;
+          const storeIdsRoles = Object.entries(storeIds)
+            .map(([storeId, roles]) => `${storeId}: ${roles.join(', ')}`)
+            .join('; ');
 
-          console.log(idToken.claims);
+          crashlytics().setAttributes({
+            authTime,
+            email,
+            user_id,
+            storeIdsRoles,
+            role,
+          });
 
           if (!storeIds) {
             await auth()

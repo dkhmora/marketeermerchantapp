@@ -56,6 +56,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+    crashlytics().sendUnsentReports();
     crashlytics().setCrashlyticsCollectionEnabled(true);
     crashlytics().log('App Mounted');
 
