@@ -29,10 +29,12 @@ import {
 import CustomInput from '../components/CustomInput';
 import FastImage from 'react-native-fast-image';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import moment from 'moment';
 
 const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 @inject('detailsStore')
 @inject('itemsStore')
+@inject('authStore')
 @observer
 class DashboardScreen extends Component {
   constructor(props) {
@@ -56,23 +58,15 @@ class DashboardScreen extends Component {
       storeDetailsEditMode: false,
       storeDetailsSaving: false,
       storeDetailsIsValid: false,
+      selectedDay: null,
+      imagesLoaded: false,
     };
   }
 
   componentDidMount() {
     crashlytics().log('DashboardScreen');
-  }
 
-  componentDidUpdate(prevProps, prevState) {
-    const {displayImageUrl, coverImageUrl, gettingImages} = this.state;
-
-    if (
-      prevProps.detailsStore.storeDetails.updatedAt !==
-        this.props.detailsStore.storeDetails.updatedAt ||
-      (!gettingImages && (!displayImageUrl || !coverImageUrl))
-    ) {
-      this.getImage();
-    }
+    this.getImage();
   }
 
   @computed get selectedPaymentMethods() {
@@ -166,14 +160,18 @@ class DashboardScreen extends Component {
     this.setState(
       {deliveryDetailsSaving: true, deliveryDetailsEditMode: false},
       async () => {
+        this.props.authStore.appReady = false;
+
         await this.props.detailsStore.updateStoreDetails(values).then(() => {
-          this.setState({deliveryDetailsSaving: false}, () =>
+          this.setState({deliveryDetailsSaving: false}, () => {
+            this.props.authStore.appReady = true;
+
             Toast({
               text: 'Delivery details successfully updated!',
               type: 'success',
               duration: 3000,
-            }),
-          );
+            });
+          });
         });
       },
     );
@@ -183,6 +181,8 @@ class DashboardScreen extends Component {
     this.setState(
       {storeDetailsSaving: true, storeDetailsEditMode: false},
       async () => {
+        this.props.authStore.appReady = false;
+
         if (!values.displayImage) {
           delete values.displayImage;
         }
@@ -193,12 +193,18 @@ class DashboardScreen extends Component {
 
         await this.props.detailsStore.updateStoreDetails(values).then(() => {
           this.setState({storeDetailsSaving: false}, () => {
+            this.props.authStore.appReady = true;
+
             if (!values.displayImage) {
               this.setState({displayImageUrl: null});
             }
 
             if (!values.coverImage) {
               this.setState({coverImageUrl: null});
+            }
+
+            if (values.coverImage || values.displayImage) {
+              this.getImage();
             }
 
             Toast({
@@ -282,6 +288,8 @@ class DashboardScreen extends Component {
       storeDetailsEditMode,
       storeDetailsSaving,
       storeDetailsIsValid,
+      selectedDay,
+      selectedDayPoint,
     } = this.state;
 
     const {navigation} = this.props;
@@ -451,6 +459,39 @@ class DashboardScreen extends Component {
                               />
                             )
                           }
+                        />
+
+                        <DateTimePickerModal
+                          isVisible={selectedDay !== null}
+                          mode="time"
+                          onConfirm={(newDate) => {
+                            console.log(
+                              moment(newDate).format('HH:MM'),
+                              selectedDayPoint,
+                              selectedDay,
+                            );
+                            setFieldValue(
+                              `storeHours[${selectedDay}][${selectedDayPoint}]`,
+                              moment(newDate).format('HH:MM'),
+                            );
+                            this.setState({
+                              selectedDay: null,
+                              selectedDayPoint: null,
+                            });
+                          }}
+                          onCancel={() =>
+                            this.setState({
+                              selectedDay: null,
+                              selectedDayPoint: null,
+                            })
+                          }
+                          locale={'en'}
+                          modalTransparent={false}
+                          animationType={'fade'}
+                          androidMode={'default'}
+                          placeHolderText={`Select time of ${selectedDayPoint} on ${selectedDay}`}
+                          textStyle={{color: colors.primary}}
+                          disabled={false}
                         />
 
                         <CardItem>
@@ -924,7 +965,13 @@ class DashboardScreen extends Component {
                                               padding: 3,
                                             },
                                           ]}
-                                          onPress={() => console.log('press')}>
+                                          onPress={() =>
+                                            storeDetailsEditMode &&
+                                            this.setState({
+                                              selectedDay: day,
+                                              selectedDayPoint: 'start',
+                                            })
+                                          }>
                                           <Text
                                             style={{
                                               color: colors.primary,
@@ -935,7 +982,9 @@ class DashboardScreen extends Component {
                                             {`Opening: ${
                                               storeHours?.[day]?.start !==
                                               undefined
-                                                ? `${storeHours?.[day]?.start}`
+                                                ? storeDetailsEditMode
+                                                  ? `${values.storeHours?.[day]?.start}`
+                                                  : `${storeHours?.[day]?.start}`
                                                 : 'Not Set'
                                             }`}
                                           </Text>
@@ -953,7 +1002,13 @@ class DashboardScreen extends Component {
                                               padding: 3,
                                             },
                                           ]}
-                                          onPress={() => console.log('press')}>
+                                          onPress={() =>
+                                            storeDetailsEditMode &&
+                                            this.setState({
+                                              selectedDay: day,
+                                              selectedDayPoint: 'end',
+                                            })
+                                          }>
                                           <Text
                                             style={{
                                               color: colors.primary,
@@ -964,7 +1019,9 @@ class DashboardScreen extends Component {
                                             {`Closing: ${
                                               storeHours?.[day]?.end !==
                                               undefined
-                                                ? `${storeHours?.[day]?.end}`
+                                                ? storeDetailsEditMode
+                                                  ? `${values.storeHours?.[day]?.end}`
+                                                  : `${storeHours?.[day]?.end}`
                                                 : 'Not Set'
                                             }`}
                                           </Text>
