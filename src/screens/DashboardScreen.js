@@ -9,7 +9,7 @@ import {
 import {Card, CardItem} from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
-import {computed} from 'mobx';
+import {computed, when} from 'mobx';
 import {Text, Icon, Button, CheckBox, Divider} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
 import BaseOptionsMenu from '../components/BaseOptionsMenu';
@@ -66,7 +66,10 @@ class DashboardScreen extends Component {
   componentDidMount() {
     crashlytics().log('DashboardScreen');
 
-    this.getImage();
+    when(
+      () => Object.keys(this.props.detailsStore.storeDetails).length > 0,
+      () => this.getImage(),
+    );
   }
 
   @computed get selectedPaymentMethods() {
@@ -360,7 +363,7 @@ class DashboardScreen extends Component {
 
               <Formik
                 validateOnMount
-                validationSchema={storeDetailsValidationSchema}
+                validationSchema={storeDetailsValidationSchema(daysList)}
                 initialValues={{
                   displayImage: null,
                   coverImage: null,
@@ -898,7 +901,7 @@ class DashboardScreen extends Component {
                                 fontSize: 16,
                                 fontFamily: 'ProductSans-Bold',
                               }}>
-                              Store Hours
+                              Store Operating Days
                             </Text>
 
                             <Card
@@ -906,133 +909,162 @@ class DashboardScreen extends Component {
                                 borderRadius: 10,
                                 marginTop: 10,
                               }}>
-                              {daysList.map((day, index) => (
-                                <View key={`${day}${index}`}>
-                                  <CardItem
-                                    style={{
-                                      borderRadius: 10,
-                                      overflow: 'hidden',
-                                    }}>
-                                    <View
-                                      style={{
-                                        flex: 1,
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                      }}>
-                                      <CheckBox
-                                        title={day}
-                                        checked={
-                                          storeDetailsEditMode
-                                            ? values?.storeHours?.[day]
-                                                ?.closed === false
-                                            : storeHours?.[day]?.closed ===
-                                              false
-                                        }
-                                        disabled={!storeDetailsEditMode}
-                                        onPress={() =>
-                                          setFieldValue(
-                                            `storeHours[${day}].closed`,
-                                            !values.storeHours[day].closed,
-                                          )
-                                        }
-                                        containerStyle={{
-                                          elevation: 0,
-                                          marginTop: 0,
-                                          marginBottom: 0,
-                                          flex: 1,
-                                          flexDirection: 'row',
-                                          alignItems: 'center',
-                                          paddingLeft: 0,
-                                        }}
-                                      />
+                              {daysList.map((day, index) => {
+                                const openingHours = moment(
+                                  storeDetailsEditMode
+                                    ? `${values.storeHours?.[day]?.start}`
+                                    : `${storeHours?.[day]?.start}`,
+                                  'hh:mm',
+                                ).format('h:mm a');
+                                const closingHours = moment(
+                                  storeDetailsEditMode
+                                    ? `${values.storeHours?.[day]?.end}`
+                                    : `${storeHours?.[day]?.end}`,
+                                  'hh:mm',
+                                ).format('h:mm a');
 
+                                return (
+                                  <View key={`${day}${index}`}>
+                                    <CardItem
+                                      style={{
+                                        borderRadius: 10,
+                                        overflow: 'hidden',
+                                      }}>
                                       <View
                                         style={{
                                           flex: 1,
-                                          alignItems: 'flex-end',
-                                          backgroundColor: colors.icons,
+                                          flexDirection: 'row',
+                                          alignItems: 'center',
+                                          justifyContent: 'space-between',
                                         }}>
-                                        <Pressable
-                                          style={({pressed}) => [
-                                            {
-                                              backgroundColor:
-                                                pressed && storeDetailsEditMode
-                                                  ? colors.primary_lightOpacity
-                                                  : colors.icons,
-                                            },
-                                            {
-                                              padding: 3,
-                                            },
-                                          ]}
+                                        <CheckBox
+                                          title={day}
+                                          checked={
+                                            storeDetailsEditMode
+                                              ? values?.storeHours?.[day]
+                                                  ?.closed === false
+                                              : storeHours?.[day]?.closed ===
+                                                false
+                                          }
+                                          disabled={!storeDetailsEditMode}
                                           onPress={() =>
-                                            storeDetailsEditMode &&
-                                            this.setState({
-                                              selectedDay: day,
-                                              selectedDayPoint: 'start',
-                                            })
-                                          }>
-                                          <Text
-                                            style={{
-                                              color: colors.primary,
-                                              fontSize: 16,
-                                              fontFamily: 'ProductSans-Bold',
-                                              textAlign: 'right',
-                                            }}>
-                                            {`Opening: ${
-                                              storeHours?.[day]?.start !==
-                                              undefined
-                                                ? storeDetailsEditMode
-                                                  ? `${values.storeHours?.[day]?.start}`
-                                                  : `${storeHours?.[day]?.start}`
-                                                : 'Not Set'
-                                            }`}
-                                          </Text>
-                                        </Pressable>
+                                            setFieldValue(
+                                              `storeHours[${day}].closed`,
+                                              values?.storeHours?.[day]
+                                                ?.closed !== undefined
+                                                ? !values?.storeHours?.[day]
+                                                    ?.closed
+                                                : false,
+                                            )
+                                          }
+                                          containerStyle={{
+                                            elevation: 0,
+                                            marginTop: 0,
+                                            marginBottom: 0,
+                                            flex: 1,
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            paddingLeft: 0,
+                                          }}
+                                        />
 
-                                        <Pressable
-                                          style={({pressed}) => [
-                                            {
-                                              backgroundColor:
-                                                pressed && storeDetailsEditMode
-                                                  ? colors.primary_lightOpacity
-                                                  : colors.icons,
-                                            },
-                                            {
-                                              padding: 3,
-                                            },
-                                          ]}
-                                          onPress={() =>
-                                            storeDetailsEditMode &&
-                                            this.setState({
-                                              selectedDay: day,
-                                              selectedDayPoint: 'end',
-                                            })
-                                          }>
-                                          <Text
-                                            style={{
-                                              color: colors.primary,
-                                              fontSize: 16,
-                                              fontFamily: 'ProductSans-Bold',
-                                              textAlign: 'right',
-                                            }}>
-                                            {`Closing: ${
-                                              storeHours?.[day]?.end !==
-                                              undefined
-                                                ? storeDetailsEditMode
-                                                  ? `${values.storeHours?.[day]?.end}`
-                                                  : `${storeHours?.[day]?.end}`
-                                                : 'Not Set'
-                                            }`}
-                                          </Text>
-                                        </Pressable>
+                                        <View
+                                          style={{
+                                            flex: 1,
+                                            alignItems: 'flex-end',
+                                            backgroundColor: colors.icons,
+                                          }}>
+                                          <Pressable
+                                            style={({pressed}) => [
+                                              {
+                                                backgroundColor:
+                                                  pressed &&
+                                                  storeDetailsEditMode
+                                                    ? colors.primary_lightOpacity
+                                                    : colors.icons,
+                                              },
+                                              {
+                                                padding: 3,
+                                              },
+                                            ]}
+                                            onPress={() =>
+                                              storeDetailsEditMode &&
+                                              this.setState({
+                                                selectedDay: day,
+                                                selectedDayPoint: 'start',
+                                              })
+                                            }>
+                                            <Text
+                                              style={{
+                                                color: colors.primary,
+                                                fontSize: 16,
+                                                fontFamily: 'ProductSans-Bold',
+                                                textAlign: 'right',
+                                              }}>
+                                              {`Opening: ${
+                                                storeHours?.[day]?.start !==
+                                                undefined
+                                                  ? openingHours
+                                                  : 'Not Set'
+                                              }`}
+                                            </Text>
+                                          </Pressable>
+
+                                          <Pressable
+                                            style={({pressed}) => [
+                                              {
+                                                backgroundColor:
+                                                  pressed &&
+                                                  storeDetailsEditMode
+                                                    ? colors.primary_lightOpacity
+                                                    : colors.icons,
+                                              },
+                                              {
+                                                padding: 3,
+                                              },
+                                            ]}
+                                            onPress={() =>
+                                              storeDetailsEditMode &&
+                                              this.setState({
+                                                selectedDay: day,
+                                                selectedDayPoint: 'end',
+                                              })
+                                            }>
+                                            <Text
+                                              style={{
+                                                color: colors.primary,
+                                                fontSize: 16,
+                                                fontFamily: 'ProductSans-Bold',
+                                                textAlign: 'right',
+                                              }}>
+                                              {`Closing: ${
+                                                storeHours?.[day]?.end !==
+                                                undefined
+                                                  ? closingHours
+                                                  : 'Not Set'
+                                              }`}
+                                            </Text>
+                                          </Pressable>
+
+                                          {storeDetailsEditMode &&
+                                            errors?.test_storeHours?.[day] !==
+                                              undefined && (
+                                              <Text
+                                                style={{
+                                                  color: colors.danger,
+                                                  fontSize: 12,
+                                                }}>
+                                                {errors?.test_storeHours?.[day]}
+                                              </Text>
+                                            )}
+                                        </View>
                                       </View>
-                                    </View>
-                                  </CardItem>
+                                    </CardItem>
 
-                                  <Divider style={{marginTop: 1}} />
-                                </View>
-                              ))}
+                                    <Divider style={{marginTop: 1}} />
+                                  </View>
+                                );
+                              })}
                             </Card>
                           </View>
                         </CardItem>
@@ -1082,15 +1114,16 @@ class DashboardScreen extends Component {
                                     ),
                                   )}
 
-                                  {errors?.testAvailablePaymentMethods && (
-                                    <Text
-                                      style={{
-                                        color: colors.danger,
-                                        fontSize: 12,
-                                      }}>
-                                      {errors?.testAvailablePaymentMethods}
-                                    </Text>
-                                  )}
+                                  {storeDetailsEditMode &&
+                                    errors?.testAvailablePaymentMethods && (
+                                      <Text
+                                        style={{
+                                          color: colors.danger,
+                                          fontSize: 12,
+                                        }}>
+                                        {errors?.testAvailablePaymentMethods}
+                                      </Text>
+                                    )}
                                 </View>
                               ) : (
                                 this.CategoryPills(this.selectedPaymentMethods)

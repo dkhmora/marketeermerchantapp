@@ -85,32 +85,70 @@ const deliveryDetailsValidationSchema = yup.object().shape({
   deliveryType: yup.string().required('Delivery Type is a required field'),
 });
 
-const storeDetailsValidationSchema = yup.object().shape({
-  displayImage: yup.string().nullable(),
-  coverImage: yup.string().nullable(),
-  storeDescription: yup.string().max(200),
-  availablePaymentMethods: yup
-    .object({
-      ['Online Banking']: yup.object({
-        activated: yup.boolean(),
-      }),
-      ['COD']: yup.object({
-        activated: yup.boolean(),
-      }),
-    })
-    .test('testAvailablePaymentMethods', null, (obj) => {
-      if (obj['Online Banking']?.activated || obj['COD']?.activated) {
-        return true;
-      }
+const storeDetailsValidationSchema = (days) => {
+  const tempSchema = {
+    displayImage: yup.string().nullable(),
+    coverImage: yup.string().nullable(),
+    storeDescription: yup.string().max(200),
+    availablePaymentMethods: yup
+      .object({
+        ['Online Banking']: yup.object({
+          activated: yup.boolean(),
+        }),
+        ['COD']: yup.object({
+          activated: yup.boolean(),
+        }),
+      })
+      .test('testAvailablePaymentMethods', null, (obj) => {
+        if (obj['Online Banking']?.activated || obj['COD']?.activated) {
+          return true;
+        }
 
-      return new yup.ValidationError(
-        'Please select at least one payment method',
-        null,
-        'testAvailablePaymentMethods',
-      );
-    }),
-  vacationMode: yup.boolean(),
-});
+        return new yup.ValidationError(
+          'Please select at least one payment method',
+          null,
+          'testAvailablePaymentMethods',
+        );
+      }),
+    vacationMode: yup.boolean(),
+    storeHours: null,
+  };
+
+  days.map((day) => {
+    tempSchema.storeHours = {
+      ...tempSchema.storeHours,
+      [day]: yup
+        .object({
+          start: yup.string().nullable(),
+          end: yup.string().nullable(),
+          closed: yup.boolean(),
+        })
+        .test(`test_storeHours.${day}`, null, (obj) => {
+          if (
+            obj.closed === undefined ||
+            (obj.start === undefined && obj.end === undefined) ||
+            (!obj.closed && obj.start <= obj.end)
+          ) {
+            return true;
+          }
+
+          if (obj.closed) {
+            return true;
+          }
+
+          return new yup.ValidationError(
+            'Opening hours needs to be less than Closing hours',
+            null,
+            `test_storeHours.${day}`,
+          );
+        }),
+    };
+  });
+
+  tempSchema.storeHours = yup.object(tempSchema.storeHours);
+
+  return yup.object().shape(tempSchema);
+};
 
 export {
   itemValidationSchema,
