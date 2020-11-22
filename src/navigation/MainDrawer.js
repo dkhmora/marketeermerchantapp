@@ -49,7 +49,7 @@ class MainDrawer extends Component {
     try {
       const initialLink = await dynamicLinks().getInitialLink();
 
-      if (initialLink.url !== null) {
+      if (initialLink?.url !== undefined) {
         this.handleDynamicLink(initialLink);
       }
     } catch (error) {

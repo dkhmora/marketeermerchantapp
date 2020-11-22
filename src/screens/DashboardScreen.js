@@ -1,10 +1,16 @@
 import React, {Component} from 'react';
-import {ActivityIndicator, View, SafeAreaView, Image} from 'react-native';
+import {
+  ActivityIndicator,
+  View,
+  SafeAreaView,
+  Image,
+  Pressable,
+} from 'react-native';
 import {Card, CardItem} from 'native-base';
 import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 import {computed} from 'mobx';
-import {Text, Icon, Button, CheckBox} from 'react-native-elements';
+import {Text, Icon, Button, CheckBox, Divider} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
 import BaseOptionsMenu from '../components/BaseOptionsMenu';
 import {colors} from '../../assets/colors';
@@ -21,7 +27,6 @@ import {
   storeDetailsValidationSchema,
 } from '../util/validationSchemas';
 import CustomInput from '../components/CustomInput';
-import Divider from '../components/Divider';
 import FastImage from 'react-native-fast-image';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
@@ -354,6 +359,7 @@ class DashboardScreen extends Component {
                   storeDescription,
                   availablePaymentMethods,
                   vacationMode,
+                  storeHours,
                 }}
                 onSubmit={(values) => {
                   this.handleEditStoreDetails(values);
@@ -859,8 +865,8 @@ class DashboardScreen extends Component {
                                 borderRadius: 10,
                                 marginTop: 10,
                               }}>
-                              {daysList.map((day) => (
-                                <View>
+                              {daysList.map((day, index) => (
+                                <View key={`${day}${index}`}>
                                   <CardItem
                                     style={{
                                       borderRadius: 10,
@@ -873,81 +879,101 @@ class DashboardScreen extends Component {
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
                                       }}>
-                                      <View
-                                        style={{
+                                      <CheckBox
+                                        title={day}
+                                        checked={
+                                          storeDetailsEditMode
+                                            ? values?.storeHours?.[day]
+                                                ?.closed === false
+                                            : storeHours?.[day]?.closed ===
+                                              false
+                                        }
+                                        disabled={!storeDetailsEditMode}
+                                        onPress={() =>
+                                          setFieldValue(
+                                            `storeHours[${day}].closed`,
+                                            !values.storeHours[day].closed,
+                                          )
+                                        }
+                                        containerStyle={{
+                                          elevation: 0,
+                                          marginTop: 0,
+                                          marginBottom: 0,
                                           flex: 1,
-                                          paddingright: 10,
-                                        }}>
-                                        <Text
-                                          style={{
-                                            fontSize: 16,
-                                          }}>
-                                          {day}
-                                        </Text>
-                                      </View>
+                                          flexDirection: 'row',
+                                          alignItems: 'center',
+                                          paddingLeft: 0,
+                                        }}
+                                      />
 
                                       <View
                                         style={{
                                           flex: 1,
                                           alignItems: 'flex-end',
+                                          backgroundColor: colors.icons,
                                         }}>
-                                        {storeDetailsEditMode ? (
-                                          <Text>Edit Time</Text>
-                                        ) : (
-                                          <View>
-                                            {storeHours?.[day]?.closed !==
-                                            true ? (
-                                              <View>
-                                                <Text
-                                                  style={{
-                                                    color: colors.primary,
-                                                    fontSize: 16,
-                                                    fontFamily:
-                                                      'ProductSans-Bold',
-                                                    textAlign: 'right',
-                                                  }}>
-                                                  {`Opening: ${
-                                                    storeHours?.[day]?.start !==
-                                                    undefined
-                                                      ? `${storeHours?.[day]?.start}`
-                                                      : 'Not Set'
-                                                  }`}
-                                                </Text>
-                                                <Text
-                                                  style={{
-                                                    color: colors.primary,
-                                                    fontSize: 16,
-                                                    fontFamily:
-                                                      'ProductSans-Bold',
-                                                    textAlign: 'right',
-                                                  }}>
-                                                  {`Closing: ${
-                                                    storeHours?.[day]?.end !==
-                                                    undefined
-                                                      ? `${storeHours?.[day]?.end}`
-                                                      : 'Not Set'
-                                                  }`}
-                                                </Text>
-                                              </View>
-                                            ) : (
-                                              <Text
-                                                style={{
-                                                  color: colors.primary,
-                                                  fontSize: 16,
-                                                  fontFamily:
-                                                    'ProductSans-Bold',
-                                                  textAlign: 'right',
-                                                }}>
-                                                Closed
-                                              </Text>
-                                            )}
-                                          </View>
-                                        )}
+                                        <Pressable
+                                          style={({pressed}) => [
+                                            {
+                                              backgroundColor:
+                                                pressed && storeDetailsEditMode
+                                                  ? colors.primary_lightOpacity
+                                                  : colors.icons,
+                                            },
+                                            {
+                                              padding: 3,
+                                            },
+                                          ]}
+                                          onPress={() => console.log('press')}>
+                                          <Text
+                                            style={{
+                                              color: colors.primary,
+                                              fontSize: 16,
+                                              fontFamily: 'ProductSans-Bold',
+                                              textAlign: 'right',
+                                            }}>
+                                            {`Opening: ${
+                                              storeHours?.[day]?.start !==
+                                              undefined
+                                                ? `${storeHours?.[day]?.start}`
+                                                : 'Not Set'
+                                            }`}
+                                          </Text>
+                                        </Pressable>
+
+                                        <Pressable
+                                          style={({pressed}) => [
+                                            {
+                                              backgroundColor:
+                                                pressed && storeDetailsEditMode
+                                                  ? colors.primary_lightOpacity
+                                                  : colors.icons,
+                                            },
+                                            {
+                                              padding: 3,
+                                            },
+                                          ]}
+                                          onPress={() => console.log('press')}>
+                                          <Text
+                                            style={{
+                                              color: colors.primary,
+                                              fontSize: 16,
+                                              fontFamily: 'ProductSans-Bold',
+                                              textAlign: 'right',
+                                            }}>
+                                            {`Closing: ${
+                                              storeHours?.[day]?.end !==
+                                              undefined
+                                                ? `${storeHours?.[day]?.end}`
+                                                : 'Not Set'
+                                            }`}
+                                          </Text>
+                                        </Pressable>
                                       </View>
                                     </View>
                                   </CardItem>
 
-                                  <Divider />
+                                  <Divider style={{marginTop: 1}} />
                                 </View>
                               ))}
                             </Card>

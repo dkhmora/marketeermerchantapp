@@ -52,7 +52,13 @@ const theme = {
   },
   CheckBox: {
     checkedColor: colors.accent,
-    fontFamily: 'ProductSans-Light',
+    titleProps: {
+      style: {
+        fontFamily: 'ProductSans-Regular',
+        fontSize: 15,
+        paddingHorizontal: 5,
+      },
+    },
     containerStyle: {
       borderRadius: 30,
       backgroundColor: colors.icons,
