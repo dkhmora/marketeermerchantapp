@@ -59,6 +59,8 @@ class DashboardScreen extends Component {
       storeDetailsSaving: false,
       storeDetailsIsValid: false,
       selectedDay: null,
+      selectedDayPoint: null,
+      selectedDayTime: null,
       imagesLoaded: false,
     };
   }
@@ -293,6 +295,7 @@ class DashboardScreen extends Component {
       storeDetailsIsValid,
       selectedDay,
       selectedDayPoint,
+      selectedDayTime,
     } = this.state;
 
     const {navigation} = this.props;
@@ -465,14 +468,13 @@ class DashboardScreen extends Component {
                         />
 
                         <DateTimePickerModal
-                          isVisible={selectedDay !== null}
+                          isVisible={
+                            selectedDay !== null &&
+                            selectedDayPoint !== null &&
+                            selectedDayTime !== null
+                          }
                           mode="time"
                           onConfirm={(newDate) => {
-                            console.log(
-                              moment(newDate).format('HH:MM'),
-                              selectedDayPoint,
-                              selectedDay,
-                            );
                             setFieldValue(
                               `storeHours[${selectedDay}][${selectedDayPoint}]`,
                               moment(newDate).format('HH:MM'),
@@ -480,14 +482,17 @@ class DashboardScreen extends Component {
                             this.setState({
                               selectedDay: null,
                               selectedDayPoint: null,
+                              selectedDayTime: null,
                             });
                           }}
                           onCancel={() =>
                             this.setState({
                               selectedDay: null,
                               selectedDayPoint: null,
+                              selectedDayTime: null,
                             })
                           }
+                          date={selectedDayTime ? selectedDayTime : new Date()}
                           locale={'en'}
                           modalTransparent={false}
                           animationType={'fade'}
@@ -992,11 +997,19 @@ class DashboardScreen extends Component {
                                               this.setState({
                                                 selectedDay: day,
                                                 selectedDayPoint: 'start',
+                                                selectedDayTime: new Date().setTime(
+                                                  moment(
+                                                    openingHours,
+                                                    'h:mm a',
+                                                  ).format('x'),
+                                                ),
                                               })
                                             }>
                                             <Text
                                               style={{
-                                                color: colors.primary,
+                                                color: storeDetailsEditMode
+                                                  ? colors.accent
+                                                  : colors.primary,
                                                 fontSize: 16,
                                                 fontFamily: 'ProductSans-Bold',
                                                 textAlign: 'right',
@@ -1028,11 +1041,19 @@ class DashboardScreen extends Component {
                                               this.setState({
                                                 selectedDay: day,
                                                 selectedDayPoint: 'end',
+                                                selectedDayTime: new Date().setTime(
+                                                  moment(
+                                                    closingHours,
+                                                    'h:mm a',
+                                                  ).format('x'),
+                                                ),
                                               })
                                             }>
                                             <Text
                                               style={{
-                                                color: colors.primary,
+                                                color: storeDetailsEditMode
+                                                  ? colors.accent
+                                                  : colors.primary,
                                                 fontSize: 16,
                                                 fontFamily: 'ProductSans-Bold',
                                                 textAlign: 'right',
@@ -1053,6 +1074,7 @@ class DashboardScreen extends Component {
                                                 style={{
                                                   color: colors.danger,
                                                   fontSize: 12,
+                                                  textAlign: 'right',
                                                 }}>
                                                 {errors?.test_storeHours?.[day]}
                                               </Text>
