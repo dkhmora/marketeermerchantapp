@@ -1012,7 +1012,9 @@ class DashboardScreen extends Component {
                                               }}>
                                               {`Opening: ${
                                                 storeHours?.[day]?.start !==
-                                                undefined
+                                                  undefined ||
+                                                values.storeHours?.[day]
+                                                  ?.start !== undefined
                                                   ? openingHours
                                                   : 'Not Set'
                                               }`}
@@ -1054,7 +1056,9 @@ class DashboardScreen extends Component {
                                               }}>
                                               {`Closing: ${
                                                 storeHours?.[day]?.end !==
-                                                undefined
+                                                  undefined ||
+                                                values.storeHours?.[day]
+                                                  ?.end !== undefined
                                                   ? closingHours
                                                   : 'Not Set'
                                               }`}
