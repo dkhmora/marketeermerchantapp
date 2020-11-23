@@ -972,6 +972,7 @@ class DashboardScreen extends Component {
                                           }
                                           containerStyle={{
                                             elevation: 0,
+                                            shadowColor: 'transparent',
                                             marginTop: 0,
                                             marginBottom: 0,
                                             flex: 1,
