@@ -901,7 +901,7 @@ class DashboardScreen extends Component {
                                 fontSize: 16,
                                 fontFamily: 'ProductSans-Bold',
                               }}>
-                              Store Operating Days
+                              Store Operating Days/Hours
                             </Text>
 
                             <Card
