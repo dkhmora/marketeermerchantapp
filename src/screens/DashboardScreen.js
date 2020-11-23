@@ -316,6 +316,10 @@ class DashboardScreen extends Component {
       'Sunday',
     ];
 
+    const elementAccentColor = storeDetailsEditMode
+      ? colors.accent
+      : colors.primary;
+
     return (
       <View style={{flex: 1}}>
         <BaseHeader title={this.props.route.name} navigation={navigation} />
@@ -450,11 +454,7 @@ class DashboardScreen extends Component {
                               </View>
                             ) : (
                               <BaseOptionsMenu
-                                iconColor={
-                                  storeDetailsEditMode
-                                    ? colors.icons
-                                    : colors.primary
-                                }
+                                iconColor={elementAccentColor}
                                 options={['Edit Store Details']}
                                 actions={[
                                   () =>
@@ -591,9 +591,7 @@ class DashboardScreen extends Component {
                                     width: '70%',
                                     borderRadius: 10,
                                     borderWidth: 1,
-                                    borderColor: storeDetailsEditMode
-                                      ? colors.accent
-                                      : colors.primary,
+                                    borderColor: elementAccentColor,
                                     overflow: 'hidden',
                                   }}>
                                   <FastImage
@@ -726,9 +724,7 @@ class DashboardScreen extends Component {
                                     width: '100%',
                                     borderRadius: 10,
                                     borderWidth: 1,
-                                    borderColor: storeDetailsEditMode
-                                      ? colors.accent
-                                      : colors.primary,
+                                    borderColor: elementAccentColor,
                                     overflow: 'hidden',
                                   }}>
                                   <FastImage
@@ -839,6 +835,7 @@ class DashboardScreen extends Component {
                                   component={CustomInput}
                                   name="storeDescription"
                                   leftIcon="align-justify"
+                                  leftIconProps={{color: colors.accent}}
                                   placeholder="Store Description"
                                   maxLength={200}
                                   numberOfLines={3}
@@ -944,6 +941,7 @@ class DashboardScreen extends Component {
                                         }}>
                                         <CheckBox
                                           title={day}
+                                          checkedColor={elementAccentColor}
                                           checked={
                                             storeDetailsEditMode
                                               ? values?.storeHours?.[day]
@@ -1007,9 +1005,7 @@ class DashboardScreen extends Component {
                                             }>
                                             <Text
                                               style={{
-                                                color: storeDetailsEditMode
-                                                  ? colors.accent
-                                                  : colors.primary,
+                                                color: elementAccentColor,
                                                 fontSize: 16,
                                                 fontFamily: 'ProductSans-Bold',
                                                 textAlign: 'right',
@@ -1051,9 +1047,7 @@ class DashboardScreen extends Component {
                                             }>
                                             <Text
                                               style={{
-                                                color: storeDetailsEditMode
-                                                  ? colors.accent
-                                                  : colors.primary,
+                                                color: elementAccentColor,
                                                 fontSize: 16,
                                                 fontFamily: 'ProductSans-Bold',
                                                 textAlign: 'right',
@@ -1212,9 +1206,7 @@ class DashboardScreen extends Component {
                               <Switch
                                 trackColor={{
                                   false: '#767577',
-                                  true: storeDetailsEditMode
-                                    ? colors.accent
-                                    : colors.primary,
+                                  true: elementAccentColor,
                                 }}
                                 thumbColor={'#f4f3f4'}
                                 ios_backgroundColor="#3e3e3e"
@@ -1448,7 +1440,7 @@ class DashboardScreen extends Component {
                                                   leftIcon={
                                                     <Text
                                                       style={{
-                                                        color: colors.primary,
+                                                        color: colors.accent,
                                                         fontSize: 25,
                                                       }}>
                                                       ₱
@@ -1569,7 +1561,7 @@ class DashboardScreen extends Component {
                                             leftIcon={
                                               <Text
                                                 style={{
-                                                  color: colors.primary,
+                                                  color: colors.accent,
                                                   fontSize: 25,
                                                 }}>
                                                 ₱
@@ -1634,7 +1626,7 @@ class DashboardScreen extends Component {
                                             leftIcon={
                                               <Text
                                                 style={{
-                                                  color: colors.primary,
+                                                  color: colors.accent,
                                                   fontSize: 25,
                                                 }}>
                                                 ₱

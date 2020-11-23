@@ -14,6 +14,7 @@ class CustomInput extends Component {
       form: {errors, touched, setFieldTouched, setFieldValue},
       leftIcon,
       type,
+      leftIconProps,
       ...inputProps
     } = this.props;
 
@@ -29,7 +30,12 @@ class CustomInput extends Component {
         leftIcon={
           leftIcon ? (
             typeof leftIcon === 'string' ? (
-              <Icon name={leftIcon} color={colors.primary} size={20} />
+              <Icon
+                name={leftIcon}
+                color={colors.primary}
+                size={20}
+                {...leftIconProps}
+              />
             ) : (
               leftIcon
             )
