@@ -61,6 +61,7 @@ class DashboardScreen extends Component {
       selectedDay: null,
       selectedDayPoint: null,
       selectedDayTime: null,
+      timePickerVisible: false,
       imagesLoaded: false,
     };
   }
@@ -208,9 +209,7 @@ class DashboardScreen extends Component {
               this.setState({coverImageUrl: null});
             }
 
-            if (values.coverImage || values.displayImage) {
-              this.getImage();
-            }
+            this.getImage();
 
             Toast({
               text: 'Store details successfully updated!',
@@ -296,6 +295,7 @@ class DashboardScreen extends Component {
       selectedDay,
       selectedDayPoint,
       selectedDayTime,
+      timePickerVisible,
     } = this.state;
 
     const {navigation} = this.props;
@@ -468,21 +468,18 @@ class DashboardScreen extends Component {
                         />
 
                         <DateTimePickerModal
-                          isVisible={
-                            selectedDay !== null &&
-                            selectedDayPoint !== null &&
-                            selectedDayTime !== null
-                          }
+                          isVisible={timePickerVisible}
                           mode="time"
                           onConfirm={(newDate) => {
                             setFieldValue(
                               `storeHours[${selectedDay}][${selectedDayPoint}]`,
-                              moment(newDate).format('HH:MM'),
+                              moment(newDate).format('HH:mm'),
                             );
                             this.setState({
                               selectedDay: null,
                               selectedDayPoint: null,
                               selectedDayTime: null,
+                              timePickerVisible: false,
                             });
                           }}
                           onCancel={() =>
@@ -490,9 +487,10 @@ class DashboardScreen extends Component {
                               selectedDay: null,
                               selectedDayPoint: null,
                               selectedDayTime: null,
+                              timePickerVisible: false,
                             })
                           }
-                          date={selectedDayTime ? selectedDayTime : new Date()}
+                          date={selectedDayTime}
                           locale={'en'}
                           modalTransparent={false}
                           animationType={'fade'}
@@ -912,18 +910,30 @@ class DashboardScreen extends Component {
                                 marginTop: 10,
                               }}>
                               {daysList.map((day, index) => {
-                                const openingHours = moment(
-                                  storeDetailsEditMode
-                                    ? `${values.storeHours?.[day]?.start}`
-                                    : `${storeHours?.[day]?.start}`,
-                                  'hh:mm',
-                                ).format('h:mm a');
-                                const closingHours = moment(
-                                  storeDetailsEditMode
-                                    ? `${values.storeHours?.[day]?.end}`
-                                    : `${storeHours?.[day]?.end}`,
-                                  'hh:mm',
-                                ).format('h:mm a');
+                                const openingHours =
+                                  storeDetailsEditMode &&
+                                  values.storeHours?.[day]?.start !== undefined
+                                    ? values.storeHours[day].start
+                                    : storeHours?.[day]?.start !== undefined
+                                    ? storeHours[day].start
+                                    : null;
+                                const formattedOpeningHours = openingHours
+                                  ? moment(openingHours, 'HH:mm').format(
+                                      'h:mm a',
+                                    )
+                                  : null;
+                                const closingHours =
+                                  storeDetailsEditMode &&
+                                  values.storeHours?.[day]?.end !== undefined
+                                    ? values.storeHours[day].end
+                                    : storeHours?.[day]?.end !== undefined
+                                    ? storeHours[day].end
+                                    : null;
+                                const formattedClosingHours = closingHours
+                                  ? moment(closingHours, 'HH:mm').format(
+                                      'h:mm a',
+                                    )
+                                  : null;
 
                                 return (
                                   <View key={`${day}${index}`}>
@@ -995,12 +1005,15 @@ class DashboardScreen extends Component {
                                               this.setState({
                                                 selectedDay: day,
                                                 selectedDayPoint: 'start',
-                                                selectedDayTime: new Date().setTime(
-                                                  moment(
-                                                    openingHours,
-                                                    'h:mm a',
-                                                  ).format('x'),
-                                                ),
+                                                selectedDayTime: openingHours
+                                                  ? new Date().setTime(
+                                                      moment(
+                                                        openingHours,
+                                                        'HH:mm',
+                                                      ).format('x'),
+                                                    )
+                                                  : new Date(),
+                                                timePickerVisible: true,
                                               })
                                             }>
                                             <Text
@@ -1011,11 +1024,8 @@ class DashboardScreen extends Component {
                                                 textAlign: 'right',
                                               }}>
                                               {`Opening: ${
-                                                storeHours?.[day]?.start !==
-                                                  undefined ||
-                                                values.storeHours?.[day]
-                                                  ?.start !== undefined
-                                                  ? openingHours
+                                                formattedOpeningHours
+                                                  ? formattedOpeningHours
                                                   : 'Not Set'
                                               }`}
                                             </Text>
@@ -1039,12 +1049,15 @@ class DashboardScreen extends Component {
                                               this.setState({
                                                 selectedDay: day,
                                                 selectedDayPoint: 'end',
-                                                selectedDayTime: new Date().setTime(
-                                                  moment(
-                                                    closingHours,
-                                                    'h:mm a',
-                                                  ).format('x'),
-                                                ),
+                                                selectedDayTime: closingHours
+                                                  ? new Date().setTime(
+                                                      moment(
+                                                        closingHours,
+                                                        'HH:mm',
+                                                      ).format('x'),
+                                                    )
+                                                  : new Date(),
+                                                timePickerVisible: true,
                                               })
                                             }>
                                             <Text
@@ -1055,11 +1068,8 @@ class DashboardScreen extends Component {
                                                 textAlign: 'right',
                                               }}>
                                               {`Closing: ${
-                                                storeHours?.[day]?.end !==
-                                                  undefined ||
-                                                values.storeHours?.[day]
-                                                  ?.end !== undefined
-                                                  ? closingHours
+                                                formattedClosingHours
+                                                  ? formattedClosingHours
                                                   : 'Not Set'
                                               }`}
                                             </Text>

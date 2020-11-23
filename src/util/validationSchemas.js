@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import moment from 'moment';
 
 const itemValidationSchema = yup.object().shape({
   name: yup.string().max(50).required('Item Name is a required field'),
@@ -126,14 +127,22 @@ const storeDetailsValidationSchema = (days) => {
         .test(`test_storeHours.${day}`, null, (obj) => {
           if (
             obj.closed === undefined ||
-            (obj.start === undefined && obj.end === undefined) ||
-            (!obj.closed && obj.start <= obj.end)
+            obj.closed ||
+            (!obj.closed &&
+              moment(obj.start, 'HH:mm').isBefore(moment(obj.end, 'HH:mm')))
           ) {
             return true;
           }
 
-          if (obj.closed) {
-            return true;
+          if (
+            !obj.closed &&
+            (obj.start === undefined || obj.end === undefined)
+          ) {
+            return new yup.ValidationError(
+              'Opening hours and Closing hours is required',
+              null,
+              `test_storeHours.${day}`,
+            );
           }
 
           return new yup.ValidationError(
