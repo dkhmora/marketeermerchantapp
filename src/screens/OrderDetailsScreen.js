@@ -1,6 +1,13 @@
 import React, {Component} from 'react';
 import {Card, CardItem, Left, Right, Body} from 'native-base';
-import {Text, Icon, Button, Avatar, Badge} from 'react-native-elements';
+import {
+  Text,
+  Icon,
+  Button,
+  Avatar,
+  Badge,
+  Divider,
+} from 'react-native-elements';
 import {
   View,
   ActivityIndicator,
@@ -8,6 +15,7 @@ import {
   Dimensions,
   Image,
   StatusBar,
+  StyleSheet,
 } from 'react-native';
 import BaseHeader from '../components/BaseHeader';
 import {
@@ -333,7 +341,7 @@ class OrderDetailsScreen extends Component {
 
         if (response.data.s === 200) {
           this.props.ordersStore.mrspeedyBottomSheet &&
-            this.props.ordersStore.mrspeedyBottomSheet.snapTo(0);
+            this.mrspeedyBottomSheet.modalizeRef.close();
 
           return Toast({
             text: response.data.m,
@@ -355,8 +363,8 @@ class OrderDetailsScreen extends Component {
     const {selectedOrder} = this.props.ordersStore;
 
     if (selectedOrder.paymentMethod === 'COD') {
-      this.mrspeedyBottomSheet.bottomSheet &&
-        this.mrspeedyBottomSheet.bottomSheet.snapTo(1);
+      this.mrspeedyBottomSheet.modalizeRef &&
+        this.mrspeedyBottomSheet.modalizeRef.open();
     } else {
       this.props.authStore.appReady = false;
 
@@ -378,7 +386,15 @@ class OrderDetailsScreen extends Component {
     return (
       <View>
         {orderItems.map((item, index) => {
-          return <OrderItemListItem item={item} key={index} />;
+          return (
+            <View>
+              <OrderItemListItem
+                item={item}
+                key={`${item.cartId}${item.itemId}${index}`}
+              />
+              <Divider />
+            </View>
+          );
         })}
       </View>
     );
@@ -400,74 +416,77 @@ class OrderDetailsScreen extends Component {
         : null;
 
     return (
-      <TouchableWithoutFeedback
-        onPress={() => {
-          if (this.mrspeedyBottomSheet.state.openRatio > 0) {
-            this.mrspeedyBottomSheet.bottomSheet.snapTo(0);
+      <View style={{...StyleSheet.absoluteFillObject}}>
+        <MrSpeedyBottomSheet
+          ref={(mrspeedyBottomSheet) =>
+            (this.mrspeedyBottomSheet = mrspeedyBottomSheet)
           }
-        }}>
-        <View style={{height: SCREEN_HEIGHT + StatusBar.currentHeight}}>
-          <BaseHeader
-            centerComponent={
-              !selectedOrder ? (
-                <ActivityIndicator color={colors.icons} size="small" />
-              ) : (
-                <Text
-                  adjustsFontSizeToFit
-                  numberOfLines={1}
-                  style={{fontSize: 20, color: colors.icons}}>
-                  {`Order # ${selectedOrder.storeOrderNumber} | ${orderStatus}`}
-                </Text>
-              )
-            }
-            backButton
-            options={
-              orderStatus[0] === 'PENDING' ||
-              orderStatus[0] === 'UNPAID' ||
-              (orderStatus[0] === 'PAID' &&
-                selectedOrder.paymentMethod === 'COD') ||
-              (orderStatus[0] === 'SHIPPED' &&
-                (selectedOrder.deliveryMethod === 'Own Delivery' ||
-                  (selectedOrder.deliveryMethod === 'Mr. Speedy' &&
-                    selectedOrder.mrspeedyBookingData.order.status ===
-                      'canceled')))
-                ? ['Cancel Order']
-                : null
-            }
-            actions={[
-              () => {
-                this.props.ordersStore.cancelOrderModal = true;
-                this.props.ordersStore.selectedCancelOrder = selectedOrder;
-              },
-            ]}
-            navigation={navigation}
-          />
+        />
 
-          {selectedOrder && orderId ? (
-            <View style={{flex: 1}}>
-              <ConfirmationModal
-                isVisible={this.state.changeOrderStatusModal}
-                title={`${buttonText} Order # ${selectedOrder.storeOrderNumber}?`}
-                body={`Are you sure you want to ${buttonText} Order # ${selectedOrder.storeOrderNumber}?`}
-                onConfirm={() => {
-                  this.setState({changeOrderStatusModal: false}, () => {
-                    this.handleChangeOrderStatus();
-                  });
-                }}
-                closeModal={() =>
-                  this.setState({changeOrderStatusModal: false})
-                }
-              />
+        <BaseHeader
+          centerComponent={
+            !selectedOrder ? (
+              <ActivityIndicator color={colors.icons} size="small" />
+            ) : (
+              <Text
+                adjustsFontSizeToFit
+                numberOfLines={1}
+                style={{fontSize: 20, color: colors.icons}}>
+                {`Order # ${selectedOrder.storeOrderNumber} | ${orderStatus}`}
+              </Text>
+            )
+          }
+          backButton
+          options={
+            orderStatus[0] === 'PENDING' ||
+            orderStatus[0] === 'UNPAID' ||
+            (orderStatus[0] === 'PAID' &&
+              selectedOrder.paymentMethod === 'COD') ||
+            (orderStatus[0] === 'SHIPPED' &&
+              (selectedOrder.deliveryMethod === 'Own Delivery' ||
+                (selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+                  selectedOrder.mrspeedyBookingData.order.status ===
+                    'canceled')))
+              ? ['Cancel Order']
+              : null
+          }
+          actions={[
+            () => {
+              this.props.ordersStore.cancelOrderModal = true;
+              this.props.ordersStore.selectedCancelOrder = selectedOrder;
+            },
+          ]}
+          navigation={navigation}
+        />
 
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                scrollEnabled={this.state.allowDragging}
+        {selectedOrder && orderId ? (
+          <View style={{flex: 1}}>
+            <ConfirmationModal
+              isVisible={this.state.changeOrderStatusModal}
+              title={`${buttonText} Order # ${selectedOrder.storeOrderNumber}?`}
+              body={`Are you sure you want to ${buttonText} Order # ${selectedOrder.storeOrderNumber}?`}
+              onConfirm={() => {
+                this.setState({changeOrderStatusModal: false}, () => {
+                  this.handleChangeOrderStatus();
+                });
+              }}
+              closeModal={() => this.setState({changeOrderStatusModal: false})}
+            />
+
+            <ScrollView
+              contentInsetAdjustmentBehavior="automatic"
+              showsVerticalScrollIndicator={false}
+              scrollEnabled={this.state.allowDragging}
+              style={{
+                flex: 1,
+                flexDirection: 'column',
+                paddingHorizontal: 10,
+              }}>
+              <Card
                 style={{
-                  flex: 1,
-                  flexDirection: 'column',
-                  paddingHorizontal: 10,
+                  borderRadius: 10,
                 }}>
-                <Card
+                <View
                   style={{
                     borderRadius: 10,
                     overflow: 'hidden',
@@ -506,7 +525,9 @@ class OrderDetailsScreen extends Component {
                               selectedOrder.storeUnreadCount > 0 && (
                                 <Badge
                                   value={selectedOrder.storeUnreadCount}
-                                  badgeStyle={{backgroundColor: colors.accent}}
+                                  badgeStyle={{
+                                    backgroundColor: colors.accent,
+                                  }}
                                   containerStyle={{
                                     position: 'absolute',
                                     top: 0,
@@ -532,7 +553,10 @@ class OrderDetailsScreen extends Component {
                   <CardItem bordered>
                     <Left>
                       <Text
-                        style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
                         Customer Name:
                       </Text>
                     </Left>
@@ -552,7 +576,10 @@ class OrderDetailsScreen extends Component {
                   <CardItem bordered>
                     <Left>
                       <Text
-                        style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
                         Customer Contact Number:
                       </Text>
                     </Left>
@@ -572,7 +599,10 @@ class OrderDetailsScreen extends Component {
                   <CardItem>
                     <Left>
                       <Text
-                        style={{fontSize: 16, fontFamily: 'ProductSans-Bold'}}>
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                        }}>
                         Delivery Address:
                       </Text>
                     </Left>
@@ -614,10 +644,15 @@ class OrderDetailsScreen extends Component {
                         }
                       />
                     ))}
-                </Card>
+                </View>
+              </Card>
 
-                <SafeAreaView>
-                  <Card
+              <SafeAreaView>
+                <Card
+                  style={{
+                    borderRadius: 10,
+                  }}>
+                  <View
                     style={{
                       borderRadius: 10,
                       overflow: 'hidden',
@@ -692,11 +727,16 @@ class OrderDetailsScreen extends Component {
                         </Text>
                       </Right>
                     </CardItem>
-                  </Card>
+                  </View>
+                </Card>
 
-                  {selectedOrder.mrspeedyBookingData &&
-                    selectedOrder.mrspeedyBookingData.order && (
-                      <Card
+                {selectedOrder.mrspeedyBookingData &&
+                  selectedOrder.mrspeedyBookingData.order && (
+                    <Card
+                      style={{
+                        borderRadius: 10,
+                      }}>
+                      <View
                         style={{
                           borderRadius: 10,
                           overflow: 'hidden',
@@ -948,10 +988,15 @@ class OrderDetailsScreen extends Component {
                           vehicleType={this.mrspeedyVehicleType}
                           courierCoordinates={courierCoordinates}
                         />
-                      </Card>
-                    )}
+                      </View>
+                    </Card>
+                  )}
 
-                  <Card
+                <Card
+                  style={{
+                    borderRadius: 10,
+                  }}>
+                  <View
                     style={{
                       borderRadius: 10,
                       overflow: 'hidden',
@@ -970,7 +1015,10 @@ class OrderDetailsScreen extends Component {
                       </Left>
                       <Right>
                         <View
-                          style={{flexDirection: 'row', alignItems: 'center'}}>
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
                           <Text
                             style={{
                               fontSize: 15,
@@ -990,7 +1038,10 @@ class OrderDetailsScreen extends Component {
                         </View>
 
                         <View
-                          style={{flexDirection: 'row', alignItems: 'center'}}>
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
                           <Text
                             style={{
                               fontSize: 15,
@@ -1017,7 +1068,10 @@ class OrderDetailsScreen extends Component {
 
                       <Right>
                         <View
-                          style={{flexDirection: 'row', alignItems: 'center'}}>
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
                           <Text
                             style={{
                               fontSize: 15,
@@ -1039,47 +1093,51 @@ class OrderDetailsScreen extends Component {
                         </View>
                       </Right>
                     </CardItem>
-                  </Card>
+                  </View>
+                </Card>
 
-                  {buttonText &&
-                    !(
-                      buttonText === 'COMPLETE' &&
-                      selectedOrder.deliveryMethod === 'Mr. Speedy'
-                    ) && (
-                      <Button
-                        onPress={() => {
-                          if (
-                            (selectedOrder.deliveryMethod === 'Mr. Speedy' &&
-                              selectedOrder.paymentMethod === 'COD' &&
-                              selectedOrder.orderStatus.paid.status) ||
-                            (selectedOrder.deliveryMethod === 'Mr. Speedy' &&
-                              selectedOrder.paymentMethod ===
-                                'Online Banking' &&
-                              selectedOrder.orderStatus.pending.status)
-                          ) {
-                            this.mrspeedyBottomSheet.bottomSheet &&
-                              this.mrspeedyBottomSheet.bottomSheet.snapTo(1);
-                            this.mrspeedyBottomSheet.getMrspeedyOrderPriceEstimate();
-                          } else {
-                            this.setState({changeOrderStatusModal: true});
-                          }
-                        }}
-                        title={buttonText}
-                        titleStyle={{color: colors.icons}}
-                        containerStyle={{
-                          borderRadius: 24,
-                          marginTop: 10,
-                          height: 50,
-                        }}
-                        buttonStyle={{
-                          height: 50,
-                          backgroundColor: colors.accent,
-                        }}
-                      />
-                    )}
+                {buttonText &&
+                  !(
+                    buttonText === 'COMPLETE' &&
+                    selectedOrder.deliveryMethod === 'Mr. Speedy'
+                  ) && (
+                    <Button
+                      onPress={() => {
+                        if (
+                          (selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+                            selectedOrder.paymentMethod === 'COD' &&
+                            selectedOrder.orderStatus.paid.status) ||
+                          (selectedOrder.deliveryMethod === 'Mr. Speedy' &&
+                            selectedOrder.paymentMethod === 'Online Banking' &&
+                            selectedOrder.orderStatus.pending.status)
+                        ) {
+                          this.mrspeedyBottomSheet.modalizeRef &&
+                            this.mrspeedyBottomSheet.modalizeRef.open();
+                        } else {
+                          this.setState({changeOrderStatusModal: true});
+                        }
+                      }}
+                      title={buttonText}
+                      titleStyle={{color: colors.icons}}
+                      containerStyle={{
+                        borderRadius: 24,
+                        marginTop: 10,
+                        height: 50,
+                      }}
+                      buttonStyle={{
+                        height: 50,
+                        backgroundColor: colors.accent,
+                      }}
+                    />
+                  )}
 
-                  {selectedOrder.orderStatus.cancelled.status && (
-                    <Card
+                {selectedOrder.orderStatus.cancelled.status && (
+                  <Card
+                    style={{
+                      borderRadius: 10,
+                      overflow: 'hidden',
+                    }}>
+                    <View
                       style={{
                         borderRadius: 10,
                         overflow: 'hidden',
@@ -1092,6 +1150,7 @@ class OrderDetailsScreen extends Component {
                           Reason for Cancellation
                         </Text>
                       </CardItem>
+
                       <CardItem>
                         <Body>
                           <Text style={{width: '100%', textAlign: 'justify'}}>
@@ -1099,30 +1158,24 @@ class OrderDetailsScreen extends Component {
                           </Text>
                         </Body>
                       </CardItem>
-                    </Card>
-                  )}
-                </SafeAreaView>
-              </ScrollView>
-
-              <MrSpeedyBottomSheet
-                ref={(mrspeedyBottomSheet) =>
-                  (this.mrspeedyBottomSheet = mrspeedyBottomSheet)
-                }
-              />
-            </View>
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: colors.icons,
-              }}>
-              <ActivityIndicator size="large" color={colors.primary} />
-            </View>
-          )}
-        </View>
-      </TouchableWithoutFeedback>
+                    </View>
+                  </Card>
+                )}
+              </SafeAreaView>
+            </ScrollView>
+          </View>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: colors.icons,
+            }}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        )}
+      </View>
     );
   }
 }

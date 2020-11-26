@@ -26,17 +26,19 @@ class OrderCard extends PureComponent {
   @computed get orderStatus() {
     const {order} = this.props;
 
-    const statusLabel = Object.entries(order.orderStatus).map(
-      ([key, value]) => {
-        if (value.status) {
-          return key.toUpperCase();
-        }
+    if (order?.orderStatus !== undefined) {
+      const statusLabel = Object.entries(order.orderStatus).map(
+        ([key, value]) => {
+          if (value.status) {
+            return key.toUpperCase();
+          }
 
-        return;
-      },
-    );
+          return;
+        },
+      );
 
-    return statusLabel.filter((item) => item != null);
+      return statusLabel.filter((item) => item != null);
+    }
   }
 
   @computed get timeStamp() {
@@ -151,14 +153,19 @@ class OrderCard extends PureComponent {
     const {orderStatus, footerText, buttonText} = this;
 
     const CardHeader = () => {
-      const optionsButton =
-        orderStatus[0] === 'PENDING' ||
-        orderStatus[0] === 'UNPAID' ||
-        (orderStatus[0] === 'PAID' && order.paymentMethod === 'COD') ||
-        (orderStatus[0] === 'SHIPPED' &&
-          (order.deliveryMethod === 'Own Delivery' ||
-            (order.deliveryMethod === 'Mr. Speedy' &&
-              order.mrspeedyBookingData.order.status === 'canceled')));
+      const optionsButton = () => {
+        if (orderStatus) {
+          return (
+            orderStatus[0] === 'PENDING' ||
+            orderStatus[0] === 'UNPAID' ||
+            (orderStatus[0] === 'PAID' && order.paymentMethod === 'COD') ||
+            (orderStatus[0] === 'SHIPPED' &&
+              (order.deliveryMethod === 'Own Delivery' ||
+                (order.deliveryMethod === 'Mr. Speedy' &&
+                  order.mrspeedyBookingData.order.status === 'canceled')))
+          );
+        }
+      };
 
       return (
         <CardItem
@@ -217,7 +224,11 @@ class OrderCard extends PureComponent {
                 {order.userName}
               </Text>
 
-              <Text style={{color: colors.text_secondary}}>
+              <Text
+                style={{
+                  color: colors.text_secondary,
+                  fontFamily: 'ProductSans-Light',
+                }}>
                 Order # {order.storeOrderNumber}
               </Text>
 
@@ -249,7 +260,7 @@ class OrderCard extends PureComponent {
               flex: 1,
               backgroundColor: colors.primary,
               borderRadius: 16,
-              paddingVertical: 10,
+              padding: 5,
             }}>
             <View
               style={{
@@ -271,7 +282,7 @@ class OrderCard extends PureComponent {
 
               <Text
                 style={{
-                  fontSize: 16,
+                  fontSize: 14,
                   color: colors.icons,
                   textAlign: 'center',
                 }}>
@@ -309,7 +320,9 @@ class OrderCard extends PureComponent {
         <CardItem footer style={{paddingTop: 0, paddingBottom: 10}}>
           <Left>
             <Text style={{color: colors.primary}}>{this.orderStatus}</Text>
-            <Text> - {this.timeStamp}</Text>
+            <Text style={{fontFamily: 'ProductSans-Light'}}>
+              {` - ${this.timeStamp}`}
+            </Text>
           </Left>
           <Right>
             {buttonText &&
@@ -337,13 +350,10 @@ class OrderCard extends PureComponent {
                       order.paymentMethod === 'Online Banking' &&
                       order.orderStatus.pending.status)
                   ) {
-                    this.props.ordersStore.order = order;
+                    this.props.ordersStore.selectedOrder = order;
 
                     if (this.props.ordersStore.mrspeedyBottomSheet) {
-                      this.props.ordersStore.mrspeedyBottomSheet.getMrspeedyOrderPriceEstimate();
-                      this.props.ordersStore.mrspeedyBottomSheet.bottomSheet.snapTo(
-                        1,
-                      );
+                      this.props.ordersStore.mrspeedyBottomSheet.modalizeRef.open();
                     }
                   } else {
                     this.setState({changeOrderStatusModal: true});
@@ -352,7 +362,12 @@ class OrderCard extends PureComponent {
                 //onPress={() => this.setState({changeOrderStatusModal: true})}
               />
             ) : (
-              <Text style={{textAlign: 'right', color: colors.text_secondary}}>
+              <Text
+                style={{
+                  textAlign: 'right',
+                  color: colors.text_secondary,
+                  fontFamily: 'ProductSans-Light',
+                }}>
                 {footerText}
               </Text>
             )}
@@ -364,6 +379,7 @@ class OrderCard extends PureComponent {
     return (
       <View
         style={{
+          flex: 1,
           shadowColor: '#000',
           shadowOffset: {
             width: 0,
@@ -371,6 +387,7 @@ class OrderCard extends PureComponent {
           },
           shadowOpacity: 0.2,
           shadowRadius: 1.41,
+          marginHorizontal: 3,
         }}>
         <ConfirmationModal
           isVisible={this.state.changeOrderStatusModal}
@@ -419,10 +436,11 @@ class OrderCard extends PureComponent {
                       }}>{`₱${order.subTotal}`}</Text>
                     <Text
                       style={{
-                        fontSize: 14,
+                        fontSize: 12,
+                        fontFamily: 'ProductSans-Light',
                         color: colors.text_secondary,
                       }}>
-                      {`${order.quantity} Items`}
+                      {`${order.quantity} items`}
                     </Text>
                   </View>
                 </View>

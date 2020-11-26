@@ -16,7 +16,7 @@ const theme = {
   Text: {
     style: {
       color: colors.text_primary,
-      fontFamily: 'ProductSans-Light',
+      fontFamily: 'ProductSans-Regular',
     },
   },
   Button: {
@@ -44,11 +44,21 @@ const theme = {
     inputStyle: {
       fontFamily: 'ProductSans-Light',
     },
+    errorStyle: {
+      fontFamily: 'ProductSans-Light',
+      color: colors.danger,
+    },
     placeholderTextColor: colors.text_secondary,
   },
   CheckBox: {
     checkedColor: colors.accent,
-    fontFamily: 'ProductSans-Light',
+    titleProps: {
+      style: {
+        fontFamily: 'ProductSans-Regular',
+        fontSize: 15,
+        paddingHorizontal: 5,
+      },
+    },
     containerStyle: {
       borderRadius: 30,
       backgroundColor: colors.icons,

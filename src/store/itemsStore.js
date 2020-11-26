@@ -20,7 +20,7 @@ class ItemsStore {
 
   @action async editItem(
     storeId,
-    newItem,
+    item,
     additionalStock,
     itemOptions,
     imagePath,
@@ -29,12 +29,12 @@ class ItemsStore {
       .collection('stores')
       .doc(storeId)
       .collection('items')
-      .doc(newItem.doc);
+      .doc(item.doc);
     const timeStamp = firestore.Timestamp.now().toMillis();
 
     const fileExtension = imagePath ? imagePath.split('.').pop() : null;
     const imageRef = imagePath
-      ? `/images/stores/${storeId}/items/${newItem.itemId}_${timeStamp}.${fileExtension}`
+      ? `/images/stores/${storeId}/items/${item.itemId}_${timeStamp}.${fileExtension}`
       : null;
 
     if (imagePath) {
@@ -49,26 +49,22 @@ class ItemsStore {
           let dbItems = [...storeItemsDocument.data().items];
 
           const dbItemIndex = dbItems.findIndex(
-            (dbItem) => newItem.itemId === dbItem.itemId,
+            (dbItem) => item.itemId === dbItem.itemId,
           );
 
           if (dbItemIndex >= 0) {
-            newItem.updatedAt = timeStamp;
-            if (newItem.stock + additionalStock >= 0) {
-              newItem.stock += additionalStock;
-            } else {
-              newItem.stock = 0;
-            }
+            item.updatedAt = timeStamp;
+            item.stock = Math.max(0, additionalStock + item.stock);
 
             if (imagePath) {
-              newItem.image = imageRef;
+              item.image = imageRef;
             }
 
             if (itemOptions) {
-              newItem.options = itemOptions;
+              item.options = itemOptions;
             }
 
-            dbItems[dbItemIndex] = newItem;
+            dbItems[dbItemIndex] = item;
 
             await dbItems.sort((a, b) => a.name > b.name);
 

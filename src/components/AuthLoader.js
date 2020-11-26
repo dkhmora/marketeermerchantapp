@@ -6,6 +6,7 @@ import {View} from 'native-base';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import {when} from 'mobx';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 @inject('authStore')
 @inject('ordersStore')
@@ -23,9 +24,9 @@ class AuthLoader extends React.Component {
       await auth()
         .currentUser.getIdTokenResult(true)
         .then(async (idToken) => {
-          const {storeIds, role} = idToken.claims;
+          const {authTime, email, user_id, storeIds, role} = idToken.claims;
 
-          if (!storeIds && (!role || (role && role !== 'merchant'))) {
+          if (!storeIds) {
             await auth()
               .signOut()
               .then(() => {
@@ -40,7 +41,19 @@ class AuthLoader extends React.Component {
               );
           }
 
-          if (role) {
+          const storeIdsRoles = Object.entries(storeIds)
+            .map(([storeId, roles]) => `${storeId}: ${roles.join(', ')}`)
+            .join('; ');
+
+          crashlytics().setAttributes({
+            authTime,
+            email,
+            user_id,
+            storeIdsRoles,
+            role,
+          });
+
+          if (role === 'merchant') {
             !this.props.detailsStore.unsubscribeSetMerchantDetails &&
               this.props.detailsStore.setMerchantDetails(user.uid);
           }

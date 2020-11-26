@@ -13,10 +13,10 @@ import BaseHeader from '../components/BaseHeader';
 import {inject, observer} from 'mobx-react';
 import {Text, Icon, Button, Card} from 'react-native-elements';
 import {colors} from '../../assets/colors';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import moment from 'moment';
 import crashlytics from '@react-native-firebase/crashlytics';
 import CardItemHeader from '../components/CardItemHeader';
+import { ScrollView } from 'react-native-gesture-handler';
 @inject('detailsStore')
 @inject('itemsStore')
 @observer
@@ -323,7 +323,7 @@ class StoreDetailsScreen extends Component {
             <ActivityIndicator size="large" color={colors.icons} />
           </View>
         ) : (
-          <KeyboardAwareScrollView
+          <ScrollView
             style={{paddingHorizontal: 10}}
             showsVerticalScrollIndicator={false}
             contentInsetAdjustmentBehavior="automatic"
@@ -494,7 +494,7 @@ class StoreDetailsScreen extends Component {
                 </Card>
               </View>
             </SafeAreaView>
-          </KeyboardAwareScrollView>
+          </ScrollView>
         )}
       </View>
     );

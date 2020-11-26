@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: colors.primary,
     justifyContent: 'space-around',
-    zIndex: 100,
+    zIndex: 200,
     elevation: 10,
   },
   buttonContainer: {

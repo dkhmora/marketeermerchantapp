@@ -236,48 +236,37 @@ class DetailsStore {
     return await publicStorageBucket
       .ref(imageRef)
       .putFile(imagePath)
-      .then(() =>
-        this.storeRef.update({
-          [`${type}Image`]: imageRef,
-          updatedAt: firestore.Timestamp.now().toMillis(),
-        }),
-      )
+      .then(() => imageRef)
       .catch((err) => {
         crashlytics().recordError(err);
         Toast({text: err.message, type: 'danger'});
       });
   }
 
-  @action async updateStoreDetails(
-    storeDescription,
-    freeDelivery,
-    vacationMode,
-    availablePaymentMethods,
-    availableDeliveryMethods,
-    deliveryDiscount,
-    deliveryType,
-    ownDeliveryServiceFee,
-    freeDeliveryMinimum,
-  ) {
-    await this.storeRef
-      .update({
-        storeDescription,
-        freeDelivery,
-        freeDeliveryMinimum: freeDeliveryMinimum ? freeDeliveryMinimum : 0,
-        vacationMode,
-        availablePaymentMethods,
-        availableDeliveryMethods,
-        deliveryDiscount,
-        deliveryType,
-        ownDeliveryServiceFee: ownDeliveryServiceFee
-          ? ownDeliveryServiceFee
-          : 0,
-        updatedAt: firestore.Timestamp.now().toMillis(),
-      })
-      .catch((err) => {
-        crashlytics().recordError(err);
-        Toast({text: `Something went wrong. Error: ${err}`, type: 'danger'});
-      });
+  @action async updateStoreDetails(values) {
+    let finalValues = {
+      ...values,
+      updatedAt: firestore.Timestamp.now().toMillis(),
+    };
+
+    if (values.displayImage) {
+      finalValues.displayImage = await this.uploadImage(
+        values.displayImage,
+        'display',
+      );
+    }
+
+    if (values.coverImage) {
+      finalValues.coverImage = await this.uploadImage(
+        values.coverImage,
+        'cover',
+      );
+    }
+
+    return await this.storeRef.set(finalValues, {merge: true}).catch((err) => {
+      crashlytics().recordError(err);
+      Toast({text: `Something went wrong. Error: ${err}`, type: 'danger'});
+    });
   }
 }
 

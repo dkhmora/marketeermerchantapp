@@ -4,6 +4,8 @@ import {observer} from 'mobx-react';
 import {colors} from '../../assets/colors';
 import FastImage from 'react-native-fast-image';
 import {Fade, Placeholder, PlaceholderMedia} from 'rn-placeholder';
+import CustomizationOptionsList from './store_items/food/CustomizationOptionsList';
+import {StyleSheet} from 'react-native';
 
 @observer
 class OrderItemCard extends PureComponent {
@@ -16,58 +18,88 @@ class OrderItemCard extends PureComponent {
   }
 
   render() {
-    const {item, ...otherProps} = this.props;
-    const {imageReady} = this.state;
-    const url = item.image
-      ? {uri: `https://cdn.marketeer.ph${item.image}`}
+    const {
+      props: {
+        item: {
+          name,
+          description,
+          quantity,
+          price,
+          discountedPrice,
+          image,
+          selectedOptions,
+          specialInstructions,
+          totalOptionsPrice,
+        },
+        ...otherProps
+      },
+      state: {imageReady},
+    } = this;
+    const url = image
+      ? {uri: `https://cdn.marketeer.ph${image}`}
       : require('../../assets/placeholder.jpg');
-    const itemPrice = item.discountedPrice ? item.discountedPrice : item.price;
+    const optionsPrice = totalOptionsPrice ? totalOptionsPrice : 0;
+    const itemPrice = discountedPrice ? discountedPrice : price;
+    const totalItemPrice = itemPrice + optionsPrice;
 
     return (
       <CardItem
-        bordered
+        {...otherProps}
         style={{
-          paddingLeft: 10,
-          paddingRight: 10,
-          paddingBottom: 5,
-          paddingTop: 10,
+          paddingLeft: 0,
+          paddingRight: 0,
+          paddingBottom: 0,
+          paddingTop: 0,
+          flexDirection: 'column',
         }}>
         <View
           style={{
             flexDirection: 'row',
+            paddingHorizontal: 10,
+            paddingVertical: 5,
           }}>
-          <FastImage
-            key={item.name}
-            source={url}
+          <View
             style={{
+              elevation: 3,
+              borderRadius: 10,
               height: 55,
               width: 55,
-              borderColor: colors.primary,
-              borderWidth: 1,
-              borderRadius: 10,
-            }}
-            resizeMode={FastImage.resizeMode.cover}
-            onLoad={() => this.setState({imageReady: true})}
-          />
-
-          {!imageReady && (
-            <View
+              overflow: 'hidden',
+              backgroundColor: colors.icons,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: colors.divider,
+            }}>
+            <FastImage
+              key={name}
+              source={url}
               style={{
-                position: 'absolute',
-              }}>
-              <Placeholder Animation={Fade}>
-                <PlaceholderMedia
-                  style={{
-                    backgroundColor: colors.primary,
-                    aspectRatio: 1,
-                    width: 55,
-                    height: 55,
-                    borderRadius: 10,
-                  }}
-                />
-              </Placeholder>
-            </View>
-          )}
+                height: 55,
+                width: 55,
+                backgroundColor: colors.primary,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+              onLoad={() => this.setState({imageReady: true})}
+            />
+
+            {!imageReady && (
+              <View
+                style={{
+                  position: 'absolute',
+                }}>
+                <Placeholder Animation={Fade}>
+                  <PlaceholderMedia
+                    style={{
+                      backgroundColor: colors.primary,
+                      aspectRatio: 1,
+                      width: 55,
+                      height: 55,
+                      borderRadius: 10,
+                    }}
+                  />
+                </Placeholder>
+              </View>
+            )}
+          </View>
 
           <View
             style={{
@@ -75,18 +107,18 @@ class OrderItemCard extends PureComponent {
               flexDirection: 'column',
               paddingHorizontal: 10,
             }}>
-            <Text style={{fontFamily: 'ProductSans-Regular', fontSize: 18}}>
-              {item.name}
+            <Text style={{fontFamily: 'ProductSans-Bold', fontSize: 18}}>
+              {name}
             </Text>
 
             <Text
               numberOfLines={2}
               style={{
-                fontFamily: 'ProductSans-Light',
+                fontFamily: 'ProductSans-Regular',
                 fontSize: 14,
                 color: colors.text_secondary,
               }}>
-              {item.description}
+              {description}
             </Text>
           </View>
 
@@ -98,11 +130,11 @@ class OrderItemCard extends PureComponent {
             }}>
             <Text
               style={{
-                fontFamily: 'ProductSans-Black',
+                fontFamily: 'ProductSans-Regular',
                 fontSize: 16,
                 color: colors.text_primary,
               }}>
-              ₱{itemPrice}
+              ₱{totalItemPrice}
             </Text>
 
             <Text
@@ -112,8 +144,9 @@ class OrderItemCard extends PureComponent {
                 borderBottomWidth: 1,
                 textAlign: 'right',
                 width: '100%',
+                fontSize: 12,
               }}>
-              x{item.quantity}
+              x{quantity}
             </Text>
 
             <Text
@@ -122,9 +155,16 @@ class OrderItemCard extends PureComponent {
                 fontSize: 18,
                 color: colors.text_primary,
               }}>
-              ₱{itemPrice * item.quantity}
+              ₱{totalItemPrice * quantity}
             </Text>
           </View>
+        </View>
+
+        <View style={{width: '100%'}}>
+          <CustomizationOptionsList
+            selectedOptions={selectedOptions}
+            specialInstructions={specialInstructions}
+          />
         </View>
       </CardItem>
     );

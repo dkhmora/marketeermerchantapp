@@ -86,13 +86,13 @@ class ItemsList extends Component {
 
     return (
       <Container style={{flex: 1}}>
-        <View style={{paddingHorizontal: 10, flex: 1}}>
+        <View style={{flex: 1}}>
           {this.props.itemsStore.loaded ? (
             <FlatList
               ref={(flatList) => (this.flatList = flatList)}
               data={this.formatData(dataSource, numColumns)}
               numColumns={numColumns}
-              contentContainerStyle={{flexGrow: 1}}
+              contentContainerStyle={{flexGrow: 1, padding: 5}}
               initialNumToRender={4}
               renderItem={this.renderItem}
               ListEmptyComponent={
@@ -109,8 +109,8 @@ class ItemsList extends Component {
                       textAlign: 'center',
                       paddingHorizontal: 15,
                     }}>
-                    You haven't placed added an item to this category yet. Add
-                    an item by pressing
+                    You haven't added an item to this category yet. Add an item
+                    by pressing
                   </Text>
                   <Icon
                     name="plus"
@@ -143,6 +143,12 @@ class ItemsList extends Component {
 
         <Fab
           position="bottomRight"
+          containerStyle={{
+            backgroundColor: colors.accent,
+            elevation: 5,
+            borderRadius: 100,
+            overflow: 'hidden',
+          }}
           style={{backgroundColor: colors.accent}}
           onPress={() => {
             if (
@@ -151,7 +157,7 @@ class ItemsList extends Component {
             ) {
               navigation.navigate('Edit Item', {
                 item: null,
-                itemCategory: category,
+                itemCategory: category !== 'All' ? category : null,
               });
             } else {
               Toast({

@@ -11,27 +11,41 @@ class CustomInput extends Component {
   render() {
     const {
       field: {name, onBlur, onChange, value},
-      form: {errors, touched, setFieldTouched},
+      form: {errors, touched, setFieldTouched, setFieldValue},
       leftIcon,
+      type,
+      leftIconProps,
       ...inputProps
     } = this.props;
 
-    const hasError = errors[name] && touched[name];
+    const error = name.split('.').reduce((o, i) => o?.[i], errors);
+    const touch = name.split('.').reduce((o, i) => o?.[i], touched);
+
+    const hasError = error && touch;
 
     return (
       <Input
-        value={value}
-        errorMessage={hasError ? errors[name] : ''}
+        value={type === 'number' && value ? String(value) : value}
+        errorMessage={hasError ? error : ''}
         leftIcon={
           leftIcon ? (
             typeof leftIcon === 'string' ? (
-              <Icon name={leftIcon} color={colors.primary} size={20} />
+              <Icon
+                name={leftIcon}
+                color={colors.primary}
+                size={20}
+                {...leftIconProps}
+              />
             ) : (
               leftIcon
             )
           ) : null
         }
-        onChangeText={(text) => onChange(name)(text)}
+        onChangeText={(text) =>
+          type === 'number' && text
+            ? setFieldValue(name, Number(text))
+            : onChange(name)(text)
+        }
         onBlur={() => {
           setFieldTouched(name);
           onBlur(name);

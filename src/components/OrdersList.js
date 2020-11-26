@@ -91,14 +91,22 @@ class OrdersList extends Component {
     return data;
   }
 
-  renderItem = ({item, index}) => (
-    <OrderCard
-      order={item}
-      tabName={this.props.route.name}
-      navigation={this.props.navigation}
-      key={item.orderId}
-    />
-  );
+  renderItem = ({item, index}) => {
+    if (item.empty) {
+      return (
+        <View style={{flex: 1, backgroundColor: 'transparent'}} key={index} />
+      );
+    }
+
+    return (
+      <OrderCard
+        order={item}
+        tabName={this.props.route.name}
+        navigation={this.props.navigation}
+        key={item.orderId}
+      />
+    );
+  };
 
   render() {
     const {loading} = this.state;
@@ -113,10 +121,10 @@ class OrdersList extends Component {
           ref={(flatList) => (this.flatList = flatList)}
           data={this.formatData(dataSource, numColumns)}
           numColumns={numColumns}
-          contentContainerStyle={{flexGrow: 1}}
-          initialNumToRender={5}
+          contentContainerStyle={{flexGrow: 1, padding: 5}}
+          initialNumToRender={10}
           windowSize={11}
-          style={{flex: 1, paddingHorizontal: 10}}
+          style={{flex: 1}}
           renderItem={this.renderItem}
           keyExtractor={(item) => item.orderId}
           showsVerticalScrollIndicator={false}

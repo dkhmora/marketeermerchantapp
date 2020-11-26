@@ -13,4 +13,6 @@ export const colors = {
   danger: '#ff4444',
   warning: '#ffbb33',
   info: '#33b5e5',
+  text_disabled: '#dddd',
+  primary_lightOpacity: '#448AFF40',
 };

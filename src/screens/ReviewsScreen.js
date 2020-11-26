@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {inject, observer} from 'mobx-react';
 import {View, RefreshControl} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-import {Text, Avatar} from 'react-native-elements';
+import {Text, Avatar, Divider} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import {Rating} from 'react-native-rating-element';
 import moment from 'moment';
@@ -47,10 +47,8 @@ class ReviewsScreen extends Component {
         style={{
           width: '100%',
           flexDirection: 'column',
-          paddingVertical: 10,
-          borderBottomColor: colors.divider,
-          borderBottomWidth: 1,
-          paddingHorizontal: 15,
+          paddingHorizontal: 5,
+          paddingVertical: 5,
         }}>
         <View
           style={{
@@ -101,7 +99,13 @@ class ReviewsScreen extends Component {
             {item.reviewBody}
           </Text>
 
-          <Text style={{color: colors.text_secondary}}>{timeStamp}</Text>
+          <Text
+            style={{
+              color: colors.text_secondary,
+              fontFamily: 'ProductSans-Light',
+            }}>
+            {timeStamp}
+          </Text>
         </View>
       </View>
     );
@@ -113,8 +117,6 @@ class ReviewsScreen extends Component {
         style={{
           alignItems: 'center',
           paddingVertical: 10,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.divider,
         }}>
         <Text
           style={{
@@ -137,11 +139,19 @@ class ReviewsScreen extends Component {
           onIconTap={() => {}}
         />
 
-        <Text style={{fontSize: 18, fontFamily: 'ProductSans-Regular'}}>
-          {storeDetails.ratingAverage
-            ? storeDetails.ratingAverage.toFixed(1)
-            : 'No Rating Yet'}
-        </Text>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={{fontSize: 18, fontFamily: 'ProductSans-Regular'}}>
+            {storeDetails.ratingAverage
+              ? storeDetails.ratingAverage.toFixed(1)
+              : 'No Rating Yet'}
+          </Text>
+          <Text
+            style={{
+              textAlignVertical: 'center',
+              paddingHorizontal: 2,
+              fontSize: 16,
+            }}>{`(${storeDetails.reviewNumber})`}</Text>
+        </View>
       </View>
     );
   }
@@ -159,11 +169,19 @@ class ReviewsScreen extends Component {
           style={{flex: 1}}
           data={reviews}
           initialNumToRender={30}
+          contentContainerStyle={{paddingHorizontal: 10, paddingVertical: 5}}
           ListHeaderComponent={
-            <this.AverageRatingHeader storeDetails={storeDetails} />
+            <View>
+              <this.AverageRatingHeader storeDetails={storeDetails} />
+              <Divider />
+            </View>
           }
           renderItem={({item, index}) => (
-            <this.ReviewListItem item={item} key={index} />
+            <View key={index}>
+              <this.ReviewListItem item={item} />
+
+              <Divider />
+            </View>
           )}
           refreshControl={
             <RefreshControl
@@ -173,7 +191,6 @@ class ReviewsScreen extends Component {
             />
           }
           keyExtractor={(item) => item.orderId}
-          showsVerticalScrollIndicator={false}
         />
       </View>
     );
