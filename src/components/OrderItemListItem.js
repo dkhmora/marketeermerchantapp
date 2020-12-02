@@ -31,6 +31,7 @@ class OrderItemCard extends PureComponent {
           specialInstructions,
           totalOptionsPrice,
         },
+        containerStyle,
         ...otherProps
       },
       state: {imageReady},
@@ -51,6 +52,7 @@ class OrderItemCard extends PureComponent {
           paddingBottom: 0,
           paddingTop: 0,
           flexDirection: 'column',
+          ...containerStyle,
         }}>
         <View
           style={{

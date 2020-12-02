@@ -1,0 +1,3 @@
+const isString = (variable, type) => {
+
+}

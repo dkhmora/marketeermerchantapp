@@ -33,6 +33,7 @@ import MapCardItem from '../components/MapCardItem';
 import CardItemHeader from '../components/CardItemHeader';
 import MrSpeedyBottomSheet from '../components/MrSpeedyBottomSheet';
 import moment from 'moment';
+import ChatIcon from '../components/ChatIcon';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -387,13 +388,11 @@ class OrderDetailsScreen extends Component {
       <View>
         {orderItems.map((item, index) => {
           return (
-            <View>
-              <OrderItemListItem
-                item={item}
-                key={`${item.cartId}${item.itemId}${index}`}
-              />
-              <Divider />
-            </View>
+            <OrderItemListItem
+              key={`${item.cartId}${item.itemId}${index}`}
+              item={item}
+              containerStyle={{marginBottom: 10, elevation: 3}}
+            />
           );
         })}
       </View>
@@ -492,54 +491,9 @@ class OrderDetailsScreen extends Component {
                     overflow: 'hidden',
                   }}>
                   <CardItemHeader
-                    title={
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          flex: 1,
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            color: colors.primary,
-                            fontFamily: 'ProductSans-Bold',
-                            fontSize: 20,
-                          }}>
-                          Customer Details
-                        </Text>
-
-                        <View style={{alignItems: 'center'}}>
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              paddingHorizontal: 5,
-                              paddingTop: 5,
-                            }}>
-                            <Icon
-                              name="message-square"
-                              color={colors.primary}
-                            />
-
-                            {selectedOrder.storeUnreadCount !== null &&
-                              selectedOrder.storeUnreadCount > 0 && (
-                                <Badge
-                                  value={selectedOrder.storeUnreadCount}
-                                  badgeStyle={{
-                                    backgroundColor: colors.accent,
-                                  }}
-                                  containerStyle={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    right: 0,
-                                  }}
-                                />
-                              )}
-                          </View>
-
-                          <Text style={{color: colors.primary}}>Chat</Text>
-                        </View>
-                      </View>
+                    title="Customer Details"
+                    rightComponent={
+                      <ChatIcon badgeCount={selectedOrder.storeUnreadCount} />
                     }
                     onPress={() =>
                       navigation.navigate('Order Chat', {
@@ -1000,8 +954,12 @@ class OrderDetailsScreen extends Component {
                     style={{
                       borderRadius: 10,
                       overflow: 'hidden',
+                      backgroundColor: colors.list_background,
                     }}>
-                    <CardItemHeader title="Order Items" />
+                    <CardItemHeader
+                      title="Order Items"
+                      style={{marginBottom: 10}}
+                    />
 
                     {loading ? (
                       <ActivityIndicator color={colors.primary} size="large" />
@@ -1009,7 +967,7 @@ class OrderDetailsScreen extends Component {
                       this.OrderItemsList(orderItems)
                     )}
 
-                    <CardItem bordered>
+                    <CardItem bordered style={{elevation: 3}}>
                       <Left>
                         <Text note>{selectedOrder.quantity} items</Text>
                       </Left>
@@ -1063,7 +1021,7 @@ class OrderDetailsScreen extends Component {
                       </Right>
                     </CardItem>
 
-                    <CardItem footer bordered>
+                    <CardItem footer bordered style={{elevation: 3}}>
                       <Left />
 
                       <Right>

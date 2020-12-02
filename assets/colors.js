@@ -15,4 +15,5 @@ export const colors = {
   info: '#33b5e5',
   text_disabled: '#dddd',
   primary_lightOpacity: '#448AFF40',
+  list_background: '#F5F5F5',
 };

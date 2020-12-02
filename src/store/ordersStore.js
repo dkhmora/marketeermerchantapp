@@ -151,10 +151,6 @@ class OrdersStore {
             if (documentSnapshot.exists) {
               this.orderMessages = [];
 
-              if (documentSnapshot.data().storeUnreadCount !== 0) {
-                this.markMessagesAsRead(orderId);
-              }
-
               this.selectedOrder = {...documentSnapshot.data(), orderId};
 
               if (
@@ -175,15 +171,14 @@ class OrdersStore {
   }
 
   @action async markMessagesAsRead(orderId) {
-    this.markMessagesAsReadTimeout &&
-      clearTimeout(this.markMessagesAsReadTimeout);
-
-    this.markMessagesAsReadTimeout = setTimeout(() => {
-      firestore().collection('orders').doc(orderId).update({
+    return firestore()
+      .collection('orders')
+      .doc(orderId)
+      .update({
         storeUnreadCount: 0,
         updatedAt: firestore.Timestamp.now().toMillis(),
-      });
-    }, 100);
+      })
+      .then(() => console.log('up'));
   }
 
   @action async getOrderItems(orderId) {
