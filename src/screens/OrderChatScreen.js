@@ -309,6 +309,7 @@ class OrderChatScreen extends Component {
               messages={dataSource}
               onSend={(messages) => this.onSend(messages)}
               user={user}
+              keyboardShouldPersistTaps="handled"
             />
           </KeyboardAvoidingView>
         </Container>
