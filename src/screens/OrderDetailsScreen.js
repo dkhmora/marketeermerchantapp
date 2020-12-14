@@ -413,6 +413,29 @@ class OrderDetailsScreen extends Component {
         : orderStatus[0] === 'SHIPPED'
         ? 'COMPLETE'
         : null;
+    const appliedDeliveryVoucherTitle =
+      selectedOrder?.marketeerVoucherDetails?.delivery?.title;
+    const appliedDeliveryVoucherAmount =
+      selectedOrder?.marketeerVoucherDetails?.delivery?.discount?.amount;
+    const finalDeliveryPrice = selectedOrder?.deliveryPrice
+      ? Math.max(
+          0,
+          selectedOrder?.deliveryPrice -
+            Number(
+              selectedOrder?.deliveryDiscount
+                ? selectedOrder.deliveryDiscount
+                : 0,
+            ) -
+            Number(
+              appliedDeliveryVoucherAmount !== undefined
+                ? appliedDeliveryVoucherAmount
+                : 0,
+            ),
+        )
+      : 0;
+    const totalAmount =
+      (selectedOrder?.subTotal !== undefined ? selectedOrder.subTotal : 0) +
+      finalDeliveryPrice;
 
     return (
       <View style={{...StyleSheet.absoluteFillObject}}>
@@ -929,6 +952,47 @@ class OrderDetailsScreen extends Component {
                           </Right>
                         </CardItem>
 
+                        {appliedDeliveryVoucherTitle !== undefined && (
+                          <CardItem bordered>
+                            <Left>
+                              <Text
+                                style={{
+                                  fontSize: 16,
+                                  fontFamily: 'ProductSans-Bold',
+                                }}>
+                                Voucher/s Applied:
+                              </Text>
+                            </Left>
+
+                            <Right>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  backgroundColor: colors.primary,
+                                  elevation: 3,
+                                  borderRadius: 8,
+                                  padding: 3,
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}>
+                                <Icon
+                                  name="tag"
+                                  color={colors.icons}
+                                  size={16}
+                                />
+                                <Text
+                                  style={{
+                                    color: colors.icons,
+                                    fontSize: 16,
+                                    paddingHorizontal: 3,
+                                  }}>
+                                  {appliedDeliveryVoucherTitle}
+                                </Text>
+                              </View>
+                            </Right>
+                          </CardItem>
+                        )}
+
                         <MapCardItem
                           onTouchStart={() =>
                             this.setState({allowDragging: false})
@@ -967,86 +1031,195 @@ class OrderDetailsScreen extends Component {
                       this.OrderItemsList(orderItems)
                     )}
 
-                    <CardItem bordered style={{elevation: 3}}>
+                    <Divider />
+
+                    <CardItem bordered>
+                      <View style={{flex: 1}}>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}>
+                          <Text
+                            style={{
+                              flex: 1,
+                              fontSize: 16,
+                              textAlign: 'left',
+                            }}>
+                            {'Subtotal: '}
+                          </Text>
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              fontFamily: 'ProductSans-Black',
+                            }}>
+                            ₱{selectedOrder?.subTotal.toFixed(2)}
+                          </Text>
+                        </View>
+
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}>
+                          <View style={{flex: 1}}>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                textAlign: 'left',
+                              }}>
+                              {'Delivery Price: '}
+                            </Text>
+
+                            {!selectedOrder?.deliveryPrice && (
+                              <Text
+                                style={{
+                                  flex: 1,
+                                  fontSize: 12,
+                                  color: colors.text_secondary,
+                                  textAlign: 'left',
+                                }}>
+                                Delivery price will be shown once the store has
+                                shipped order
+                              </Text>
+                            )}
+                          </View>
+
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              fontFamily: 'ProductSans-Black',
+                            }}>
+                            {selectedOrder?.deliveryPrice
+                              ? `₱${selectedOrder?.deliveryPrice.toFixed(2)}`
+                              : 'TBD'}
+                          </Text>
+                        </View>
+
+                        {selectedOrder?.deliveryDiscount && (
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <Text
+                              style={{
+                                flex: 1,
+                                fontSize: 16,
+                                textAlign: 'left',
+                              }}>
+                              {'Store Delivery Discount: '}
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Black',
+                              }}>
+                              -₱{selectedOrder.deliveryDiscount.toFixed(2)}
+                            </Text>
+                          </View>
+                        )}
+
+                        {appliedDeliveryVoucherAmount && (
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }}>
+                            <Text
+                              style={{
+                                flex: 1,
+                                fontSize: 16,
+                                textAlign: 'left',
+                              }}>
+                              {'Marketeer Voucher Delivery Discount: '}
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Black',
+                              }}>
+                              -₱{appliedDeliveryVoucherAmount.toFixed(2)}
+                            </Text>
+                          </View>
+                        )}
+
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}>
+                          <View style={{flex: 1}}>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                textAlign: 'left',
+                              }}>
+                              {'Delivery Price Subtotal: '}
+                            </Text>
+
+                            {!selectedOrder?.deliveryPrice && (
+                              <Text
+                                style={{
+                                  flex: 1,
+                                  fontSize: 12,
+                                  color: colors.text_secondary,
+                                  textAlign: 'left',
+                                }}>
+                                Delivery price will be shown once the store has
+                                shipped order
+                              </Text>
+                            )}
+                          </View>
+
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              fontFamily: 'ProductSans-Black',
+                            }}>
+                            {selectedOrder?.deliveryPrice
+                              ? `₱${finalDeliveryPrice.toFixed(2)}`
+                              : 'TBD'}
+                          </Text>
+                        </View>
+                      </View>
+                    </CardItem>
+                    <CardItem footer bordered>
                       <Left>
-                        <Text note>{selectedOrder.quantity} items</Text>
+                        <View style={{flex: 1}}>
+                          <Text style={{color: colors.text_secondary}}>
+                            {selectedOrder?.quantity} items
+                          </Text>
+                        </View>
                       </Left>
                       <Right>
                         <View
                           style={{
                             flexDirection: 'row',
                             alignItems: 'center',
+                            justifyContent: 'space-between',
                           }}>
                           <Text
                             style={{
-                              fontSize: 15,
-                              color: colors.text_primary,
+                              fontSize: 16,
                               fontFamily: 'ProductSans-Light',
-                            }}>
-                            {'Subtotal: '}
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 18,
-                              color: colors.text_primary,
-                              fontFamily: 'ProductSans-Black',
-                            }}>
-                            {`₱${selectedOrder.subTotal.toFixed(2)}`}
-                          </Text>
-                        </View>
-
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                          }}>
-                          <Text
-                            style={{
-                              fontSize: 15,
-                              color: colors.text_primary,
-                              fontFamily: 'ProductSans-Light',
-                            }}>
-                            {'Delivery Price: '}
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 18,
-                              color: colors.text_primary,
-                              fontFamily: 'ProductSans-Black',
-                              textAlign: 'right',
-                            }}>
-                            {this.deliveryPriceText}
-                          </Text>
-                        </View>
-                      </Right>
-                    </CardItem>
-
-                    <CardItem footer bordered style={{elevation: 3}}>
-                      <Left />
-
-                      <Right>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                          }}>
-                          <Text
-                            style={{
-                              fontSize: 15,
-                              color: colors.text_primary,
-                              fontFamily: 'ProductSans-Light',
+                              textAlign: 'left',
                             }}>
                             {'Order Total: '}
                           </Text>
-
                           <Text
                             style={{
-                              fontSize: 18,
-                              color: colors.text_primary,
+                              fontSize: 16,
                               fontFamily: 'ProductSans-Black',
-                              textAlign: 'right',
                             }}>
-                            {this.orderTotalText}
+                            {`₱${totalAmount.toFixed(2)}`}
                           </Text>
                         </View>
                       </Right>
