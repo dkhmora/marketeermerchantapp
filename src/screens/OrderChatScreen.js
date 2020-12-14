@@ -114,12 +114,13 @@ class OrderChatScreen extends Component {
         route: {
           params: {orderId},
         },
+        selectedOrder: {storeUnreadCount} = {},
       },
       state: {readingMessages},
     } = this;
 
     when(
-      () => this.props.ordersStore.storeUnreadCount > 0 && !readingMessages,
+      () => storeUnreadCount > 0 && !readingMessages,
       () => {
         this.setState({readingMessages: true}, () => {
           this.props.ordersStore.markMessagesAsRead(orderId).then(() => {
