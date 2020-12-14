@@ -2,10 +2,9 @@ import {observable, action, computed} from 'mobx';
 import auth from '@react-native-firebase/auth';
 import messaging from '@react-native-firebase/messaging';
 import Toast from '../components/Toast';
-import firebase from '@react-native-firebase/app';
 import crashlytics from '@react-native-firebase/crashlytics';
+import {functions} from '../util/variables';
 
-const functions = firebase.app().functions('asia-northeast1');
 class AuthStore {
   @observable appReady = true;
 

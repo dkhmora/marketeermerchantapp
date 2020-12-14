@@ -1,12 +1,10 @@
 import {observable, action} from 'mobx';
-import firebase from '@react-native-firebase/app';
 import firestore from '@react-native-firebase/firestore';
 import '@react-native-firebase/functions';
 import 'react-native-get-random-values';
 import Toast from '../components/Toast';
 import crashlytics from '@react-native-firebase/crashlytics';
-
-const functions = firebase.app().functions('asia-northeast1');
+import {functions} from '../util/variables';
 
 class PaymentsStore {
   @observable payments = [];

@@ -10,7 +10,6 @@ import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import ConfirmationModal from './ConfirmationModal';
 import ChatIcon from './ChatIcon';
-
 @inject('ordersStore')
 @inject('detailsStore')
 @observer
