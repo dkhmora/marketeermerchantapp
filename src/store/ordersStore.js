@@ -6,7 +6,7 @@ import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
 import {persist} from 'mobx-persist';
 import Toast from '../components/Toast';
-import { functions } from '../util/variables';
+import {functions} from '../util/variables';
 
 const ordersCollection = firestore().collection('orders');
 class OrdersStore {
@@ -169,14 +169,10 @@ class OrdersStore {
   }
 
   @action async markMessagesAsRead(orderId) {
-    return firestore()
-      .collection('orders')
-      .doc(orderId)
-      .update({
-        storeUnreadCount: 0,
-        updatedAt: firestore.Timestamp.now().toMillis(),
-      })
-      .then(() => console.log('up'));
+    return firestore().collection('orders').doc(orderId).update({
+      storeUnreadCount: 0,
+      updatedAt: firestore.Timestamp.now().toMillis(),
+    });
   }
 
   @action async getOrderItems(orderId) {
