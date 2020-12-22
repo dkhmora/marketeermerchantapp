@@ -399,8 +399,10 @@ class EditItemScreen extends Component {
                       unit: '',
                       price: null,
                       discountedPrice: null,
-                      additionalStock: null,
-                      category: itemCategory,
+                      additionalStock: storeType === 'food' ? null : undefined,
+                      category: itemCategory
+                        ? itemCategory
+                        : this.categories[0],
                     }
               }
               onSubmit={(values) => {

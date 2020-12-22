@@ -6,13 +6,14 @@ import {GiftedChat, Bubble, Send} from 'react-native-gifted-chat';
 import {inject, observer} from 'mobx-react';
 import {Avatar, Icon, Button, Text} from 'react-native-elements';
 import ImagePicker from 'react-native-image-crop-picker';
-import {observable, computed} from 'mobx';
+import {observable, computed, when} from 'mobx';
 import {colors} from '../../assets/colors';
 import Toast from '../components/Toast';
 import ConfirmationModal from '../components/ConfirmationModal';
 import firestore from '@react-native-firebase/firestore';
 import moment from 'moment';
 import crashlytics from '@react-native-firebase/crashlytics';
+
 @inject('ordersStore')
 @inject('detailsStore')
 @inject('authStore')
@@ -24,6 +25,7 @@ class OrderChatScreen extends Component {
     this.state = {
       confirmImageModal: false,
       loading: true,
+      readingMessages: false,
     };
 
     this.renderComposer.bind(this);
@@ -71,10 +73,22 @@ class OrderChatScreen extends Component {
     return false;
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    this.checkMessagesRead();
+  }
+
   componentDidMount() {
     this.props.navigation.setOptions({gestureEnabled: false});
 
-    const {orderId, data} = this.props.route.params;
+    const {
+      props: {
+        route: {
+          params: {orderId, data},
+        },
+      },
+    } = this;
+
+    this.checkMessagesRead();
 
     if (!data) {
       this.props.ordersStore.getOrder(orderId);
@@ -92,6 +106,29 @@ class OrderChatScreen extends Component {
       this.props.ordersStore.unsubscribeGetOrder &&
         this.props.ordersStore.unsubscribeGetOrder();
     }
+  }
+
+  checkMessagesRead() {
+    const {
+      props: {
+        route: {
+          params: {orderId},
+        },
+        selectedOrder: {storeUnreadCount} = {},
+      },
+      state: {readingMessages},
+    } = this;
+
+    when(
+      () => storeUnreadCount > 0 && !readingMessages,
+      () => {
+        this.setState({readingMessages: true}, () => {
+          this.props.ordersStore.markMessagesAsRead(orderId).then(() => {
+            this.setState({readingMessages: false});
+          });
+        });
+      },
+    );
   }
 
   onSend(messages = []) {
@@ -270,6 +307,7 @@ class OrderChatScreen extends Component {
               messages={dataSource}
               onSend={(messages) => this.onSend(messages)}
               user={user}
+              keyboardShouldPersistTaps="handled"
             />
           </KeyboardAvoidingView>
         </Container>

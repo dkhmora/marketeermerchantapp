@@ -6,17 +6,17 @@ import {
   FlatList,
   RefreshControl,
 } from 'react-native';
-import {CardItem} from 'native-base';
+import {Card, CardItem} from 'native-base';
 // Custom Components
 import BaseHeader from '../components/BaseHeader';
 // Mobx
 import {inject, observer} from 'mobx-react';
-import {Text, Icon, Button, Card} from 'react-native-elements';
+import {Text, Icon, Button} from 'react-native-elements';
 import {colors} from '../../assets/colors';
 import moment from 'moment';
 import crashlytics from '@react-native-firebase/crashlytics';
 import CardItemHeader from '../components/CardItemHeader';
-import { ScrollView } from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native-gesture-handler';
 @inject('detailsStore')
 @inject('itemsStore')
 @observer
@@ -94,205 +94,210 @@ class StoreDetailsScreen extends Component {
           </Text>
         </View>
 
-        {item.mrspeedy && (
-          <Card
-            containerStyle={{
-              flex: 1,
-              borderRadius: 10,
-              paddingLeft: 0,
-              paddingRight: 0,
-              paddingTop: 0,
-              paddingBottom: 0,
-              overflow: 'hidden',
-            }}>
-            <CardItemHeader
-              style={{height: 25}}
-              title="Mr. Speedy COD Transactions"
-              titleStyle={{fontSize: 15}}
-            />
-
-            <View
+        <View style={{marginHorizontal: 5}}>
+          {item.mrspeedy && (
+            <Card
               style={{
                 flex: 1,
-                flexDirection: 'row',
-                paddingHorizontal: 10,
-                paddingVertical: 10,
+                borderRadius: 10,
+                paddingLeft: 0,
+                paddingRight: 0,
+                paddingTop: 0,
+                paddingBottom: 0,
               }}>
-              <View style={{flex: 1}}>
+              <View style={{borderRadius: 10, overflow: 'hidden'}}>
+                <CardItemHeader
+                  style={{height: 25}}
+                  title="Mr. Speedy COD Transactions"
+                  titleStyle={{fontSize: 15}}
+                />
+
                 <View
                   style={{
+                    flex: 1,
                     flexDirection: 'row',
-                    flex: 1,
+                    paddingHorizontal: 10,
+                    paddingVertical: 10,
                   }}>
-                  <Text
+                  <View style={{flex: 1}}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        flex: 1,
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                          color: colors.text_primary,
+                          textAlign: 'left',
+                        }}>
+                        {'Total Delivery Discount: '}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Regular',
+                          color: colors.text_primary,
+                          textAlign: 'left',
+                        }}>
+                        -₱{item.mrspeedy.totalDeliveryDiscount}
+                      </Text>
+                    </View>
+
+                    <Text
+                      style={{
+                        fontSize: 14,
+                      }}>
+                      {`${item.mrspeedy.transactionCount} `}
+                      {item.mrspeedy.transactionCount < 2
+                        ? 'transaction'
+                        : 'transactions'}
+                    </Text>
+
+                    <Text style={{color: colors.text_secondary, paddingTop: 8}}>
+                      Updated {timeStamp}
+                    </Text>
+                  </View>
+
+                  <View
                     style={{
-                      fontSize: 16,
-                      fontFamily: 'ProductSans-Bold',
-                      color: colors.text_primary,
-                      textAlign: 'left',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.primary,
+                      borderRadius: 10,
+                      elevation: 3,
+                      padding: 5,
+                      width: '30%',
                     }}>
-                    {'Total Delivery Discount: '}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontFamily: 'ProductSans-Regular',
-                      color: colors.text_primary,
-                      textAlign: 'left',
-                    }}>
-                    -₱{item.mrspeedy.totalDeliveryDiscount}
-                  </Text>
+                    <Text
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      style={{
+                        fontSize: 20,
+                        flex: 1,
+                        fontFamily: 'ProductSans-Bold',
+                        color: colors.icons,
+                        textAlign: 'center',
+                        flexWrap: 'wrap',
+                      }}>
+                      ₱{item.mrspeedy.totalAmount.toFixed(2)}
+                    </Text>
+                    <Text
+                      numberOfLines={2}
+                      style={{
+                        color: colors.icons,
+                        textAlign: 'center',
+                      }}>
+                      Total Amount
+                    </Text>
+                  </View>
                 </View>
-
-                <Text
-                  style={{
-                    fontSize: 14,
-                  }}>
-                  {`${item.mrspeedy.transactionCount} `}
-                  {item.mrspeedy.transactionCount < 2
-                    ? 'transaction'
-                    : 'transactions'}
-                </Text>
-
-                <Text style={{color: colors.text_secondary, paddingTop: 8}}>
-                  Updated {timeStamp}
-                </Text>
               </View>
+            </Card>
+          )}
 
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: colors.primary,
-                  borderRadius: 10,
-                  elevation: 3,
-                  padding: 5,
-                  width: '30%',
-                }}>
-                <Text
-                  numberOfLines={2}
-                  adjustsFontSizeToFit
-                  style={{
-                    fontSize: 20,
-                    flex: 1,
-                    fontFamily: 'ProductSans-Bold',
-                    color: colors.icons,
-                    textAlign: 'center',
-                    flexWrap: 'wrap',
-                  }}>
-                  ₱{item.mrspeedy.totalAmount.toFixed(2)}
-                </Text>
-                <Text
-                  style={{
-                    color: colors.icons,
-                    textAlign: 'center',
-                  }}>
-                  Total Amount
-                </Text>
-              </View>
-            </View>
-          </Card>
-        )}
-
-        {item.onlineBanking && (
-          <Card
-            containerStyle={{
-              flex: 1,
-              borderRadius: 10,
-              paddingLeft: 0,
-              paddingRight: 0,
-              paddingTop: 0,
-              paddingBottom: 0,
-              overflow: 'hidden',
-            }}>
-            <CardItemHeader
-              style={{height: 25}}
-              title="Online Banking Transactions"
-              titleStyle={{fontSize: 15}}
-            />
-
-            <View
+          {item.onlineBanking && (
+            <Card
               style={{
                 flex: 1,
-                flexDirection: 'row',
-                paddingHorizontal: 10,
-                paddingVertical: 10,
+                borderRadius: 10,
+                paddingLeft: 0,
+                paddingRight: 0,
+                paddingTop: 0,
+                paddingBottom: 0,
               }}>
-              <View style={{flex: 1}}>
+              <View style={{borderRadius: 10, overflow: 'hidden'}}>
+                <CardItemHeader
+                  style={{height: 25}}
+                  title="Online Banking Transactions"
+                  titleStyle={{fontSize: 15}}
+                />
+
                 <View
                   style={{
+                    flex: 1,
                     flexDirection: 'row',
-                    flex: 1,
+                    paddingHorizontal: 10,
+                    paddingVertical: 10,
                   }}>
-                  <Text
+                  <View style={{flex: 1}}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        flex: 1,
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Bold',
+                          color: colors.text_primary,
+                          textAlign: 'left',
+                        }}>
+                        {'Payment Gateway Fee: '}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontFamily: 'ProductSans-Regular',
+                          color: colors.text_primary,
+                          textAlign: 'left',
+                        }}>
+                        -₱{item.onlineBanking.totalPaymentGatewayFees}
+                      </Text>
+                    </View>
+
+                    <Text
+                      style={{
+                        fontSize: 14,
+                      }}>
+                      {`${item.onlineBanking.transactionCount} `}
+                      {item.onlineBanking.transactionCount < 2
+                        ? 'transaction'
+                        : 'transactions'}
+                    </Text>
+
+                    <Text style={{color: colors.text_secondary, paddingTop: 8}}>
+                      Updated {timeStamp}
+                    </Text>
+                  </View>
+
+                  <View
                     style={{
-                      fontSize: 16,
-                      fontFamily: 'ProductSans-Bold',
-                      color: colors.text_primary,
-                      textAlign: 'left',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: colors.primary,
+                      borderRadius: 10,
+                      elevation: 3,
+                      padding: 5,
+                      width: '30%',
                     }}>
-                    {'Payment Gateway Fee: '}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontFamily: 'ProductSans-Regular',
-                      color: colors.text_primary,
-                      textAlign: 'left',
-                    }}>
-                    -₱{item.onlineBanking.totalPaymentGatewayFees}
-                  </Text>
+                    <Text
+                      numberOfLines={2}
+                      adjustsFontSizeToFit
+                      style={{
+                        fontSize: 20,
+                        flex: 1,
+                        fontFamily: 'ProductSans-Bold',
+                        color: colors.icons,
+                        textAlign: 'center',
+                        flexWrap: 'wrap',
+                      }}>
+                      ₱{item.onlineBanking.totalAmount.toFixed(2)}
+                    </Text>
+                    <Text
+                      style={{
+                        color: colors.icons,
+                        textAlign: 'center',
+                      }}>
+                      Total Amount
+                    </Text>
+                  </View>
                 </View>
-
-                <Text
-                  style={{
-                    fontSize: 14,
-                  }}>
-                  {`${item.onlineBanking.transactionCount} `}
-                  {item.onlineBanking.transactionCount < 2
-                    ? 'transaction'
-                    : 'transactions'}
-                </Text>
-
-                <Text style={{color: colors.text_secondary, paddingTop: 8}}>
-                  Updated {timeStamp}
-                </Text>
               </View>
-
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: colors.primary,
-                  borderRadius: 10,
-                  elevation: 3,
-                  padding: 5,
-                  width: '30%',
-                }}>
-                <Text
-                  numberOfLines={2}
-                  adjustsFontSizeToFit
-                  style={{
-                    fontSize: 20,
-                    flex: 1,
-                    fontFamily: 'ProductSans-Bold',
-                    color: colors.icons,
-                    textAlign: 'center',
-                    flexWrap: 'wrap',
-                  }}>
-                  ₱{item.onlineBanking.totalAmount.toFixed(2)}
-                </Text>
-                <Text
-                  style={{
-                    color: colors.icons,
-                    textAlign: 'center',
-                  }}>
-                  Total Amount
-                </Text>
-              </View>
-            </View>
-          </Card>
-        )}
+            </Card>
+          )}
+        </View>
       </View>
     );
   }
@@ -324,8 +329,8 @@ class StoreDetailsScreen extends Component {
           </View>
         ) : (
           <ScrollView
-            style={{paddingHorizontal: 10}}
             showsVerticalScrollIndicator={false}
+            contentContainerStyle={{paddingHorizontal: 10}}
             contentInsetAdjustmentBehavior="automatic"
             keyboardOpeningTime={20}
             extraScrollHeight={20}
@@ -342,9 +347,8 @@ class StoreDetailsScreen extends Component {
                   shadowRadius: 1.41,
                 }}>
                 <Card
-                  containerStyle={{
+                  style={{
                     borderRadius: 10,
-                    overflow: 'hidden',
                     paddingLeft: 0,
                     paddingRight: 0,
                     paddingTop: 0,
@@ -352,77 +356,79 @@ class StoreDetailsScreen extends Component {
                     marginLeft: 0,
                     marginRight: 0,
                   }}>
-                  <CardItemHeader title="Markee Credits" />
+                  <View style={{borderRadius: 10, overflow: 'hidden'}}>
+                    <CardItemHeader title="Markee Credits" />
 
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        paddingHorizontal: 8,
-                      }}>
-                      <View style={{flex: 2, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Markee Credits
-                        </Text>
-                      </View>
-
-                      <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {creditData && (
+                    <CardItem bordered>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          paddingHorizontal: 8,
+                        }}>
+                        <View style={{flex: 2, paddingright: 10}}>
                           <Text
                             style={{
-                              color: colors.primary,
                               fontSize: 16,
                               fontFamily: 'ProductSans-Bold',
-                              textAlign: 'right',
                             }}>
-                            ₱{creditData.credits.toFixed(2)}
+                            Markee Credits
                           </Text>
-                        )}
-                      </View>
-                    </View>
-                  </CardItem>
+                        </View>
 
-                  <CardItem bordered>
-                    <View
-                      style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        paddingHorizontal: 8,
-                      }}>
-                      <View style={{flex: 2, paddingright: 10}}>
-                        <Text
-                          style={{
-                            fontSize: 16,
-                            fontFamily: 'ProductSans-Bold',
-                          }}>
-                          Markee Credit Threshold
-                        </Text>
+                        <View style={{flex: 3, alignItems: 'flex-end'}}>
+                          {creditData && (
+                            <Text
+                              style={{
+                                color: colors.primary,
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Bold',
+                                textAlign: 'right',
+                              }}>
+                              ₱{creditData.credits.toFixed(2)}
+                            </Text>
+                          )}
+                        </View>
                       </View>
+                    </CardItem>
 
-                      <View style={{flex: 3, alignItems: 'flex-end'}}>
-                        {creditData && (
+                    <CardItem bordered>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          paddingHorizontal: 8,
+                        }}>
+                        <View style={{flex: 2, paddingright: 10}}>
                           <Text
                             style={{
-                              color: colors.primary,
                               fontSize: 16,
                               fontFamily: 'ProductSans-Bold',
-                              textAlign: 'right',
                             }}>
-                            ₱{creditData.creditThreshold}
+                            Markee Credit Threshold
                           </Text>
-                        )}
+                        </View>
+
+                        <View style={{flex: 3, alignItems: 'flex-end'}}>
+                          {creditData && (
+                            <Text
+                              style={{
+                                color: colors.primary,
+                                fontSize: 16,
+                                fontFamily: 'ProductSans-Bold',
+                                textAlign: 'right',
+                              }}>
+                              ₱{creditData.creditThreshold}
+                            </Text>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  </CardItem>
+                    </CardItem>
+                  </View>
                 </Card>
               </View>
 
@@ -437,9 +443,8 @@ class StoreDetailsScreen extends Component {
                   shadowRadius: 1.41,
                 }}>
                 <Card
-                  containerStyle={{
+                  style={{
                     borderRadius: 10,
-                    overflow: 'hidden',
                     paddingLeft: 0,
                     paddingRight: 0,
                     paddingTop: 0,
@@ -447,50 +452,53 @@ class StoreDetailsScreen extends Component {
                     marginLeft: 0,
                     marginRight: 0,
                   }}>
-                  <CardItemHeader title="Disbursement Periods" />
+                  <View style={{borderRadius: 10, overflow: 'hidden'}}>
+                    <CardItemHeader title="Disbursement Periods" />
 
-                  <CardItem
-                    style={{
-                      paddingLeft: 0,
-                      paddingRight: 0,
-                      paddingTop: 0,
-                      paddingLeft: 0,
-                    }}>
-                    <FlatList
-                      style={{flex: 1, height: 500}}
-                      data={dataSource}
-                      nestedScrollEnabled={true}
-                      onTouchStart={() => {
-                        this.setState({allowDragging: false});
-                      }}
-                      onTouchEnd={() => this.setState({allowDragging: true})}
-                      onTouchCancel={() => this.setState({allowDragging: true})}
-                      onMomentumScrollEnd={() => {
-                        this.setState({allowDragging: true});
-                      }}
-                      onScrollEndDrag={() => {
-                        this.setState({allowDragging: true});
-                      }}
-                      initialNumToRender={10}
-                      renderItem={({item, index}) => (
-                        <this.DisbursementPeriod
-                          item={item}
-                          key={`${item.startDate}-${item.endDate}`}
-                        />
-                      )}
-                      refreshControl={
-                        <RefreshControl
-                          colors={[colors.primary, colors.dark]}
-                          refreshing={refreshing}
-                          onRefresh={this.onRefresh.bind(this)}
-                        />
-                      }
-                      keyExtractor={(item) =>
-                        `${item.startDate}-${item.endDate}`
-                      }
-                      showsVerticalScrollIndicator={false}
-                    />
-                  </CardItem>
+                    <CardItem
+                      style={{
+                        paddingLeft: 0,
+                        paddingRight: 0,
+                        paddingTop: 0,
+                      }}>
+                      <FlatList
+                        style={{flex: 1, height: 500}}
+                        data={dataSource}
+                        nestedScrollEnabled={true}
+                        onTouchStart={() => {
+                          this.setState({allowDragging: false});
+                        }}
+                        onTouchEnd={() => this.setState({allowDragging: true})}
+                        onTouchCancel={() =>
+                          this.setState({allowDragging: true})
+                        }
+                        onMomentumScrollEnd={() => {
+                          this.setState({allowDragging: true});
+                        }}
+                        onScrollEndDrag={() => {
+                          this.setState({allowDragging: true});
+                        }}
+                        initialNumToRender={10}
+                        renderItem={({item, index}) => (
+                          <this.DisbursementPeriod
+                            item={item}
+                            key={`${item.startDate}-${item.endDate}`}
+                          />
+                        )}
+                        refreshControl={
+                          <RefreshControl
+                            colors={[colors.primary, colors.dark]}
+                            refreshing={refreshing}
+                            onRefresh={this.onRefresh.bind(this)}
+                          />
+                        }
+                        keyExtractor={(item) =>
+                          `${item.startDate}-${item.endDate}`
+                        }
+                        showsVerticalScrollIndicator={false}
+                      />
+                    </CardItem>
+                  </View>
                 </Card>
               </View>
             </SafeAreaView>

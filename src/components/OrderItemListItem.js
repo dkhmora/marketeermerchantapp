@@ -31,6 +31,7 @@ class OrderItemCard extends PureComponent {
           specialInstructions,
           totalOptionsPrice,
         },
+        containerStyle,
         ...otherProps
       },
       state: {imageReady},
@@ -51,6 +52,7 @@ class OrderItemCard extends PureComponent {
           paddingBottom: 0,
           paddingTop: 0,
           flexDirection: 'column',
+          ...containerStyle,
         }}>
         <View
           style={{
@@ -107,7 +109,7 @@ class OrderItemCard extends PureComponent {
               flexDirection: 'column',
               paddingHorizontal: 10,
             }}>
-            <Text style={{fontFamily: 'ProductSans-Bold', fontSize: 18}}>
+            <Text style={{fontFamily: 'ProductSans-Bold', fontSize: 16}}>
               {name}
             </Text>
 
@@ -152,7 +154,7 @@ class OrderItemCard extends PureComponent {
             <Text
               style={{
                 fontFamily: 'ProductSans-Black',
-                fontSize: 18,
+                fontSize: 16,
                 color: colors.text_primary,
               }}>
               ₱{totalItemPrice * quantity}

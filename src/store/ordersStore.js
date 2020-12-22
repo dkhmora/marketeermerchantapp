@@ -1,15 +1,13 @@
 import {observable, action, toJS} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
-import firebase from '@react-native-firebase/app';
-import '@react-native-firebase/functions';
 import storage from '@react-native-firebase/storage';
 import {GiftedChat} from 'react-native-gifted-chat';
 import 'react-native-get-random-values';
 import {v4 as uuidv4} from 'uuid';
 import {persist} from 'mobx-persist';
 import Toast from '../components/Toast';
+import {functions} from '../util/variables';
 
-const functions = firebase.app().functions('asia-northeast1');
 const ordersCollection = firestore().collection('orders');
 class OrdersStore {
   @persist('list') @observable orders = [];
@@ -151,10 +149,6 @@ class OrdersStore {
             if (documentSnapshot.exists) {
               this.orderMessages = [];
 
-              if (documentSnapshot.data().storeUnreadCount !== 0) {
-                this.markMessagesAsRead(orderId);
-              }
-
               this.selectedOrder = {...documentSnapshot.data(), orderId};
 
               if (
@@ -175,15 +169,10 @@ class OrdersStore {
   }
 
   @action async markMessagesAsRead(orderId) {
-    this.markMessagesAsReadTimeout &&
-      clearTimeout(this.markMessagesAsReadTimeout);
-
-    this.markMessagesAsReadTimeout = setTimeout(() => {
-      firestore().collection('orders').doc(orderId).update({
-        storeUnreadCount: 0,
-        updatedAt: firestore.Timestamp.now().toMillis(),
-      });
-    }, 100);
+    return firestore().collection('orders').doc(orderId).update({
+      storeUnreadCount: 0,
+      updatedAt: firestore.Timestamp.now().toMillis(),
+    });
   }
 
   @action async getOrderItems(orderId) {

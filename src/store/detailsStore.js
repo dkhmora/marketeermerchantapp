@@ -1,6 +1,5 @@
 import {observable, action, computed} from 'mobx';
 import firestore from '@react-native-firebase/firestore';
-import storage from '@react-native-firebase/storage';
 import firebase from '@react-native-firebase/app';
 import messaging from '@react-native-firebase/messaging';
 import '@react-native-firebase/functions';
@@ -8,8 +7,8 @@ import Toast from '../components/Toast';
 import {Platform} from 'react-native';
 import {persist} from 'mobx-persist';
 import crashlytics from '@react-native-firebase/crashlytics';
+import {functions} from '../util/variables';
 
-const functions = firebase.app().functions('asia-northeast1');
 const storesCollection = firestore().collection('stores');
 const publicStorageBucket = firebase.app().storage('gs://marketeer-public');
 class DetailsStore {
@@ -186,7 +185,10 @@ class DetailsStore {
 
     const token = await messaging().getToken();
 
-    if (!this.storeDetails.fcmTokens.includes(token)) {
+    if (
+      this.storeDetails?.fcmTokens === undefined ||
+      !this.storeDetails.fcmTokens.includes(token)
+    ) {
       if (authorizationStatus) {
         return await this.storeRef
           .update('fcmTokens', firestore.FieldValue.arrayUnion(token))

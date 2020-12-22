@@ -10,12 +10,13 @@
     "bundle:release": "cd android && gradlew clean && gradlew bundleRelease",
     "pod": "cd ios && pod install",
     "ios": "react-native run-ios --simulator='iPhone 12 Pro Max'",
+    "ios:podinstall": "cd ios && pod update & pod install",
     "ios:iphone8": "react-native run-ios --simulator='iPhone 8 Plus'",
     "ios:iphonese": "react-native run-ios --simulator='iPhone SE (2nd generation)'",
     "ios:ipadpro4": "react-native run-ios --simulator='iPad Pro (12.9-inch) (4th generation)'",
     "ios:ipadpro2": "react-native run-ios --simulator='iPad Pro (12.9-inch) (2nd generation)'",
     "ios:device": "react-native run-ios --device",
-    "start": "react-native start --port 8082",
+    "start": "cross-env DEVMODE=true react-native start --port 8082",
     "test": "jest",
     "lint": "eslint .",
     "postinstall": "patch-package && npx jetify",
@@ -94,12 +95,14 @@
     "@babel/runtime": "^7.8.4",
     "@react-native-community/eslint-config": "^1.1.0",
     "babel-jest": "^25.1.0",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
+    "cross-env": "^7.0.3",
     "eslint": "^7.5.0",
-    "jetifier": "^1.6.6",
     "jest": "^25.1.0",
+    "jetifier": "^1.6.6",
     "metro-react-native-babel-preset": "^0.59.0",
-    "react-test-renderer": "16.13.1",
-    "patch-package": "^6.2.2"
+    "patch-package": "^6.2.2",
+    "react-test-renderer": "16.13.1"
   },
   "jest": {
     "preset": "react-native"

@@ -9,7 +9,7 @@ import BaseOptionsMenu from './BaseOptionsMenu';
 import {colors} from '../../assets/colors';
 import Toast from './Toast';
 import ConfirmationModal from './ConfirmationModal';
-
+import ChatIcon from './ChatIcon';
 @inject('ordersStore')
 @inject('detailsStore')
 @observer
@@ -192,26 +192,7 @@ class OrderCard extends PureComponent {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <View style={{alignItems: 'center'}}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  paddingHorizontal: 5,
-                  paddingTop: 5,
-                }}>
-                <Icon name="message-square" color={colors.primary} />
-
-                {order.storeUnreadCount !== null &&
-                  order.storeUnreadCount > 0 && (
-                    <Badge
-                      value={order.storeUnreadCount}
-                      badgeStyle={{backgroundColor: colors.accent}}
-                      containerStyle={{position: 'absolute', top: 0, right: 0}}
-                    />
-                  )}
-              </View>
-              <Text style={{color: colors.primary}}>Chat</Text>
-            </View>
+            <ChatIcon badgeCount={order.storeUnreadCount} />
 
             <View
               style={{flex: 1, flexDirection: 'column', paddingHorizontal: 10}}>

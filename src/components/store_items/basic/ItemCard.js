@@ -140,8 +140,7 @@ class ItemCard extends PureComponent {
                   fontFamily: 'ProductSans-Light',
                   fontSize: 12,
                 }}>
-                {sales}
-                {stock ? ` of ${stock}` : ''} sold
+                {sales} sold | {stock} left
               </Text>
 
               <View
